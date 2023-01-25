@@ -1,0 +1,265 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>一种基于单应性的多相机行人跟踪算法 | Caius的日常博客</title><meta name="author" content="Caius Lu"><meta name="copyright" content="Caius Lu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一种基于单应性的多相机行人跟踪算法1. 摘要在一个区域周围安装多个廉价的视频监控摄像头是很容易的。然而，多摄像头跟踪仍然是一个发展中的领域。可以使用多个摄像机生产的监控产品包括摄像机提示、广域交通分析、存在遮挡的跟踪以及现场入口跟踪。 所有这些产品都需要解决一致的标签问题。这意味着给各种摄像机中真实世界目标的所有投影提供相同的元目标跟踪标签。 本文介绍了一种多摄像头人群跟踪算法的实现与测试。首先，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一种基于单应性的多相机行人跟踪算法">
+<meta property="og:url" content="https://caiusy.github.io/2023/01/26/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="一种基于单应性的多相机行人跟踪算法1. 摘要在一个区域周围安装多个廉价的视频监控摄像头是很容易的。然而，多摄像头跟踪仍然是一个发展中的领域。可以使用多个摄像机生产的监控产品包括摄像机提示、广域交通分析、存在遮挡的跟踪以及现场入口跟踪。 所有这些产品都需要解决一致的标签问题。这意味着给各种摄像机中真实世界目标的所有投影提供相同的元目标跟踪标签。 本文介绍了一种多摄像头人群跟踪算法的实现与测试。首先，">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-01-25T16:17:01.000Z">
+<meta property="article:modified_time" content="2023-01-25T16:39:03.546Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="多视几何">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://caiusy.github.io/2023/01/26/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: undefined,
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '一种基于单应性的多相机行人跟踪算法',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-26 00:39:03'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Caius的日常博客"><span class="site-name">Caius的日常博客</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">一种基于单应性的多相机行人跟踪算法</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-25T16:17:01.000Z" title="Created 2023-01-26 00:17:01">2023-01-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-01-25T16:39:03.546Z" title="Updated 2023-01-26 00:39:03">2023-01-26</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">2.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>8min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="一种基于单应性的多相机行人跟踪算法"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h3 id="一种基于单应性的多相机行人跟踪算法"><a href="#一种基于单应性的多相机行人跟踪算法" class="headerlink" title="一种基于单应性的多相机行人跟踪算法"></a>一种基于单应性的多相机行人跟踪算法</h3><h4 id="1-摘要"><a href="#1-摘要" class="headerlink" title="1. 摘要"></a>1. 摘要</h4><p>在一个区域周围安装多个廉价的视频监控摄像头是很容易的。然而，多摄像头跟踪仍然是一个发展中的领域。可以使用多个摄像机生产的监控产品包括摄像机提示、广域交通分析、存在遮挡的跟踪以及现场入口跟踪。</p>
+<p>所有这些产品都需要解决一致的标签问题。这意味着给各种摄像机中真实世界目标的所有投影提供相同的元目标跟踪标签。</p>
+<p>本文介绍了一种多摄像头人群跟踪算法的实现与测试。首先，部分重新实现了形状匹配的单摄像机跟踪算法，以便在测试视频中工作。单摄像头跟踪器的输出是多摄像头跟踪器的输入。该算法找到每个目标的脚特征:对应于目标正下方地面平面上的一个点的像素。视野线被发现并用于创建初始元目标关联。然后，元目标在移动时丢弃一系列标记，并根据这些标记计算单应性。然后，基于同源关系的跟踪器细化元目标列表，并根据需要创建新的元目标。</p>
+<p>测试表明，该算法解决了一致性标记问题，并且在学习过程中只需要很少的边缘事件。基于同源性的匹配器被证明完全克服部分和完全的目标遮挡在一对相机之一。</p>
+<h4 id="2-介绍"><a href="#2-介绍" class="headerlink" title="2 介绍"></a>2 介绍</h4><p>视频监控是一项艰巨的任务。基于计算机视觉领域，它本身只有几十年的历史，视频馈电的自动处理通常需要专门的编码和解码硬件，快速的数字信号处理器，以及大量的存储介质。</p>
+<p>处理多个视频流的需求变得越来越重要。摄像机的价格持续下降，像样的“网络摄像机”售价不到20美元。安装同样便宜且简单。此外，社会因素也有助于监控摄像头的普及。伦敦和波士顿等城市的警察部门，以及购物中心和机场等私人企业，都在利用最近的恐怖主义，为增加视频监控提供理由。在大多数大城市，现在很容易发现摄像机。一些装置甚至自夸使用对近红外或热红外波长敏感的摄像机的微光能力。</p>
+<p>尽管多摄像头监控装置越来越普遍，但很少有算法提取额外的、有意义的多摄像头跟踪信息。第2章将介绍一些在单个视频流中跟踪运动对象的算法。单摄像机跟踪问题的解决方案已经相当完善。然而，多摄像头监控系统需要能够处理多个视频流的算法。</p>
+<h5 id="2-1-动机示例"><a href="#2-1-动机示例" class="headerlink" title="2.1 动机示例"></a>2.1 动机示例</h5><p>摄像机A和摄像机B是不相交的——它们观察世界的不同区域，并不重叠。然而，摄像机A和C部分重叠，摄像机B和C也是如此。两个摄像机同时可以看到任何一个位于较暗重叠区域的物体。</p>
+<p>现在检查这三个摄像机的输出。世界上只有两个人。然而，在这三台相机之间，它们被赋予了四个不同的标签:A-8, B-2, C-4和C-5。给定这些对象标签，我们能找到的最重要的信息是哪些标签指向相同的现实世界对象。这是一致的标签问题。</p>
+<p><img src="/../images/image-20230126002534218-167466393754814.png" alt="image-20230126002534218"></p>
+<p>在一定程度上，人类很擅长解决一致性标签问题。人工监控操作员可以对摄像机在世界上的位置保持一个心理模型，并且即使使用不同的摄像机模式(例如一个RGB摄像机和一个热红外摄像机)，也经常可以匹配摄像机与摄像机的特征。此外，人类在匹配物体方面比计算机做得更好，即使这些物体从不同的角度观察，因此具有不同的外观。然而，使用人类来分析多个视频流并不能很好地扩展，因为一个人一次只能看一个屏幕，即使一个场景可能有许多相关的视图。如果使用多个监视操作员，每个人负责一个特定的区域，那么系统将需要开发控制、目标跟踪、目标切换和可能的操作员不注意的程序。</p>
+<p><img src="/../images/image-20230126002725061.png" alt="image-20230126002725061"></p>
+<p>监视系统的一项重要任务是能够跟踪在监视区域内移动的目标。许多相机可能在任何给定的时间内都在观察目标，但即使只使用少数相机，人类也需要有意识地努力确定这组相机。此外，随着目标的移动，观察目标的摄像机也在不断变化。如果一致的标签问题解决了，计算机知道目标是否应该出现在每个摄像机的视野中，那么计算机就可以自动提示显示目标的正确摄像机组。</p>
+<p>图1.2说明了将多个摄像机视为一组单个摄像机的算法和将摄像机视为更多东西的算法之间的区别。图1.2(a)中的算法则不是这样关心多台摄像机可能拍摄世界的同一部分。第二类算法如图1.2(b)所示，取单个摄像机跟踪器的输出并将其组合。创建了新的监视功能。下面将提到这些多摄像头感知算法所创建的一些功能示例。</p>
+<h5 id="2-2-范围-目标"><a href="#2-2-范围-目标" class="headerlink" title="2.2 范围-目标"></a>2.2 范围-目标</h5><p>本论文涵盖了一种多摄像头监控算法的开发、实现和测试。该算法应具有以下特点：</p>
+<ul>
+<li><p>独立于相机外部参数，即位置和方向。该算法应该能够平稳地处理广泛不同的世界视角。</p>
+</li>
+<li><p>独立于相机的内在参数，即焦距，像素倾斜和主点的位置。市场上有不同的相机，算法应该能够处理多个焦距，分辨率的差异等等。</p>
+</li>
+<li><p>独立于相机模式。该算法应该能够处理任何单摄像头跟踪器的输出。算法不应该依赖于底层的摄像头硬件RGB，近红外，热红外，或其他成像技术。</p>
+</li>
+<li><p>解决一致性标签问题。一个真实世界的目标应该链接到该目标可见的每个摄像机中的一个对象标签</p>
+</li>
+<li><p>对目标遮挡和场景入口的鲁棒性。如果一个目标在场景中间进入监视区域，比如通过一扇门，那么该算法应该正确地解决一致性标签问题。类似地，如果一个目标分裂成两个，比如两个亲密的人走不同的路，算法应该识别并正确标记两个目标。</p>
+</li>
+<li><p>设置简单。不需要相机校准。如果需要，训练应尽可能少地花费时间，并应在正常的现场交通条件下进行。训练应该是自动的，不需要操作员干预。</p>
+</li>
+<li><p>具备摄像提示能力。该算法应该能够确定哪些摄像机应该能够看到给定的目标。</p>
+</li>
+</ul>
+<h5 id="2-3-范围-限制"><a href="#2-3-范围-限制" class="headerlink" title="2.3 范围-限制"></a>2.3 范围-限制</h5><p>算法的范围限制如下:</p>
+<ul>
+<li>追踪行走的人的算法应使用。车辆、动物等各类运动物体不在本文研究范围之内。</li>
+<li>要处理的相机对至少有部分重叠的视野。这就要求操作员在安装硬件和初始化算法时做出初步判断:决定哪些摄像机看到的是世界上相同的部分。</li>
+<li>摄像机应该是静止的。一旦安装，相机的内在和外在参数都应该是固定的。这意味着相机不能安装在平底倾斜炮塔上，或者如果它是，炮塔不能移动。</li>
+<li>摄像机的输出图像将是一个实用的大小。该算法将不包括单像素探测器(例如红外运动探测器，光束破光探测器)。这种限制是必要的，以确保单摄像机跟踪是可能的，而不需要对所选算法进行重大更改。</li>
+<li>帧率将足以让单摄像头跟踪算法正常工作。</li>
+<li>相机应近似常规中心投影相机与基本针孔光学。相机具有极宽的视场视点-鱼眼镜头-或显著未校正的扭曲将不使用。</li>
+<li>最重要的是，目标应该在地面上行走。任何两个摄像机之间的重叠区域不得有明显偏离平面。处理丘陵地区或台阶的代码不包含在本算法中。</li>
+<li>摄像机不得安装在地平面上。这可以防止在场景几何中出现退化的情况，如下文所示</li>
+</ul>
+<h5 id="2-4-对-领域的贡献"><a href="#2-4-对-领域的贡献" class="headerlink" title="2.4 对 领域的贡献"></a>2.4 对 领域的贡献</h5><p>  如上所述，多摄像头视频处理是一个相对较新的领域。算法一直在开发中，还有很多问题有待解决。如果本文开发的算法满足1.2节和1.3节中描述的目标和限制，则可以实现以下场景:</p>
+<ul>
+<li><p>自动提示:感兴趣的目标走进监视区域。</p>
+<p>操作员在一个摄像机中标记目标。当目标在整个区域内移动时，计算机在算法的驱动下，自动显示所有可见目标的视频源。目标可以用颜色一致的“光环”或包围框标记。这让操作员专注于目标的行动，而不是它在世界上相对于每个摄像机的位置。</p>
+</li>
+<li><p>路径分析:一个区域被置于监视之下。该算法不是试图手动匹配人们从一个摄像头到另一个摄像头的路径，而是自动连接人们通过该区域所走的路径。这使得流量分析能够更快、更有效地进行。</p>
+</li>
+<li><p>跟踪遮挡恢复。为了欺骗当前的许多跟踪算法，你可以移动到遮挡物后面(例如建筑支柱或高大的同伙)，改变速度，然后移出遮挡物。遮挡破坏了许多当前的跟踪算法，如果速度变化显著，大多数其他算法就会破坏。只要目标在至少一个摄像机中仍然可见，接下来章节中讨论的算法将从遮挡中恢复，并重新建立一致的跟踪标签</p>
+</li>
+<li><p>现场的入口。该算法应该能够在人们可以从框架中间进入的场景中创建一致的跟踪标签，例如通过电梯或门</p>
+</li>
+</ul>
+<h6 id="2-4-1-具体的贡献"><a href="#2-4-1-具体的贡献" class="headerlink" title="2.4.1 具体的贡献"></a>2.4.1 具体的贡献</h6><p>本文为视频处理领域提供了以下具体贡献:</p>
+<ul>
+<li>一种即使在摄像机明显倾斜时也能找到目标脚的方法</li>
+<li>一种利用目标运动来寻找平面诱导单应性的方法，即使入口和出口在空间上是有限的</li>
+<li>一种具有特定规则的方法，描述如何使用平面诱导单应性来跨多个摄像机创建和维持目标关联</li>
+</ul>
+<p>第三章讨论基础理论，第四章讨论实现细节。试验结果见第5章。</p>
+<h4 id="3-背景"><a href="#3-背景" class="headerlink" title="3. 背景"></a>3. 背景</h4></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://caiusy.github.io">Caius Lu</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://caiusy.github.io/2023/01/26/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/">https://caiusy.github.io/2023/01/26/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%A4%9A%E8%A7%86%E5%87%A0%E4%BD%95/">多视几何</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2023/01/24/%E5%8D%95%E5%BA%94%E6%80%A7%E6%A1%86%E6%9E%B6%E4%B8%8B%E5%9F%BA%E4%BA%8E%E5%9B%BE%E5%88%87%E7%9A%84%E5%89%8D%E6%99%AF%E5%88%86%E5%89%B2%E7%9A%84%E5%A4%9A%E6%91%84%E5%83%8F%E6%9C%BA%E4%BA%BA%E7%89%A9%E8%B7%9F%E8%B8%AA/" title="单应性框架下基于图切的前景分割的多摄像机人物跟踪"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">单应性框架下基于图切的前景分割的多摄像机人物跟踪</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2023/01/22/%E5%8D%95%E5%BA%94%E7%9F%A9%E9%98%B5H%E6%B1%82%E8%A7%A3/" title="单应矩阵H求解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-22</div><div class="title">单应矩阵H求解</div></div></a></div><div><a href="/2023/01/24/%E5%9F%BA%E4%BA%8E%E8%87%AA%E5%AE%9A%E4%BD%8D%E6%99%BA%E8%83%BD%E6%91%84%E5%83%8F%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" title="基于自定位智能摄像机网络的分布式目标跟踪"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-24</div><div class="title">基于自定位智能摄像机网络的分布式目标跟踪</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Caius Lu</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/caiusy"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">一种基于单应性的多相机行人跟踪算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%91%98%E8%A6%81"><span class="toc-number">1.1.</span> <span class="toc-text">1. 摘要</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.2.</span> <span class="toc-text">2 介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#2-1-%E5%8A%A8%E6%9C%BA%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.2.1.</span> <span class="toc-text">2.1 动机示例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-2-%E8%8C%83%E5%9B%B4-%E7%9B%AE%E6%A0%87"><span class="toc-number">1.2.2.</span> <span class="toc-text">2.2 范围-目标</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-3-%E8%8C%83%E5%9B%B4-%E9%99%90%E5%88%B6"><span class="toc-number">1.2.3.</span> <span class="toc-text">2.3 范围-限制</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-4-%E5%AF%B9-%E9%A2%86%E5%9F%9F%E7%9A%84%E8%B4%A1%E7%8C%AE"><span class="toc-number">1.2.4.</span> <span class="toc-text">2.4 对 领域的贡献</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#2-4-1-%E5%85%B7%E4%BD%93%E7%9A%84%E8%B4%A1%E7%8C%AE"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">2.4.1 具体的贡献</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E8%83%8C%E6%99%AF"><span class="toc-number">1.3.</span> <span class="toc-text">3. 背景</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/26/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/" title="一种基于单应性的多相机行人跟踪算法">一种基于单应性的多相机行人跟踪算法</a><time datetime="2023-01-25T16:17:01.000Z" title="Created 2023-01-26 00:17:01">2023-01-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/24/%E5%8D%95%E5%BA%94%E6%80%A7%E6%A1%86%E6%9E%B6%E4%B8%8B%E5%9F%BA%E4%BA%8E%E5%9B%BE%E5%88%87%E7%9A%84%E5%89%8D%E6%99%AF%E5%88%86%E5%89%B2%E7%9A%84%E5%A4%9A%E6%91%84%E5%83%8F%E6%9C%BA%E4%BA%BA%E7%89%A9%E8%B7%9F%E8%B8%AA/" title="单应性框架下基于图切的前景分割的多摄像机人物跟踪">单应性框架下基于图切的前景分割的多摄像机人物跟踪</a><time datetime="2023-01-24T14:38:41.000Z" title="Created 2023-01-24 22:38:41">2023-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/24/%E5%9C%A8%E6%89%8B%E6%9C%AF%E5%AE%A4%E5%A4%9A%E7%9B%B8%E6%9C%BA%E5%A4%9A%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E5%92%8C%E9%87%8D%E8%AF%86%E5%88%AB/" title="在手术室多相机多行人跟踪和重识别">在手术室多相机多行人跟踪和重识别</a><time datetime="2023-01-24T13:28:12.000Z" title="Created 2023-01-24 21:28:12">2023-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/24/%E5%9F%BA%E4%BA%8E%E8%87%AA%E5%AE%9A%E4%BD%8D%E6%99%BA%E8%83%BD%E6%91%84%E5%83%8F%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" title="基于自定位智能摄像机网络的分布式目标跟踪">基于自定位智能摄像机网络的分布式目标跟踪</a><time datetime="2023-01-24T12:21:21.000Z" title="Created 2023-01-24 20:21:21">2023-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/22/adaptive-pose/" title="adaptive_pose">adaptive_pose</a><time datetime="2023-01-22T13:15:24.000Z" title="Created 2023-01-22 21:15:24">2023-01-22</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Caius Lu</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>RANSAC算法 | Caius的日常博客</title><meta name="author" content="Caius Lu"><meta name="copyright" content="Caius Lu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="RANSAC算法 RANSAC(RAndom SAmple Consensus,随机采样一致)算法  RANSAC(RAndom SAmple Consensus,随机采样一致)算法是从一组含有“外点”(outliers)的数据中正确估计数学模型参数的迭代算法。“外点”一般指的的数据中的噪声，比如说匹配中的误匹配和估计曲线中的离群点。所以，RANSAC也是一种“外点”检测算法。RANSAC算法是一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RANSAC算法">
+<meta property="og:url" content="https://caiusy.github.io/2023/01/22/RANSAC%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="RANSAC算法 RANSAC(RAndom SAmple Consensus,随机采样一致)算法  RANSAC(RAndom SAmple Consensus,随机采样一致)算法是从一组含有“外点”(outliers)的数据中正确估计数学模型参数的迭代算法。“外点”一般指的的数据中的噪声，比如说匹配中的误匹配和估计曲线中的离群点。所以，RANSAC也是一种“外点”检测算法。RANSAC算法是一">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-01-22T08:55:53.000Z">
+<meta property="article:modified_time" content="2023-01-22T12:38:13.883Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://caiusy.github.io/2023/01/22/RANSAC%E7%AE%97%E6%B3%95/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: undefined,
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'RANSAC算法',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-22 20:38:13'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Caius的日常博客"><span class="site-name">Caius的日常博客</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">RANSAC算法</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-22T08:55:53.000Z" title="Created 2023-01-22 16:55:53">2023-01-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-01-22T12:38:13.883Z" title="Updated 2023-01-22 20:38:13">2023-01-22</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">1.2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>4min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="RANSAC算法"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h3 id="RANSAC算法"><a href="#RANSAC算法" class="headerlink" title="RANSAC算法"></a>RANSAC算法</h3><hr>
+<p><strong>RANSAC</strong>(<strong>RA</strong>ndom <strong>SA</strong>mple <strong>C</strong>onsensus,随机采样一致)算法</p>
+<hr>
+<p><strong>RANSAC</strong>(<strong>RA</strong>ndom <strong>SA</strong>mple <strong>C</strong>onsensus,随机采样一致)算法是从一组含有“外点”(outliers)的数据中正确估计数学模型参数的迭代算法。“外点”一般指的的数据中的噪声，比如说匹配中的误匹配和估计曲线中的离群点。所以，RANSAC也是一种“外点”检测算法。RANSAC算法是一种不确定算法，它只能在一种概率下产生结果，并且这个概率会随着迭代次数的增加而加大（之后会解释为什么这个算法是这样的）。RANSAC算最早是由Fischler和Bolles在SRI上提出用来解决LDP(Location Determination Proble)问题的。</p>
+<p>对于RANSAC算法来说一个<strong>基本的假设</strong>就是数据是由“内点”和“外点”组成的。“内点”就是组成模型参数的数据，“外点”就是不适合模型的数据。同时RANSAC假设：在给定一组含有少部分“内点”的数据，存在一个程序可以估计出符合“内点”的模型。</p>
+<h4 id="算法基本思想和流程"><a href="#算法基本思想和流程" class="headerlink" title="算法基本思想和流程"></a>算法基本思想和流程</h4><p>RANSAC是通过反复选择数据集去估计出模型，一直迭代到估计出认为比较好的模型。<br>具体的实现步骤可以分为以下几步：</p>
+<ol>
+<li>选择出可以估计出模型的最小数据集；(对于直线拟合来说就是两个点，对于计算Homography矩阵就是4个点)</li>
+<li>使用这个数据集来计算出数据模型；</li>
+<li>将所有数据带入这个模型，计算出“内点”的数目；(累加在一定误差范围内的适合当前迭代推出模型的数据)</li>
+<li>比较当前模型和之前推出的最好的模型的“内点“的数量，记录最大“内点”数的模型参数和“内点”数；</li>
+<li>重复1-4步，直到迭代结束或者当前模型已经足够好了(“内点数目大于一定数量”)。</li>
+</ol>
+<h4 id="迭代次数推导"><a href="#迭代次数推导" class="headerlink" title="迭代次数推导"></a>迭代次数推导</h4><p>假设“内点”在数据中的占比为 <img src="https://www.zhihu.com/equation?tex=t" alt="[公式]"></p>
+<p><img src="https://www.zhihu.com/equation?tex=t=%5Cfrac%7Bn_%7Bi+n+l+i+e+r+s%7D%7D%7Bn_%7Bi+n+l+i+e+r+s%7D+n_%7Bo+u+t+l+i+e+r+s%7D%7D+%5C%5C" alt="[公式]"></p>
+<p>那么我们每次计算模型使用 <img src="https://www.zhihu.com/equation?tex=N" alt="[公式]"> 个点的情况下，选取的点至少有一个外点的情况就是</p>
+<p><img src="https://www.zhihu.com/equation?tex=+1+-+t%5EN+%5C%5C" alt="[公式]"></p>
+<p>也就是说，在迭代 <img src="https://www.zhihu.com/equation?tex=k" alt="[公式]"> 次的情况下， <img src="https://www.zhihu.com/equation?tex=(1-t_n)%5Ek" alt="[公式]"> 就是 <img src="https://www.zhihu.com/equation?tex=k" alt="[公式]"> 次迭代计算模型都至少采样到一个“外点”去计算模型的概率。那么能采样到正确的 <img src="https://www.zhihu.com/equation?tex=N" alt="[公式]"> 个点去计算出正确模型的概率就是</p>
+<p><img src="https://www.zhihu.com/equation?tex=P=1-%5Cleft(1-t%5E%7Bn%7D%5Cright)%5E%7Bk%7D+%5C%5C" alt="[公式]"></p>
+<p>通过上式，可以求得</p>
+<p><img src="https://www.zhihu.com/equation?tex=k=%5Cfrac%7B%5Clog+(1-P)%7D%7B%5Clog+%5Cleft(1-t%5E%7Bn%7D%5Cright)%7D++%5C%5C" alt="[公式]"></p>
+<p>内点”的概率 <img src="https://www.zhihu.com/equation?tex=t" alt="[公式]"> 通常是一个先验值。然后 <img src="https://www.zhihu.com/equation?tex=P" alt="[公式]"> 是我们希望RANSAC得到正确模型的概率。如果事先不知道 <img src="https://www.zhihu.com/equation?tex=t" alt="[公式]"> 的值，可以使用自适应迭代次数的方法。也就是一开始设定一个无穷大的迭代次数，然后每次更新模型参数估计的时候，用当前的“内点”比值当成 <img src="https://www.zhihu.com/equation?tex=t" alt="[公式]"> 来估算出迭代次数。</p>
+<h5 id="用Python实现直线拟合"><a href="#用Python实现直线拟合" class="headerlink" title="用Python实现直线拟合"></a>用Python实现直线拟合</h5><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> matplotlib<span class="token punctuation">.</span>pyplot <span class="token keyword">as</span> plt
+<span class="token keyword">import</span> random
+<span class="token keyword">import</span> math
+
+<span class="token comment" spellcheck="true"># 数据量。</span>
+SIZE <span class="token operator">=</span> <span class="token number">50</span>
+<span class="token comment" spellcheck="true"># 产生数据。np.linspace 返回一个一维数组，SIZE指定数组长度。</span>
+<span class="token comment" spellcheck="true"># 数组最小值是0，最大值是10。所有元素间隔相等。</span>
+X <span class="token operator">=</span> np<span class="token punctuation">.</span>linspace<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> SIZE<span class="token punctuation">)</span>
+Y <span class="token operator">=</span> <span class="token number">3</span> <span class="token operator">*</span> X <span class="token operator">+</span> <span class="token number">10</span>
+
+fig <span class="token operator">=</span> plt<span class="token punctuation">.</span>figure<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># 画图区域分成1行1列。选择第一块区域。</span>
+ax1 <span class="token operator">=</span> fig<span class="token punctuation">.</span>add_subplot<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># 标题</span>
+ax1<span class="token punctuation">.</span>set_title<span class="token punctuation">(</span><span class="token string">"RANSAC"</span><span class="token punctuation">)</span>
+
+
+<span class="token comment" spellcheck="true"># 让散点图的数据更加随机并且添加一些噪声。</span>
+random_x <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+random_y <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+<span class="token comment" spellcheck="true"># 添加直线随机噪声</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>SIZE<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    random_x<span class="token punctuation">.</span>append<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">0.5</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
+    random_y<span class="token punctuation">.</span>append<span class="token punctuation">(</span>Y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">0.5</span><span class="token punctuation">,</span> <span class="token number">0.5</span><span class="token punctuation">)</span><span class="token punctuation">)</span> 
+<span class="token comment" spellcheck="true"># 添加随机噪声</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>SIZE<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    random_x<span class="token punctuation">.</span>append<span class="token punctuation">(</span>random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    random_y<span class="token punctuation">.</span>append<span class="token punctuation">(</span>random<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+RANDOM_X <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>random_x<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 散点图的横轴。</span>
+RANDOM_Y <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>random_y<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 散点图的纵轴。</span>
+
+<span class="token comment" spellcheck="true"># 画散点图。</span>
+ax1<span class="token punctuation">.</span>scatter<span class="token punctuation">(</span>RANDOM_X<span class="token punctuation">,</span> RANDOM_Y<span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># 横轴名称。</span>
+ax1<span class="token punctuation">.</span>set_xlabel<span class="token punctuation">(</span><span class="token string">"x"</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true"># 纵轴名称。</span>
+ax1<span class="token punctuation">.</span>set_ylabel<span class="token punctuation">(</span><span class="token string">"y"</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true"># 使用RANSAC算法估算模型</span>
+<span class="token comment" spellcheck="true"># 迭代最大次数，每次得到更好的估计会优化iters的数值</span>
+iters <span class="token operator">=</span> <span class="token number">100000</span>
+<span class="token comment" spellcheck="true"># 数据和模型之间可接受的差值</span>
+sigma <span class="token operator">=</span> <span class="token number">0.25</span>
+<span class="token comment" spellcheck="true"># 最好模型的参数估计和内点数目</span>
+best_a <span class="token operator">=</span> <span class="token number">0</span>
+best_b <span class="token operator">=</span> <span class="token number">0</span>
+pretotal <span class="token operator">=</span> <span class="token number">0</span>
+<span class="token comment" spellcheck="true"># 希望的得到正确模型的概率</span>
+P <span class="token operator">=</span> <span class="token number">0.99</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>iters<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment" spellcheck="true"># 随机在数据中红选出两个点去求解模型</span>
+    sample_index <span class="token operator">=</span> random<span class="token punctuation">.</span>sample<span class="token punctuation">(</span>range<span class="token punctuation">(</span>SIZE <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span>
+    x_1 <span class="token operator">=</span> RANDOM_X<span class="token punctuation">[</span>sample_index<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+    x_2 <span class="token operator">=</span> RANDOM_X<span class="token punctuation">[</span>sample_index<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+    y_1 <span class="token operator">=</span> RANDOM_Y<span class="token punctuation">[</span>sample_index<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+    y_2 <span class="token operator">=</span> RANDOM_Y<span class="token punctuation">[</span>sample_index<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+
+    <span class="token comment" spellcheck="true"># y = ax + b 求解出a，b</span>
+    a <span class="token operator">=</span> <span class="token punctuation">(</span>y_2 <span class="token operator">-</span> y_1<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span>x_2 <span class="token operator">-</span> x_1<span class="token punctuation">)</span>
+    b <span class="token operator">=</span> y_1 <span class="token operator">-</span> a <span class="token operator">*</span> x_1
+
+    <span class="token comment" spellcheck="true"># 算出内点数目</span>
+    total_inlier <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> index <span class="token keyword">in</span> range<span class="token punctuation">(</span>SIZE <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        y_estimate <span class="token operator">=</span> a <span class="token operator">*</span> RANDOM_X<span class="token punctuation">[</span>index<span class="token punctuation">]</span> <span class="token operator">+</span> b
+        <span class="token keyword">if</span> abs<span class="token punctuation">(</span>y_estimate <span class="token operator">-</span> RANDOM_Y<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> sigma<span class="token punctuation">:</span>
+            total_inlier <span class="token operator">=</span> total_inlier <span class="token operator">+</span> <span class="token number">1</span>
+
+    <span class="token comment" spellcheck="true"># 判断当前的模型是否比之前估算的模型好</span>
+    <span class="token keyword">if</span> total_inlier <span class="token operator">></span> pretotal<span class="token punctuation">:</span>
+        iters <span class="token operator">=</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> P<span class="token punctuation">)</span> <span class="token operator">/</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> pow<span class="token punctuation">(</span>total_inlier <span class="token operator">/</span> <span class="token punctuation">(</span>SIZE <span class="token operator">*</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        pretotal <span class="token operator">=</span> total_inlier
+        best_a <span class="token operator">=</span> a
+        best_b <span class="token operator">=</span> b
+
+    <span class="token comment" spellcheck="true"># 判断是否当前模型已经符合超过一半的点</span>
+    <span class="token keyword">if</span> total_inlier <span class="token operator">></span> SIZE<span class="token punctuation">:</span>
+        <span class="token keyword">break</span>
+
+<span class="token comment" spellcheck="true"># 用我们得到的最佳估计画图</span>
+Y <span class="token operator">=</span> best_a <span class="token operator">*</span> RANDOM_X <span class="token operator">+</span> best_b
+
+<span class="token comment" spellcheck="true"># 直线图</span>
+ax1<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>RANDOM_X<span class="token punctuation">,</span> Y<span class="token punctuation">)</span>
+text <span class="token operator">=</span> <span class="token string">"best_a = "</span> <span class="token operator">+</span> str<span class="token punctuation">(</span>best_a<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"\nbest_b = "</span> <span class="token operator">+</span> str<span class="token punctuation">(</span>best_b<span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>text<span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">,</span> text<span class="token punctuation">,</span>
+         fontdict<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">'size'</span><span class="token punctuation">:</span> <span class="token number">8</span><span class="token punctuation">,</span> <span class="token string">'color'</span><span class="token punctuation">:</span> <span class="token string">'r'</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<p><img src="/./images/image-20220718002303153.png" alt="image-20220718002303153"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://caiusy.github.io">Caius Lu</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://caiusy.github.io/2023/01/22/RANSAC%E7%AE%97%E6%B3%95/">https://caiusy.github.io/2023/01/22/RANSAC%E7%AE%97%E6%B3%95/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/22/2022%E5%B9%B4%E5%B7%A5%E4%BD%9C%E6%9A%82%E6%97%B6%E6%80%A7%E6%80%BB%E7%BB%93/" title="2022年工作暂时性总结"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">2022年工作暂时性总结</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/22/%E5%8D%95%E5%BA%94%E7%9F%A9%E9%98%B5H%E6%B1%82%E8%A7%A3/" title="单应矩阵H求解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">单应矩阵H求解</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Caius Lu</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/caiusy"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#RANSAC%E7%AE%97%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">RANSAC算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3%E5%92%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.</span> <span class="toc-text">算法基本思想和流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%AD%E4%BB%A3%E6%AC%A1%E6%95%B0%E6%8E%A8%E5%AF%BC"><span class="toc-number">1.2.</span> <span class="toc-text">迭代次数推导</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%94%A8Python%E5%AE%9E%E7%8E%B0%E7%9B%B4%E7%BA%BF%E6%8B%9F%E5%90%88"><span class="toc-number">1.2.1.</span> <span class="toc-text">用Python实现直线拟合</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/26/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/" title="一种基于单应性的多相机行人跟踪算法">一种基于单应性的多相机行人跟踪算法</a><time datetime="2023-01-25T16:17:01.000Z" title="Created 2023-01-26 00:17:01">2023-01-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/24/%E5%8D%95%E5%BA%94%E6%80%A7%E6%A1%86%E6%9E%B6%E4%B8%8B%E5%9F%BA%E4%BA%8E%E5%9B%BE%E5%88%87%E7%9A%84%E5%89%8D%E6%99%AF%E5%88%86%E5%89%B2%E7%9A%84%E5%A4%9A%E6%91%84%E5%83%8F%E6%9C%BA%E4%BA%BA%E7%89%A9%E8%B7%9F%E8%B8%AA/" title="单应性框架下基于图切的前景分割的多摄像机人物跟踪">单应性框架下基于图切的前景分割的多摄像机人物跟踪</a><time datetime="2023-01-24T14:38:41.000Z" title="Created 2023-01-24 22:38:41">2023-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/24/%E5%9C%A8%E6%89%8B%E6%9C%AF%E5%AE%A4%E5%A4%9A%E7%9B%B8%E6%9C%BA%E5%A4%9A%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E5%92%8C%E9%87%8D%E8%AF%86%E5%88%AB/" title="在手术室多相机多行人跟踪和重识别">在手术室多相机多行人跟踪和重识别</a><time datetime="2023-01-24T13:28:12.000Z" title="Created 2023-01-24 21:28:12">2023-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/24/%E5%9F%BA%E4%BA%8E%E8%87%AA%E5%AE%9A%E4%BD%8D%E6%99%BA%E8%83%BD%E6%91%84%E5%83%8F%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" title="基于自定位智能摄像机网络的分布式目标跟踪">基于自定位智能摄像机网络的分布式目标跟踪</a><time datetime="2023-01-24T12:21:21.000Z" title="Created 2023-01-24 20:21:21">2023-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/22/adaptive-pose/" title="adaptive_pose">adaptive_pose</a><time datetime="2023-01-22T13:15:24.000Z" title="Created 2023-01-22 21:15:24">2023-01-22</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Caius Lu</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

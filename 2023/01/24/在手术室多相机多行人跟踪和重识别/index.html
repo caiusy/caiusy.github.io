@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>在手术室多相机多行人跟踪和重识别 | Caius的日常博客</title><meta name="author" content="Caius Lu"><meta name="copyright" content="Caius Lu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在手术室多相机多行人跟踪和重识别 Multi-Camera Multi-Person T racking and Re-Identification inan Operating Room  摘要多摄像头多人(MCMP)跟踪与重识别(ReID)是安全、行人分析等方面的重要任务;然而，大多数研究都集中在室外场景，因为在一个有障碍物的拥挤房间里，处理遮挡和错误识别要复杂得多。此外，在一个框架内完成这两">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在手术室多相机多行人跟踪和重识别">
+<meta property="og:url" content="https://caiusy.github.io/2023/01/24/%E5%9C%A8%E6%89%8B%E6%9C%AF%E5%AE%A4%E5%A4%9A%E7%9B%B8%E6%9C%BA%E5%A4%9A%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E5%92%8C%E9%87%8D%E8%AF%86%E5%88%AB/index.html">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="在手术室多相机多行人跟踪和重识别 Multi-Camera Multi-Person T racking and Re-Identification inan Operating Room  摘要多摄像头多人(MCMP)跟踪与重识别(ReID)是安全、行人分析等方面的重要任务;然而，大多数研究都集中在室外场景，因为在一个有障碍物的拥挤房间里，处理遮挡和错误识别要复杂得多。此外，在一个框架内完成这两">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-01-24T13:28:12.000Z">
+<meta property="article:modified_time" content="2023-01-24T14:27:02.251Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="Multi-Camera">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://caiusy.github.io/2023/01/24/%E5%9C%A8%E6%89%8B%E6%9C%AF%E5%AE%A4%E5%A4%9A%E7%9B%B8%E6%9C%BA%E5%A4%9A%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E5%92%8C%E9%87%8D%E8%AF%86%E5%88%AB/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: undefined,
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '在手术室多相机多行人跟踪和重识别',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-24 22:27:02'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Caius的日常博客"><span class="site-name">Caius的日常博客</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">在手术室多相机多行人跟踪和重识别</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-24T13:28:12.000Z" title="Created 2023-01-24 21:28:12">2023-01-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-01-24T14:27:02.251Z" title="Updated 2023-01-24 22:27:02">2023-01-24</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>6min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="在手术室多相机多行人跟踪和重识别"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h3 id="在手术室多相机多行人跟踪和重识别"><a href="#在手术室多相机多行人跟踪和重识别" class="headerlink" title="在手术室多相机多行人跟踪和重识别"></a>在手术室多相机多行人跟踪和重识别</h3><blockquote>
+<p>Multi-Camera Multi-Person T racking and Re-Identification in<br>an Operating Room</p>
+</blockquote>
+<h4 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h4><p>多摄像头多人(MCMP)跟踪与重识别(ReID)是安全、行人分析等方面的重要任务;然而，大多数研究都集中在室外场景，因为在一个有障碍物的拥挤房间里，处理遮挡和错误识别要复杂得多。此外，在一个框架内完成这两项任务具有挑战性。本文提出了一种基于轨迹的方法，将跟踪和ReID任务集成在一起。首先，每台摄像机捕捉到的所有手术成员的姿势被逐帧检测;然后，利用检测到的姿态来跟踪每个摄像机的所有成员的轨迹;最后，将这些不同摄像机的轨迹聚类，通过所有摄像机重新识别手术室中的成员。与其他MCMP跟踪和ReID方法相比，本文提出的方法主要利用轨迹，将手术室场景中不易识别的纹理特征作为辅助线索。本文还在ReID过程中集成了时间信息，这比当前最先进的框架(逐帧进行ReID)更可靠。此外，我们的框架在部署到新场景之前不需要培训。本文还创建了一个带有实际手术室视频的注释MCMP数据集。实验证明了所提出的基于轨迹的ReID算法的有效性。提出的框架在ReID任务中达到了85.44%的准确率，在本文提出的手术室数据集中优于最先进的框架。</p>
+<h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>在本文中，我们旨在建立一种在手术室内获得可靠的单目人员跟踪和相机间人员ReID结果的方法。与直接用神经网络提取图像特征相比，我们主要通过运动轨迹进行判断，以纹理特征作为辅助线索。因为工作人员的运动遵循一定的规则，他们的轨迹比难以区分的纹理特征更可靠。即使是由于遮挡或人为探测失败导致某摄像头的轨迹被“破坏”，在跨摄像头ReID的步骤中，也可以根据其他摄像头更完整的轨迹将其破坏的轨迹连接起来。相对于在闭塞前后强制连接可能属于同一个人的两条轨迹或其他类型的故障，本方法仅追求更好的单目跟踪性能，可以获得更好、更可靠的整体性能。</p>
+<p>该方法可分为三个步骤:首先，利用训练好的姿态估计神经网络检测每台摄像机捕捉到的每一帧图像中工作人员的姿态;然后筛选出姿态置信度得分高的工作人员，根据每个人脚的图像坐标和预估的图像平面到世界地平面的单应性矩阵，估计和跟踪每个人在手术室中的位置;最后，我们设计了一种聚类算法，重新识别所有摄像机中被检测到的工作人员的轨迹，从而获得手术室中所有工作人员的完整轨迹。</p>
+<h4 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h4><p>由于手术室场景的特殊性，我们很难用端到端模型解决跟踪和ReID问题;因此，根据其特点，我们建立了一个包含三个模型的框架，逐步完成整个任务。方法流程如图2所示。利用估计的姿态和边界框分别生成所有摄像机的几段轨迹，然后结合所有摄像机的结果连接并重新识别得到的破碎轨迹。</p>
+<p><img src="/../images/image-20230124220825454-16745703020465.png" alt="image-20230124220825454"></p>
+<h5 id="3-1-姿态估计和检测框"><a href="#3-1-姿态估计和检测框" class="headerlink" title="3.1 姿态估计和检测框"></a>3.1 姿态估计和检测框</h5><p>人体姿态估计的研究在计算机视觉领域已流行多年[27-29]。在本文中，我们使用了一种成熟且流行的姿态估计神经网络AlphaPose[27]。对于每一个被检测到的人，AlphaPose不仅给出一套完整的带有置信度分数的姿态关键点，还给出了整个姿态及其包围框的置信度分数。通过获得的信息，我们能够估计每个手术成员在手术室中的位置，并在后续步骤中提取他们的图像特征。</p>
+<h5 id="3-2-单目跟踪"><a href="#3-2-单目跟踪" class="headerlink" title="3.2 单目跟踪"></a>3.2 单目跟踪</h5><p>因此，受Trackpy[30]的启发，我们设计了一种简洁可靠的方法，在单目跟踪的步骤中利用每个人的位置。首先，从所有检测到的姿态中筛选出可用的姿态，删除那些姿态信心分数小于T11或脚踝信心分数都小于T12的姿态。然后，估计每个筛选出来的手术成员的位置，并将其映射到世界地平面上，我们估计其在图像坐标系中的位置，Cp = (xp, yp)，其两个脚踝坐标在同一帧中，这意味着我们利用一个人的两个脚踝的平均坐标来表示他们的位置:<img src="/../images/image-20230124221312362-16745703216817.png" alt="image-20230124221312362"></p>
+<p>，其中Cla和Cra分别表示左右脚踝的坐标，然后我们将Cp映射到世界地平面上，使用预先估计的摄像机单应性矩阵H: <img src="/../images/image-20230124221340476-16745703326399.png" alt="image-20230124221340476"></p>
+<p>其中(Xp, Yp)表示这个人在地坐标系中的坐标。</p>
+<p>最后，我们逐帧跟踪每个筛选的手术成员，如果他们在当前帧和下一帧的位置距离小于预先设定的阈值T13(人在地坐标系中可以跑的最大距离)，则在下一帧中跟踪他们。此外，为了处理某人的姿势可能在某些帧中丢失或被过滤掉的情况，我们设置了另一个参数T14，称为“记忆帧数”，这意味着我们考虑到一个人可能会丢失几帧，然后再次出现的可能性，我们保留消失的外科成员的跟踪，并在他们最后一次出现后保留他们的id，最多保留一些帧数。通过这种方法，我们获得了每个摄像机的所有手术成员的初始轨迹。</p>
+<h5 id="3-3-相机间重识别"><a href="#3-3-相机间重识别" class="headerlink" title="3.3 相机间重识别"></a>3.3 相机间重识别</h5><p>由于闭塞和一些其他干扰，获得的轨迹将被分成几个段为每个手术成员如上所述。在单目跟踪中，这个问题很难解决。幸运的是，在手术室场景中放置多个摄像机是很方便的，这意味着我们可以通过其他摄像机更完整的轨迹来克服这些挑战。我们引入了基于密度的空间聚类方法(DBSCAN[31])来总结不同摄像机的轨迹，为属于同一人的摄像机分配相同的ID。</p>
+<p>原始DBSCAN的思想非常简洁:它从一个没有访问过的任意核心点开始;检索这个点的e邻域，如果它包含足够多的点，则启动一个集群;否则，这个点被标记为噪声。受此思想启发，我们设计了我们的聚类算法:在原始的DBSCAN中，将核心对象定义为其邻域内的高密度点，基于轨迹的完整性，我们将时间长度(单位:帧)大于T21的轨迹定义为我们的案例中的核心对象;对于核心轨迹p，如果p与另一个轨迹q的平均距离小于T22，且p与q的平均目标框相似度(本文采用直方图相关系数)大于T23，则认为q是p的邻域对象。对于聚类后标记为“噪声”的轨迹，我们根据平均距离和平均包围盒相似度为每个“噪声”轨迹寻找最可能的聚类。此外，为了避免逻辑错误，对应于同一行人并来自同一摄像机的轨迹不应该在时域重叠，因为行人只能在一个摄像机帧中出现一次。最后，我们获得了所有检测到的手术成员和对应的轨迹，每个摄像机的id。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://caiusy.github.io">Caius Lu</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://caiusy.github.io/2023/01/24/%E5%9C%A8%E6%89%8B%E6%9C%AF%E5%AE%A4%E5%A4%9A%E7%9B%B8%E6%9C%BA%E5%A4%9A%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E5%92%8C%E9%87%8D%E8%AF%86%E5%88%AB/">https://caiusy.github.io/2023/01/24/%E5%9C%A8%E6%89%8B%E6%9C%AF%E5%AE%A4%E5%A4%9A%E7%9B%B8%E6%9C%BA%E5%A4%9A%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E5%92%8C%E9%87%8D%E8%AF%86%E5%88%AB/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Multi-Camera/">Multi-Camera</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/24/%E5%8D%95%E5%BA%94%E6%80%A7%E6%A1%86%E6%9E%B6%E4%B8%8B%E5%9F%BA%E4%BA%8E%E5%9B%BE%E5%88%87%E7%9A%84%E5%89%8D%E6%99%AF%E5%88%86%E5%89%B2%E7%9A%84%E5%A4%9A%E6%91%84%E5%83%8F%E6%9C%BA%E4%BA%BA%E7%89%A9%E8%B7%9F%E8%B8%AA/" title="单应性框架下基于图切的前景分割的多摄像机人物跟踪"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">单应性框架下基于图切的前景分割的多摄像机人物跟踪</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/24/%E5%9F%BA%E4%BA%8E%E8%87%AA%E5%AE%9A%E4%BD%8D%E6%99%BA%E8%83%BD%E6%91%84%E5%83%8F%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" title="基于自定位智能摄像机网络的分布式目标跟踪"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">基于自定位智能摄像机网络的分布式目标跟踪</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2023/01/24/%E5%8D%95%E5%BA%94%E6%80%A7%E6%A1%86%E6%9E%B6%E4%B8%8B%E5%9F%BA%E4%BA%8E%E5%9B%BE%E5%88%87%E7%9A%84%E5%89%8D%E6%99%AF%E5%88%86%E5%89%B2%E7%9A%84%E5%A4%9A%E6%91%84%E5%83%8F%E6%9C%BA%E4%BA%BA%E7%89%A9%E8%B7%9F%E8%B8%AA/" title="单应性框架下基于图切的前景分割的多摄像机人物跟踪"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-24</div><div class="title">单应性框架下基于图切的前景分割的多摄像机人物跟踪</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Caius Lu</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/caiusy"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E6%89%8B%E6%9C%AF%E5%AE%A4%E5%A4%9A%E7%9B%B8%E6%9C%BA%E5%A4%9A%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E5%92%8C%E9%87%8D%E8%AF%86%E5%88%AB"><span class="toc-number">1.</span> <span class="toc-text">在手术室多相机多行人跟踪和重识别</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%91%98%E8%A6%81"><span class="toc-number">1.1.</span> <span class="toc-text">摘要</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.2.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%B3%95"><span class="toc-number">1.3.</span> <span class="toc-text">方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-1-%E5%A7%BF%E6%80%81%E4%BC%B0%E8%AE%A1%E5%92%8C%E6%A3%80%E6%B5%8B%E6%A1%86"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1 姿态估计和检测框</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-2-%E5%8D%95%E7%9B%AE%E8%B7%9F%E8%B8%AA"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2 单目跟踪</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-3-%E7%9B%B8%E6%9C%BA%E9%97%B4%E9%87%8D%E8%AF%86%E5%88%AB"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.3 相机间重识别</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/26/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/" title="一种基于单应性的多相机行人跟踪算法">一种基于单应性的多相机行人跟踪算法</a><time datetime="2023-01-25T16:17:01.000Z" title="Created 2023-01-26 00:17:01">2023-01-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/24/%E5%8D%95%E5%BA%94%E6%80%A7%E6%A1%86%E6%9E%B6%E4%B8%8B%E5%9F%BA%E4%BA%8E%E5%9B%BE%E5%88%87%E7%9A%84%E5%89%8D%E6%99%AF%E5%88%86%E5%89%B2%E7%9A%84%E5%A4%9A%E6%91%84%E5%83%8F%E6%9C%BA%E4%BA%BA%E7%89%A9%E8%B7%9F%E8%B8%AA/" title="单应性框架下基于图切的前景分割的多摄像机人物跟踪">单应性框架下基于图切的前景分割的多摄像机人物跟踪</a><time datetime="2023-01-24T14:38:41.000Z" title="Created 2023-01-24 22:38:41">2023-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/24/%E5%9C%A8%E6%89%8B%E6%9C%AF%E5%AE%A4%E5%A4%9A%E7%9B%B8%E6%9C%BA%E5%A4%9A%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E5%92%8C%E9%87%8D%E8%AF%86%E5%88%AB/" title="在手术室多相机多行人跟踪和重识别">在手术室多相机多行人跟踪和重识别</a><time datetime="2023-01-24T13:28:12.000Z" title="Created 2023-01-24 21:28:12">2023-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/24/%E5%9F%BA%E4%BA%8E%E8%87%AA%E5%AE%9A%E4%BD%8D%E6%99%BA%E8%83%BD%E6%91%84%E5%83%8F%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/" title="基于自定位智能摄像机网络的分布式目标跟踪">基于自定位智能摄像机网络的分布式目标跟踪</a><time datetime="2023-01-24T12:21:21.000Z" title="Created 2023-01-24 20:21:21">2023-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/01/22/adaptive-pose/" title="adaptive_pose">adaptive_pose</a><time datetime="2023-01-22T13:15:24.000Z" title="Created 2023-01-22 21:15:24">2023-01-22</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Caius Lu</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

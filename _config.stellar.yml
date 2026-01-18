@@ -13,6 +13,14 @@ preconnect:
   # - https://gcore.jsdelivr.net
   # - https://unpkg.com
 
+# 引入自定义 CSS
+inject:
+  head:
+    - '<link rel="stylesheet" href="/css/custom.css">'
+    - '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    - '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+    - '<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>'
+
 # 一旦设置源站地址，非源站地址将不会被SEO收录，并且访问时弹出提示
 # 如果访问地址不在备用站主机列表，则警告信息为非法克隆
 canonical:
@@ -33,37 +41,32 @@ structured_data:
 logo:
   avatar: '[{config.avatar}](/about/)' # you can set avatar link in _config.yml or '[https://xxx.png](/about/)'
   title: '[{config.title}](/)' # you can set html tag like: '[<img no-lazy height="32px" src="xxx"/>](/)'
-  subtitle: '{config.subtitle}' # '文字1 | 文字2' (鼠标放上去会切换到文字2)
+  subtitle: '计算机视觉 | AI探索者' # '文字1 | 文字2' (鼠标放上去会切换到文字2)
 
 # 侧边栏主功能导航菜单
 menubar:
   columns: 4 # 一行多少个
   items: # 可按照自己需求增加，符合以下格式即可
-    # id: 页面中高亮的 menu_id 
-    # theme: 高亮时的颜色，仅 svg 中 fill="currentColor" 时有效
-    # icon: 支持 svg/img 标签，可以定义在 icons.yml 文件中，也支持外部图片的 URL
-    # title: 标题
-    # url: 点击跳转到哪，支持相对路径和绝对路径
-    # - id: post
-    #   theme: '#1BCDFC'
-    #   icon: solar:documents-bold-duotone
-    #   title: 博客
-    #   url: /
-    # - id: wiki
-    #   theme: '#3DC550'
-    #   icon: solar:notebook-bookmark-bold-duotone
-    #   title: 文档
-    #   url: /wiki/
-    # - id: explore
-    #   theme: '#FA6400'
-    #   icon: solar:planet-bold-duotone
-    #   title: 探索
-    #   url: /explore/
-    # - id: social
-    #   theme: '#F44336'
-    #   icon: solar:chat-square-like-bold-duotone
-    #   title: 社交
-    #   url: /friends/
+    - id: post
+      theme: '#6366F1'
+      icon: '<img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/>'
+      title: 博客
+      url: /
+    - id: archives
+      theme: '#10B981'
+      icon: '<img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/>'
+      title: 归档
+      url: /archives/
+    - id: categories
+      theme: '#F59E0B'
+      icon: '<img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/>'
+      title: 分类
+      url: /categories/
+    - id: tags
+      theme: '#EC4899'
+      icon: '<img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/>'
+      title: 标签
+      url: /tags/
 
 
 ######## Main ########
@@ -181,20 +184,25 @@ article:
   # 缩进两个文字宽度，适合文字类博客，可以在 front-matter/topic/wiki 中覆盖此参数
   indent: # true / false
   # 封面图宽高比
-  cover_ratio: 2
+  cover_ratio: 2.5
   # 文章内横幅宽高比
-  banner_ratio: 2.5
+  banner_ratio: 3
   # 如果没有指定横幅，是否根据 tags 作为关键词搜索横幅图片？
-  auto_banner: false # search from https://source.unsplash.com/
+  auto_banner: true # search from https://source.unsplash.com/
   # 如果没有指定 excerpt 和 description，将自动取多长的内容作为文章摘要？
-  auto_excerpt: 128
+  auto_excerpt: 150
   # 分类颜色
   category_color:
+    '计算机视觉': '#6366F1'
+    '深度学习': '#10B981'
+    '目标跟踪': '#F59E0B'
     '探索号': '#f44336'
+    '技术笔记': '#8B5CF6'
+    '项目实践': '#EC4899'
   # 文章许可协议
   license: false  # 关闭文章顶部的大 License 框
   # 分享
-  share: # [wechat, weibo, email, link]
+  share: [wechat, link]
   # 相关文章，需要安装插件 (for layout: post)
   # npm i hexo-related-popular-posts
   related_posts:
@@ -217,9 +225,9 @@ search:
 
 ######## Comments ########
 comments:
-  service: # beaudar, utterances, giscus, twikoo, waline, artalk
-  comment_title: 快来参与讨论吧~
-  lazyload: false # true / false
+  service: giscus # beaudar, utterances, giscus, twikoo, waline, artalk
+  comment_title: 💬 欢迎留言讨论
+  lazyload: true # true / false
   custom_css: # artalk,twikoo,... 可以为没有全局启用的评论加载自定义样式
   # beaudar
   # https://beaudar.lipk.org/
@@ -246,18 +254,18 @@ comments:
   # https://giscus.app/zh-CN
   giscus:
     src: https://giscus.app/client.js
-    data-repo: xxx/xxx # [在此输入仓库]
-    data-repo-id: # [在此输入仓库 ID]
-    data-category: # [在此输入分类名]
-    data-category-id:
+    data-repo: caiusy/caiusy.github.io
+    data-repo-id: R_kgDOI0diCA
+    data-category: Announcements
+    data-category-id: DIC_kwDOI0diCM4C1G8d
     data-mapping: pathname
     data-strict: 0
     data-reactions-enabled: 1
     data-emit-metadata: 0
-    data-input-position: top # top, bottom
+    data-input-position: bottom
     data-theme: preferred_color_scheme
     data-lang: zh-CN
-    data-loading: # lazy
+    data-loading: lazy
     crossorigin: anonymous
 
   # Twikoo
@@ -329,46 +337,33 @@ comments:
 ######## Footer ########
 footer:
   social:
-    # github:
-    #   icon: '<img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/>'
-    #   url: /
+    github:
+      icon: '<img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/>'
+      url: https://github.com/caiusy
     # music:
     #   icon: '<img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/3845874.svg"/>'
     #   url: /
-    # unsplash:
-    #   icon: '<img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/3616429.svg"/>'
-    #   url: /
-    # comments:
-    #   icon: '<img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/942ebbf1a4b91.svg"/>'
-    #   url: /about/#comments
   sitemap:
-    # - title: 博客
-    #   items:
-    #     - '[近期发布](/)'
-    #     - '[分类](/blog/categories/)'
-    #     - '[标签](/blog/tags/)'
-    #     - '[归档](/blog/archives/)'
-    # - title: 项目
-    #   items:
-    #     - '[xxx](/)'
-    #     - '[xxx](/)'
-    #     - '[xxx](/)'
-    #     - '[xxx](/)'
-    # - title: 社交
-    #   items:
-    #     - '[xxx](/)'
-    #     - '[xxx](/)'
-    #     - '[xxx](/)'
-    #     - '[xxx](/)'
-    # - title: 关于
-    #   items:
-    #     - '[xxx](/)'
-    #     - '[xxx](/)'
-    #     - '[xxx](/)'
-    #     - '[xxx](/)'
+    - title: 博客
+      items:
+        - '[近期发布](/)'
+        - '[分类](/categories/)'
+        - '[标签](/tags/)'
+        - '[归档](/archives/)'
+    - title: 技术领域
+      items:
+        - '[计算机视觉](/tags/CV/)'
+        - '[目标跟踪](/tags/tracking/)'
+        - '[深度学习](/tags/深度学习/)'
+    - title: 关于
+      items:
+        - '[关于我](/about/)'
+        - '[GitHub](https://github.com/caiusy)'
   content: | # 支持 Markdown 格式
-    本站由 [{author.name}](/) 使用 [{theme.name} {theme.version}]({theme.tree}) 主题创建。
-    本博客所有文章除特别声明外，均采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 许可协议，转载请注明出处。
+    本站由 **Caius Lu** 使用 [Stellar](https://github.com/xaoxuu/hexo-theme-stellar) 主题创建
+    © 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀
+    
+    <span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span>
   # 主题用户越多，开发者维护和更新的积极性就越高，如果您喜欢本主题，请在适当的位置显示主题信息和仓库链接以表支持。
 
 
@@ -540,11 +535,8 @@ plugins:
     loader: /js/plugins/fancybox-loader.js
     js: https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js
     css: https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css
-    # 让 md 语法图片支持放大可以这样写: .md-text img:not([class]), .md-text .image img
-    # 可以处理评论区的图片（不支持 iframe 类评论系统）例如：
-    # 使用 twikoo 评论可以写: .tk-content img:not([class*="emo"])
-    # 使用 waline 评论可以写: #waline_container .vcontent img
-    selector: .timenode p>img # 多个选择器用英文逗号隔开
+    # 让 md 语法图片支持放大
+    selector: .md-text img:not([class]), .md-text .image img, .timenode p>img
 
   # swiper
   swiper:
@@ -553,12 +545,13 @@ plugins:
     js: https://unpkg.com/swiper@10.3/swiper-bundle.min.js
 
   # https://scrollrevealjs.org/api/reveal.html
+  # 页面滚动动画效果
   scrollreveal:
-    enable: #true # 慎用，有些时候打开页面空白
+    enable: true
     js: https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js
-    distance: 8px
-    duration: 500 # ms
-    interval: 50 # ms
+    distance: 16px
+    duration: 600 # ms
+    interval: 100 # ms
     scale: 1 # 0.1~1
   
   # AI 摘要
@@ -640,43 +633,43 @@ style:
     code: 85% # 相较于其所在行的文本大小，建议用百分比
     codeblock: 0.8125rem # 13px
   font-family:
-    body: 'system-ui, "Microsoft Yahei", "Segoe UI", Arial, sans-serif'
-    code: 'Menlo, Monaco, Consolas, system-ui, monospace, sans-serif'
-    codeblock: 'Menlo, Monaco, Consolas, system-ui, monospace, sans-serif'
+    body: '"LXGW WenKai Screen", system-ui, "Microsoft Yahei", "Segoe UI", Arial, sans-serif'
+    code: '"JetBrains Mono", Menlo, Monaco, Consolas, system-ui, monospace, sans-serif'
+    codeblock: '"JetBrains Mono", Menlo, Monaco, Consolas, system-ui, monospace, sans-serif'
   text-align: left
   prefix:
     h2: https://api.iconify.design/ci:heading-h2.svg
   border-radius:
-    card-l: 24px # 侧边栏、文章横幅位置的圆角
+    card-l: 20px # 侧边栏、文章横幅位置的圆角
     card: 16px # 文章内大部分卡片的圆角
     card-s: 12px # 文章内小型卡片的圆角
     bar: 8px # 横条类元素的圆角
-    image-l: 24px # 非技术类文章插图圆角
-    image: 16px # 技术类文章插图圆角
+    image-l: 20px # 非技术类文章插图圆角
+    image: 12px # 技术类文章插图圆角
     image-s: 8px # 评论区图片圆角（部分评论支持）
   color:
-    # 主题色配置（不会根据明暗动态调整，请设置为通用的颜色）
-    theme: 'hsl(192 98% 55%)' # 主题色
-    accent: 'hsl(14 100% 57%)' # 强调色
-    link: 'hsl(207 90% 54%)' # 超链接颜色
+    # 主题色配置 - 科技紫配色方案
+    theme: 'hsl(250 95% 65%)' # 紫罗兰主题色 - 更有科技感
+    accent: 'hsl(340 82% 59%)' # 玫红强调色 - 更加醒目
+    link: 'hsl(250 90% 60%)' # 超链接颜色 - 与主题色协调
   animated_avatar:
     animate: auto # auto, always
     background: https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp
   codeblock:
     scrollbar: 4px
-    highlightjs_theme: https://gcore.jsdelivr.net/gh/highlightjs/cdn-release@11.9/build/styles/atom-one-dark.min.css
+    highlightjs_theme: https://gcore.jsdelivr.net/gh/highlightjs/cdn-release@11.9/build/styles/github-dark.min.css
   loading:
     loading: 正在加载
     error: 加载失败，请稍后重试。
   gradient: # https://webgradients.com/
-    start: 'linear-gradient(to right, hsl(215, 95%, 64%), hsl(195, 95%, 60%), hsl(165, 95%, 56%), hsl(165, 95%, 56%), hsl(195 95% 60%), hsl(215, 95%, 64%))'
+    start: 'linear-gradient(135deg, hsl(250, 95%, 65%), hsl(280, 90%, 60%), hsl(320, 85%, 58%), hsl(340, 82%, 59%))'
   leftbar:
     # 可以设置：纯色/渐变色/图片作为背景
     background-color: var(--card) # var(--block)
-    background-image: url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.13/image/sidebar-bg1@small.jpg)
+    background-image: # 使用纯色更清爽
     blur-px: 100px
     blur-bg: var(--bg-a60)
-    background-opacity: 0.8
+    background-opacity: 0.95
   paginator:
     prev: https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/arrow/f049bbd4e88ec.svg
     next: https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/arrow/064b95430caf4.svg
@@ -688,10 +681,10 @@ style:
     blur-sat: 300%
   # 技术文章内页各级标题前面的符号
   header_prefix:
-    h2: '#'
-    h3: '='
-    h4: '|'
-    h5: ':'
+    h2: '◈'
+    h3: '◇'
+    h4: '▸'
+    h5: '•'
 
 
 default:

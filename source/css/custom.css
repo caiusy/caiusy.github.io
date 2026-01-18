@@ -1,0 +1,199 @@
+/* ============================================
+   Caius 博客自定义样式 - 科技紫主题
+   ============================================ */
+
+/* 引入霞鹜文楷字体 */
+@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css');
+/* 引入 JetBrains Mono 编程字体 */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ===== 全局动画效果 ===== */
+:root {
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* ===== 卡片悬浮效果 ===== */
+.post-card,
+.widget-wrapper,
+article.article {
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+}
+
+/* ===== 链接动画效果 ===== */
+a {
+  transition: color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.md-text a:not(.button) {
+  background: linear-gradient(to right, hsl(250, 95%, 65%), hsl(340, 82%, 59%));
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size var(--transition-normal);
+}
+
+.md-text a:not(.button):hover {
+  background-size: 100% 2px;
+}
+
+/* ===== 按钮效果 ===== */
+.menubar .nav-item,
+.tag-plugin.button {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.menubar .nav-item:hover,
+.tag-plugin.button:hover {
+  transform: scale(1.05);
+}
+
+/* ===== 头像动画 ===== */
+.avatar img {
+  transition: transform var(--transition-normal);
+}
+
+.avatar:hover img {
+  transform: rotate(360deg) scale(1.1);
+}
+
+/* ===== 代码块美化 ===== */
+pre code {
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace !important;
+}
+
+pre {
+  border-left: 3px solid hsl(250, 95%, 65%);
+}
+
+/* ===== 标题装饰 ===== */
+.md-text h2 {
+  position: relative;
+  padding-bottom: 0.5em;
+}
+
+.md-text h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(135deg, hsl(250, 95%, 65%), hsl(340, 82%, 59%));
+  border-radius: 2px;
+}
+
+/* ===== 引用块美化 ===== */
+blockquote {
+  border-left: 4px solid hsl(250, 95%, 65%);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(236, 72, 153, 0.05));
+  border-radius: 0 8px 8px 0;
+  padding: 1em 1.5em;
+}
+
+/* ===== 滚动条美化 ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, hsl(250, 95%, 65%), hsl(340, 82%, 59%));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, hsl(250, 85%, 55%), hsl(340, 72%, 49%));
+}
+
+/* ===== 选中文字效果 ===== */
+::selection {
+  background: hsl(250, 95%, 65%);
+  color: white;
+}
+
+::-moz-selection {
+  background: hsl(250, 95%, 65%);
+  color: white;
+}
+
+/* ===== 图片悬浮效果 ===== */
+.md-text img {
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  border-radius: 12px;
+}
+
+.md-text img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.2);
+}
+
+/* ===== 标签样式 ===== */
+.tag-plugin.tag {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.tag-plugin.tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+/* ===== 页脚美化 ===== */
+footer.page-footer {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.03), rgba(236, 72, 153, 0.03));
+}
+
+/* ===== 加载动画 ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.post-card {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* ===== 渐变文字效果（用于特殊标题）===== */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(250, 95%, 65%), hsl(340, 82%, 59%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== 毛玻璃效果 ===== */
+.blur-card {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .blur-card {
+  background: rgba(30, 30, 30, 0.7);
+}
+
+/* ===== 暗色模式优化 ===== */
+[data-theme="dark"] .post-card:hover {
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.25);
+}
+
+[data-theme="dark"] blockquote {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+}

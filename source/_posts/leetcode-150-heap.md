@@ -12,7 +12,6 @@ tags:
   - 优先队列
   - TopK
   - 面试
-cover: https://picsum.photos/seed/heap/800/400
 description: LeetCode 面试 150 题之堆/优先队列专题，含堆结构图解、TopK问题、代码模板
 ---
 

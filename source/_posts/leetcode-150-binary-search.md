@@ -11,7 +11,6 @@ tags:
   - 二分查找
   - Binary Search
   - 面试
-cover: https://picsum.photos/seed/binarysearch/800/400
 description: LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀
 ---
 

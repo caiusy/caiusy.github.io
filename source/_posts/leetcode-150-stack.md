@@ -12,7 +12,6 @@ tags:
   - 队列
   - 单调栈
   - 面试
-cover: https://picsum.photos/seed/stackqueue/800/400
 description: LeetCode 面试 150 题之栈与队列专题，含单调栈图解、代码模板、记忆口诀
 ---
 

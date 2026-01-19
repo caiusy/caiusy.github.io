@@ -11,7 +11,6 @@ tags:
   - 面试
   - 算法
   - 数据结构
-cover: https://picsum.photos/seed/leetcode150/800/400
 description: LeetCode 面试经典 150 题完整攻略，包含图解、口诀、代码模板，助你高效刷题拿 Offer！
 ---
 

@@ -10,7 +10,6 @@ tags:
   - leetcode面试150
   - 滑动窗口
   - 面试
-cover: https://picsum.photos/seed/slidingwindow/800/400
 description: LeetCode 面试 150 题之滑动窗口专题，含图解、代码模板、记忆口诀
 ---
 

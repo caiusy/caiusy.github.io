@@ -113,3 +113,8 @@ prism_plugin:
   theme: 'tomorrow'
   line_number: false    # default false
   custom_css:
+
+# Marked 渲染器配置
+marked:
+  prependRoot: true
+  postAsset: true

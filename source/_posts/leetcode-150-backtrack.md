@@ -11,7 +11,6 @@ tags:
   - 回溯
   - Backtracking
   - 面试
-cover: https://picsum.photos/seed/backtrack/800/400
 description: LeetCode 面试 150 题之回溯算法专题，含决策树图解、代码模板、记忆口诀
 ---
 

@@ -11,7 +11,6 @@ tags:
   - 动态规划
   - DP
   - 面试
-cover: https://picsum.photos/seed/dynamicprog/800/400
 description: LeetCode 面试 150 题之动态规划专题，含状态转移图解、代码模板、记忆口诀
 ---
 

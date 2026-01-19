@@ -11,7 +11,6 @@ tags:
   - 数组
   - 字符串
   - 双指针
-cover: https://picsum.photos/seed/array/800/400
 description: LeetCode 面试 150 题之数组与字符串专题，含图解、代码模板、记忆口诀
 ---
 

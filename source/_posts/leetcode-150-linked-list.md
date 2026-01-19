@@ -10,7 +10,6 @@ tags:
   - leetcode面试150
   - 链表
   - 面试
-cover: https://picsum.photos/seed/linkedlist/800/400
 description: LeetCode 面试 150 题之链表专题，含图解、代码模板、记忆口诀
 ---
 

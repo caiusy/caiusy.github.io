@@ -13,7 +13,6 @@ tags:
   - DFS
   - 拓扑排序
   - 面试
-cover: https://picsum.photos/seed/graph/800/400
 description: LeetCode 面试 150 题之图论与搜索专题，含BFS/DFS图解、代码模板、记忆口诀
 ---
 

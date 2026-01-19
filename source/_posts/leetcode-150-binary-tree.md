@@ -11,7 +11,6 @@ tags:
   - 二叉树
   - Binary Tree
   - 面试
-cover: https://picsum.photos/seed/binarytree/800/400
 description: LeetCode 面试 150 题之二叉树专题，含遍历图解、递归思维、代码模板
 ---
 

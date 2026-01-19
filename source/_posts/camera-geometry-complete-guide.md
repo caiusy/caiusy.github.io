@@ -34,17 +34,6 @@ mathjax: true
 
 ### 1.1 四个坐标系统
 
-```mermaid
-graph TB
-    A[世界坐标系<br/>Xw, Yw, Zw] -->|外参矩阵 R,t| B[相机坐标系<br/>Xc, Yc, Zc]
-    B -->|透视投影 ÷Zc| C[图像坐标系<br/>x, y mm]
-    C -->|内参矩阵 K| D[像素坐标系<br/>u, v px]
-    
-    style A fill:#FFE6E6
-    style B fill:#E6F3FF
-    style C fill:#E6FFE6
-    style D fill:#FFF9E6
-```
 
 #### **1. 世界坐标系 (World Coordinate System)**
 - 符号：$(X_w, Y_w, Z_w)$

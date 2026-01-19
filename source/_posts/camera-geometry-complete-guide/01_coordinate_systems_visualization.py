@@ -491,10 +491,10 @@ r_{31} & r_{32} & r_{33} & t_z
             bbox=dict(boxstyle='round', facecolor='lightgray', alpha=0.7),
             transform=ax6.transAxes)
     
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.savefig('coordinate_systems_complete.png', dpi=300, bbox_inches='tight')
     print("✓ 图像已保存: coordinate_systems_complete.png")
-    plt.show()
+    #plt.show()
 
 if __name__ == "__main__":
     print("正在生成坐标系统可视化...")

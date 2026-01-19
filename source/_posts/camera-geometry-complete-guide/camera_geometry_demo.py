@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use("Agg")
 """
 相机几何完整演示
 包含所有核心功能：投影、分解、旋转矩阵、单应矩阵等

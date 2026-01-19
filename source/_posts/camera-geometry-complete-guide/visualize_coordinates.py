@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use("Agg")
 """
 相机几何可视化 - 坐标系统转换
 展示从世界坐标系到像素坐标系的完整转换过程
@@ -476,11 +478,11 @@ r_{31} & r_{32} & r_{33} & t_z
     ax6.set_xlim(0, 1)
     ax6.set_ylim(0, 1)
     
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.savefig('coordinate_systems_complete.png', dpi=300, bbox_inches='tight', 
                 facecolor='white', edgecolor='none')
     print("✓ 图像已保存: coordinate_systems_complete.png")
-    plt.show()
+    #plt.show()
 
 
 if __name__ == "__main__":

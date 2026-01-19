@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use("Agg")
 """
 旋转矩阵可视化
 展示旋转矩阵的列向量含义、欧拉角、轴角等
@@ -373,11 +375,11 @@ def visualize_rotation_matrix():
     ax6.view_init(elev=20, azim=45)
     ax6.grid(True, alpha=0.3)
     
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.savefig('rotation_matrix_visualization.png', dpi=300, bbox_inches='tight',
                 facecolor='white', edgecolor='none')
     print("✓ 旋转矩阵可视化已保存: rotation_matrix_visualization.png")
-    plt.show()
+    #plt.show()
 
 
 if __name__ == "__main__":

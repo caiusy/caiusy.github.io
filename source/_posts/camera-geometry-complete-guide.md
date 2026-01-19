@@ -156,7 +156,14 @@ $$
 
 针孔相机模型是最基本的相机模型：
 
-![针孔相机模型示意图](camera-geometry-complete-guide/pinhole_camera_model.png)
+```
+光心 O ────────────────→ 成像平面
+          ↗         ↗
+      3D点 P    投影点 p
+      
+相似三角形: x/f = Xc/Zc, y/f = Yc/Zc
+因此: x = f·(Xc/Zc), y = f·(Yc/Zc)
+```
 
 #### 透视投影公式
 
@@ -256,6 +263,8 @@ $$
 
 ### 4.2 基本旋转矩阵
 
+
+![基本旋转矩阵可视化](camera-geometry-complete-guide/rotation_matrices_visualization.png)
 #### 绕X轴旋转（Roll）
 
 $$
@@ -411,6 +420,8 @@ $$
 ---
 
 ## 五、单应矩阵推导 {#单应矩阵}
+
+![单应矩阵变换示意图](camera-geometry-complete-guide/homography_transformation.png)
 
 ### 5.1 单应矩阵的定义
 

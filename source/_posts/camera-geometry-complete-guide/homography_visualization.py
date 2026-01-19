@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use("Agg")
 """
 单应矩阵可视化
 展示平面到平面的投影变换
@@ -348,11 +350,11 @@ SVD求解:
     ax6.set_xlabel('X', fontsize=10, weight='bold')
     ax6.set_ylabel('Y', fontsize=10, weight='bold')
     
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.savefig('homography_visualization.png', dpi=300, bbox_inches='tight',
                 facecolor='white', edgecolor='none')
     print("✓ 单应矩阵可视化已保存: homography_visualization.png")
-    plt.show()
+    #plt.show()
 
 
 if __name__ == "__main__":

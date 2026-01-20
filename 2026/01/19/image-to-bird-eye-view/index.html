@@ -1,0 +1,1697 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>从图像到俯视图：完整实现指南 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="详细讲解如何将透视图像转换为鸟瞰图，涵盖从基础概念到完整代码实现，适合所有水平的学习者。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从图像到俯视图：完整实现指南">
+<meta property="og:url" content="https://caiusy.github.io/2026/01/19/image-to-bird-eye-view/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="详细讲解如何将透视图像转换为鸟瞰图，涵盖从基础概念到完整代码实现，适合所有水平的学习者。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-01-18T16:36:00.000Z">
+<meta property="article:modified_time" content="2026-01-18T16:36:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="计算机视觉 - 计算机视觉 - OpenCV - Python - 图像处理 - 单应性变换">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="计算机视觉 - 计算机视觉 - OpenCV - Python - 图像处理 - 单应性变换">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-01-19T00:36:00+08:00","dateModified":"2026-01-19T00:36:00+08:00","datePublished":"2026-01-19T00:36:00+08:00","description":"\n从输入图像到输出鸟瞰图的完整实现 - 适合所有水平的学习者\n","headline":"从图像到俯视图：完整实现指南","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/01/19/image-to-bird-eye-view/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/01/19/image-to-bird-eye-view/","keywords":"计算机视觉 - 计算机视觉 - OpenCV - Python - 图像处理 - 单应性变换","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> AI探索者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a><a class="item title" href="/2019/12/19/20191219-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/"><span class="title">二叉树打印</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89-%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉 - 计算机视觉</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-01-18T16:36:00.000Z">2026-01-19</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-01-18T16:36:00.000Z">2026-01-19</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>从图像到俯视图：完整实现指南</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><blockquote>
+<p><strong>从输入图像到输出鸟瞰图的完整实现</strong> - 适合所有水平的学习者</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="🎯-教程简介"><a href="#🎯-教程简介" class="headerlink" title="🎯 教程简介"></a>🎯 教程简介</h2><p>本教程将带你<strong>从零开始</strong>学习如何把一张斜着拍摄的图像（比如路面照片）转换成从正上方看的俯视图（鸟瞰图）。</p>
+<h3 id="你将学到什么？"><a href="#你将学到什么？" class="headerlink" title="你将学到什么？"></a>你将学到什么？</h3><pre class=" language-infographic"><code class="language-infographic">infographic list-row-simple-horizontal-arrow
+data
+  title 完整学习路径
+  items
+    - label 输入图像
+      desc 斜着看的照片
+    - label 理解透视
+      desc 坐标系统
+    - label 计算变换
+      desc 单应性矩阵
+    - label 实现代码
+      desc Python+OpenCV
+    - label 输出俯视图
+      desc 鸟瞰图
+</code></pre>
+<hr>
+<h2 id="📚-第一章：基础概念"><a href="#📚-第一章：基础概念" class="headerlink" title="📚 第一章：基础概念"></a>📚 第一章：基础概念</h2><h3 id="1-1-三种坐标系统"><a href="#1-1-三种坐标系统" class="headerlink" title="1.1 三种坐标系统"></a>1.1 三种坐标系统</h3><p>在图像处理中，我们需要理解三种坐标系统的转换关系：</p>
+<p><img src="/./image-to-bird-eye-view/figures/01_coordinate_systems.png" alt="坐标系统示意图"></p>
+<pre class=" language-infographic"><code class="language-infographic">infographic list-grid-badge-card
+data
+  title 三种坐标系
+  items
+    - label 世界坐标系
+      desc 固定在地面，单位：米
+      icon mdi:earth
+    - label 相机坐标系
+      desc 跟随相机移动旋转
+      icon mdi:camera
+    - label 图像坐标系
+      desc 2D像素平面
+      icon mdi:image
+</code></pre>
+<h4 id="世界坐标系-World-Coordinates"><a href="#世界坐标系-World-Coordinates" class="headerlink" title="世界坐标系 (World Coordinates)"></a>世界坐标系 (World Coordinates)</h4><p><strong>生活例子</strong>：就像地图的经纬度，固定不变的参考系。</p>
+<pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 世界坐标中的一个点（3米，5米，0米）</span>
+point_world <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">3.0</span><span class="token punctuation">,</span> <span class="token number">5.0</span><span class="token punctuation">,</span> <span class="token number">0.0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># [X, Y, Z]</span>
+</code></pre>
+<p><strong>特点：</strong></p>
+<ul>
+<li>原点：通常选在地面某个固定位置</li>
+<li>X轴：向右（东方）</li>
+<li>Y轴：向前（北方）</li>
+<li>Z轴：向上（天空）</li>
+</ul>
+<hr>
+<h4 id="相机坐标系-Camera-Coordinates"><a href="#相机坐标系-Camera-Coordinates" class="headerlink" title="相机坐标系 (Camera Coordinates)"></a>相机坐标系 (Camera Coordinates)</h4><p><img src="/./image-to-bird-eye-view/figures/14_where_is_z.png" alt="Z坐标位置说明"></p>
+<p><strong>核心规则：</strong></p>
+<ul>
+<li>原点：在相机镜头中心</li>
+<li>Z轴：镜头朝向（光轴方向）</li>
+<li>X轴：相机向右</li>
+<li>Y轴：相机向下（⚠️ 注意：向下！）</li>
+</ul>
+<p><strong>为什么Y轴向下？</strong></p>
+<pre><code>传统原因：
+┌─────────┐
+│ (0,0)   │  ← 图像左上角是(0,0)
+│    ↓ Y  │
+│  → X    │
+└─────────┘
+</code></pre>
+<hr>
+<h4 id="图像坐标系-Image-Coordinates"><a href="#图像坐标系-Image-Coordinates" class="headerlink" title="图像坐标系 (Image Coordinates)"></a>图像坐标系 (Image Coordinates)</h4><p><strong>就是我们看到的照片像素坐标：</strong></p>
+<pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 图像中的一个像素点</span>
+pixel <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">320</span><span class="token punctuation">,</span> <span class="token number">240</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># (u, v) 像素坐标</span>
+</code></pre>
+<p><strong>单位</strong>：像素 (pixel)</p>
+<hr>
+<h3 id="1-2-透视投影原理"><a href="#1-2-透视投影原理" class="headerlink" title="1.2 透视投影原理"></a>1.2 透视投影原理</h3><p><img src="/./image-to-bird-eye-view/figures/01_pinhole_camera.png" alt="小孔成像模型"></p>
+<p><strong>小孔成像模型</strong>是相机的数学抽象：</p>
+<pre><code>3D世界 ──────&gt; 小孔 ──────&gt; 2D图像
+(X,Y,Z)        相机        (u,v)
+</code></pre>
+<p><strong>投影过程：</strong></p>
+<p><img src="/./image-to-bird-eye-view/figures/02_projection_process.png" alt="投影过程示意图"></p>
+<p><strong>数学公式：</strong></p>
+<p>$$<br>\begin{bmatrix} u \ v \ 1 \end{bmatrix} = K \begin{bmatrix} R | t \end{bmatrix} \begin{bmatrix} X \ Y \ Z \ 1 \end{bmatrix}<br>$$</p>
+<p>其中：</p>
+<ul>
+<li><strong>K</strong>：相机内参矩阵（焦距、主点）</li>
+<li><strong>R</strong>：旋转矩阵（相机朝向）</li>
+<li><strong>t</strong>：平移向量（相机位置）</li>
+</ul>
+<hr>
+<h3 id="1-3-透视效果"><a href="#1-3-透视效果" class="headerlink" title="1.3 透视效果"></a>1.3 透视效果</h3><p><img src="/./image-to-bird-eye-view/figures/03_perspective_effect.png" alt="透视效果"></p>
+<p><strong>为什么远处的物体看起来小？</strong></p>
+<pre><code>近处的车 ━━━━  看起来大
+中间的车 ━━━   看起来中等
+远处的车 ━━    看起来小
+</code></pre>
+<p>这就是<strong>透视投影</strong>的效果！</p>
+<hr>
+<h2 id="📐-第二章：消失点理论"><a href="#📐-第二章：消失点理论" class="headerlink" title="📐 第二章：消失点理论"></a>📐 第二章：消失点理论</h2><h3 id="2-1-什么是消失点？"><a href="#2-1-什么是消失点？" class="headerlink" title="2.1 什么是消失点？"></a>2.1 什么是消失点？</h3><p><img src="/./image-to-bird-eye-view/figures/02_vanishing_point.png" alt="消失点示意图"></p>
+<p><strong>生活例子</strong>：站在铁轨中间拍照，两条平行的铁轨在远处看起来会”相交”。</p>
+<p><strong>定义</strong>：</p>
+<blockquote>
+<p>现实中平行的线，在图像中延伸后相交的点，就是<strong>消失点</strong> (Vanishing Point)。</p>
+</blockquote>
+<hr>
+<h3 id="2-2-消失点的计算"><a href="#2-2-消失点的计算" class="headerlink" title="2.2 消失点的计算"></a>2.2 消失点的计算</h3><p><strong>原理</strong>：两条平行线的交点</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">compute_vanishing_point</span><span class="token punctuation">(</span>line1_pts<span class="token punctuation">,</span> line2_pts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    计算两条平行线的消失点
+    
+    参数：
+        line1_pts: 直线1的两个点 [[x1,y1], [x2,y2]]
+        line2_pts: 直线2的两个点 [[x3,y3], [x4,y4]]
+    
+    返回：
+        vp: 消失点坐标 [vx, vy]
+    """</span>
+    <span class="token comment" spellcheck="true"># 转为齐次坐标</span>
+    p1 <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>line1_pts<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> line1_pts<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    p2 <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>line1_pts<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> line1_pts<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    p3 <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>line2_pts<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> line2_pts<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    p4 <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>line2_pts<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> line2_pts<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 计算直线（叉乘）</span>
+    L1 <span class="token operator">=</span> np<span class="token punctuation">.</span>cross<span class="token punctuation">(</span>p1<span class="token punctuation">,</span> p2<span class="token punctuation">)</span>
+    L2 <span class="token operator">=</span> np<span class="token punctuation">.</span>cross<span class="token punctuation">(</span>p3<span class="token punctuation">,</span> p4<span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 计算交点（叉乘）</span>
+    vp_homo <span class="token operator">=</span> np<span class="token punctuation">.</span>cross<span class="token punctuation">(</span>L1<span class="token punctuation">,</span> L2<span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 归一化</span>
+    vp <span class="token operator">=</span> vp_homo<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">/</span> vp_homo<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span>
+    
+    <span class="token keyword">return</span> vp
+</code></pre>
+<hr>
+<h3 id="2-3-从消失点到相机参数"><a href="#2-3-从消失点到相机参数" class="headerlink" title="2.3 从消失点到相机参数"></a>2.3 从消失点到相机参数</h3><p><img src="/./image-to-bird-eye-view/figures/09_vanishing_point_to_angles.png" alt="消失点到角度的转换"></p>
+<p><strong>核心思想</strong>：消失点的位置反映了相机的朝向！</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">estimate_camera_params</span><span class="token punctuation">(</span>vp<span class="token punctuation">,</span> img_shape<span class="token punctuation">,</span> cx<span class="token operator">=</span>None<span class="token punctuation">,</span> cy<span class="token operator">=</span>None<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    从消失点估计相机参数
+    
+    参数：
+        vp: 消失点坐标 [vx, vy]
+        img_shape: 图像大小 (height, width)
+        cx, cy: 主点坐标（可选）
+    
+    返回：
+        focal: 估计的焦距
+        yaw: yaw角度（度）
+        pitch: pitch角度（度）
+    """</span>
+    h<span class="token punctuation">,</span> w <span class="token operator">=</span> img_shape<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">]</span>
+    
+    <span class="token comment" spellcheck="true"># 主点（默认图像中心）</span>
+    <span class="token keyword">if</span> cx <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+        cx <span class="token operator">=</span> w <span class="token operator">/</span> <span class="token number">2</span>
+    <span class="token keyword">if</span> cy <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+        cy <span class="token operator">=</span> h <span class="token operator">/</span> <span class="token number">2</span>
+    
+    vx<span class="token punctuation">,</span> vy <span class="token operator">=</span> vp
+    
+    <span class="token comment" spellcheck="true"># 计算偏移</span>
+    dx <span class="token operator">=</span> vx <span class="token operator">-</span> cx
+    dy <span class="token operator">=</span> vy <span class="token operator">-</span> cy
+    
+    <span class="token comment" spellcheck="true"># 估计焦距</span>
+    focal <span class="token operator">=</span> np<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span>w<span class="token operator">**</span><span class="token number">2</span> <span class="token operator">+</span> h<span class="token operator">**</span><span class="token number">2</span><span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 计算角度</span>
+    yaw <span class="token operator">=</span> np<span class="token punctuation">.</span>arctan2<span class="token punctuation">(</span>dx<span class="token punctuation">,</span> focal<span class="token punctuation">)</span>
+    pitch <span class="token operator">=</span> np<span class="token punctuation">.</span>arctan2<span class="token punctuation">(</span>dy<span class="token punctuation">,</span> focal<span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 转为角度</span>
+    yaw_deg <span class="token operator">=</span> np<span class="token punctuation">.</span>degrees<span class="token punctuation">(</span>yaw<span class="token punctuation">)</span>
+    pitch_deg <span class="token operator">=</span> np<span class="token punctuation">.</span>degrees<span class="token punctuation">(</span>pitch<span class="token punctuation">)</span>
+    
+    <span class="token keyword">return</span> focal<span class="token punctuation">,</span> yaw_deg<span class="token punctuation">,</span> pitch_deg
+</code></pre>
+<hr>
+<h3 id="2-4-几何证明"><a href="#2-4-几何证明" class="headerlink" title="2.4 几何证明"></a>2.4 几何证明</h3><p><img src="/./image-to-bird-eye-view/figures/10_geometric_proof_yaw_pitch_fixed.png" alt="几何证明：yaw和pitch"></p>
+<p><img src="/./image-to-bird-eye-view/figures/12_pitch_proof.png" alt="Pitch角度证明"></p>
+<p><strong>核心公式：</strong></p>
+<p>$$<br>\text{yaw} = \arctan\left(\frac{v_x - c_x}{f}\right)<br>$$</p>
+<p>$$<br>\text{pitch} = \arctan\left(\frac{v_y - c_y}{f}\right)<br>$$</p>
+<hr>
+<h2 id="🔄-第三章：单应性变换"><a href="#🔄-第三章：单应性变换" class="headerlink" title="🔄 第三章：单应性变换"></a>🔄 第三章：单应性变换</h2><h3 id="3-1-什么是单应性？"><a href="#3-1-什么是单应性？" class="headerlink" title="3.1 什么是单应性？"></a>3.1 什么是单应性？</h3><p><strong>生活例子</strong>：</p>
+<pre><code>相机视角（透视图）：
+     |  |      近处的条纹 - 看起来很宽
+     |   |
+     |    |    
+     |     |   
+     |      |  远处的条纹 - 看起来很窄
+
+鸟瞰视角：
+  ||||||||     所有条纹 - 宽度一样
+  ||||||||
+  ||||||||
+</code></pre>
+<p><strong>单应性变换</strong>就是把第一种视角转换成第二种视角的数学方法！</p>
+<p><img src="/./image-to-bird-eye-view/figures/03_homography_comparison.png" alt="单应性对比"></p>
+<hr>
+<h3 id="3-2-单应性矩阵"><a href="#3-2-单应性矩阵" class="headerlink" title="3.2 单应性矩阵"></a>3.2 单应性矩阵</h3><p><strong>数学定义：</strong></p>
+<p>$$<br>\begin{bmatrix} x’ \ y’ \ 1 \end{bmatrix} = H \begin{bmatrix} x \ y \ 1 \end{bmatrix}<br>$$</p>
+<p>其中 <strong>H</strong> 是一个 <strong>3×3 的矩阵</strong>：</p>
+<pre><code>     ┌                    ┐
+     │  h11   h12   h13  │
+H =  │  h21   h22   h23  │
+     │  h31   h32   h33  │
+     └                    ┘
+</code></pre>
+<p><strong>特点</strong>：</p>
+<ul>
+<li>9个数字，但只有8个自由度</li>
+<li>可以表示旋转、缩放、平移、透视变换</li>
+</ul>
+<hr>
+<h3 id="3-3-DLT算法求解H矩阵"><a href="#3-3-DLT算法求解H矩阵" class="headerlink" title="3.3 DLT算法求解H矩阵"></a>3.3 DLT算法求解H矩阵</h3><p><strong>核心思想</strong>：用4对点构建方程组，用SVD求解。</p>
+<pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">normalize_points</span><span class="token punctuation">(</span>points<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    归一化点集（提高数值稳定性）
+    """</span>
+    <span class="token comment" spellcheck="true"># 计算中心点</span>
+    centroid <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>points<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 平移到原点</span>
+    centered <span class="token operator">=</span> points <span class="token operator">-</span> centroid
+    
+    <span class="token comment" spellcheck="true"># 计算平均距离</span>
+    avg_dist <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>np<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span>np<span class="token punctuation">.</span>sum<span class="token punctuation">(</span>centered<span class="token operator">**</span><span class="token number">2</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 缩放因子</span>
+    scale <span class="token operator">=</span> np<span class="token punctuation">.</span>sqrt<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span>avg_dist <span class="token operator">+</span> <span class="token number">1e</span><span class="token operator">-</span><span class="token number">8</span><span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 构建归一化矩阵</span>
+    T <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>
+        <span class="token punctuation">[</span>scale<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span>scale <span class="token operator">*</span> centroid<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> scale<span class="token punctuation">,</span> <span class="token operator">-</span>scale <span class="token operator">*</span> centroid<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span>
+    
+    <span class="token keyword">return</span> T
+
+<span class="token keyword">def</span> <span class="token function">compute_homography_dlt</span><span class="token punctuation">(</span>src_pts<span class="token punctuation">,</span> dst_pts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    使用DLT算法计算单应性矩阵
+    
+    参数：
+        src_pts: 源平面点 (N×2)
+        dst_pts: 目标平面点 (N×2)
+    
+    返回：
+        H: 3×3 单应性矩阵
+    """</span>
+    <span class="token keyword">assert</span> len<span class="token punctuation">(</span>src_pts<span class="token punctuation">)</span> <span class="token operator">&gt;=</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token string">"至少需要4个点！"</span>
+    
+    <span class="token comment" spellcheck="true"># 归一化（提高数值稳定性）</span>
+    T_src <span class="token operator">=</span> normalize_points<span class="token punctuation">(</span>src_pts<span class="token punctuation">)</span>
+    T_dst <span class="token operator">=</span> normalize_points<span class="token punctuation">(</span>dst_pts<span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 归一化点</span>
+    src_homo <span class="token operator">=</span> np<span class="token punctuation">.</span>column_stack<span class="token punctuation">(</span><span class="token punctuation">[</span>src_pts<span class="token punctuation">,</span> np<span class="token punctuation">.</span>ones<span class="token punctuation">(</span>len<span class="token punctuation">(</span>src_pts<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    dst_homo <span class="token operator">=</span> np<span class="token punctuation">.</span>column_stack<span class="token punctuation">(</span><span class="token punctuation">[</span>dst_pts<span class="token punctuation">,</span> np<span class="token punctuation">.</span>ones<span class="token punctuation">(</span>len<span class="token punctuation">(</span>dst_pts<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    
+    src_norm <span class="token operator">=</span> <span class="token punctuation">(</span>T_src @ src_homo<span class="token punctuation">.</span>T<span class="token punctuation">)</span><span class="token punctuation">.</span>T
+    dst_norm <span class="token operator">=</span> <span class="token punctuation">(</span>T_dst @ dst_homo<span class="token punctuation">.</span>T<span class="token punctuation">)</span><span class="token punctuation">.</span>T
+    
+    src_norm_2d <span class="token operator">=</span> src_norm<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">/</span> src_norm<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">:</span><span class="token number">3</span><span class="token punctuation">]</span>
+    dst_norm_2d <span class="token operator">=</span> dst_norm<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">/</span> dst_norm<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">:</span><span class="token number">3</span><span class="token punctuation">]</span>
+    
+    <span class="token comment" spellcheck="true"># 构建矩阵A</span>
+    A <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>src_norm_2d<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        x1<span class="token punctuation">,</span> y1 <span class="token operator">=</span> src_norm_2d<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        x2<span class="token punctuation">,</span> y2 <span class="token operator">=</span> dst_norm_2d<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        
+        <span class="token comment" spellcheck="true"># 两个约束方程</span>
+        A<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>
+            <span class="token operator">-</span>x1<span class="token punctuation">,</span> <span class="token operator">-</span>y1<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> x2<span class="token operator">*</span>x1<span class="token punctuation">,</span> x2<span class="token operator">*</span>y1<span class="token punctuation">,</span> x2
+        <span class="token punctuation">]</span><span class="token punctuation">)</span>
+        A<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>
+            <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">-</span>x1<span class="token punctuation">,</span> <span class="token operator">-</span>y1<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> y2<span class="token operator">*</span>x1<span class="token punctuation">,</span> y2<span class="token operator">*</span>y1<span class="token punctuation">,</span> y2
+        <span class="token punctuation">]</span><span class="token punctuation">)</span>
+    
+    A <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>A<span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># SVD分解</span>
+    U<span class="token punctuation">,</span> S<span class="token punctuation">,</span> Vt <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>svd<span class="token punctuation">(</span>A<span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 最小奇异值对应的向量</span>
+    h <span class="token operator">=</span> Vt<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span>
+    
+    <span class="token comment" spellcheck="true"># 重构H矩阵</span>
+    H_norm <span class="token operator">=</span> h<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+    
+    <span class="token comment" spellcheck="true"># 反归一化</span>
+    H <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>inv<span class="token punctuation">(</span>T_dst<span class="token punctuation">)</span> @ H_norm @ T_src
+    
+    <span class="token comment" spellcheck="true"># 归一化（使h33=1）</span>
+    H <span class="token operator">=</span> H <span class="token operator">/</span> H<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span>
+    
+    <span class="token keyword">return</span> H
+</code></pre>
+<hr>
+<h3 id="3-4-优化过程"><a href="#3-4-优化过程" class="headerlink" title="3.4 优化过程"></a>3.4 优化过程</h3><p><img src="/./image-to-bird-eye-view/figures/05_optimization_process.png" alt="优化过程示意图"></p>
+<p><strong>步骤解析：</strong></p>
+<pre class=" language-infographic"><code class="language-infographic">infographic sequence-steps-simple
+data
+  title DLT算法流程
+  items
+    - label 归一化点
+      desc 提高数值稳定性
+    - label 构建方程组
+      desc Ah = 0
+    - label SVD分解
+      desc 求最小奇异值
+    - label 提取H矩阵
+      desc 重构3×3矩阵
+    - label 反归一化
+      desc 恢复原始尺度
+</code></pre>
+<hr>
+<h2 id="💻-第四章：完整代码实现"><a href="#💻-第四章：完整代码实现" class="headerlink" title="💻 第四章：完整代码实现"></a>💻 第四章：完整代码实现</h2><h3 id="4-1-环境搭建"><a href="#4-1-环境搭建" class="headerlink" title="4.1 环境搭建"></a>4.1 环境搭建</h3><p><strong>Python环境要求：</strong></p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># Python版本</span>
+Python 3.7+
+
+<span class="token comment" spellcheck="true"># 核心库</span>
+numpy<span class="token operator">&gt;=</span>1.19.0
+opencv-python<span class="token operator">&gt;=</span>4.5.0
+matplotlib<span class="token operator">&gt;=</span>3.3.0
+</code></pre>
+<p><strong>安装步骤：</strong></p>
+<pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建虚拟环境（推荐）</span>
+python -m venv cv_env
+
+<span class="token comment" spellcheck="true"># 激活虚拟环境</span>
+<span class="token comment" spellcheck="true"># Mac/Linux:</span>
+<span class="token function">source</span> cv_env/bin/activate
+<span class="token comment" spellcheck="true"># Windows:</span>
+cv_env\Scripts\activate
+
+<span class="token comment" spellcheck="true"># 安装依赖</span>
+pip <span class="token function">install</span> numpy opencv-python matplotlib
+
+<span class="token comment" spellcheck="true"># 验证安装</span>
+python -c <span class="token string">"import cv2; print(cv2.__version__)"</span>
+</code></pre>
+<hr>
+<h3 id="4-2-项目结构"><a href="#4-2-项目结构" class="headerlink" title="4.2 项目结构"></a>4.2 项目结构</h3><pre><code>bird_eye_view_project/
+├── input/                  # 输入图像
+│   └── dashcam.jpg
+├── output/                 # 输出结果
+│   ├── marked.jpg
+│   ├── bird_view.jpg
+│   └── result.jpg
+├── main.py                 # 主程序
+└── requirements.txt        # 依赖列表
+</code></pre>
+<hr>
+<h3 id="4-3-交互式鸟瞰图生成器"><a href="#4-3-交互式鸟瞰图生成器" class="headerlink" title="4.3 交互式鸟瞰图生成器"></a>4.3 交互式鸟瞰图生成器</h3><pre class=" language-python"><code class="language-python"><span class="token triple-quoted-string string">"""
+从图像到俯视图：完整实现
+功能：交互式选点 → 计算单应性矩阵 → 生成鸟瞰图
+"""</span>
+
+<span class="token keyword">import</span> cv2
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> matplotlib<span class="token punctuation">.</span>pyplot <span class="token keyword">as</span> plt
+<span class="token keyword">from</span> pathlib <span class="token keyword">import</span> Path
+
+<span class="token keyword">class</span> <span class="token class-name">InteractiveBirdEyeView</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    交互式鸟瞰图生成器
+    
+    使用方法：
+    1. 点击图像选择4个点
+    2. 自动计算单应性矩阵
+    3. 生成鸟瞰图
+    """</span>
+    
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> img<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""
+        初始化
+        
+        参数：
+            img: 输入图像（numpy数组）
+        """</span>
+        self<span class="token punctuation">.</span>img <span class="token operator">=</span> img<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>display_img <span class="token operator">=</span> img<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>points <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>max_points <span class="token operator">=</span> <span class="token number">4</span>
+        self<span class="token punctuation">.</span>window_name <span class="token operator">=</span> <span class="token string">'选择4个点（按顺序：左下→右下→右上→左上）'</span>
+        
+    <span class="token keyword">def</span> <span class="token function">mouse_callback</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> event<span class="token punctuation">,</span> x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> param<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""鼠标回调函数"""</span>
+        <span class="token keyword">if</span> event <span class="token operator">==</span> cv2<span class="token punctuation">.</span>EVENT_LBUTTONDOWN<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">)</span> <span class="token operator">&lt;</span> self<span class="token punctuation">.</span>max_points<span class="token punctuation">:</span>
+                self<span class="token punctuation">.</span>points<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>x<span class="token punctuation">,</span> y<span class="token punctuation">]</span><span class="token punctuation">)</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"点 &amp;#123;len(self.points)&amp;#125;: (&amp;#123;x&amp;#125;, &amp;#123;y&amp;#125;)"</span><span class="token punctuation">)</span>
+                self<span class="token punctuation">.</span>draw_points<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                
+                <span class="token comment" spellcheck="true"># 如果已经选择了4个点，自动处理</span>
+                <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">)</span> <span class="token operator">==</span> self<span class="token punctuation">.</span>max_points<span class="token punctuation">:</span>
+                    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n✅ 已选择4个点，计算中..."</span><span class="token punctuation">)</span>
+                    cv2<span class="token punctuation">.</span>waitKey<span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span>
+                    cv2<span class="token punctuation">.</span>destroyWindow<span class="token punctuation">(</span>self<span class="token punctuation">.</span>window_name<span class="token punctuation">)</span>
+    
+    <span class="token keyword">def</span> <span class="token function">draw_points</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""绘制已选择的点"""</span>
+        self<span class="token punctuation">.</span>display_img <span class="token operator">=</span> self<span class="token punctuation">.</span>img<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> pt <span class="token keyword">in</span> enumerate<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># 绘制圆点</span>
+            cv2<span class="token punctuation">.</span>circle<span class="token punctuation">(</span>self<span class="token punctuation">.</span>display_img<span class="token punctuation">,</span> tuple<span class="token punctuation">(</span>pt<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+            <span class="token comment" spellcheck="true"># 绘制序号</span>
+            cv2<span class="token punctuation">.</span>putText<span class="token punctuation">(</span>
+                self<span class="token punctuation">.</span>display_img<span class="token punctuation">,</span> 
+                str<span class="token punctuation">(</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> 
+                <span class="token punctuation">(</span>pt<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token operator">+</span><span class="token number">15</span><span class="token punctuation">,</span> pt<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> 
+                cv2<span class="token punctuation">.</span>FONT_HERSHEY_SIMPLEX<span class="token punctuation">,</span> 
+                <span class="token number">0.8</span><span class="token punctuation">,</span> 
+                <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">,</span> 
+
+```python
+            <span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># 绘制连线</span>
+        <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">1</span><span class="token punctuation">:</span>
+            pts <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">,</span> np<span class="token punctuation">.</span>int32<span class="token punctuation">)</span>
+            cv2<span class="token punctuation">.</span>polylines<span class="token punctuation">(</span>
+                self<span class="token punctuation">.</span>display_img<span class="token punctuation">,</span>
+                <span class="token punctuation">[</span>pts<span class="token punctuation">]</span><span class="token punctuation">,</span>
+                len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">4</span><span class="token punctuation">,</span>
+                <span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># 显示提示信息</span>
+        info <span class="token operator">=</span> f<span class="token string">"已选择 &amp;#123;len(self.points)&amp;#125;/&amp;#123;self.max_points&amp;#125; 个点"</span>
+        cv2<span class="token punctuation">.</span>putText<span class="token punctuation">(</span>
+            self<span class="token punctuation">.</span>display_img<span class="token punctuation">,</span>
+            info<span class="token punctuation">,</span>
+            <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            cv2<span class="token punctuation">.</span>FONT_HERSHEY_SIMPLEX<span class="token punctuation">,</span>
+            <span class="token number">1</span><span class="token punctuation">,</span>
+            <span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token punctuation">)</span>
+        cv2<span class="token punctuation">.</span>imshow<span class="token punctuation">(</span>self<span class="token punctuation">.</span>window_name<span class="token punctuation">,</span> self<span class="token punctuation">.</span>display_img<span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">select_points</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""
+        交互式选择点
+        返回：
+            points: 4×2 numpy数组，或None（如果取消）
+        """</span>
+        cv2<span class="token punctuation">.</span>namedWindow<span class="token punctuation">(</span>self<span class="token punctuation">.</span>window_name<span class="token punctuation">,</span> cv2<span class="token punctuation">.</span>WINDOW_NORMAL<span class="token punctuation">)</span>
+        cv2<span class="token punctuation">.</span>setMouseCallback<span class="token punctuation">(</span>self<span class="token punctuation">.</span>window_name<span class="token punctuation">,</span> self<span class="token punctuation">.</span>mouse_callback<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span><span class="token operator">*</span><span class="token number">60</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"📌 请在图像上依次点击4个点"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"   顺序：左下 → 右下 → 右上 → 左上"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"   提示：选择路面上的矩形区域"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"   按ESC可以取消"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span><span class="token operator">*</span><span class="token number">60</span> <span class="token operator">+</span> <span class="token string">"\n"</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>draw_points<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">while</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">)</span> <span class="token operator">&lt;</span> self<span class="token punctuation">.</span>max_points<span class="token punctuation">:</span>
+            key <span class="token operator">=</span> cv2<span class="token punctuation">.</span>waitKey<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span>
+            <span class="token keyword">if</span> key <span class="token operator">==</span> <span class="token number">27</span><span class="token punctuation">:</span>  <span class="token comment" spellcheck="true"># ESC</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"❌ 已取消"</span><span class="token punctuation">)</span>
+                cv2<span class="token punctuation">.</span>destroyAllWindows<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token keyword">return</span> None
+        <span class="token keyword">return</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">compute_bird_view</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> bird_w<span class="token operator">=</span><span class="token number">400</span><span class="token punctuation">,</span> bird_h<span class="token operator">=</span><span class="token number">600</span><span class="token punctuation">,</span> margin<span class="token operator">=</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""
+        计算并显示鸟瞰图
+        参数：
+            bird_w: 鸟瞰图宽度（像素）
+            bird_h: 鸟瞰图高度（像素）
+            margin: 边距（像素）
+        返回：
+            result: 包含原图和鸟瞰图的字典
+        """</span>
+        <span class="token comment" spellcheck="true"># 选择点</span>
+        src_pts <span class="token operator">=</span> self<span class="token punctuation">.</span>select_points<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> src_pts <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> None
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n🔄 处理中..."</span><span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># 定义目标点（俯视图中的矩形）</span>
+        dst_pts <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span>
+            <span class="token punctuation">[</span>margin<span class="token punctuation">,</span> bird_h <span class="token operator">-</span> margin<span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token punctuation">[</span>bird_w <span class="token operator">-</span> margin<span class="token punctuation">,</span> bird_h <span class="token operator">-</span> margin<span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token punctuation">[</span>bird_w <span class="token operator">-</span> margin<span class="token punctuation">,</span> margin<span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token punctuation">[</span>margin<span class="token punctuation">,</span> margin<span class="token punctuation">]</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># 计算单应性矩阵</span>
+        H <span class="token operator">=</span> compute_homography_dlt<span class="token punctuation">(</span>src_pts<span class="token punctuation">,</span> dst_pts<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n📐 单应性矩阵 H:"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>H<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># 变换图像</span>
+        bird_view <span class="token operator">=</span> cv2<span class="token punctuation">.</span>warpPerspective<span class="token punctuation">(</span>
+            self<span class="token punctuation">.</span>img<span class="token punctuation">,</span>
+            H<span class="token punctuation">,</span>
+            <span class="token punctuation">(</span>bird_w<span class="token punctuation">,</span> bird_h<span class="token punctuation">)</span><span class="token punctuation">,</span>
+            flags<span class="token operator">=</span>cv2<span class="token punctuation">.</span>INTER_LINEAR
+        <span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># 在原图上绘制选择的区域</span>
+        marked_img <span class="token operator">=</span> self<span class="token punctuation">.</span>img<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        pts <span class="token operator">=</span> src_pts<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>int32<span class="token punctuation">)</span><span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        cv2<span class="token punctuation">.</span>polylines<span class="token punctuation">(</span>marked_img<span class="token punctuation">,</span> <span class="token punctuation">[</span>pts<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token boolean">True</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> pt <span class="token keyword">in</span> enumerate<span class="token punctuation">(</span>src_pts<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            cv2<span class="token punctuation">.</span>circle<span class="token punctuation">(</span>marked_img<span class="token punctuation">,</span> tuple<span class="token punctuation">(</span>pt<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>int<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+            cv2<span class="token punctuation">.</span>putText<span class="token punctuation">(</span>
+                marked_img<span class="token punctuation">,</span>
+                str<span class="token punctuation">(</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                tuple<span class="token punctuation">(</span>pt<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>int<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                cv2<span class="token punctuation">.</span>FONT_HERSHEY_SIMPLEX<span class="token punctuation">,</span>
+                <span class="token number">1</span><span class="token punctuation">,</span>
+                <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># 返回结果</span>
+        result <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+            <span class="token string">'original'</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>img<span class="token punctuation">,</span>
+            <span class="token string">'marked'</span><span class="token punctuation">:</span> marked_img<span class="token punctuation">,</span>
+            <span class="token string">'bird_view'</span><span class="token punctuation">:</span> bird_view<span class="token punctuation">,</span>
+            <span class="token string">'homography'</span><span class="token punctuation">:</span> H<span class="token punctuation">,</span>
+            <span class="token string">'src_points'</span><span class="token punctuation">:</span> src_pts<span class="token punctuation">,</span>
+            <span class="token string">'dst_points'</span><span class="token punctuation">:</span> dst_pts
+        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n✅ 处理完成！"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> result
+<span class="token keyword">def</span> <span class="token function">visualize_results</span><span class="token punctuation">(</span>result<span class="token punctuation">,</span> save_path<span class="token operator">=</span>None<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    可视化结果
+    参数：
+        result: compute_bird_view返回的结果字典
+        save_path: 保存路径（可选）
+    """</span>
+    <span class="token keyword">if</span> result <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"没有结果可显示"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token comment" spellcheck="true"># 创建对比图</span>
+    h1<span class="token punctuation">,</span> w1 <span class="token operator">=</span> result<span class="token punctuation">[</span><span class="token string">'marked'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">]</span>
+    h2<span class="token punctuation">,</span> w2 <span class="token operator">=</span> result<span class="token punctuation">[</span><span class="token string">'bird_view'</span><span class="token punctuation">]</span><span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">2</span><span class="token punctuation">]</span>
+    <span class="token comment" spellcheck="true"># 调整大小使高度一致</span>
+    target_h <span class="token operator">=</span> <span class="token number">400</span>
+    scale1 <span class="token operator">=</span> target_h <span class="token operator">/</span> h1
+    scale2 <span class="token operator">=</span> target_h <span class="token operator">/</span> h2
+    img1_resized <span class="token operator">=</span> cv2<span class="token punctuation">.</span>resize<span class="token punctuation">(</span>result<span class="token punctuation">[</span><span class="token string">'marked'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>int<span class="token punctuation">(</span>w1<span class="token operator">*</span>scale1<span class="token punctuation">)</span><span class="token punctuation">,</span> target_h<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    img2_resized <span class="token operator">=</span> cv2<span class="token punctuation">.</span>resize<span class="token punctuation">(</span>result<span class="token punctuation">[</span><span class="token string">'bird_view'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>int<span class="token punctuation">(</span>w2<span class="token operator">*</span>scale2<span class="token punctuation">)</span><span class="token punctuation">,</span> target_h<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 水平拼接</span>
+    combined <span class="token operator">=</span> np<span class="token punctuation">.</span>hstack<span class="token punctuation">(</span><span class="token punctuation">[</span>img1_resized<span class="token punctuation">,</span> img2_resized<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 添加标题</span>
+    cv2<span class="token punctuation">.</span>putText<span class="token punctuation">(</span>
+        combined<span class="token punctuation">,</span>
+        <span class="token string">'Original (Perspective)'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        cv2<span class="token punctuation">.</span>FONT_HERSHEY_SIMPLEX<span class="token punctuation">,</span>
+        <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+    cv2<span class="token punctuation">.</span>putText<span class="token punctuation">(</span>
+        combined<span class="token punctuation">,</span>
+        <span class="token string">'Bird Eye View (Top-down)'</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span>int<span class="token punctuation">(</span>w1<span class="token operator">*</span>scale1<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        cv2<span class="token punctuation">.</span>FONT_HERSHEY_SIMPLEX<span class="token punctuation">,</span>
+        <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 显示</span>
+    cv2<span class="token punctuation">.</span>namedWindow<span class="token punctuation">(</span><span class="token string">'Result'</span><span class="token punctuation">,</span> cv2<span class="token punctuation">.</span>WINDOW_NORMAL<span class="token punctuation">)</span>
+    cv2<span class="token punctuation">.</span>imshow<span class="token punctuation">(</span><span class="token string">'Result'</span><span class="token punctuation">,</span> combined<span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 保存</span>
+    <span class="token keyword">if</span> save_path<span class="token punctuation">:</span>
+        cv2<span class="token punctuation">.</span>imwrite<span class="token punctuation">(</span>str<span class="token punctuation">(</span>save_path<span class="token punctuation">)</span><span class="token punctuation">,</span> combined<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"\n💾 结果已保存到: &amp;#123;save_path&amp;#125;"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n按任意键关闭..."</span><span class="token punctuation">)</span>
+    cv2<span class="token punctuation">.</span>waitKey<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    cv2<span class="token punctuation">.</span>destroyAllWindows<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
+    主函数
+    """</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n"</span> <span class="token operator">+</span> <span class="token string">"="</span><span class="token operator">*</span><span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"🚗 从图像到俯视图：完整实现"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"="</span><span class="token operator">*</span><span class="token number">60</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 1. 读取图像</span>
+    img_path <span class="token operator">=</span> input<span class="token punctuation">(</span><span class="token string">"\n请输入图像路径（或按回车使用默认）: "</span><span class="token punctuation">)</span><span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> img_path<span class="token punctuation">:</span>
+        img_path <span class="token operator">=</span> <span class="token string">"input/dashcam.jpg"</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"\n📂 读取图像: &amp;#123;img_path&amp;#125;"</span><span class="token punctuation">)</span>
+    img <span class="token operator">=</span> cv2<span class="token punctuation">.</span>imread<span class="token punctuation">(</span>img_path<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> img <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"❌ 无法读取图像: &amp;#123;img_path&amp;#125;"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"✅ 图像大小: &amp;#123;img.shape[1]&amp;#125; × &amp;#123;img.shape[0]&amp;#125;"</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 2. 创建交互式界面</span>
+    bev <span class="token operator">=</span> InteractiveBirdEyeView<span class="token punctuation">(</span>img<span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 3. 计算鸟瞰图</span>
+    result <span class="token operator">=</span> bev<span class="token punctuation">.</span>compute_bird_view<span class="token punctuation">(</span>
+        bird_w<span class="token operator">=</span><span class="token number">400</span><span class="token punctuation">,</span>
+        bird_h<span class="token operator">=</span><span class="token number">600</span><span class="token punctuation">,</span>
+        margin<span class="token operator">=</span><span class="token number">50</span>
+    <span class="token punctuation">)</span>
+    <span class="token keyword">if</span> result <span class="token keyword">is</span> None<span class="token punctuation">:</span>
+        <span class="token keyword">return</span>
+    <span class="token comment" spellcheck="true"># 4. 显示结果</span>
+    visualize_results<span class="token punctuation">(</span>result<span class="token punctuation">,</span> save_path<span class="token operator">=</span><span class="token string">"output/result.jpg"</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 5. 保存各个结果</span>
+    cv2<span class="token punctuation">.</span>imwrite<span class="token punctuation">(</span><span class="token string">"output/marked.jpg"</span><span class="token punctuation">,</span> result<span class="token punctuation">[</span><span class="token string">'marked'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    cv2<span class="token punctuation">.</span>imwrite<span class="token punctuation">(</span><span class="token string">"output/bird_view.jpg"</span><span class="token punctuation">,</span> result<span class="token punctuation">[</span><span class="token string">'bird_view'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n📁 所有文件已保存到 output/ 目录"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n✨ 完成！"</span><span class="token punctuation">)</span>
+<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">"__main__"</span><span class="token punctuation">:</span>
+    main<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<hr>
+<h3 id="4-4-运行效果"><a href="#4-4-运行效果" class="headerlink" title="4.4 运行效果"></a>4.4 运行效果</h3><h2 id="运行步骤：bash-1-运行程序-python-main-py-2-输入图像路径（或使用默认）-请输入图像路径（或按回车使用默认）-3-在弹出的窗口中点击4个点-📌-请在图像上依次点击4个点-顺序：左下-→-右下-→-右上-→-左上-4-查看结果-✅-处理完成！-💾-结果已保存到-output-result-jpg-效果展示：输入图像（斜视角）-输出图像（俯视图）-╱╲-┌──────┐-╱-╲-→-│-│-╱-╲-变换-│-│-╱-╲-└──────┘-梯形效果-矩形效果"><a href="#运行步骤：bash-1-运行程序-python-main-py-2-输入图像路径（或使用默认）-请输入图像路径（或按回车使用默认）-3-在弹出的窗口中点击4个点-📌-请在图像上依次点击4个点-顺序：左下-→-右下-→-右上-→-左上-4-查看结果-✅-处理完成！-💾-结果已保存到-output-result-jpg-效果展示：输入图像（斜视角）-输出图像（俯视图）-╱╲-┌──────┐-╱-╲-→-│-│-╱-╲-变换-│-│-╱-╲-└──────┘-梯形效果-矩形效果" class="headerlink" title="运行步骤：bash # 1. 运行程序 python main.py # 2. 输入图像路径（或使用默认） 请输入图像路径（或按回车使用默认）: # 3. 在弹出的窗口中点击4个点 📌 请在图像上依次点击4个点    顺序：左下 → 右下 → 右上 → 左上 # 4. 查看结果 ✅ 处理完成！ 💾 结果已保存到: output/result.jpg 效果展示：输入图像（斜视角）          输出图像（俯视图）      ╱╲                        ┌──────┐     ╱  ╲       →               │      │    ╱    ╲      变换             │      │   ╱______╲                      └──────┘  梯形效果                        矩形效果"></a><strong>运行步骤：</strong><br><code>bash # 1. 运行程序 python main.py # 2. 输入图像路径（或使用默认） 请输入图像路径（或按回车使用默认）: # 3. 在弹出的窗口中点击4个点 📌 请在图像上依次点击4个点    顺序：左下 → 右下 → 右上 → 左上 # 4. 查看结果 ✅ 处理完成！ 💾 结果已保存到: output/result.jpg </code><br><strong>效果展示：</strong><br><code>输入图像（斜视角）          输出图像（俯视图）      ╱╲                        ┌──────┐     ╱  ╲       →               │      │    ╱    ╲      变换             │      │   ╱______╲                      └──────┘  梯形效果                        矩形效果</code></h2><h2 id="🐛-第五章：调试与优化"><a href="#🐛-第五章：调试与优化" class="headerlink" title="🐛 第五章：调试与优化"></a>🐛 第五章：调试与优化</h2><h3 id="5-1-常见问题"><a href="#5-1-常见问题" class="headerlink" title="5.1 常见问题"></a>5.1 常见问题</h3><h4 id="问题1：图像变形严重"><a href="#问题1：图像变形严重" class="headerlink" title="问题1：图像变形严重"></a>问题1：图像变形严重</h4><h2 id="原因：点选择不合理解决方案：python-def-check-points-distribution-pts-quot-quot-quot-检查点的分布-quot-quot-quot-std-x-np-std-pts-0-std-y-np-std-pts-1-if-std-x-lt-50-or-std-y-lt-50-print-quot-⚠️-警告：点分布过于集中！-quot-print-f-quot-X方向标准差-std-x-1f-quot-print-f-quot-Y方向标准差-std-y-1f-quot-print-quot-建议：选择更分散的点-quot-return-False-return-True"><a href="#原因：点选择不合理解决方案：python-def-check-points-distribution-pts-quot-quot-quot-检查点的分布-quot-quot-quot-std-x-np-std-pts-0-std-y-np-std-pts-1-if-std-x-lt-50-or-std-y-lt-50-print-quot-⚠️-警告：点分布过于集中！-quot-print-f-quot-X方向标准差-std-x-1f-quot-print-f-quot-Y方向标准差-std-y-1f-quot-print-quot-建议：选择更分散的点-quot-return-False-return-True" class="headerlink" title="原因：点选择不合理解决方案：python def check_points_distribution(pts):     &quot;&quot;&quot;检查点的分布&quot;&quot;&quot;     std_x = np.std(pts[:, 0])     std_y = np.std(pts[:, 1])     if std_x < 50 or std_y < 50:         print(&quot;⚠️  警告：点分布过于集中！&quot;)         print(f&quot;   X方向标准差: {std_x:.1f}&quot;)         print(f&quot;   Y方向标准差: {std_y:.1f}&quot;)         print(&quot;   建议：选择更分散的点&quot;)         return False     return True "></a><strong>原因</strong>：点选择不合理<br><strong>解决方案</strong>：<br><code>python def check_points_distribution(pts):     """检查点的分布"""     std_x = np.std(pts[:, 0])     std_y = np.std(pts[:, 1])     if std_x &lt; 50 or std_y &lt; 50:         print("⚠️  警告：点分布过于集中！")         print(f"   X方向标准差: {std_x:.1f}")         print(f"   Y方向标准差: {std_y:.1f}")         print("   建议：选择更分散的点")         return False     return True </code></h2><h4 id="问题2：鸟瞰图有黑边"><a href="#问题2：鸟瞰图有黑边" class="headerlink" title="问题2：鸟瞰图有黑边"></a>问题2：鸟瞰图有黑边</h4><h2 id="原因：输出图像范围设置不当解决方案：python-def-compute-output-size-img-H-src-pts-quot-quot-quot-自动计算输出图像大小-quot-quot-quot-h-w-img-shape-2-变换图像的四个角点-corners-np-array-0-0-w-0-w-h-0-h-dtype-np-float32-应用H变换-corners-homo-np-column-stack-corners-np-ones-4-transformed-H-corners-homo-T-T-transformed-transformed-2-transformed-2-3-计算边界-min-x-np-min-transformed-0-max-x-np-max-transformed-0-min-y-np-min-transformed-1-max-y-np-max-transformed-1-out-w-int-max-x-min-x-out-h-int-max-y-min-y-return-out-w-out-h"><a href="#原因：输出图像范围设置不当解决方案：python-def-compute-output-size-img-H-src-pts-quot-quot-quot-自动计算输出图像大小-quot-quot-quot-h-w-img-shape-2-变换图像的四个角点-corners-np-array-0-0-w-0-w-h-0-h-dtype-np-float32-应用H变换-corners-homo-np-column-stack-corners-np-ones-4-transformed-H-corners-homo-T-T-transformed-transformed-2-transformed-2-3-计算边界-min-x-np-min-transformed-0-max-x-np-max-transformed-0-min-y-np-min-transformed-1-max-y-np-max-transformed-1-out-w-int-max-x-min-x-out-h-int-max-y-min-y-return-out-w-out-h" class="headerlink" title="原因：输出图像范围设置不当解决方案：python def compute_output_size(img, H, src_pts):     &quot;&quot;&quot;自动计算输出图像大小&quot;&quot;&quot;     h, w = img.shape[:2]     # 变换图像的四个角点     corners = np.array([         [0, 0], [w, 0], [w, h], [0, h]     ], dtype=np.float32)     # 应用H变换     corners_homo = np.column_stack([corners, np.ones(4)])     transformed = (H @ corners_homo.T).T     transformed = transformed[:, :2] / transformed[:, 2:3]     # 计算边界     min_x = np.min(transformed[:, 0])     max_x = np.max(transformed[:, 0])     min_y = np.min(transformed[:, 1])     max_y = np.max(transformed[:, 1])     out_w = int(max_x - min_x)     out_h = int(max_y - min_y)     return out_w, out_h "></a><strong>原因</strong>：输出图像范围设置不当<br><strong>解决方案</strong>：<br><code>python def compute_output_size(img, H, src_pts):     """自动计算输出图像大小"""     h, w = img.shape[:2]     # 变换图像的四个角点     corners = np.array([         [0, 0], [w, 0], [w, h], [0, h]     ], dtype=np.float32)     # 应用H变换     corners_homo = np.column_stack([corners, np.ones(4)])     transformed = (H @ corners_homo.T).T     transformed = transformed[:, :2] / transformed[:, 2:3]     # 计算边界     min_x = np.min(transformed[:, 0])     max_x = np.max(transformed[:, 0])     min_y = np.min(transformed[:, 1])     max_y = np.max(transformed[:, 1])     out_w = int(max_x - min_x)     out_h = int(max_y - min_y)     return out_w, out_h </code></h2><h4 id="问题3：运行速度慢"><a href="#问题3：运行速度慢" class="headerlink" title="问题3：运行速度慢"></a>问题3：运行速度慢</h4><h2 id="解决方案：python-使用更快的插值方法-result-cv2-warpPerspective-img-H-out-w-out-h-flags-cv2-INTER-LINEAR-双线性插值（快）-flags-cv2-INTER-CUBIC-双三次插值（慢但更好）"><a href="#解决方案：python-使用更快的插值方法-result-cv2-warpPerspective-img-H-out-w-out-h-flags-cv2-INTER-LINEAR-双线性插值（快）-flags-cv2-INTER-CUBIC-双三次插值（慢但更好）" class="headerlink" title="解决方案：python # 使用更快的插值方法 result = cv2.warpPerspective(     img,     H,     (out_w, out_h),     flags=cv2.INTER_LINEAR  # 双线性插值（快）     # flags=cv2.INTER_CUBIC  # 双三次插值（慢但更好） ) "></a><strong>解决方案</strong>：<br><code>python # 使用更快的插值方法 result = cv2.warpPerspective(     img,     H,     (out_w, out_h),     flags=cv2.INTER_LINEAR  # 双线性插值（快）     # flags=cv2.INTER_CUBIC  # 双三次插值（慢但更好） ) </code></h2><h3 id="5-2-性能优化"><a href="#5-2-性能优化" class="headerlink" title="5.2 性能优化"></a>5.2 性能优化</h3><pre class=" language-infographic"><code class="language-infographic">infographic list-grid-badge-card
+data
+  title 优化技巧
+  items
+    - label 向量化计算
+      desc 避免Python循环
+      icon mdi:speedometer
+    - label GPU加速
+      desc 使用cv2.cuda模块
+      icon mdi:chip
+    - label 多线程
+      desc 并行处理多张图像
+      icon mdi:lan
+    - label 缓存结果
+      desc 避免重复计算
+      icon mdi:cached
+</code></pre>
+<hr>
+<h2 id="🚀-第六章：进阶应用"><a href="#🚀-第六章：进阶应用" class="headerlink" title="🚀 第六章：进阶应用"></a>🚀 第六章：进阶应用</h2><h3 id="6-1-视频流处理"><a href="#6-1-视频流处理" class="headerlink" title="6.1 视频流处理"></a>6.1 视频流处理</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">process_video</span><span class="token punctuation">(</span>video_path<span class="token punctuation">,</span> H<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""对视频应用鸟瞰变换"""</span>
+    cap <span class="token operator">=</span> cv2<span class="token punctuation">.</span>VideoCapture<span class="token punctuation">(</span>video_path<span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 获取视频参数</span>
+    fps <span class="token operator">=</span> int<span class="token punctuation">(</span>cap<span class="token punctuation">.</span>get<span class="token punctuation">(</span>cv2<span class="token punctuation">.</span>CAP_PROP_FPS<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    w <span class="token operator">=</span> int<span class="token punctuation">(</span>cap<span class="token punctuation">.</span>get<span class="token punctuation">(</span>cv2<span class="token punctuation">.</span>CAP_PROP_FRAME_WIDTH<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    h <span class="token operator">=</span> int<span class="token punctuation">(</span>cap<span class="token punctuation">.</span>get<span class="token punctuation">(</span>cv2<span class="token punctuation">.</span>CAP_PROP_FRAME_HEIGHT<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true"># 创建输出视频</span>
+    fourcc <span class="token operator">=</span> cv2<span class="token punctuation">.</span>VideoWriter_fourcc<span class="token punctuation">(</span><span class="token operator">*</span><span class="token string">'mp4v'</span><span class="token punctuation">)</span>
+    out <span class="token operator">=</span> cv2<span class="token punctuation">.</span>VideoWriter<span class="token punctuation">(</span><span class="token string">'output.mp4'</span><span class="token punctuation">,</span> fourcc<span class="token punctuation">,</span> fps<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"处理视频：&amp;#123;fps&amp;#125; FPS, &amp;#123;w&amp;#125;x&amp;#123;h&amp;#125;"</span><span class="token punctuation">)</span>
+    frame_count <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">while</span> cap<span class="token punctuation">.</span>isOpened<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        ret<span class="token punctuation">,</span> frame <span class="token operator">=</span> cap<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token operator">not</span> ret<span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+        <span class="token comment" spellcheck="true"># 应用变换</span>
+        bird_view <span class="token operator">=</span> cv2<span class="token punctuation">.</span>warpPerspective<span class="token punctuation">(</span>frame<span class="token punctuation">,</span> H<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># 写入输出</span>
+        out<span class="token punctuation">.</span>write<span class="token punctuation">(</span>bird_view<span class="token punctuation">)</span>
+        frame_count <span class="token operator">+=</span> <span class="token number">1</span>
+        <span class="token keyword">if</span> frame_count <span class="token operator">%</span> <span class="token number">30</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"已处理 &amp;#123;frame_count&amp;#125; 帧"</span><span class="token punctuation">)</span>
+    cap<span class="token punctuation">.</span>release<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    out<span class="token punctuation">.</span>release<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    cv2<span class="token punctuation">.</span>destroyAllWindows<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"✅ 完成！共处理 &amp;#123;frame_count&amp;#125; 帧"</span><span class="token punctuation">)</span>
+</code></pre>
+<hr>
+<h3 id="6-2-实时相机标定"><a href="#6-2-实时相机标定" class="headerlink" title="6.2 实时相机标定"></a>6.2 实时相机标定</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">realtime_calibration</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""实时相机标定和鸟瞰图生成"""</span>
+    cap <span class="token operator">=</span> cv2<span class="token punctuation">.</span>VideoCapture<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    H <span class="token operator">=</span> None
+    calibrated <span class="token operator">=</span> <span class="token boolean">False</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"按 'c' 进入标定模式"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"按 'q' 退出"</span><span class="token punctuation">)</span>
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        ret<span class="token punctuation">,</span> frame <span class="token operator">=</span> cap<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token operator">not</span> ret<span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+        <span class="token keyword">if</span> calibrated <span class="token operator">and</span> H <span class="token keyword">is</span> <span class="token operator">not</span> None<span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># 应用变换</span>
+            bird_view <span class="token operator">=</span> cv2<span class="token punctuation">.</span>warpPerspective<span class="token punctuation">(</span>frame<span class="token punctuation">,</span> H<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token comment" spellcheck="true"># 并排显示</span>
+            display <span class="token operator">=</span> np<span class="token punctuation">.</span>hstack<span class="token punctuation">(</span><span class="token punctuation">[</span>
+                cv2<span class="token punctuation">.</span>resize<span class="token punctuation">(</span>frame<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">300</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                cv2<span class="token punctuation">.</span>resize<span class="token punctuation">(</span>bird_view<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">300</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">]</span><span class="token punctuation">)</span>
+            cv2<span class="token punctuation">.</span>imshow<span class="token punctuation">(</span><span class="token string">'Camera | Bird View'</span><span class="token punctuation">,</span> display<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            cv2<span class="token punctuation">.</span>imshow<span class="token punctuation">(</span><span class="token string">'Camera'</span><span class="token punctuation">,</span> frame<span class="token punctuation">)</span>
+        key <span class="token operator">=</span> cv2<span class="token punctuation">.</span>waitKey<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span>
+        <span class="token keyword">if</span> key <span class="token operator">==</span> ord<span class="token punctuation">(</span><span class="token string">'c'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n开始标定..."</span><span class="token punctuation">)</span>
+            bev <span class="token operator">=</span> InteractiveBirdEyeView<span class="token punctuation">(</span>frame<span class="token punctuation">)</span>
+            result <span class="token operator">=</span> bev<span class="token punctuation">.</span>compute_bird_view<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> result <span class="token keyword">is</span> <span class="token operator">not</span> None<span class="token punctuation">:</span>
+                H <span class="token operator">=</span> result<span class="token punctuation">[</span><span class="token string">'homography'</span><span class="token punctuation">]</span>
+                calibrated <span class="token operator">=</span> <span class="token boolean">True</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"✅ 标定完成！"</span><span class="token punctuation">)</span>
+        <span class="token keyword">elif</span> key <span class="token operator">==</span> ord<span class="token punctuation">(</span><span class="token string">'q'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+    cap<span class="token punctuation">.</span>release<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    cv2<span class="token punctuation">.</span>destroyAllWindows<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<hr>
+<h2 id="📊-总结"><a href="#📊-总结" class="headerlink" title="📊 总结"></a>📊 总结</h2><h3 id="学习成果"><a href="#学习成果" class="headerlink" title="学习成果"></a>学习成果</h3><pre class=" language-infographic"><code class="language-infographic">infographic list-column-done-list
+data
+  title 你已经掌握
+  items
+    - label 理解透视投影原理
+      desc 3D到2D的转换
+    - label 计算消失点
+      desc 从平行线找交点
+    - label 估计相机参数
+      desc 焦距和角度
+    - label 单应性变换
+      desc DLT算法
+    - label 完整代码实现
+      desc Python+OpenCV
+</code></pre>
+<hr>
+<h3 id="核心知识点"><a href="#核心知识点" class="headerlink" title="核心知识点"></a>核心知识点</h3><p>| 概念 | 公式/方法 | 应用 |</p>
+<pre><code>
+| 透视投影 | `u = K[R\|t]X` | 3D→2D转换 |
+| 消失点 | 平行线交点 | 估计相机朝向 |
+| 单应性 | `x' = Hx` | 平面变换 |
+| DLT算法 | SVD求解 | 计算H矩阵 |
+
+---
+
+### 后续学习方向
+
+```infographic
+infographic hierarchy-tree-curved-line-rounded-rect-node
+data
+  title 进阶路径
+  items
+    - label 深度学习
+      children:
+        - label 神经网络检测关键点
+        - label 端到端视角转换
+    - label 3D重建
+      children:
+        - label 多视角3D恢复
+        - label SLAM技术
+    - label 实时系统
+      children:
+        - label GPU加速
+        - label 嵌入式部署
+</code></pre>
+<hr>
+<h2 id="🎉-结语"><a href="#🎉-结语" class="headerlink" title="🎉 结语"></a>🎉 结语</h2><p>你已经掌握了从图像到俯视图转换的完整知识和技能！</p>
+<p><strong>记住：</strong></p>
+<ul>
+<li>📚 理论是基础</li>
+<li>💻 代码是实践</li>
+<li>🐛 调试是成长</li>
+<li>🚀 应用是目标</li>
+</ul>
+<p><strong>继续探索，不断进步！</strong> ✨</p>
+<hr>
+<h2 id="📚-参考资料"><a href="#📚-参考资料" class="headerlink" title="📚 参考资料"></a>📚 参考资料</h2><h3 id="学习资源"><a href="#学习资源" class="headerlink" title="学习资源"></a>学习资源</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.opencv.org/">OpenCV官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.robots.ox.ac.uk/~vgg/hzbook/">Multiple View Geometry (Hartley &amp; Zisserman)</a></li>
+<li><a target="_blank" rel="noopener" href="https://szeliski.org/Book/">计算机视觉基础</a></li>
+</ul>
+<h3 id="相关论文"><a href="#相关论文" class="headerlink" title="相关论文"></a>相关论文</h3><ul>
+<li>Homography Estimation: A Review</li>
+<li>Camera Calibration Methods</li>
+<li>Perspective Transformation in Computer Vision</li>
+</ul>
+<hr>
+<p><strong>版本信息：</strong></p>
+<ul>
+<li>版本：1.0.0</li>
+<li>创建日期：2026-01-19</li>
+<li>编程语言：Python 3.7+</li>
+<li>主要依赖：OpenCV, NumPy</li>
+</ul>
+<hr>
+<p><strong>祝你学习愉快！如有任何问题，欢迎交流讨论。</strong> 🎉</p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/01/19/image-to-bird-eye-view/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/01/19/image-to-bird-eye-view/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/19/camera-geometry-complete-guide/">相机几何完全指南：从世界坐标到图像坐标的完整推导</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/">如何使用Hexo写博客</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%AF-%E6%95%99%E7%A8%8B%E7%AE%80%E4%BB%8B"><span class="toc-text">🎯 教程简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%A0%E5%B0%86%E5%AD%A6%E5%88%B0%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">你将学到什么？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%9A-%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9A%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="toc-text">📚 第一章：基础概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E4%B8%89%E7%A7%8D%E5%9D%90%E6%A0%87%E7%B3%BB%E7%BB%9F"><span class="toc-text">1.1 三种坐标系统</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E7%B3%BB-World-Coordinates"><span class="toc-text">世界坐标系 (World Coordinates)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B8%E6%9C%BA%E5%9D%90%E6%A0%87%E7%B3%BB-Camera-Coordinates"><span class="toc-text">相机坐标系 (Camera Coordinates)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%9D%90%E6%A0%87%E7%B3%BB-Image-Coordinates"><span class="toc-text">图像坐标系 (Image Coordinates)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E9%80%8F%E8%A7%86%E6%8A%95%E5%BD%B1%E5%8E%9F%E7%90%86"><span class="toc-text">1.2 透视投影原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E9%80%8F%E8%A7%86%E6%95%88%E6%9E%9C"><span class="toc-text">1.3 透视效果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%90-%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9A%E6%B6%88%E5%A4%B1%E7%82%B9%E7%90%86%E8%AE%BA"><span class="toc-text">📐 第二章：消失点理论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E4%BB%80%E4%B9%88%E6%98%AF%E6%B6%88%E5%A4%B1%E7%82%B9%EF%BC%9F"><span class="toc-text">2.1 什么是消失点？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E6%B6%88%E5%A4%B1%E7%82%B9%E7%9A%84%E8%AE%A1%E7%AE%97"><span class="toc-text">2.2 消失点的计算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E4%BB%8E%E6%B6%88%E5%A4%B1%E7%82%B9%E5%88%B0%E7%9B%B8%E6%9C%BA%E5%8F%82%E6%95%B0"><span class="toc-text">2.3 从消失点到相机参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E5%87%A0%E4%BD%95%E8%AF%81%E6%98%8E"><span class="toc-text">2.4 几何证明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%84-%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9A%E5%8D%95%E5%BA%94%E6%80%A7%E5%8F%98%E6%8D%A2"><span class="toc-text">🔄 第三章：单应性变换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E4%BB%80%E4%B9%88%E6%98%AF%E5%8D%95%E5%BA%94%E6%80%A7%EF%BC%9F"><span class="toc-text">3.1 什么是单应性？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%8D%95%E5%BA%94%E6%80%A7%E7%9F%A9%E9%98%B5"><span class="toc-text">3.2 单应性矩阵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-DLT%E7%AE%97%E6%B3%95%E6%B1%82%E8%A7%A3H%E7%9F%A9%E9%98%B5"><span class="toc-text">3.3 DLT算法求解H矩阵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B"><span class="toc-text">3.4 优化过程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%92%BB-%E7%AC%AC%E5%9B%9B%E7%AB%A0%EF%BC%9A%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-text">💻 第四章：完整代码实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="toc-text">4.1 环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84"><span class="toc-text">4.2 项目结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E4%BA%A4%E4%BA%92%E5%BC%8F%E9%B8%9F%E7%9E%B0%E5%9B%BE%E7%94%9F%E6%88%90%E5%99%A8"><span class="toc-text">4.3 交互式鸟瞰图生成器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E8%BF%90%E8%A1%8C%E6%95%88%E6%9E%9C"><span class="toc-text">4.4 运行效果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%AD%A5%E9%AA%A4%EF%BC%9Abash-1-%E8%BF%90%E8%A1%8C%E7%A8%8B%E5%BA%8F-python-main-py-2-%E8%BE%93%E5%85%A5%E5%9B%BE%E5%83%8F%E8%B7%AF%E5%BE%84%EF%BC%88%E6%88%96%E4%BD%BF%E7%94%A8%E9%BB%98%E8%AE%A4%EF%BC%89-%E8%AF%B7%E8%BE%93%E5%85%A5%E5%9B%BE%E5%83%8F%E8%B7%AF%E5%BE%84%EF%BC%88%E6%88%96%E6%8C%89%E5%9B%9E%E8%BD%A6%E4%BD%BF%E7%94%A8%E9%BB%98%E8%AE%A4%EF%BC%89-3-%E5%9C%A8%E5%BC%B9%E5%87%BA%E7%9A%84%E7%AA%97%E5%8F%A3%E4%B8%AD%E7%82%B9%E5%87%BB4%E4%B8%AA%E7%82%B9-%F0%9F%93%8C-%E8%AF%B7%E5%9C%A8%E5%9B%BE%E5%83%8F%E4%B8%8A%E4%BE%9D%E6%AC%A1%E7%82%B9%E5%87%BB4%E4%B8%AA%E7%82%B9-%E9%A1%BA%E5%BA%8F%EF%BC%9A%E5%B7%A6%E4%B8%8B-%E2%86%92-%E5%8F%B3%E4%B8%8B-%E2%86%92-%E5%8F%B3%E4%B8%8A-%E2%86%92-%E5%B7%A6%E4%B8%8A-4-%E6%9F%A5%E7%9C%8B%E7%BB%93%E6%9E%9C-%E2%9C%85-%E5%A4%84%E7%90%86%E5%AE%8C%E6%88%90%EF%BC%81-%F0%9F%92%BE-%E7%BB%93%E6%9E%9C%E5%B7%B2%E4%BF%9D%E5%AD%98%E5%88%B0-output-result-jpg-%E6%95%88%E6%9E%9C%E5%B1%95%E7%A4%BA%EF%BC%9A%E8%BE%93%E5%85%A5%E5%9B%BE%E5%83%8F%EF%BC%88%E6%96%9C%E8%A7%86%E8%A7%92%EF%BC%89-%E8%BE%93%E5%87%BA%E5%9B%BE%E5%83%8F%EF%BC%88%E4%BF%AF%E8%A7%86%E5%9B%BE%EF%BC%89-%E2%95%B1%E2%95%B2-%E2%94%8C%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%90-%E2%95%B1-%E2%95%B2-%E2%86%92-%E2%94%82-%E2%94%82-%E2%95%B1-%E2%95%B2-%E5%8F%98%E6%8D%A2-%E2%94%82-%E2%94%82-%E2%95%B1-%E2%95%B2-%E2%94%94%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%98-%E6%A2%AF%E5%BD%A2%E6%95%88%E6%9E%9C-%E7%9F%A9%E5%BD%A2%E6%95%88%E6%9E%9C"><span class="toc-text">运行步骤：bash # 1. 运行程序 python main.py # 2. 输入图像路径（或使用默认） 请输入图像路径（或按回车使用默认）: # 3. 在弹出的窗口中点击4个点 📌 请在图像上依次点击4个点    顺序：左下 → 右下 → 右上 → 左上 # 4. 查看结果 ✅ 处理完成！ 💾 结果已保存到: output&#x2F;result.jpg 效果展示：输入图像（斜视角）          输出图像（俯视图）      ╱╲                        ┌──────┐     ╱  ╲       →               │      │    ╱    ╲      变换             │      │   ╱______╲                      └──────┘  梯形效果                        矩形效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%90%9B-%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9A%E8%B0%83%E8%AF%95%E4%B8%8E%E4%BC%98%E5%8C%96"><span class="toc-text">🐛 第五章：调试与优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="toc-text">5.1 常见问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%97%AE%E9%A2%981%EF%BC%9A%E5%9B%BE%E5%83%8F%E5%8F%98%E5%BD%A2%E4%B8%A5%E9%87%8D"><span class="toc-text">问题1：图像变形严重</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%EF%BC%9A%E7%82%B9%E9%80%89%E6%8B%A9%E4%B8%8D%E5%90%88%E7%90%86%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9Apython-def-check-points-distribution-pts-quot-quot-quot-%E6%A3%80%E6%9F%A5%E7%82%B9%E7%9A%84%E5%88%86%E5%B8%83-quot-quot-quot-std-x-np-std-pts-0-std-y-np-std-pts-1-if-std-x-lt-50-or-std-y-lt-50-print-quot-%E2%9A%A0%EF%B8%8F-%E8%AD%A6%E5%91%8A%EF%BC%9A%E7%82%B9%E5%88%86%E5%B8%83%E8%BF%87%E4%BA%8E%E9%9B%86%E4%B8%AD%EF%BC%81-quot-print-f-quot-X%E6%96%B9%E5%90%91%E6%A0%87%E5%87%86%E5%B7%AE-std-x-1f-quot-print-f-quot-Y%E6%96%B9%E5%90%91%E6%A0%87%E5%87%86%E5%B7%AE-std-y-1f-quot-print-quot-%E5%BB%BA%E8%AE%AE%EF%BC%9A%E9%80%89%E6%8B%A9%E6%9B%B4%E5%88%86%E6%95%A3%E7%9A%84%E7%82%B9-quot-return-False-return-True"><span class="toc-text">原因：点选择不合理解决方案：python def check_points_distribution(pts):     &quot;&quot;&quot;检查点的分布&quot;&quot;&quot;     std_x &#x3D; np.std(pts[:, 0])     std_y &#x3D; np.std(pts[:, 1])     if std_x &lt; 50 or std_y &lt; 50:         print(&quot;⚠️  警告：点分布过于集中！&quot;)         print(f&quot;   X方向标准差: {std_x:.1f}&quot;)         print(f&quot;   Y方向标准差: {std_y:.1f}&quot;)         print(&quot;   建议：选择更分散的点&quot;)         return False     return True </span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%97%AE%E9%A2%982%EF%BC%9A%E9%B8%9F%E7%9E%B0%E5%9B%BE%E6%9C%89%E9%BB%91%E8%BE%B9"><span class="toc-text">问题2：鸟瞰图有黑边</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%EF%BC%9A%E8%BE%93%E5%87%BA%E5%9B%BE%E5%83%8F%E8%8C%83%E5%9B%B4%E8%AE%BE%E7%BD%AE%E4%B8%8D%E5%BD%93%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9Apython-def-compute-output-size-img-H-src-pts-quot-quot-quot-%E8%87%AA%E5%8A%A8%E8%AE%A1%E7%AE%97%E8%BE%93%E5%87%BA%E5%9B%BE%E5%83%8F%E5%A4%A7%E5%B0%8F-quot-quot-quot-h-w-img-shape-2-%E5%8F%98%E6%8D%A2%E5%9B%BE%E5%83%8F%E7%9A%84%E5%9B%9B%E4%B8%AA%E8%A7%92%E7%82%B9-corners-np-array-0-0-w-0-w-h-0-h-dtype-np-float32-%E5%BA%94%E7%94%A8H%E5%8F%98%E6%8D%A2-corners-homo-np-column-stack-corners-np-ones-4-transformed-H-corners-homo-T-T-transformed-transformed-2-transformed-2-3-%E8%AE%A1%E7%AE%97%E8%BE%B9%E7%95%8C-min-x-np-min-transformed-0-max-x-np-max-transformed-0-min-y-np-min-transformed-1-max-y-np-max-transformed-1-out-w-int-max-x-min-x-out-h-int-max-y-min-y-return-out-w-out-h"><span class="toc-text">原因：输出图像范围设置不当解决方案：python def compute_output_size(img, H, src_pts):     &quot;&quot;&quot;自动计算输出图像大小&quot;&quot;&quot;     h, w &#x3D; img.shape[:2]     # 变换图像的四个角点     corners &#x3D; np.array([         [0, 0], [w, 0], [w, h], [0, h]     ], dtype&#x3D;np.float32)     # 应用H变换     corners_homo &#x3D; np.column_stack([corners, np.ones(4)])     transformed &#x3D; (H @ corners_homo.T).T     transformed &#x3D; transformed[:, :2] &#x2F; transformed[:, 2:3]     # 计算边界     min_x &#x3D; np.min(transformed[:, 0])     max_x &#x3D; np.max(transformed[:, 0])     min_y &#x3D; np.min(transformed[:, 1])     max_y &#x3D; np.max(transformed[:, 1])     out_w &#x3D; int(max_x - min_x)     out_h &#x3D; int(max_y - min_y)     return out_w, out_h </span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%97%AE%E9%A2%983%EF%BC%9A%E8%BF%90%E8%A1%8C%E9%80%9F%E5%BA%A6%E6%85%A2"><span class="toc-text">问题3：运行速度慢</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9Apython-%E4%BD%BF%E7%94%A8%E6%9B%B4%E5%BF%AB%E7%9A%84%E6%8F%92%E5%80%BC%E6%96%B9%E6%B3%95-result-cv2-warpPerspective-img-H-out-w-out-h-flags-cv2-INTER-LINEAR-%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC%EF%BC%88%E5%BF%AB%EF%BC%89-flags-cv2-INTER-CUBIC-%E5%8F%8C%E4%B8%89%E6%AC%A1%E6%8F%92%E5%80%BC%EF%BC%88%E6%85%A2%E4%BD%86%E6%9B%B4%E5%A5%BD%EF%BC%89"><span class="toc-text">解决方案：python # 使用更快的插值方法 result &#x3D; cv2.warpPerspective(     img,     H,     (out_w, out_h),     flags&#x3D;cv2.INTER_LINEAR  # 双线性插值（快）     # flags&#x3D;cv2.INTER_CUBIC  # 双三次插值（慢但更好） ) </span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96"><span class="toc-text">5.2 性能优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%9A%80-%E7%AC%AC%E5%85%AD%E7%AB%A0%EF%BC%9A%E8%BF%9B%E9%98%B6%E5%BA%94%E7%94%A8"><span class="toc-text">🚀 第六章：进阶应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E8%A7%86%E9%A2%91%E6%B5%81%E5%A4%84%E7%90%86"><span class="toc-text">6.1 视频流处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%AE%9E%E6%97%B6%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A"><span class="toc-text">6.2 实时相机标定</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8A-%E6%80%BB%E7%BB%93"><span class="toc-text">📊 总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C"><span class="toc-text">学习成果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-text">核心知识点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%89-%E7%BB%93%E8%AF%AD"><span class="toc-text">🎉 结语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%9A-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-text">📚 参考资料</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90"><span class="toc-text">学习资源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E8%AE%BA%E6%96%87"><span class="toc-text">相关论文</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/01/19/image-to-bird-eye-view/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

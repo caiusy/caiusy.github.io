@@ -1,0 +1,1048 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>🌳 LeetCode 150 - 二叉树专题 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="LeetCode 面试 150 题之二叉树专题，含遍历图解、递归思维、代码模板">
+<meta property="og:type" content="article">
+<meta property="og:title" content="🌳 LeetCode 150 - 二叉树专题">
+<meta property="og:url" content="https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="LeetCode 面试 150 题之二叉树专题，含遍历图解、递归思维、代码模板">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-01-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-17T16:00:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="LeetCode - LeetCode - leetcode面试150 - 二叉树 - Binary Tree - 面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="LeetCode - LeetCode - leetcode面试150 - 二叉树 - Binary Tree - 面试">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-01-18T00:00:00+08:00","dateModified":"2026-01-18T00:00:00+08:00","datePublished":"2026-01-18T00:00:00+08:00","description":"","headline":"🌳 LeetCode 150 - 二叉树专题","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/","keywords":"LeetCode - LeetCode - leetcode面试150 - 二叉树 - Binary Tree - 面试","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> AI探索者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a><a class="item title" href="/2019/12/19/20191219-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/"><span class="title">二叉树打印</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/">LeetCode</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/%E7%AE%97%E6%B3%95/">算法</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/%E7%AE%97%E6%B3%95/LeetCode/">LeetCode</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-01-17T16:00:00.000Z">2026-01-18</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-01-17T16:00:00.000Z">2026-01-18</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>🌳 LeetCode 150 - 二叉树专题</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h1 id="🌳-二叉树专题-14题"><a href="#🌳-二叉树专题-14题" class="headerlink" title="🌳 二叉树专题 (14题)"></a>🌳 二叉树专题 (14题)</h1><blockquote>
+<p>🎯 <strong>核心思想</strong>：递归思维 + 分解问题</p>
+</blockquote>
+<hr>
+<h2 id="🗺️-二叉树的思维模式"><a href="#🗺️-二叉树的思维模式" class="headerlink" title="🗺️ 二叉树的思维模式"></a>🗺️ 二叉树的思维模式</h2><pre><code>┌─────────────────────────────────────────────────────────────┐
+│                 二叉树的两种思维模式                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  模式一：遍历思维                                            │
+│  ────────────────                                           │
+│  用一个 traverse 函数遍历整棵树                              │
+│  在遍历过程中更新外部变量                                    │
+│                                                             │
+│  模式二：分解问题思维                                        │
+│  ──────────────────                                         │
+│  将问题分解为子问题                                          │
+│  通过子问题的答案推导出原问题的答案                          │
+│                                                             │
+│            1                                                │
+│           / \                                               │
+│          2   3        问题(根) = f(问题(左), 问题(右))       │
+│         / \                                                 │
+│        4   5                                                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr>
+<h2 id="🔧-二叉树遍历模板"><a href="#🔧-二叉树遍历模板" class="headerlink" title="🔧 二叉树遍历模板"></a>🔧 二叉树遍历模板</h2><h3 id="前序遍历（根-左-右）"><a href="#前序遍历（根-左-右）" class="headerlink" title="前序遍历（根-左-右）"></a>前序遍历（根-左-右）</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">preorder</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> root<span class="token punctuation">:</span>
+        <span class="token keyword">return</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>root<span class="token punctuation">.</span>val<span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># 先处理根</span>
+    preorder<span class="token punctuation">(</span>root<span class="token punctuation">.</span>left<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 再左子树</span>
+    preorder<span class="token punctuation">(</span>root<span class="token punctuation">.</span>right<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 后右子树</span>
+</code></pre>
+<h3 id="中序遍历（左-根-右）"><a href="#中序遍历（左-根-右）" class="headerlink" title="中序遍历（左-根-右）"></a>中序遍历（左-根-右）</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">inorder</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> root<span class="token punctuation">:</span>
+        <span class="token keyword">return</span>
+    inorder<span class="token punctuation">(</span>root<span class="token punctuation">.</span>left<span class="token punctuation">)</span>   <span class="token comment" spellcheck="true"># 先左子树</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>root<span class="token punctuation">.</span>val<span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># 再处理根</span>
+    inorder<span class="token punctuation">(</span>root<span class="token punctuation">.</span>right<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 后右子树</span>
+</code></pre>
+<h3 id="后序遍历（左-右-根）"><a href="#后序遍历（左-右-根）" class="headerlink" title="后序遍历（左-右-根）"></a>后序遍历（左-右-根）</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">postorder</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> root<span class="token punctuation">:</span>
+        <span class="token keyword">return</span>
+    postorder<span class="token punctuation">(</span>root<span class="token punctuation">.</span>left<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 先左子树</span>
+    postorder<span class="token punctuation">(</span>root<span class="token punctuation">.</span>right<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 再右子树</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>root<span class="token punctuation">.</span>val<span class="token punctuation">)</span>       <span class="token comment" spellcheck="true"># 后处理根</span>
+</code></pre>
+<h3 id="层序遍历（BFS）"><a href="#层序遍历（BFS）" class="headerlink" title="层序遍历（BFS）"></a>层序遍历（BFS）</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> collections <span class="token keyword">import</span> deque
+
+<span class="token keyword">def</span> <span class="token function">levelorder</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> root<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    
+    queue <span class="token operator">=</span> deque<span class="token punctuation">(</span><span class="token punctuation">[</span>root<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    
+    <span class="token keyword">while</span> queue<span class="token punctuation">:</span>
+        level <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>queue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            node <span class="token operator">=</span> queue<span class="token punctuation">.</span>popleft<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            level<span class="token punctuation">.</span>append<span class="token punctuation">(</span>node<span class="token punctuation">.</span>val<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> node<span class="token punctuation">.</span>left<span class="token punctuation">:</span>
+                queue<span class="token punctuation">.</span>append<span class="token punctuation">(</span>node<span class="token punctuation">.</span>left<span class="token punctuation">)</span>
+            <span class="token keyword">if</span> node<span class="token punctuation">.</span>right<span class="token punctuation">:</span>
+                queue<span class="token punctuation">.</span>append<span class="token punctuation">(</span>node<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
+        result<span class="token punctuation">.</span>append<span class="token punctuation">(</span>level<span class="token punctuation">)</span>
+    
+    <span class="token keyword">return</span> result
+</code></pre>
+<hr>
+<h2 id="1️⃣-LC-104-二叉树的最大深度-🟢"><a href="#1️⃣-LC-104-二叉树的最大深度-🟢" class="headerlink" title="1️⃣ LC 104. 二叉树的最大深度 🟢"></a>1️⃣ LC 104. 二叉树的最大深度 🟢</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>返回二叉树的最大深度。</p>
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>
+```python
+   / \
+  9  20
+    /  \
+   15   7
+分解思维:
+maxDepth(3) = 1 + max(maxDepth(9), maxDepth(20))
+            = 1 + max(1, 2)
+            = 3
+</code></pre>
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">maxDepth</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> root<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token number">0</span>
+    left_depth <span class="token operator">=</span> maxDepth<span class="token punctuation">(</span>root<span class="token punctuation">.</span>left<span class="token punctuation">)</span>
+    right_depth <span class="token operator">=</span> maxDepth<span class="token punctuation">(</span>root<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token number">1</span> <span class="token operator">+</span> max<span class="token punctuation">(</span>left_depth<span class="token punctuation">,</span> right_depth<span class="token punctuation">)</span>
+</code></pre>
+<h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“深度 = 1 + max(左深度, 右深度)”</strong></p>
+</blockquote>
+<hr>
+<h2 id="2️⃣-LC-100-相同的树-🟢"><a href="#2️⃣-LC-100-相同的树-🟢" class="headerlink" title="2️⃣ LC 100. 相同的树 🟢"></a>2️⃣ LC 100. 相同的树 🟢</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="判断两棵树是否相同。-🎨-图解思路-p-q-1-1-2-3-2-3-相同的条件-1-根节点值相同-2-左子树相同-3-右子树相同-💻-代码实现python-def-isSameTree-p-q-gt-bool-if-not-p-and-not-q-return-True-if-not-p-or-not-q-return-False-return-p-val-q-val-and-isSameTree-p-left-q-left-and-isSameTree-p-right-q-right-🧠-记忆口诀-gt-“根同左同右同，才是真的同”"><a href="#判断两棵树是否相同。-🎨-图解思路-p-q-1-1-2-3-2-3-相同的条件-1-根节点值相同-2-左子树相同-3-右子树相同-💻-代码实现python-def-isSameTree-p-q-gt-bool-if-not-p-and-not-q-return-True-if-not-p-or-not-q-return-False-return-p-val-q-val-and-isSameTree-p-left-q-left-and-isSameTree-p-right-q-right-🧠-记忆口诀-gt-“根同左同右同，才是真的同”" class="headerlink" title="判断两棵树是否相同。### 🎨 图解思路   p       q    1       1   / \     / \  2   3   2   3 相同的条件: 1. 根节点值相同 2. 左子树相同 3. 右子树相同### 💻 代码实现python def isSameTree(p, q) -> bool:     if not p and not q:         return True     if not p or not q:         return False     return (p.val == q.val and             isSameTree(p.left, q.left) and             isSameTree(p.right, q.right)) ### 🧠 记忆口诀> “根同左同右同，才是真的同”"></a>判断两棵树是否相同。<br>### 🎨 图解思路<br><code>   p       q    1       1   / \     / \  2   3   2   3 相同的条件: 1. 根节点值相同 2. 左子树相同 3. 右子树相同</code><br>### 💻 代码实现<br><code>python def isSameTree(p, q) -&gt; bool:     if not p and not q:         return True     if not p or not q:         return False     return (p.val == q.val and             isSameTree(p.left, q.left) and             isSameTree(p.right, q.right)) </code><br>### 🧠 记忆口诀<br>&gt; <strong>“根同左同右同，才是真的同”</strong></h2><h2 id="3️⃣-LC-226-翻转二叉树-🟢"><a href="#3️⃣-LC-226-翻转二叉树-🟢" class="headerlink" title="3️⃣ LC 226. 翻转二叉树 🟢"></a>3️⃣ LC 226. 翻转二叉树 🟢</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="翻转二叉树（镜像）。-🎨-图解思路-4-4-2-7-gt-7-2-1-3-6-9-9-6-3-1-交换每个节点的左右子树-💻-代码实现python-def-invertTree-root-if-not-root-return-None-交换左右子树-root-left-root-right-root-right-root-left-递归翻转子树-invertTree-root-left-invertTree-root-right-return-root-🧠-记忆口诀-gt-“先交换，再递归”"><a href="#翻转二叉树（镜像）。-🎨-图解思路-4-4-2-7-gt-7-2-1-3-6-9-9-6-3-1-交换每个节点的左右子树-💻-代码实现python-def-invertTree-root-if-not-root-return-None-交换左右子树-root-left-root-right-root-right-root-left-递归翻转子树-invertTree-root-left-invertTree-root-right-return-root-🧠-记忆口诀-gt-“先交换，再递归”" class="headerlink" title="翻转二叉树（镜像）。### 🎨 图解思路     4              4    /   \          /   \   2     7   =>   7     2  / \   / \      / \   / \ 1   3 6   9    9   6 3   1 交换每个节点的左右子树### 💻 代码实现python def invertTree(root):     if not root:         return None     # 交换左右子树     root.left, root.right = root.right, root.left     # 递归翻转子树     invertTree(root.left)     invertTree(root.right)     return root ### 🧠 记忆口诀> “先交换，再递归”"></a>翻转二叉树（镜像）。<br>### 🎨 图解思路<br><code>     4              4    /   \          /   \   2     7   =&gt;   7     2  / \   / \      / \   / \ 1   3 6   9    9   6 3   1 交换每个节点的左右子树</code><br>### 💻 代码实现<br><code>python def invertTree(root):     if not root:         return None     # 交换左右子树     root.left, root.right = root.right, root.left     # 递归翻转子树     invertTree(root.left)     invertTree(root.right)     return root </code><br>### 🧠 记忆口诀<br>&gt; <strong>“先交换，再递归”</strong></h2><h2 id="4️⃣-LC-101-对称二叉树-🟢"><a href="#4️⃣-LC-101-对称二叉树-🟢" class="headerlink" title="4️⃣ LC 101. 对称二叉树 🟢"></a>4️⃣ LC 101. 对称二叉树 🟢</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="判断二叉树是否对称。-🎨-图解思路-2-2-3-4-4-3-对称条件-左子树的左-右子树的右-左子树的右-右子树的左-💻-代码实现python-def-isSymmetric-root-gt-bool-def-check-left-right-if-not-left-and-not-right-return-True-if-not-left-or-not-right-return-False-return-left-val-right-val-and-check-left-left-right-right-and-check-left-right-right-left-return-check-root-left-root-right-if-root-else-True-🧠-记忆口诀-gt-“外外相等，内内相等”"><a href="#判断二叉树是否对称。-🎨-图解思路-2-2-3-4-4-3-对称条件-左子树的左-右子树的右-左子树的右-右子树的左-💻-代码实现python-def-isSymmetric-root-gt-bool-def-check-left-right-if-not-left-and-not-right-return-True-if-not-left-or-not-right-return-False-return-left-val-right-val-and-check-left-left-right-right-and-check-left-right-right-left-return-check-root-left-root-right-if-root-else-True-🧠-记忆口诀-gt-“外外相等，内内相等”" class="headerlink" title="判断二叉树是否对称。### 🎨 图解思路   / \   2   2  / \ / \ 3  4 4  3 对称条件: 左子树的左 == 右子树的右 左子树的右 == 右子树的左### 💻 代码实现python def isSymmetric(root) -> bool:     def check(left, right):         if not left and not right:             return True         if not left or not right:             return False         return (left.val == right.val and                 check(left.left, right.right) and                 check(left.right, right.left))     return check(root.left, root.right) if root else True ### 🧠 记忆口诀> “外外相等，内内相等”"></a>判断二叉树是否对称。<br>### 🎨 图解思路<br><code>   / \   2   2  / \ / \ 3  4 4  3 对称条件: 左子树的左 == 右子树的右 左子树的右 == 右子树的左</code><br>### 💻 代码实现<br><code>python def isSymmetric(root) -&gt; bool:     def check(left, right):         if not left and not right:             return True         if not left or not right:             return False         return (left.val == right.val and                 check(left.left, right.right) and                 check(left.right, right.left))     return check(root.left, root.right) if root else True </code><br>### 🧠 记忆口诀<br>&gt; <strong>“外外相等，内内相等”</strong></h2><h2 id="5️⃣-LC-105-从前序与中序遍历序列构造二叉树-🟡"><a href="#5️⃣-LC-105-从前序与中序遍历序列构造二叉树-🟡" class="headerlink" title="5️⃣ LC 105. 从前序与中序遍历序列构造二叉树 🟡"></a>5️⃣ LC 105. 从前序与中序遍历序列构造二叉树 🟡</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="根据前序和中序遍历结果，构建二叉树。-🎨-图解思路preorder-3-9-20-15-7-根-左-右-inorder-9-3-15-20-7-左-根-右-步骤-1-preorder-0-3-是根节点-2-在-inorder-中找到-3，左边是左子树，右边是右子树-3-递归构建-9-20-15-7-💻-代码实现python-def-buildTree-preorder-list-inorder-list-if-not-preorder-return-None-根节点是前序第一个-root-TreeNode-preorder-0-在中序中找到根节点位置-mid-inorder-index-preorder-0-递归构建左右子树-root-left-buildTree-preorder-1-mid-1-inorder-mid-root-right-buildTree-preorder-mid-1-inorder-mid-1-return-root-🧠-记忆口诀-gt-“前序定根，中序分边”"><a href="#根据前序和中序遍历结果，构建二叉树。-🎨-图解思路preorder-3-9-20-15-7-根-左-右-inorder-9-3-15-20-7-左-根-右-步骤-1-preorder-0-3-是根节点-2-在-inorder-中找到-3，左边是左子树，右边是右子树-3-递归构建-9-20-15-7-💻-代码实现python-def-buildTree-preorder-list-inorder-list-if-not-preorder-return-None-根节点是前序第一个-root-TreeNode-preorder-0-在中序中找到根节点位置-mid-inorder-index-preorder-0-递归构建左右子树-root-left-buildTree-preorder-1-mid-1-inorder-mid-root-right-buildTree-preorder-mid-1-inorder-mid-1-return-root-🧠-记忆口诀-gt-“前序定根，中序分边”" class="headerlink" title="根据前序和中序遍历结果，构建二叉树。### 🎨 图解思路preorder = [3, 9, 20, 15, 7]  根-左-右 inorder  = [9, 3, 15, 20, 7]  左-根-右 步骤: 1. preorder[0] = 3 是根节点 2. 在 inorder 中找到 3，左边是左子树，右边是右子树 3. 递归构建    / \   9  20     /  \    15   7### 💻 代码实现python def buildTree(preorder: list, inorder: list):     if not preorder:         return None     # 根节点是前序第一个     root = TreeNode(preorder[0])     # 在中序中找到根节点位置     mid = inorder.index(preorder[0])     # 递归构建左右子树     root.left = buildTree(preorder[1:mid+1], inorder[:mid])     root.right = buildTree(preorder[mid+1:], inorder[mid+1:])     return root ### 🧠 记忆口诀> “前序定根，中序分边”"></a>根据前序和中序遍历结果，构建二叉树。<br>### 🎨 图解思路<br><code>preorder = [3, 9, 20, 15, 7]  根-左-右 inorder  = [9, 3, 15, 20, 7]  左-根-右 步骤: 1. preorder[0] = 3 是根节点 2. 在 inorder 中找到 3，左边是左子树，右边是右子树 3. 递归构建    / \   9  20     /  \    15   7</code><br>### 💻 代码实现<br><code>python def buildTree(preorder: list, inorder: list):     if not preorder:         return None     # 根节点是前序第一个     root = TreeNode(preorder[0])     # 在中序中找到根节点位置     mid = inorder.index(preorder[0])     # 递归构建左右子树     root.left = buildTree(preorder[1:mid+1], inorder[:mid])     root.right = buildTree(preorder[mid+1:], inorder[mid+1:])     return root </code><br>### 🧠 记忆口诀<br>&gt; <strong>“前序定根，中序分边”</strong></h2><h2 id="6️⃣-LC-106-从中序与后序遍历序列构造二叉树-🟡"><a href="#6️⃣-LC-106-从中序与后序遍历序列构造二叉树-🟡" class="headerlink" title="6️⃣ LC 106. 从中序与后序遍历序列构造二叉树 🟡"></a>6️⃣ LC 106. 从中序与后序遍历序列构造二叉树 🟡</h2><h3 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="根据中序和后序遍历结果，构建二叉树。-🎨-图解思路inorder-9-3-15-20-7-左-根-右-postorder-9-15-7-20-3-左-右-根-后序最后一个是根！-💻-代码实现python-def-buildTree-inorder-list-postorder-list-if-not-postorder-return-None-根节点是后序最后一个-root-TreeNode-postorder-1-在中序中找到根节点位置-mid-inorder-index-postorder-1-递归构建左右子树-root-left-buildTree-inorder-mid-postorder-mid-root-right-buildTree-inorder-mid-1-postorder-mid-1-return-root-🧠-记忆口诀-gt-“后序定根（最后），中序分边”"><a href="#根据中序和后序遍历结果，构建二叉树。-🎨-图解思路inorder-9-3-15-20-7-左-根-右-postorder-9-15-7-20-3-左-右-根-后序最后一个是根！-💻-代码实现python-def-buildTree-inorder-list-postorder-list-if-not-postorder-return-None-根节点是后序最后一个-root-TreeNode-postorder-1-在中序中找到根节点位置-mid-inorder-index-postorder-1-递归构建左右子树-root-left-buildTree-inorder-mid-postorder-mid-root-right-buildTree-inorder-mid-1-postorder-mid-1-return-root-🧠-记忆口诀-gt-“后序定根（最后），中序分边”" class="headerlink" title="根据中序和后序遍历结果，构建二叉树。### 🎨 图解思路inorder   = [9, 3, 15, 20, 7]  左-根-右 postorder = [9, 15, 7, 20, 3]  左-右-根 后序最后一个是根！### 💻 代码实现python def buildTree(inorder: list, postorder: list):     if not postorder:         return None     # 根节点是后序最后一个     root = TreeNode(postorder[-1])     # 在中序中找到根节点位置     mid = inorder.index(postorder[-1])     # 递归构建左右子树     root.left = buildTree(inorder[:mid], postorder[:mid])     root.right = buildTree(inorder[mid+1:], postorder[mid:-1])     return root ### 🧠 记忆口诀> “后序定根（最后），中序分边”"></a>根据中序和后序遍历结果，构建二叉树。<br>### 🎨 图解思路<br><code>inorder   = [9, 3, 15, 20, 7]  左-根-右 postorder = [9, 15, 7, 20, 3]  左-右-根 后序最后一个是根！</code><br>### 💻 代码实现<br><code>python def buildTree(inorder: list, postorder: list):     if not postorder:         return None     # 根节点是后序最后一个     root = TreeNode(postorder[-1])     # 在中序中找到根节点位置     mid = inorder.index(postorder[-1])     # 递归构建左右子树     root.left = buildTree(inorder[:mid], postorder[:mid])     root.right = buildTree(inorder[mid+1:], postorder[mid:-1])     return root </code><br>### 🧠 记忆口诀<br>&gt; <strong>“后序定根（最后），中序分边”</strong></h2><h2 id="7️⃣-LC-117-填充每个节点的下一个右侧节点指针-II-🟡"><a href="#7️⃣-LC-117-填充每个节点的下一个右侧节点指针-II-🟡" class="headerlink" title="7️⃣ LC 117. 填充每个节点的下一个右侧节点指针 II 🟡"></a>7️⃣ LC 117. 填充每个节点的下一个右侧节点指针 II 🟡</h2><h3 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="填充每个节点的-next-指针指向右侧节点。-🎨-图解思路-1-→-NULL-2-→-3-→-NULL-4→-5-→-7-→-NULL-使用层序遍历，连接同层节点-💻-代码实现python-def-connect-root-if-not-root-return-None-queue-deque-root-while-queue-size-len-queue-prev-None-for-i-in-range-size-node-queue-popleft-if-prev-prev-next-node-prev-node-if-node-left-queue-append-node-left-if-node-right-queue-append-node-right-return-root-🧠-记忆口诀-gt-“层序遍历，前连后”"><a href="#填充每个节点的-next-指针指向右侧节点。-🎨-图解思路-1-→-NULL-2-→-3-→-NULL-4→-5-→-7-→-NULL-使用层序遍历，连接同层节点-💻-代码实现python-def-connect-root-if-not-root-return-None-queue-deque-root-while-queue-size-len-queue-prev-None-for-i-in-range-size-node-queue-popleft-if-prev-prev-next-node-prev-node-if-node-left-queue-append-node-left-if-node-right-queue-append-node-right-return-root-🧠-记忆口诀-gt-“层序遍历，前连后”" class="headerlink" title="填充每个节点的 next 指针指向右侧节点。### 🎨 图解思路     1 → NULL    /   \   2  →  3 → NULL  / \     \ 4→  5  →  7 → NULL 使用层序遍历，连接同层节点### 💻 代码实现python def connect(root):     if not root:         return None     queue = deque([root])     while queue:         size = len(queue)         prev = None         for i in range(size):             node = queue.popleft()             if prev:                 prev.next = node             prev = node             if node.left:                 queue.append(node.left)             if node.right:                 queue.append(node.right)     return root ### 🧠 记忆口诀> “层序遍历，前连后”"></a>填充每个节点的 next 指针指向右侧节点。<br>### 🎨 图解思路<br><code>     1 → NULL    /   \   2  →  3 → NULL  / \     \ 4→  5  →  7 → NULL 使用层序遍历，连接同层节点</code><br>### 💻 代码实现<br><code>python def connect(root):     if not root:         return None     queue = deque([root])     while queue:         size = len(queue)         prev = None         for i in range(size):             node = queue.popleft()             if prev:                 prev.next = node             prev = node             if node.left:                 queue.append(node.left)             if node.right:                 queue.append(node.right)     return root </code><br>### 🧠 记忆口诀<br>&gt; <strong>“层序遍历，前连后”</strong></h2><h2 id="8️⃣-LC-114-二叉树展开为链表-🟡"><a href="#8️⃣-LC-114-二叉树展开为链表-🟡" class="headerlink" title="8️⃣ LC 114. 二叉树展开为链表 🟡"></a>8️⃣ LC 114. 二叉树展开为链表 🟡</h2><h3 id="题目描述-7"><a href="#题目描述-7" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="将二叉树展开为单链表（前序顺序）。-🎨-图解思路-1-1-2-5-gt-2-3-4-6-3-💻-代码实现python-def-flatten-root-gt-None-if-not-root-return-后序遍历：先处理子树，再处理根-flatten-root-left-flatten-root-right-保存右子树-right-root-right-左子树移到右边-root-right-root-left-root-left-None-找到右子树末端，接上原右子树-while-root-right-root-root-right-root-right-right-🧠-记忆口诀-gt-“左接右，原右接末尾”"><a href="#将二叉树展开为单链表（前序顺序）。-🎨-图解思路-1-1-2-5-gt-2-3-4-6-3-💻-代码实现python-def-flatten-root-gt-None-if-not-root-return-后序遍历：先处理子树，再处理根-flatten-root-left-flatten-root-right-保存右子树-right-root-right-左子树移到右边-root-right-root-left-root-left-None-找到右子树末端，接上原右子树-while-root-right-root-root-right-root-right-right-🧠-记忆口诀-gt-“左接右，原右接末尾”" class="headerlink" title="将二叉树展开为单链表（前序顺序）。### 🎨 图解思路    1           1    / \           \   2   5    =>     2  / \   \           \ 3   4   6           3                      \                        \                          \### 💻 代码实现python def flatten(root) -> None:     if not root:         return     # 后序遍历：先处理子树，再处理根     flatten(root.left)     flatten(root.right)     # 保存右子树     right = root.right     # 左子树移到右边     root.right = root.left     root.left = None     # 找到右子树末端，接上原右子树     while root.right:         root = root.right     root.right = right ### 🧠 记忆口诀> “左接右，原右接末尾”"></a>将二叉树展开为单链表（前序顺序）。<br>### 🎨 图解思路<br><code>    1           1    / \           \   2   5    =&gt;     2  / \   \           \ 3   4   6           3                      \                        \                          \</code><br>### 💻 代码实现<br><code>python def flatten(root) -&gt; None:     if not root:         return     # 后序遍历：先处理子树，再处理根     flatten(root.left)     flatten(root.right)     # 保存右子树     right = root.right     # 左子树移到右边     root.right = root.left     root.left = None     # 找到右子树末端，接上原右子树     while root.right:         root = root.right     root.right = right </code><br>### 🧠 记忆口诀<br>&gt; <strong>“左接右，原右接末尾”</strong></h2><h2 id="9️⃣-LC-112-路径总和-🟢"><a href="#9️⃣-LC-112-路径总和-🟢" class="headerlink" title="9️⃣ LC 112. 路径总和 🟢"></a>9️⃣ LC 112. 路径总和 🟢</h2><h3 id="题目描述-8"><a href="#题目描述-8" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="判断是否存在根到叶子路径，其和等于目标值。-🎨-图解思路-4-8-11-13-4-7-2-1-targetSum-22-路径-5-→-4-→-11-→-2-22-✓-💻-代码实现python-def-hasPathSum-root-targetSum-int-gt-bool-if-not-root-return-False-叶子节点-if-not-root-left-and-not-root-right-return-root-val-targetSum-递归检查子树-remaining-targetSum-root-val-return-hasPathSum-root-left-remaining-or-hasPathSum-root-right-remaining-🧠-记忆口诀-gt-“叶子判相等，非叶递归减”"><a href="#判断是否存在根到叶子路径，其和等于目标值。-🎨-图解思路-4-8-11-13-4-7-2-1-targetSum-22-路径-5-→-4-→-11-→-2-22-✓-💻-代码实现python-def-hasPathSum-root-targetSum-int-gt-bool-if-not-root-return-False-叶子节点-if-not-root-left-and-not-root-right-return-root-val-targetSum-递归检查子树-remaining-targetSum-root-val-return-hasPathSum-root-left-remaining-or-hasPathSum-root-right-remaining-🧠-记忆口诀-gt-“叶子判相等，非叶递归减”" class="headerlink" title="判断是否存在根到叶子路径，其和等于目标值。### 🎨 图解思路     / \     4   8    /   / \   11  13  4  /  \      \ 7    2      1 targetSum = 22 路径: 5 → 4 → 11 → 2 = 22 ✓### 💻 代码实现python def hasPathSum(root, targetSum: int) -> bool:     if not root:         return False     # 叶子节点     if not root.left and not root.right:         return root.val == targetSum     # 递归检查子树     remaining = targetSum - root.val     return (hasPathSum(root.left, remaining) or             hasPathSum(root.right, remaining)) ### 🧠 记忆口诀> “叶子判相等，非叶递归减”"></a>判断是否存在根到叶子路径，其和等于目标值。<br>### 🎨 图解思路<br><code>     / \     4   8    /   / \   11  13  4  /  \      \ 7    2      1 targetSum = 22 路径: 5 → 4 → 11 → 2 = 22 ✓</code><br>### 💻 代码实现<br><code>python def hasPathSum(root, targetSum: int) -&gt; bool:     if not root:         return False     # 叶子节点     if not root.left and not root.right:         return root.val == targetSum     # 递归检查子树     remaining = targetSum - root.val     return (hasPathSum(root.left, remaining) or             hasPathSum(root.right, remaining)) </code><br>### 🧠 记忆口诀<br>&gt; <strong>“叶子判相等，非叶递归减”</strong></h2><h2 id="🔟-LC-129-求根节点到叶节点数字之和-🟡"><a href="#🔟-LC-129-求根节点到叶节点数字之和-🟡" class="headerlink" title="🔟 LC 129. 求根节点到叶节点数字之和 🟡"></a>🔟 LC 129. 求根节点到叶节点数字之和 🟡</h2><h3 id="题目描述-9"><a href="#题目描述-9" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="每条路径组成一个数字，求所有数字之和。-🎨-图解思路-2-3-路径-1→2-12-路径-1→3-13-总和-12-13-25-💻-代码实现python-def-sumNumbers-root-gt-int-def-dfs-node-current-sum-if-not-node-return-0-current-sum-current-sum-10-node-val-叶子节点-if-not-node-left-and-not-node-right-return-current-sum-return-dfs-node-left-current-sum-dfs-node-right-current-sum-return-dfs-root-0-🧠-记忆口诀-gt-“进位乘10加当前”"><a href="#每条路径组成一个数字，求所有数字之和。-🎨-图解思路-2-3-路径-1→2-12-路径-1→3-13-总和-12-13-25-💻-代码实现python-def-sumNumbers-root-gt-int-def-dfs-node-current-sum-if-not-node-return-0-current-sum-current-sum-10-node-val-叶子节点-if-not-node-left-and-not-node-right-return-current-sum-return-dfs-node-left-current-sum-dfs-node-right-current-sum-return-dfs-root-0-🧠-记忆口诀-gt-“进位乘10加当前”" class="headerlink" title="每条路径组成一个数字，求所有数字之和。### 🎨 图解思路   / \   2   3 路径: 1→2 = 12 路径: 1→3 = 13 总和: 12 + 13 = 25### 💻 代码实现python def sumNumbers(root) -> int:     def dfs(node, current_sum):         if not node:             return 0         current_sum = current_sum * 10 + node.val         # 叶子节点         if not node.left and not node.right:             return current_sum         return dfs(node.left, current_sum) + dfs(node.right, current_sum)     return dfs(root, 0) ### 🧠 记忆口诀> “进位乘10加当前”"></a>每条路径组成一个数字，求所有数字之和。<br>### 🎨 图解思路<br><code>   / \   2   3 路径: 1→2 = 12 路径: 1→3 = 13 总和: 12 + 13 = 25</code><br>### 💻 代码实现<br><code>python def sumNumbers(root) -&gt; int:     def dfs(node, current_sum):         if not node:             return 0         current_sum = current_sum * 10 + node.val         # 叶子节点         if not node.left and not node.right:             return current_sum         return dfs(node.left, current_sum) + dfs(node.right, current_sum)     return dfs(root, 0) </code><br>### 🧠 记忆口诀<br>&gt; <strong>“进位乘10加当前”</strong></h2><h2 id="1️⃣1️⃣-LC-124-二叉树中的最大路径和-🔴"><a href="#1️⃣1️⃣-LC-124-二叉树中的最大路径和-🔴" class="headerlink" title="1️⃣1️⃣ LC 124. 二叉树中的最大路径和 🔴"></a>1️⃣1️⃣ LC 124. 二叉树中的最大路径和 🔴</h2><h3 id="题目描述-10"><a href="#题目描述-10" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="找出路径和最大的路径（可以不经过根节点）。-🎨-图解思路-10-9-20-15-7-最大路径-15-→-20-→-7-42-思路-每个节点可以：-1-只贡献自己（作为路径端点）-2-贡献自己-左子树-3-贡献自己-右子树-4-作为拐点（左-自己-右）-💻-代码实现python-def-maxPathSum-root-gt-int-max-sum-float-39-inf-39-def-max-gain-node-nonlocal-max-sum-if-not-node-return-0-左右子树的最大贡献（负数不要）-left-gain-max-max-gain-node-left-0-right-gain-max-max-gain-node-right-0-当前节点作为拐点的路径和-path-sum-node-val-left-gain-right-gain-max-sum-max-max-sum-path-sum-返回给父节点的贡献（只能选一边）-return-node-val-max-left-gain-right-gain-max-gain-root-return-max-sum-🧠-记忆口诀-gt-“拐点算全局，贡献选一边”"><a href="#找出路径和最大的路径（可以不经过根节点）。-🎨-图解思路-10-9-20-15-7-最大路径-15-→-20-→-7-42-思路-每个节点可以：-1-只贡献自己（作为路径端点）-2-贡献自己-左子树-3-贡献自己-右子树-4-作为拐点（左-自己-右）-💻-代码实现python-def-maxPathSum-root-gt-int-max-sum-float-39-inf-39-def-max-gain-node-nonlocal-max-sum-if-not-node-return-0-左右子树的最大贡献（负数不要）-left-gain-max-max-gain-node-left-0-right-gain-max-max-gain-node-right-0-当前节点作为拐点的路径和-path-sum-node-val-left-gain-right-gain-max-sum-max-max-sum-path-sum-返回给父节点的贡献（只能选一边）-return-node-val-max-left-gain-right-gain-max-gain-root-return-max-sum-🧠-记忆口诀-gt-“拐点算全局，贡献选一边”" class="headerlink" title="找出路径和最大的路径（可以不经过根节点）。### 🎨 图解思路   -10    /  \   9   20      /  \     15   7 最大路径: 15 → 20 → 7 = 42 思路: 每个节点可以： 1. 只贡献自己（作为路径端点） 2. 贡献自己+左子树 3. 贡献自己+右子树 4. 作为拐点（左+自己+右）### 💻 代码实现python def maxPathSum(root) -> int:     max_sum = float('-inf')     def max_gain(node):         nonlocal max_sum         if not node:             return 0         # 左右子树的最大贡献（负数不要）         left_gain = max(max_gain(node.left), 0)         right_gain = max(max_gain(node.right), 0)         # 当前节点作为拐点的路径和         path_sum = node.val + left_gain + right_gain         max_sum = max(max_sum, path_sum)         # 返回给父节点的贡献（只能选一边）         return node.val + max(left_gain, right_gain)     max_gain(root)     return max_sum ### 🧠 记忆口诀> “拐点算全局，贡献选一边”"></a>找出路径和最大的路径（可以不经过根节点）。<br>### 🎨 图解思路<br><code>   -10    /  \   9   20      /  \     15   7 最大路径: 15 → 20 → 7 = 42 思路: 每个节点可以： 1. 只贡献自己（作为路径端点） 2. 贡献自己+左子树 3. 贡献自己+右子树 4. 作为拐点（左+自己+右）</code><br>### 💻 代码实现<br><code>python def maxPathSum(root) -&gt; int:     max_sum = float('-inf')     def max_gain(node):         nonlocal max_sum         if not node:             return 0         # 左右子树的最大贡献（负数不要）         left_gain = max(max_gain(node.left), 0)         right_gain = max(max_gain(node.right), 0)         # 当前节点作为拐点的路径和         path_sum = node.val + left_gain + right_gain         max_sum = max(max_sum, path_sum)         # 返回给父节点的贡献（只能选一边）         return node.val + max(left_gain, right_gain)     max_gain(root)     return max_sum </code><br>### 🧠 记忆口诀<br>&gt; <strong>“拐点算全局，贡献选一边”</strong></h2><h2 id="1️⃣2️⃣-LC-173-二叉搜索树迭代器-🟡"><a href="#1️⃣2️⃣-LC-173-二叉搜索树迭代器-🟡" class="headerlink" title="1️⃣2️⃣ LC 173. 二叉搜索树迭代器 🟡"></a>1️⃣2️⃣ LC 173. 二叉搜索树迭代器 🟡</h2><h3 id="题目描述-11"><a href="#题目描述-11" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="实现二叉搜索树的迭代器。-💻-代码实现python-class-BSTIterator-def-init-self-root-self-stack-self-leftmost-inorder-root-def-leftmost-inorder-self-node-while-node-self-stack-append-node-node-node-left-def-next-self-gt-int-node-self-stack-pop-if-node-right-self-leftmost-inorder-node-right-return-node-val-def-hasNext-self-gt-bool-return-len-self-stack-gt-0-🧠-记忆口诀-gt-“栈存左链，弹出处理右”"><a href="#实现二叉搜索树的迭代器。-💻-代码实现python-class-BSTIterator-def-init-self-root-self-stack-self-leftmost-inorder-root-def-leftmost-inorder-self-node-while-node-self-stack-append-node-node-node-left-def-next-self-gt-int-node-self-stack-pop-if-node-right-self-leftmost-inorder-node-right-return-node-val-def-hasNext-self-gt-bool-return-len-self-stack-gt-0-🧠-记忆口诀-gt-“栈存左链，弹出处理右”" class="headerlink" title="实现二叉搜索树的迭代器。### 💻 代码实现python class BSTIterator:     def __init__(self, root):         self.stack = []         self._leftmost_inorder(root)     def _leftmost_inorder(self, node):         while node:             self.stack.append(node)             node = node.left     def next(self) -> int:         node = self.stack.pop()         if node.right:             self._leftmost_inorder(node.right)         return node.val     def hasNext(self) -> bool:         return len(self.stack) > 0 ### 🧠 记忆口诀> “栈存左链，弹出处理右”"></a>实现二叉搜索树的迭代器。<br>### 💻 代码实现<br><code>python class BSTIterator:     def __init__(self, root):         self.stack = []         self._leftmost_inorder(root)     def _leftmost_inorder(self, node):         while node:             self.stack.append(node)             node = node.left     def next(self) -&gt; int:         node = self.stack.pop()         if node.right:             self._leftmost_inorder(node.right)         return node.val     def hasNext(self) -&gt; bool:         return len(self.stack) &gt; 0 </code><br>### 🧠 记忆口诀<br>&gt; <strong>“栈存左链，弹出处理右”</strong></h2><h2 id="1️⃣3️⃣-LC-222-完全二叉树的节点个数-🟢"><a href="#1️⃣3️⃣-LC-222-完全二叉树的节点个数-🟢" class="headerlink" title="1️⃣3️⃣ LC 222. 完全二叉树的节点个数 🟢"></a>1️⃣3️⃣ LC 222. 完全二叉树的节点个数 🟢</h2><h3 id="题目描述-12"><a href="#题目描述-12" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="统计完全二叉树的节点个数。-💻-代码实现python-def-countNodes-root-gt-int-if-not-root-return-0-left-depth-right-depth-0-left-right-root-root-while-left-left-depth-1-left-left-left-while-right-right-depth-1-right-right-right-满二叉树-if-left-depth-right-depth-return-2-left-depth-1-递归-return-1-countNodes-root-left-countNodes-root-right-🧠-记忆口诀-gt-“满树用公式，不满递归数”"><a href="#统计完全二叉树的节点个数。-💻-代码实现python-def-countNodes-root-gt-int-if-not-root-return-0-left-depth-right-depth-0-left-right-root-root-while-left-left-depth-1-left-left-left-while-right-right-depth-1-right-right-right-满二叉树-if-left-depth-right-depth-return-2-left-depth-1-递归-return-1-countNodes-root-left-countNodes-root-right-🧠-记忆口诀-gt-“满树用公式，不满递归数”" class="headerlink" title="统计完全二叉树的节点个数。### 💻 代码实现python def countNodes(root) -> int:     if not root:         return 0     left_depth = right_depth = 0     left, right = root, root     while left:         left_depth += 1         left = left.left     while right:         right_depth += 1         right = right.right     # 满二叉树     if left_depth == right_depth:         return 2 ** left_depth - 1     # 递归     return 1 + countNodes(root.left) + countNodes(root.right) ### 🧠 记忆口诀> “满树用公式，不满递归数”"></a>统计完全二叉树的节点个数。<br>### 💻 代码实现<br><code>python def countNodes(root) -&gt; int:     if not root:         return 0     left_depth = right_depth = 0     left, right = root, root     while left:         left_depth += 1         left = left.left     while right:         right_depth += 1         right = right.right     # 满二叉树     if left_depth == right_depth:         return 2 ** left_depth - 1     # 递归     return 1 + countNodes(root.left) + countNodes(root.right) </code><br>### 🧠 记忆口诀<br>&gt; <strong>“满树用公式，不满递归数”</strong></h2><h2 id="1️⃣4️⃣-LC-236-二叉树的最近公共祖先-🟡"><a href="#1️⃣4️⃣-LC-236-二叉树的最近公共祖先-🟡" class="headerlink" title="1️⃣4️⃣ LC 236. 二叉树的最近公共祖先 🟡"></a>1️⃣4️⃣ LC 236. 二叉树的最近公共祖先 🟡</h2><h3 id="题目描述-13"><a href="#题目描述-13" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="找两个节点的最近公共祖先（LCA）。-🎨-图解思路-5-1-6-2-0-8-7-4-LCA-5-1-3-LCA-5-4-5-💻-代码实现python-def-lowestCommonAncestor-root-p-q-if-not-root-or-root-p-or-root-q-return-root-left-lowestCommonAncestor-root-left-p-q-right-lowestCommonAncestor-root-right-p-q-p-q-分布在两边-if-left-and-right-return-root-p-q-在同一边-return-left-if-left-else-right-🧠-记忆口诀-gt-“左右都有返回根，否则返回有的那边”"><a href="#找两个节点的最近公共祖先（LCA）。-🎨-图解思路-5-1-6-2-0-8-7-4-LCA-5-1-3-LCA-5-4-5-💻-代码实现python-def-lowestCommonAncestor-root-p-q-if-not-root-or-root-p-or-root-q-return-root-left-lowestCommonAncestor-root-left-p-q-right-lowestCommonAncestor-root-right-p-q-p-q-分布在两边-if-left-and-right-return-root-p-q-在同一边-return-left-if-left-else-right-🧠-记忆口诀-gt-“左右都有返回根，否则返回有的那边”" class="headerlink" title="找两个节点的最近公共祖先（LCA）。### 🎨 图解思路       / \       5   1      / \ / \     6  2 0  8       / \      7   4 LCA(5, 1) = 3 LCA(5, 4) = 5### 💻 代码实现python def lowestCommonAncestor(root, p, q):     if not root or root == p or root == q:         return root     left = lowestCommonAncestor(root.left, p, q)     right = lowestCommonAncestor(root.right, p, q)     # p, q 分布在两边     if left and right:         return root     # p, q 在同一边     return left if left else right ### 🧠 记忆口诀> “左右都有返回根，否则返回有的那边”"></a>找两个节点的最近公共祖先（LCA）。<br>### 🎨 图解思路<br><code>       / \       5   1      / \ / \     6  2 0  8       / \      7   4 LCA(5, 1) = 3 LCA(5, 4) = 5</code><br>### 💻 代码实现<br><code>python def lowestCommonAncestor(root, p, q):     if not root or root == p or root == q:         return root     left = lowestCommonAncestor(root.left, p, q)     right = lowestCommonAncestor(root.right, p, q)     # p, q 分布在两边     if left and right:         return root     # p, q 在同一边     return left if left else right </code><br>### 🧠 记忆口诀<br>&gt; <strong>“左右都有返回根，否则返回有的那边”</strong></h2><h2 id="📊-本章总结"><a href="#📊-本章总结" class="headerlink" title="📊 本章总结"></a>📊 本章总结</h2><h3 id="题目速查表"><a href="#题目速查表" class="headerlink" title="题目速查表"></a>题目速查表</h3><p>| 题号 | 题目 | 难度 | 类型 |</p>
+<pre><code>
+| 104 | 最大深度 | 🟢 | 深度 |
+| 100 | 相同的树 | 🟢 | 比较 |
+| 226 | 翻转二叉树 | 🟢 | 变换 |
+| 101 | 对称二叉树 | 🟢 | 比较 |
+| 105 | 前序+中序构造 | 🟡 | 构造 |
+| 106 | 中序+后序构造 | 🟡 | 构造 |
+| 117 | 填充next指针 | 🟡 | 层序 |
+| 114 | 展开为链表 | 🟡 | 变换 |
+| 112 | 路径总和 | 🟢 | 路径 |
+| 129 | 数字之和 | 🟡 | 路径 |
+| 124 | 最大路径和 | 🔴 | 路径 |
+| 173 | BST迭代器 | 🟡 | 迭代 |
+| 222 | 完全树节点数 | 🟢 | 计数 |
+| 236 | 最近公共祖先 | 🟡 | LCA |
+
+### 🧠 全章记忆口诀
+</code></pre>
+<p>深度相同翻对称<br>前中后序建树型<br>连接展开走路径<br>迭代计数找祖宗</p>
+<p>深度 - 最大深度 (104)<br>相同 - 相同的树 (100)<br>翻 - 翻转二叉树 (226)<br>对称 - 对称二叉树 (101)<br>前中后序 - 从遍历构造 (105, 106)<br>连接 - 填充next指针 (117)<br>展开 - 展开为链表 (114)<br>路径 - 路径总和系列 (112, 129, 124)<br>迭代 - BST迭代器 (173)<br>计数 - 节点个数 (222)<br>祖宗 - 最近公共祖先 (236)</p>
+<pre><code>
+---
+
+&gt; 📖 **下一篇**：[二叉搜索树专题](/2026/01/18/leetcode-150-bst/)
+</code></pre>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-sliding-window/">🪟 LeetCode 150 - 滑动窗口专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-stack/">📦 LeetCode 150 - 栈与队列专题</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%F0%9F%8C%B3-%E4%BA%8C%E5%8F%89%E6%A0%91%E4%B8%93%E9%A2%98-14%E9%A2%98"><span class="toc-text">🌳 二叉树专题 (14题)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%97%BA%EF%B8%8F-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%80%9D%E7%BB%B4%E6%A8%A1%E5%BC%8F"><span class="toc-text">🗺️ 二叉树的思维模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%A7-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%81%8D%E5%8E%86%E6%A8%A1%E6%9D%BF"><span class="toc-text">🔧 二叉树遍历模板</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E5%BA%8F%E9%81%8D%E5%8E%86%EF%BC%88%E6%A0%B9-%E5%B7%A6-%E5%8F%B3%EF%BC%89"><span class="toc-text">前序遍历（根-左-右）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86%EF%BC%88%E5%B7%A6-%E6%A0%B9-%E5%8F%B3%EF%BC%89"><span class="toc-text">中序遍历（左-根-右）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86%EF%BC%88%E5%B7%A6-%E5%8F%B3-%E6%A0%B9%EF%BC%89"><span class="toc-text">后序遍历（左-右-根）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86%EF%BC%88BFS%EF%BC%89"><span class="toc-text">层序遍历（BFS）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%B8%8F%E2%83%A3-LC-104-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%A4%A7%E6%B7%B1%E5%BA%A6-%F0%9F%9F%A2"><span class="toc-text">1️⃣ LC 104. 二叉树的最大深度 🟢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%EF%B8%8F%E2%83%A3-LC-100-%E7%9B%B8%E5%90%8C%E7%9A%84%E6%A0%91-%F0%9F%9F%A2"><span class="toc-text">2️⃣ LC 100. 相同的树 🟢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-1"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A4%E6%96%AD%E4%B8%A4%E6%A3%B5%E6%A0%91%E6%98%AF%E5%90%A6%E7%9B%B8%E5%90%8C%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-p-q-1-1-2-3-2-3-%E7%9B%B8%E5%90%8C%E7%9A%84%E6%9D%A1%E4%BB%B6-1-%E6%A0%B9%E8%8A%82%E7%82%B9%E5%80%BC%E7%9B%B8%E5%90%8C-2-%E5%B7%A6%E5%AD%90%E6%A0%91%E7%9B%B8%E5%90%8C-3-%E5%8F%B3%E5%AD%90%E6%A0%91%E7%9B%B8%E5%90%8C-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-isSameTree-p-q-gt-bool-if-not-p-and-not-q-return-True-if-not-p-or-not-q-return-False-return-p-val-q-val-and-isSameTree-p-left-q-left-and-isSameTree-p-right-q-right-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E6%A0%B9%E5%90%8C%E5%B7%A6%E5%90%8C%E5%8F%B3%E5%90%8C%EF%BC%8C%E6%89%8D%E6%98%AF%E7%9C%9F%E7%9A%84%E5%90%8C%E2%80%9D"><span class="toc-text">判断两棵树是否相同。### 🎨 图解思路   p       q    1       1   &#x2F; \     &#x2F; \  2   3   2   3 相同的条件: 1. 根节点值相同 2. 左子树相同 3. 右子树相同### 💻 代码实现python def isSameTree(p, q) -&gt; bool:     if not p and not q:         return True     if not p or not q:         return False     return (p.val &#x3D;&#x3D; q.val and             isSameTree(p.left, q.left) and             isSameTree(p.right, q.right)) ### 🧠 记忆口诀&gt; “根同左同右同，才是真的同”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%EF%B8%8F%E2%83%A3-LC-226-%E7%BF%BB%E8%BD%AC%E4%BA%8C%E5%8F%89%E6%A0%91-%F0%9F%9F%A2"><span class="toc-text">3️⃣ LC 226. 翻转二叉树 🟢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-2"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BF%BB%E8%BD%AC%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%88%E9%95%9C%E5%83%8F%EF%BC%89%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-4-4-2-7-gt-7-2-1-3-6-9-9-6-3-1-%E4%BA%A4%E6%8D%A2%E6%AF%8F%E4%B8%AA%E8%8A%82%E7%82%B9%E7%9A%84%E5%B7%A6%E5%8F%B3%E5%AD%90%E6%A0%91-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-invertTree-root-if-not-root-return-None-%E4%BA%A4%E6%8D%A2%E5%B7%A6%E5%8F%B3%E5%AD%90%E6%A0%91-root-left-root-right-root-right-root-left-%E9%80%92%E5%BD%92%E7%BF%BB%E8%BD%AC%E5%AD%90%E6%A0%91-invertTree-root-left-invertTree-root-right-return-root-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E5%85%88%E4%BA%A4%E6%8D%A2%EF%BC%8C%E5%86%8D%E9%80%92%E5%BD%92%E2%80%9D"><span class="toc-text">翻转二叉树（镜像）。### 🎨 图解思路     4              4    &#x2F;   \          &#x2F;   \   2     7   &#x3D;&gt;   7     2  &#x2F; \   &#x2F; \      &#x2F; \   &#x2F; \ 1   3 6   9    9   6 3   1 交换每个节点的左右子树### 💻 代码实现python def invertTree(root):     if not root:         return None     # 交换左右子树     root.left, root.right &#x3D; root.right, root.left     # 递归翻转子树     invertTree(root.left)     invertTree(root.right)     return root ### 🧠 记忆口诀&gt; “先交换，再递归”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%EF%B8%8F%E2%83%A3-LC-101-%E5%AF%B9%E7%A7%B0%E4%BA%8C%E5%8F%89%E6%A0%91-%F0%9F%9F%A2"><span class="toc-text">4️⃣ LC 101. 对称二叉树 🟢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-3"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A4%E6%96%AD%E4%BA%8C%E5%8F%89%E6%A0%91%E6%98%AF%E5%90%A6%E5%AF%B9%E7%A7%B0%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-2-2-3-4-4-3-%E5%AF%B9%E7%A7%B0%E6%9D%A1%E4%BB%B6-%E5%B7%A6%E5%AD%90%E6%A0%91%E7%9A%84%E5%B7%A6-%E5%8F%B3%E5%AD%90%E6%A0%91%E7%9A%84%E5%8F%B3-%E5%B7%A6%E5%AD%90%E6%A0%91%E7%9A%84%E5%8F%B3-%E5%8F%B3%E5%AD%90%E6%A0%91%E7%9A%84%E5%B7%A6-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-isSymmetric-root-gt-bool-def-check-left-right-if-not-left-and-not-right-return-True-if-not-left-or-not-right-return-False-return-left-val-right-val-and-check-left-left-right-right-and-check-left-right-right-left-return-check-root-left-root-right-if-root-else-True-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E5%A4%96%E5%A4%96%E7%9B%B8%E7%AD%89%EF%BC%8C%E5%86%85%E5%86%85%E7%9B%B8%E7%AD%89%E2%80%9D"><span class="toc-text">判断二叉树是否对称。### 🎨 图解思路   &#x2F; \   2   2  &#x2F; \ &#x2F; \ 3  4 4  3 对称条件: 左子树的左 &#x3D;&#x3D; 右子树的右 左子树的右 &#x3D;&#x3D; 右子树的左### 💻 代码实现python def isSymmetric(root) -&gt; bool:     def check(left, right):         if not left and not right:             return True         if not left or not right:             return False         return (left.val &#x3D;&#x3D; right.val and                 check(left.left, right.right) and                 check(left.right, right.left))     return check(root.left, root.right) if root else True ### 🧠 记忆口诀&gt; “外外相等，内内相等”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%EF%B8%8F%E2%83%A3-LC-105-%E4%BB%8E%E5%89%8D%E5%BA%8F%E4%B8%8E%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86%E5%BA%8F%E5%88%97%E6%9E%84%E9%80%A0%E4%BA%8C%E5%8F%89%E6%A0%91-%F0%9F%9F%A1"><span class="toc-text">5️⃣ LC 105. 从前序与中序遍历序列构造二叉树 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-4"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B9%E6%8D%AE%E5%89%8D%E5%BA%8F%E5%92%8C%E4%B8%AD%E5%BA%8F%E9%81%8D%E5%8E%86%E7%BB%93%E6%9E%9C%EF%BC%8C%E6%9E%84%E5%BB%BA%E4%BA%8C%E5%8F%89%E6%A0%91%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AFpreorder-3-9-20-15-7-%E6%A0%B9-%E5%B7%A6-%E5%8F%B3-inorder-9-3-15-20-7-%E5%B7%A6-%E6%A0%B9-%E5%8F%B3-%E6%AD%A5%E9%AA%A4-1-preorder-0-3-%E6%98%AF%E6%A0%B9%E8%8A%82%E7%82%B9-2-%E5%9C%A8-inorder-%E4%B8%AD%E6%89%BE%E5%88%B0-3%EF%BC%8C%E5%B7%A6%E8%BE%B9%E6%98%AF%E5%B7%A6%E5%AD%90%E6%A0%91%EF%BC%8C%E5%8F%B3%E8%BE%B9%E6%98%AF%E5%8F%B3%E5%AD%90%E6%A0%91-3-%E9%80%92%E5%BD%92%E6%9E%84%E5%BB%BA-9-20-15-7-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-buildTree-preorder-list-inorder-list-if-not-preorder-return-None-%E6%A0%B9%E8%8A%82%E7%82%B9%E6%98%AF%E5%89%8D%E5%BA%8F%E7%AC%AC%E4%B8%80%E4%B8%AA-root-TreeNode-preorder-0-%E5%9C%A8%E4%B8%AD%E5%BA%8F%E4%B8%AD%E6%89%BE%E5%88%B0%E6%A0%B9%E8%8A%82%E7%82%B9%E4%BD%8D%E7%BD%AE-mid-inorder-index-preorder-0-%E9%80%92%E5%BD%92%E6%9E%84%E5%BB%BA%E5%B7%A6%E5%8F%B3%E5%AD%90%E6%A0%91-root-left-buildTree-preorder-1-mid-1-inorder-mid-root-right-buildTree-preorder-mid-1-inorder-mid-1-return-root-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E5%89%8D%E5%BA%8F%E5%AE%9A%E6%A0%B9%EF%BC%8C%E4%B8%AD%E5%BA%8F%E5%88%86%E8%BE%B9%E2%80%9D"><span class="toc-text">根据前序和中序遍历结果，构建二叉树。### 🎨 图解思路preorder &#x3D; [3, 9, 20, 15, 7]  根-左-右 inorder  &#x3D; [9, 3, 15, 20, 7]  左-根-右 步骤: 1. preorder[0] &#x3D; 3 是根节点 2. 在 inorder 中找到 3，左边是左子树，右边是右子树 3. 递归构建    &#x2F; \   9  20     &#x2F;  \    15   7### 💻 代码实现python def buildTree(preorder: list, inorder: list):     if not preorder:         return None     # 根节点是前序第一个     root &#x3D; TreeNode(preorder[0])     # 在中序中找到根节点位置     mid &#x3D; inorder.index(preorder[0])     # 递归构建左右子树     root.left &#x3D; buildTree(preorder[1:mid+1], inorder[:mid])     root.right &#x3D; buildTree(preorder[mid+1:], inorder[mid+1:])     return root ### 🧠 记忆口诀&gt; “前序定根，中序分边”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6%EF%B8%8F%E2%83%A3-LC-106-%E4%BB%8E%E4%B8%AD%E5%BA%8F%E4%B8%8E%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86%E5%BA%8F%E5%88%97%E6%9E%84%E9%80%A0%E4%BA%8C%E5%8F%89%E6%A0%91-%F0%9F%9F%A1"><span class="toc-text">6️⃣ LC 106. 从中序与后序遍历序列构造二叉树 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-5"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B9%E6%8D%AE%E4%B8%AD%E5%BA%8F%E5%92%8C%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86%E7%BB%93%E6%9E%9C%EF%BC%8C%E6%9E%84%E5%BB%BA%E4%BA%8C%E5%8F%89%E6%A0%91%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AFinorder-9-3-15-20-7-%E5%B7%A6-%E6%A0%B9-%E5%8F%B3-postorder-9-15-7-20-3-%E5%B7%A6-%E5%8F%B3-%E6%A0%B9-%E5%90%8E%E5%BA%8F%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E6%98%AF%E6%A0%B9%EF%BC%81-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-buildTree-inorder-list-postorder-list-if-not-postorder-return-None-%E6%A0%B9%E8%8A%82%E7%82%B9%E6%98%AF%E5%90%8E%E5%BA%8F%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA-root-TreeNode-postorder-1-%E5%9C%A8%E4%B8%AD%E5%BA%8F%E4%B8%AD%E6%89%BE%E5%88%B0%E6%A0%B9%E8%8A%82%E7%82%B9%E4%BD%8D%E7%BD%AE-mid-inorder-index-postorder-1-%E9%80%92%E5%BD%92%E6%9E%84%E5%BB%BA%E5%B7%A6%E5%8F%B3%E5%AD%90%E6%A0%91-root-left-buildTree-inorder-mid-postorder-mid-root-right-buildTree-inorder-mid-1-postorder-mid-1-return-root-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E5%90%8E%E5%BA%8F%E5%AE%9A%E6%A0%B9%EF%BC%88%E6%9C%80%E5%90%8E%EF%BC%89%EF%BC%8C%E4%B8%AD%E5%BA%8F%E5%88%86%E8%BE%B9%E2%80%9D"><span class="toc-text">根据中序和后序遍历结果，构建二叉树。### 🎨 图解思路inorder   &#x3D; [9, 3, 15, 20, 7]  左-根-右 postorder &#x3D; [9, 15, 7, 20, 3]  左-右-根 后序最后一个是根！### 💻 代码实现python def buildTree(inorder: list, postorder: list):     if not postorder:         return None     # 根节点是后序最后一个     root &#x3D; TreeNode(postorder[-1])     # 在中序中找到根节点位置     mid &#x3D; inorder.index(postorder[-1])     # 递归构建左右子树     root.left &#x3D; buildTree(inorder[:mid], postorder[:mid])     root.right &#x3D; buildTree(inorder[mid+1:], postorder[mid:-1])     return root ### 🧠 记忆口诀&gt; “后序定根（最后），中序分边”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7%EF%B8%8F%E2%83%A3-LC-117-%E5%A1%AB%E5%85%85%E6%AF%8F%E4%B8%AA%E8%8A%82%E7%82%B9%E7%9A%84%E4%B8%8B%E4%B8%80%E4%B8%AA%E5%8F%B3%E4%BE%A7%E8%8A%82%E7%82%B9%E6%8C%87%E9%92%88-II-%F0%9F%9F%A1"><span class="toc-text">7️⃣ LC 117. 填充每个节点的下一个右侧节点指针 II 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-6"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A1%AB%E5%85%85%E6%AF%8F%E4%B8%AA%E8%8A%82%E7%82%B9%E7%9A%84-next-%E6%8C%87%E9%92%88%E6%8C%87%E5%90%91%E5%8F%B3%E4%BE%A7%E8%8A%82%E7%82%B9%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-1-%E2%86%92-NULL-2-%E2%86%92-3-%E2%86%92-NULL-4%E2%86%92-5-%E2%86%92-7-%E2%86%92-NULL-%E4%BD%BF%E7%94%A8%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86%EF%BC%8C%E8%BF%9E%E6%8E%A5%E5%90%8C%E5%B1%82%E8%8A%82%E7%82%B9-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-connect-root-if-not-root-return-None-queue-deque-root-while-queue-size-len-queue-prev-None-for-i-in-range-size-node-queue-popleft-if-prev-prev-next-node-prev-node-if-node-left-queue-append-node-left-if-node-right-queue-append-node-right-return-root-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86%EF%BC%8C%E5%89%8D%E8%BF%9E%E5%90%8E%E2%80%9D"><span class="toc-text">填充每个节点的 next 指针指向右侧节点。### 🎨 图解思路     1 → NULL    &#x2F;   \   2  →  3 → NULL  &#x2F; \     \ 4→  5  →  7 → NULL 使用层序遍历，连接同层节点### 💻 代码实现python def connect(root):     if not root:         return None     queue &#x3D; deque([root])     while queue:         size &#x3D; len(queue)         prev &#x3D; None         for i in range(size):             node &#x3D; queue.popleft()             if prev:                 prev.next &#x3D; node             prev &#x3D; node             if node.left:                 queue.append(node.left)             if node.right:                 queue.append(node.right)     return root ### 🧠 记忆口诀&gt; “层序遍历，前连后”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8%EF%B8%8F%E2%83%A3-LC-114-%E4%BA%8C%E5%8F%89%E6%A0%91%E5%B1%95%E5%BC%80%E4%B8%BA%E9%93%BE%E8%A1%A8-%F0%9F%9F%A1"><span class="toc-text">8️⃣ LC 114. 二叉树展开为链表 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-7"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%86%E4%BA%8C%E5%8F%89%E6%A0%91%E5%B1%95%E5%BC%80%E4%B8%BA%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%88%E5%89%8D%E5%BA%8F%E9%A1%BA%E5%BA%8F%EF%BC%89%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-1-1-2-5-gt-2-3-4-6-3-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-flatten-root-gt-None-if-not-root-return-%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86%EF%BC%9A%E5%85%88%E5%A4%84%E7%90%86%E5%AD%90%E6%A0%91%EF%BC%8C%E5%86%8D%E5%A4%84%E7%90%86%E6%A0%B9-flatten-root-left-flatten-root-right-%E4%BF%9D%E5%AD%98%E5%8F%B3%E5%AD%90%E6%A0%91-right-root-right-%E5%B7%A6%E5%AD%90%E6%A0%91%E7%A7%BB%E5%88%B0%E5%8F%B3%E8%BE%B9-root-right-root-left-root-left-None-%E6%89%BE%E5%88%B0%E5%8F%B3%E5%AD%90%E6%A0%91%E6%9C%AB%E7%AB%AF%EF%BC%8C%E6%8E%A5%E4%B8%8A%E5%8E%9F%E5%8F%B3%E5%AD%90%E6%A0%91-while-root-right-root-root-right-root-right-right-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E5%B7%A6%E6%8E%A5%E5%8F%B3%EF%BC%8C%E5%8E%9F%E5%8F%B3%E6%8E%A5%E6%9C%AB%E5%B0%BE%E2%80%9D"><span class="toc-text">将二叉树展开为单链表（前序顺序）。### 🎨 图解思路    1           1    &#x2F; \           \   2   5    &#x3D;&gt;     2  &#x2F; \   \           \ 3   4   6           3                      \                        \                          \### 💻 代码实现python def flatten(root) -&gt; None:     if not root:         return     # 后序遍历：先处理子树，再处理根     flatten(root.left)     flatten(root.right)     # 保存右子树     right &#x3D; root.right     # 左子树移到右边     root.right &#x3D; root.left     root.left &#x3D; None     # 找到右子树末端，接上原右子树     while root.right:         root &#x3D; root.right     root.right &#x3D; right ### 🧠 记忆口诀&gt; “左接右，原右接末尾”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9%EF%B8%8F%E2%83%A3-LC-112-%E8%B7%AF%E5%BE%84%E6%80%BB%E5%92%8C-%F0%9F%9F%A2"><span class="toc-text">9️⃣ LC 112. 路径总和 🟢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-8"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%E6%A0%B9%E5%88%B0%E5%8F%B6%E5%AD%90%E8%B7%AF%E5%BE%84%EF%BC%8C%E5%85%B6%E5%92%8C%E7%AD%89%E4%BA%8E%E7%9B%AE%E6%A0%87%E5%80%BC%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-4-8-11-13-4-7-2-1-targetSum-22-%E8%B7%AF%E5%BE%84-5-%E2%86%92-4-%E2%86%92-11-%E2%86%92-2-22-%E2%9C%93-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-hasPathSum-root-targetSum-int-gt-bool-if-not-root-return-False-%E5%8F%B6%E5%AD%90%E8%8A%82%E7%82%B9-if-not-root-left-and-not-root-right-return-root-val-targetSum-%E9%80%92%E5%BD%92%E6%A3%80%E6%9F%A5%E5%AD%90%E6%A0%91-remaining-targetSum-root-val-return-hasPathSum-root-left-remaining-or-hasPathSum-root-right-remaining-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E5%8F%B6%E5%AD%90%E5%88%A4%E7%9B%B8%E7%AD%89%EF%BC%8C%E9%9D%9E%E5%8F%B6%E9%80%92%E5%BD%92%E5%87%8F%E2%80%9D"><span class="toc-text">判断是否存在根到叶子路径，其和等于目标值。### 🎨 图解思路     &#x2F; \     4   8    &#x2F;   &#x2F; \   11  13  4  &#x2F;  \      \ 7    2      1 targetSum &#x3D; 22 路径: 5 → 4 → 11 → 2 &#x3D; 22 ✓### 💻 代码实现python def hasPathSum(root, targetSum: int) -&gt; bool:     if not root:         return False     # 叶子节点     if not root.left and not root.right:         return root.val &#x3D;&#x3D; targetSum     # 递归检查子树     remaining &#x3D; targetSum - root.val     return (hasPathSum(root.left, remaining) or             hasPathSum(root.right, remaining)) ### 🧠 记忆口诀&gt; “叶子判相等，非叶递归减”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%9F-LC-129-%E6%B1%82%E6%A0%B9%E8%8A%82%E7%82%B9%E5%88%B0%E5%8F%B6%E8%8A%82%E7%82%B9%E6%95%B0%E5%AD%97%E4%B9%8B%E5%92%8C-%F0%9F%9F%A1"><span class="toc-text">🔟 LC 129. 求根节点到叶节点数字之和 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-9"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AF%8F%E6%9D%A1%E8%B7%AF%E5%BE%84%E7%BB%84%E6%88%90%E4%B8%80%E4%B8%AA%E6%95%B0%E5%AD%97%EF%BC%8C%E6%B1%82%E6%89%80%E6%9C%89%E6%95%B0%E5%AD%97%E4%B9%8B%E5%92%8C%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-2-3-%E8%B7%AF%E5%BE%84-1%E2%86%922-12-%E8%B7%AF%E5%BE%84-1%E2%86%923-13-%E6%80%BB%E5%92%8C-12-13-25-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-sumNumbers-root-gt-int-def-dfs-node-current-sum-if-not-node-return-0-current-sum-current-sum-10-node-val-%E5%8F%B6%E5%AD%90%E8%8A%82%E7%82%B9-if-not-node-left-and-not-node-right-return-current-sum-return-dfs-node-left-current-sum-dfs-node-right-current-sum-return-dfs-root-0-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E8%BF%9B%E4%BD%8D%E4%B9%9810%E5%8A%A0%E5%BD%93%E5%89%8D%E2%80%9D"><span class="toc-text">每条路径组成一个数字，求所有数字之和。### 🎨 图解思路   &#x2F; \   2   3 路径: 1→2 &#x3D; 12 路径: 1→3 &#x3D; 13 总和: 12 + 13 &#x3D; 25### 💻 代码实现python def sumNumbers(root) -&gt; int:     def dfs(node, current_sum):         if not node:             return 0         current_sum &#x3D; current_sum * 10 + node.val         # 叶子节点         if not node.left and not node.right:             return current_sum         return dfs(node.left, current_sum) + dfs(node.right, current_sum)     return dfs(root, 0) ### 🧠 记忆口诀&gt; “进位乘10加当前”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%B8%8F%E2%83%A31%EF%B8%8F%E2%83%A3-LC-124-%E4%BA%8C%E5%8F%89%E6%A0%91%E4%B8%AD%E7%9A%84%E6%9C%80%E5%A4%A7%E8%B7%AF%E5%BE%84%E5%92%8C-%F0%9F%94%B4"><span class="toc-text">1️⃣1️⃣ LC 124. 二叉树中的最大路径和 🔴</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-10"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%BE%E5%87%BA%E8%B7%AF%E5%BE%84%E5%92%8C%E6%9C%80%E5%A4%A7%E7%9A%84%E8%B7%AF%E5%BE%84%EF%BC%88%E5%8F%AF%E4%BB%A5%E4%B8%8D%E7%BB%8F%E8%BF%87%E6%A0%B9%E8%8A%82%E7%82%B9%EF%BC%89%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-10-9-20-15-7-%E6%9C%80%E5%A4%A7%E8%B7%AF%E5%BE%84-15-%E2%86%92-20-%E2%86%92-7-42-%E6%80%9D%E8%B7%AF-%E6%AF%8F%E4%B8%AA%E8%8A%82%E7%82%B9%E5%8F%AF%E4%BB%A5%EF%BC%9A-1-%E5%8F%AA%E8%B4%A1%E7%8C%AE%E8%87%AA%E5%B7%B1%EF%BC%88%E4%BD%9C%E4%B8%BA%E8%B7%AF%E5%BE%84%E7%AB%AF%E7%82%B9%EF%BC%89-2-%E8%B4%A1%E7%8C%AE%E8%87%AA%E5%B7%B1-%E5%B7%A6%E5%AD%90%E6%A0%91-3-%E8%B4%A1%E7%8C%AE%E8%87%AA%E5%B7%B1-%E5%8F%B3%E5%AD%90%E6%A0%91-4-%E4%BD%9C%E4%B8%BA%E6%8B%90%E7%82%B9%EF%BC%88%E5%B7%A6-%E8%87%AA%E5%B7%B1-%E5%8F%B3%EF%BC%89-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-maxPathSum-root-gt-int-max-sum-float-39-inf-39-def-max-gain-node-nonlocal-max-sum-if-not-node-return-0-%E5%B7%A6%E5%8F%B3%E5%AD%90%E6%A0%91%E7%9A%84%E6%9C%80%E5%A4%A7%E8%B4%A1%E7%8C%AE%EF%BC%88%E8%B4%9F%E6%95%B0%E4%B8%8D%E8%A6%81%EF%BC%89-left-gain-max-max-gain-node-left-0-right-gain-max-max-gain-node-right-0-%E5%BD%93%E5%89%8D%E8%8A%82%E7%82%B9%E4%BD%9C%E4%B8%BA%E6%8B%90%E7%82%B9%E7%9A%84%E8%B7%AF%E5%BE%84%E5%92%8C-path-sum-node-val-left-gain-right-gain-max-sum-max-max-sum-path-sum-%E8%BF%94%E5%9B%9E%E7%BB%99%E7%88%B6%E8%8A%82%E7%82%B9%E7%9A%84%E8%B4%A1%E7%8C%AE%EF%BC%88%E5%8F%AA%E8%83%BD%E9%80%89%E4%B8%80%E8%BE%B9%EF%BC%89-return-node-val-max-left-gain-right-gain-max-gain-root-return-max-sum-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E6%8B%90%E7%82%B9%E7%AE%97%E5%85%A8%E5%B1%80%EF%BC%8C%E8%B4%A1%E7%8C%AE%E9%80%89%E4%B8%80%E8%BE%B9%E2%80%9D"><span class="toc-text">找出路径和最大的路径（可以不经过根节点）。### 🎨 图解思路   -10    &#x2F;  \   9   20      &#x2F;  \     15   7 最大路径: 15 → 20 → 7 &#x3D; 42 思路: 每个节点可以： 1. 只贡献自己（作为路径端点） 2. 贡献自己+左子树 3. 贡献自己+右子树 4. 作为拐点（左+自己+右）### 💻 代码实现python def maxPathSum(root) -&gt; int:     max_sum &#x3D; float(&#39;-inf&#39;)     def max_gain(node):         nonlocal max_sum         if not node:             return 0         # 左右子树的最大贡献（负数不要）         left_gain &#x3D; max(max_gain(node.left), 0)         right_gain &#x3D; max(max_gain(node.right), 0)         # 当前节点作为拐点的路径和         path_sum &#x3D; node.val + left_gain + right_gain         max_sum &#x3D; max(max_sum, path_sum)         # 返回给父节点的贡献（只能选一边）         return node.val + max(left_gain, right_gain)     max_gain(root)     return max_sum ### 🧠 记忆口诀&gt; “拐点算全局，贡献选一边”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%B8%8F%E2%83%A32%EF%B8%8F%E2%83%A3-LC-173-%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E8%BF%AD%E4%BB%A3%E5%99%A8-%F0%9F%9F%A1"><span class="toc-text">1️⃣2️⃣ LC 173. 二叉搜索树迭代器 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-11"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E7%9A%84%E8%BF%AD%E4%BB%A3%E5%99%A8%E3%80%82-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-class-BSTIterator-def-init-self-root-self-stack-self-leftmost-inorder-root-def-leftmost-inorder-self-node-while-node-self-stack-append-node-node-node-left-def-next-self-gt-int-node-self-stack-pop-if-node-right-self-leftmost-inorder-node-right-return-node-val-def-hasNext-self-gt-bool-return-len-self-stack-gt-0-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E6%A0%88%E5%AD%98%E5%B7%A6%E9%93%BE%EF%BC%8C%E5%BC%B9%E5%87%BA%E5%A4%84%E7%90%86%E5%8F%B3%E2%80%9D"><span class="toc-text">实现二叉搜索树的迭代器。### 💻 代码实现python class BSTIterator:     def __init__(self, root):         self.stack &#x3D; []         self._leftmost_inorder(root)     def _leftmost_inorder(self, node):         while node:             self.stack.append(node)             node &#x3D; node.left     def next(self) -&gt; int:         node &#x3D; self.stack.pop()         if node.right:             self._leftmost_inorder(node.right)         return node.val     def hasNext(self) -&gt; bool:         return len(self.stack) &gt; 0 ### 🧠 记忆口诀&gt; “栈存左链，弹出处理右”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%B8%8F%E2%83%A33%EF%B8%8F%E2%83%A3-LC-222-%E5%AE%8C%E5%85%A8%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E8%8A%82%E7%82%B9%E4%B8%AA%E6%95%B0-%F0%9F%9F%A2"><span class="toc-text">1️⃣3️⃣ LC 222. 完全二叉树的节点个数 🟢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-12"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%9F%E8%AE%A1%E5%AE%8C%E5%85%A8%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E8%8A%82%E7%82%B9%E4%B8%AA%E6%95%B0%E3%80%82-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-countNodes-root-gt-int-if-not-root-return-0-left-depth-right-depth-0-left-right-root-root-while-left-left-depth-1-left-left-left-while-right-right-depth-1-right-right-right-%E6%BB%A1%E4%BA%8C%E5%8F%89%E6%A0%91-if-left-depth-right-depth-return-2-left-depth-1-%E9%80%92%E5%BD%92-return-1-countNodes-root-left-countNodes-root-right-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E6%BB%A1%E6%A0%91%E7%94%A8%E5%85%AC%E5%BC%8F%EF%BC%8C%E4%B8%8D%E6%BB%A1%E9%80%92%E5%BD%92%E6%95%B0%E2%80%9D"><span class="toc-text">统计完全二叉树的节点个数。### 💻 代码实现python def countNodes(root) -&gt; int:     if not root:         return 0     left_depth &#x3D; right_depth &#x3D; 0     left, right &#x3D; root, root     while left:         left_depth +&#x3D; 1         left &#x3D; left.left     while right:         right_depth +&#x3D; 1         right &#x3D; right.right     # 满二叉树     if left_depth &#x3D;&#x3D; right_depth:         return 2 ** left_depth - 1     # 递归     return 1 + countNodes(root.left) + countNodes(root.right) ### 🧠 记忆口诀&gt; “满树用公式，不满递归数”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%B8%8F%E2%83%A34%EF%B8%8F%E2%83%A3-LC-236-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88-%F0%9F%9F%A1"><span class="toc-text">1️⃣4️⃣ LC 236. 二叉树的最近公共祖先 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-13"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%BE%E4%B8%A4%E4%B8%AA%E8%8A%82%E7%82%B9%E7%9A%84%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88%EF%BC%88LCA%EF%BC%89%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-5-1-6-2-0-8-7-4-LCA-5-1-3-LCA-5-4-5-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0python-def-lowestCommonAncestor-root-p-q-if-not-root-or-root-p-or-root-q-return-root-left-lowestCommonAncestor-root-left-p-q-right-lowestCommonAncestor-root-right-p-q-p-q-%E5%88%86%E5%B8%83%E5%9C%A8%E4%B8%A4%E8%BE%B9-if-left-and-right-return-root-p-q-%E5%9C%A8%E5%90%8C%E4%B8%80%E8%BE%B9-return-left-if-left-else-right-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E5%B7%A6%E5%8F%B3%E9%83%BD%E6%9C%89%E8%BF%94%E5%9B%9E%E6%A0%B9%EF%BC%8C%E5%90%A6%E5%88%99%E8%BF%94%E5%9B%9E%E6%9C%89%E7%9A%84%E9%82%A3%E8%BE%B9%E2%80%9D"><span class="toc-text">找两个节点的最近公共祖先（LCA）。### 🎨 图解思路       &#x2F; \       5   1      &#x2F; \ &#x2F; \     6  2 0  8       &#x2F; \      7   4 LCA(5, 1) &#x3D; 3 LCA(5, 4) &#x3D; 5### 💻 代码实现python def lowestCommonAncestor(root, p, q):     if not root or root &#x3D;&#x3D; p or root &#x3D;&#x3D; q:         return root     left &#x3D; lowestCommonAncestor(root.left, p, q)     right &#x3D; lowestCommonAncestor(root.right, p, q)     # p, q 分布在两边     if left and right:         return root     # p, q 在同一边     return left if left else right ### 🧠 记忆口诀&gt; “左右都有返回根，否则返回有的那边”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8A-%E6%9C%AC%E7%AB%A0%E6%80%BB%E7%BB%93"><span class="toc-text">📊 本章总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="toc-text">题目速查表</span></a></li></ol></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

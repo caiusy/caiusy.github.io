@@ -1,0 +1,1520 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>🔗 LeetCode 150 - 链表专题 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="LeetCode 面试 150 题之链表专题，含图解、代码模板、记忆口诀">
+<meta property="og:type" content="article">
+<meta property="og:title" content="🔗 LeetCode 150 - 链表专题">
+<meta property="og:url" content="https://caiusy.github.io/2026/01/18/leetcode-150-linked-list/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="LeetCode 面试 150 题之链表专题，含图解、代码模板、记忆口诀">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-01-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-17T16:00:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="LeetCode - LeetCode - leetcode面试150 - 链表 - 面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="LeetCode - LeetCode - leetcode面试150 - 链表 - 面试">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-01-18T00:00:00+08:00","dateModified":"2026-01-18T00:00:00+08:00","datePublished":"2026-01-18T00:00:00+08:00","description":"","headline":"🔗 LeetCode 150 - 链表专题","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/01/18/leetcode-150-linked-list/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/01/18/leetcode-150-linked-list/","keywords":"LeetCode - LeetCode - leetcode面试150 - 链表 - 面试","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> AI探索者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a><a class="item title" href="/2019/12/19/20191219-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/"><span class="title">二叉树打印</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/">LeetCode</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/%E7%AE%97%E6%B3%95/">算法</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/%E7%AE%97%E6%B3%95/LeetCode/">LeetCode</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-01-17T16:00:00.000Z">2026-01-18</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-01-17T16:00:00.000Z">2026-01-18</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>🔗 LeetCode 150 - 链表专题</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h1 id="🔗-链表专题-11题"><a href="#🔗-链表专题-11题" class="headerlink" title="🔗 链表专题 (11题)"></a>🔗 链表专题 (11题)</h1><blockquote>
+<p>🎯 <strong>核心技巧</strong>：虚拟头节点、快慢指针、链表反转、合并链表</p>
+</blockquote>
+<hr>
+<h2 id="🗺️-链表核心操作图解"><a href="#🗺️-链表核心操作图解" class="headerlink" title="🗺️ 链表核心操作图解"></a>🗺️ 链表核心操作图解</h2><pre><code>┌─────────────────────────────────────────────────────────────┐
+│                     链表基本操作                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  遍历:  [1] → [2] → [3] → [4] → None                       │
+│          ↑                                                  │
+│         cur (cur = cur.next)                               │
+│                                                             │
+│  插入:  [1] → [X] → [2]   (先接后断)                        │
+│              ↗   ↘                                         │
+│                                                             │
+│  删除:  [1] ──────→ [3]   (跨过中间节点)                    │
+│              ╳[2]                                          │
+│                                                             │
+│  反转:  [1] ← [2] ← [3] ← [4]                              │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr>
+<h2 id="🔧-链表万能技巧"><a href="#🔧-链表万能技巧" class="headerlink" title="🔧 链表万能技巧"></a>🔧 链表万能技巧</h2><h3 id="技巧1-虚拟头节点-Dummy-Head"><a href="#技巧1-虚拟头节点-Dummy-Head" class="headerlink" title="技巧1: 虚拟头节点 (Dummy Head)"></a>技巧1: 虚拟头节点 (Dummy Head)</h3><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 避免处理头节点的特殊情况</span>
+dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+dummy<span class="token punctuation">.</span>next <span class="token operator">=</span> head
+<span class="token comment" spellcheck="true"># ... 操作链表</span>
+<span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
+</code></pre>
+<h3 id="技巧2-快慢指针"><a href="#技巧2-快慢指针" class="headerlink" title="技巧2: 快慢指针"></a>技巧2: 快慢指针</h3><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 找中点、判断环、找环入口</span>
+slow <span class="token operator">=</span> fast <span class="token operator">=</span> head
+<span class="token keyword">while</span> fast <span class="token operator">and</span> fast<span class="token punctuation">.</span>next<span class="token punctuation">:</span>
+    slow <span class="token operator">=</span> slow<span class="token punctuation">.</span>next
+    fast <span class="token operator">=</span> fast<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
+<span class="token comment" spellcheck="true"># slow 就是中点</span>
+</code></pre>
+<h3 id="技巧3-链表反转"><a href="#技巧3-链表反转" class="headerlink" title="技巧3: 链表反转"></a>技巧3: 链表反转</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">reverse</span><span class="token punctuation">(</span>head<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    prev<span class="token punctuation">,</span> curr <span class="token operator">=</span> None<span class="token punctuation">,</span> head
+    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
+        next_temp <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> prev
+        prev <span class="token operator">=</span> curr
+        curr <span class="token operator">=</span> next_temp
+    <span class="token keyword">return</span> prev
+</code></pre>
+<hr>
+<h2 id="1️⃣-LC-141-环形链表-🟢"><a href="#1️⃣-LC-141-环形链表-🟢" class="headerlink" title="1️⃣ LC 141. 环形链表 🟢"></a>1️⃣ LC 141. 环形链表 🟢</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>判断链表中是否有环。</p>
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>快慢指针：如果有环，快指针一定会追上慢指针
+
+    ┌───────────────┐
+    ▼               │
+[1] → [2] → [3] → [4]
+        ↑     ↑
+       slow  fast
+
+快指针每次走2步，慢指针每次走1步
+相对速度为1，一定会在环内相遇
+</code></pre>
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">hasCycle</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> bool<span class="token punctuation">:</span>
+    slow <span class="token operator">=</span> fast <span class="token operator">=</span> head
+    
+    <span class="token keyword">while</span> fast <span class="token operator">and</span> fast<span class="token punctuation">.</span>next<span class="token punctuation">:</span>
+        slow <span class="token operator">=</span> slow<span class="token punctuation">.</span>next
+        fast <span class="token operator">=</span> fast<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
+        
+        <span class="token keyword">if</span> slow <span class="token operator">==</span> fast<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token boolean">True</span>
+    
+    <span class="token keyword">return</span> <span class="token boolean">False</span>
+</code></pre>
+<h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“快慢追逐，相遇有环”</strong></p>
+</blockquote>
+<hr>
+<h2 id="2️⃣-LC-2-两数相加-🟡"><a href="#2️⃣-LC-2-两数相加-🟡" class="headerlink" title="2️⃣ LC 2. 两数相加 🟡"></a>2️⃣ LC 2. 两数相加 🟡</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>两个逆序存储的链表相加，返回结果链表。</p>
+<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>   2 → 4 → 3  (表示 342)
+ + 5 → 6 → 4  (表示 465)
+ ─────────────
+   7 → 0 → 8  (表示 807)
+
+从头到尾逐位相加，注意进位！
+
+Step 1: 2 + 5 = 7, 进位0
+Step 2: 4 + 6 = 10, 写0进1  
+Step 3: 3 + 4 + 1 = 8, 进位0
+</code></pre>
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">addTwoNumbers</span><span class="token punctuation">(</span>l1<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> l2<span class="token punctuation">:</span> ListNode<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> ListNode<span class="token punctuation">:</span>
+    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    curr <span class="token operator">=</span> dummy
+    carry <span class="token operator">=</span> <span class="token number">0</span>
+    
+    <span class="token keyword">while</span> l1 <span class="token operator">or</span> l2 <span class="token operator">or</span> carry<span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># 取值（链表可能长度不同）</span>
+        val1 <span class="token operator">=</span> l1<span class="token punctuation">.</span>val <span class="token keyword">if</span> l1 <span class="token keyword">else</span> <span class="token number">0</span>
+        val2 <span class="token operator">=</span> l2<span class="token punctuation">.</span>val <span class="token keyword">if</span> l2 <span class="token keyword">else</span> <span class="token number">0</span>
+        
+        <span class="token comment" spellcheck="true"># 计算和与进位</span>
+        total <span class="token operator">=</span> val1 <span class="token operator">+</span> val2 <span class="token operator">+</span> carry
+        carry <span class="token operator">=</span> total <span class="token operator">//</span> <span class="token number">10</span>
+        
+        <span class="token comment" spellcheck="true"># 创建新节点</span>
+        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> ListNode<span class="token punctuation">(</span>total <span class="token operator">%</span> <span class="token number">10</span><span class="token punctuation">)</span>
+        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+        
+        <span class="token comment" spellcheck="true"># 移动指针</span>
+        l1 <span class="token operator">=</span> l1<span class="token punctuation">.</span>next <span class="token keyword">if</span> l1 <span class="token keyword">else</span> None
+        l2 <span class="token operator">=</span> l2<span class="token punctuation">.</span>next <span class="token keyword">if</span> l2 <span class="token keyword">else</span> None
+    
+    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
+</code></pre>
+<h3 id="🧠-记忆口诀-1"><a href="#🧠-记忆口诀-1" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“逐位相加，别忘进位”</strong></p>
+</blockquote>
+<hr>
+<h2 id="3️⃣-LC-21-合并两个有序链表-🟢"><a href="#3️⃣-LC-21-合并两个有序链表-🟢" class="headerlink" title="3️⃣ LC 21. 合并两个有序链表 🟢"></a>3️⃣ LC 21. 合并两个有序链表 🟢</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>将两个升序链表合并为一个新的升序链表。</p>
+<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>l1: 1 → 2 → 4
+l2: 1 → 3 → 4
+
+比较头节点，小的接上去：
+
+dummy → 1 → 1 → 2 → 3 → 4 → 4
+        ↑   ↑   ↑   ↑   ↑   ↑
+       l1  l2  l1  l2  l1  l2
+</code></pre>
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">mergeTwoLists</span><span class="token punctuation">(</span>l1<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> l2<span class="token punctuation">:</span> ListNode<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> ListNode<span class="token punctuation">:</span>
+    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    curr <span class="token operator">=</span> dummy
+    
+    <span class="token keyword">while</span> l1 <span class="token operator">and</span> l2<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> l1<span class="token punctuation">.</span>val <span class="token operator">&lt;=</span> l2<span class="token punctuation">.</span>val<span class="token punctuation">:</span>
+            curr<span class="token punctuation">.</span>next <span class="token operator">=</span> l1
+            l1 <span class="token operator">=</span> l1<span class="token punctuation">.</span>next
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            curr<span class="token punctuation">.</span>next <span class="token operator">=</span> l2
+            l2 <span class="token operator">=</span> l2<span class="token punctuation">.</span>next
+        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+    
+    <span class="token comment" spellcheck="true"># 接上剩余部分</span>
+    curr<span class="token punctuation">.</span>next <span class="token operator">=</span> l1 <span class="token keyword">if</span> l1 <span class="token keyword">else</span> l2
+    
+    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
+</code></pre>
+<h3 id="🧠-记忆口诀-2"><a href="#🧠-记忆口诀-2" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“比较取小，剩余直接接”</strong></p>
+</blockquote>
+<hr>
+<h2 id="4️⃣-LC-138-随机链表的复制-🟡"><a href="#4️⃣-LC-138-随机链表的复制-🟡" class="headerlink" title="4️⃣ LC 138. 随机链表的复制 🟡"></a>4️⃣ LC 138. 随机链表的复制 🟡</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><p>深拷贝带有随机指针的链表。</p>
+<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>方法：哈希表存储映射关系
+
+原链表:  [1] → [2] → [3]
+          ↓     ↓     ↓ (random)
+         [3]   [1]   None
+
+Step 1: 创建所有新节点，建立 old→new 映射
+Step 2: 连接 next 和 random 指针
+</code></pre>
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">copyRandomList</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> <span class="token string">'Node'</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> <span class="token string">'Node'</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> head<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> None
+    
+    <span class="token comment" spellcheck="true"># 建立映射: 旧节点 → 新节点</span>
+    old_to_new <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#125;</span>
+    
+    <span class="token comment" spellcheck="true"># 第一遍：创建所有新节点</span>
+    curr <span class="token operator">=</span> head
+    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
+        old_to_new<span class="token punctuation">[</span>curr<span class="token punctuation">]</span> <span class="token operator">=</span> Node<span class="token punctuation">(</span>curr<span class="token punctuation">.</span>val<span class="token punctuation">)</span>
+        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+    
+    <span class="token comment" spellcheck="true"># 第二遍：连接 next 和 random</span>
+    curr <span class="token operator">=</span> head
+    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
+        new_node <span class="token operator">=</span> old_to_new<span class="token punctuation">[</span>curr<span class="token punctuation">]</span>
+        new_node<span class="token punctuation">.</span>next <span class="token operator">=</span> old_to_new<span class="token punctuation">.</span>get<span class="token punctuation">(</span>curr<span class="token punctuation">.</span>next<span class="token punctuation">)</span>
+        new_node<span class="token punctuation">.</span>random <span class="token operator">=</span> old_to_new<span class="token punctuation">.</span>get<span class="token punctuation">(</span>curr<span class="token punctuation">.</span>random<span class="token punctuation">)</span>
+        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+    
+    <span class="token keyword">return</span> old_to_new<span class="token punctuation">[</span>head<span class="token punctuation">]</span>
+</code></pre>
+<h3 id="🔥-O-1-空间解法"><a href="#🔥-O-1-空间解法" class="headerlink" title="🔥 O(1) 空间解法"></a>🔥 O(1) 空间解法</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">copyRandomList</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> <span class="token string">'Node'</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> <span class="token string">'Node'</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> head<span class="token punctuation">:</span>
+        <span class="token keyword">return</span> None
+    
+    <span class="token comment" spellcheck="true"># Step 1: 在每个节点后插入复制节点</span>
+    <span class="token comment" spellcheck="true"># A → A' → B → B' → C → C'</span>
+    curr <span class="token operator">=</span> head
+    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
+        new_node <span class="token operator">=</span> Node<span class="token punctuation">(</span>curr<span class="token punctuation">.</span>val<span class="token punctuation">,</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">)</span>
+        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> new_node
+        curr <span class="token operator">=</span> new_node<span class="token punctuation">.</span>next
+    
+    <span class="token comment" spellcheck="true"># Step 2: 设置 random 指针</span>
+    curr <span class="token operator">=</span> head
+    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> curr<span class="token punctuation">.</span>random<span class="token punctuation">:</span>
+            curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>random <span class="token operator">=</span> curr<span class="token punctuation">.</span>random<span class="token punctuation">.</span>next
+        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
+    
+    <span class="token comment" spellcheck="true"># Step 3: 拆分链表</span>
+    dummy <span class="token operator">=</span> Node<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    new_curr <span class="token operator">=</span> dummy
+    curr <span class="token operator">=</span> head
+    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
+        new_curr<span class="token punctuation">.</span>next <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+        new_curr <span class="token operator">=</span> new_curr<span class="token punctuation">.</span>next
+        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
+        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+    
+    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
+</code></pre>
+<h3 id="🧠-记忆口诀-3"><a href="#🧠-记忆口诀-3" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“哈希映射，两遍搞定”</strong></p>
+</blockquote>
+<hr>
+<h2 id="5️⃣-LC-92-反转链表-II-🟡"><a href="#5️⃣-LC-92-反转链表-II-🟡" class="headerlink" title="5️⃣ LC 92. 反转链表 II 🟡"></a>5️⃣ LC 92. 反转链表 II 🟡</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><p>反转链表的第 left 到第 right 个节点。</p>
+<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>原链表: 1 → 2 → 3 → 4 → 5, left=2, right=4
+
+Step 1: 找到 left 前一个节点
+        1 → [2 → 3 → 4] → 5
+        ↑    └─反转区间─┘
+       prev
+
+Step 2: 反转中间部分
+        1    2 ← 3 ← 4    5
+        ↑    ↓         ↑
+       prev  └─────────┘
+
+Step 3: 重新连接
+        1 → 4 → 3 → 2 → 5
+</code></pre>
+<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">reverseBetween</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> left<span class="token punctuation">:</span> int<span class="token punctuation">,</span> right<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> ListNode<span class="token punctuation">:</span>
+    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> head<span class="token punctuation">)</span>
+    prev <span class="token operator">=</span> dummy
+    
+    <span class="token comment" spellcheck="true"># 移动到 left 前一个位置</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>left <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        prev <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
+    
+    <span class="token comment" spellcheck="true"># 反转 [left, right] 区间</span>
+    curr <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>right <span class="token operator">-</span> left<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># 把 curr.next 插到 prev 后面</span>
+        next_node <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> next_node<span class="token punctuation">.</span>next
+        next_node<span class="token punctuation">.</span>next <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
+        prev<span class="token punctuation">.</span>next <span class="token operator">=</span> next_node
+    
+    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
+</code></pre>
+<h3 id="🧠-记忆口诀-4"><a href="#🧠-记忆口诀-4" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“头插法反转，一次遍历”</strong></p>
+</blockquote>
+<hr>
+<h2 id="6️⃣-LC-25-K-个一组翻转链表-🔴"><a href="#6️⃣-LC-25-K-个一组翻转链表-🔴" class="headerlink" title="6️⃣ LC 25. K 个一组翻转链表 🔴"></a>6️⃣ LC 25. K 个一组翻转链表 🔴</h2><h3 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h3><p>每 k 个节点一组进行翻转。</p>
+<h3 id="🎨-图解思路-5"><a href="#🎨-图解思路-5" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>链表: 1 → 2 → 3 → 4 → 5, k = 2
+
+第1组: [1,2] → 反转 → [2,1]
+第2组: [3,4] → 反转 → [4,3]  
+第3组: [5] → 不足k个，保持原样
+
+结果: 2 → 1 → 4 → 3 → 5
+</code></pre>
+<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">reverseKGroup</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> k<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> ListNode<span class="token punctuation">:</span>
+    <span class="token comment" spellcheck="true"># 检查是否有 k 个节点</span>
+    <span class="token keyword">def</span> <span class="token function">get_kth</span><span class="token punctuation">(</span>node<span class="token punctuation">,</span> k<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">while</span> node <span class="token operator">and</span> k <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            node <span class="token operator">=</span> node<span class="token punctuation">.</span>next
+            k <span class="token operator">-=</span> <span class="token number">1</span>
+        <span class="token keyword">return</span> node
+    
+    <span class="token comment" spellcheck="true"># 反转链表</span>
+    <span class="token keyword">def</span> <span class="token function">reverse</span><span class="token punctuation">(</span>head<span class="token punctuation">,</span> tail<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        prev <span class="token operator">=</span> tail<span class="token punctuation">.</span>next
+        curr <span class="token operator">=</span> head
+        <span class="token keyword">while</span> prev <span class="token operator">!=</span> tail<span class="token punctuation">:</span>
+            next_temp <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+            curr<span class="token punctuation">.</span>next <span class="token operator">=</span> prev
+            prev <span class="token operator">=</span> curr
+            curr <span class="token operator">=</span> next_temp
+        <span class="token keyword">return</span> tail<span class="token punctuation">,</span> head  <span class="token comment" spellcheck="true"># 新的头和尾</span>
+    
+    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> head<span class="token punctuation">)</span>
+    prev_group <span class="token operator">=</span> dummy
+    
+    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># 找到这一组的尾节点</span>
+        kth <span class="token operator">=</span> get_kth<span class="token punctuation">(</span>prev_group<span class="token punctuation">,</span> k<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> <span class="token operator">not</span> kth<span class="token punctuation">:</span>
+            <span class="token keyword">break</span>
+        
+        next_group <span class="token operator">=</span> kth<span class="token punctuation">.</span>next
+        
+        <span class="token comment" spellcheck="true"># 反转这一组</span>
+        head<span class="token punctuation">,</span> tail <span class="token operator">=</span> prev_group<span class="token punctuation">.</span>next<span class="token punctuation">,</span> kth
+        new_head<span class="token punctuation">,</span> new_tail <span class="token operator">=</span> reverse<span class="token punctuation">(</span>head<span class="token punctuation">,</span> tail<span class="token punctuation">)</span>
+        
+        <span class="token comment" spellcheck="true"># 连接</span>
+        prev_group<span class="token punctuation">.</span>next <span class="token operator">=</span> new_head
+        new_tail<span class="token punctuation">.</span>next <span class="token operator">=</span> next_group
+        
+        prev_group <span class="token operator">=</span> new_tail
+    
+    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
+</code></pre>
+<h3 id="🧠-记忆口诀-5"><a href="#🧠-记忆口诀-5" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“够k就翻，不够就留”</strong></p>
+</blockquote>
+<hr>
+<h2 id="7️⃣-LC-19-删除链表的倒数第-N-个节点-🟡"><a href="#7️⃣-LC-19-删除链表的倒数第-N-个节点-🟡" class="headerlink" title="7️⃣ LC 19. 删除链表的倒数第 N 个节点 🟡"></a>7️⃣ LC 19. 删除链表的倒数第 N 个节点 🟡</h2><h3 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h3><p>删除链表的倒数第 n 个节点。</p>
+<h3 id="🎨-图解思路-6"><a href="#🎨-图解思路-6" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>快慢指针，快指针先走 n 步
+
+链表: 1 → 2 → 3 → 4 → 5, n = 2
+
+Step 1: fast 先走 2 步
+        1 → 2 → 3 → 4 → 5
+        ↑       ↑
+       slow    fast
+
+Step 2: 同时移动直到 fast 到末尾
+        1 → 2 → 3 → 4 → 5 → None
+                ↑       ↑
+               slow    fast
+
+Step 3: 删除 slow.next
+        1 → 2 → 3 ────→ 5
+</code></pre>
+<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">removeNthFromEnd</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> n<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> ListNode<span class="token punctuation">:</span>
+    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> head<span class="token punctuation">)</span>
+    slow <span class="token operator">=</span> fast <span class="token operator">=</span> dummy
+    
+    <span class="token comment" spellcheck="true"># fast 先走 n+1 步</span>
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        fast <span class="token operator">=</span> fast<span class="token punctuation">.</span>next
+    
+    <span class="token comment" spellcheck="true"># 同时移动</span>
+    <span class="token keyword">while</span> fast<span class="token punctuation">:</span>
+        slow <span class="token operator">=</span> slow<span class="token punctuation">.</span>next
+        fast <span class="token operator">=</span> fast<span class="token punctuation">.</span>next
+    
+    <span class="token comment" spellcheck="true"># 删除 slow.next</span>
+    slow<span class="token punctuation">.</span>next <span class="token operator">=</span> slow<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
+    
+    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
+</code></pre>
+<h3 id="🧠-记忆口诀-6"><a href="#🧠-记忆口诀-6" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“快先走n步，同行到末尾”</strong></p>
+</blockquote>
+<hr>
+<h2 id="8️⃣-LC-82-删除排序链表中的重复元素-II-🟡"><a href="#8️⃣-LC-82-删除排序链表中的重复元素-II-🟡" class="headerlink" title="8️⃣ LC 82. 删除排序链表中的重复元素 II 🟡"></a>8️⃣ LC 82. 删除排序链表中的重复元素 II 🟡</h2><h3 id="题目描述-7"><a href="#题目描述-7" class="headerlink" title="题目描述"></a>题目描述</h3><p>删除所有重复的节点，只保留原始链表中没有重复出现的数字。</p>
+<h3 id="🎨-图解思路-7"><a href="#🎨-图解思路-7" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>1 → 2 → 3 → 3 → 4 → 4 → 5
+
+检测重复并删除整组：
+1 → 2 → [3 → 3] → [4 → 4] → 5
+        删除      删除
+
+结果: 1 → 2 → 5
+</code></pre>
+<h3 id="💻-代码实现-7"><a href="#💻-代码实现-7" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">deleteDuplicates</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> ListNode<span class="token punctuation">:</span>
+    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> head<span class="token punctuation">)</span>
+    prev <span class="token operator">=</span> dummy
+    
+    <span class="token keyword">while</span> prev<span class="token punctuation">.</span>next<span class="token punctuation">:</span>
+        curr <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
+        
+        <span class="token comment" spellcheck="true"># 检测是否有重复</span>
+        <span class="token keyword">if</span> curr<span class="token punctuation">.</span>next <span class="token operator">and</span> curr<span class="token punctuation">.</span>val <span class="token operator">==</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>val<span class="token punctuation">:</span>
+            <span class="token comment" spellcheck="true"># 跳过所有重复节点</span>
+            <span class="token keyword">while</span> curr<span class="token punctuation">.</span>next <span class="token operator">and</span> curr<span class="token punctuation">.</span>val <span class="token operator">==</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>val<span class="token punctuation">:</span>
+                curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
+            prev<span class="token punctuation">.</span>next <span class="token operator">=</span> curr<span class="token punctuation">.</span>next  <span class="token comment" spellcheck="true"># 删除整组</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            prev <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
+    
+    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
+</code></pre>
+<h3 id="🧠-记忆口诀-7"><a href="#🧠-记忆口诀-7" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“见重复全删，不重复才留”</strong></p>
+</blockquote>
+<hr>
+<h2 id="9️⃣-LC-61-旋转链表-🟡"><a href="#9️⃣-LC-61-旋转链表-🟡" class="headerlink" title="9️⃣ LC 61. 旋转链表 🟡"></a>9️⃣ LC 61. 旋转链表 🟡</h2><h3 id="题目描述-8"><a href="#题目描述-8" class="headerlink" title="题目描述"></a>题目描述</h3><p>将链表每个节点向右移动 k 个位置。</p>
+<h3 id="🎨-图解思路-8"><a href="#🎨-图解思路-8" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>1 → 2 → 3 → 4 → 5, k = 2
+
+Step 1: 连成环
+        1 → 2 → 3 → 4 → 5
+        ↑               │
+        └───────────────┘
+
+Step 2: 找到新的断点 (n - k % n)
+        新头是第 5-2=3 个节点之后
+        
+Step 3: 在正确位置断开
+        4 → 5 → 1 → 2 → 3
+</code></pre>
+<h3 id="💻-代码实现-8"><a href="#💻-代码实现-8" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">rotateRight</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> k<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> ListNode<span class="token punctuation">:</span>
+    <span class="token keyword">if</span> <span class="token operator">not</span> head <span class="token operator">or</span> <span class="token operator">not</span> head<span class="token punctuation">.</span>next <span class="token operator">or</span> k <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> head
+    
+    <span class="token comment" spellcheck="true"># 计算长度并找到尾节点</span>
+    length <span class="token operator">=</span> <span class="token number">1</span>
+    tail <span class="token operator">=</span> head
+    <span class="token keyword">while</span> tail<span class="token punctuation">.</span>next<span class="token punctuation">:</span>
+        tail <span class="token operator">=</span> tail<span class="token punctuation">.</span>next
+        length <span class="token operator">+=</span> <span class="token number">1</span>
+    
+    <span class="token comment" spellcheck="true"># 实际需要移动的步数</span>
+    k <span class="token operator">=</span> k <span class="token operator">%</span> length
+    <span class="token keyword">if</span> k <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> head
+    
+    <span class="token comment" spellcheck="true"># 找到新的尾节点（第 length - k 个）</span>
+    new_tail <span class="token operator">=</span> head
+    <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>length <span class="token operator">-</span> k <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        new_tail <span class="token operator">=</span> new_tail<span class="token punctuation">.</span>next
+    
+    <span class="token comment" spellcheck="true"># 重新连接</span>
+    new_head <span class="token operator">=</span> new_tail<span class="token punctuation">.</span>next
+    new_tail<span class="token punctuation">.</span>next <span class="token operator">=</span> None
+    tail<span class="token punctuation">.</span>next <span class="token operator">=</span> head
+    
+    <span class="token keyword">return</span> new_head
+</code></pre>
+<h3 id="🧠-记忆口诀-8"><a href="#🧠-记忆口诀-8" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“先成环，再断开”</strong></p>
+</blockquote>
+<hr>
+<h2 id="🔟-LC-86-分隔链表-🟡"><a href="#🔟-LC-86-分隔链表-🟡" class="headerlink" title="🔟 LC 86. 分隔链表 🟡"></a>🔟 LC 86. 分隔链表 🟡</h2><h3 id="题目描述-9"><a href="#题目描述-9" class="headerlink" title="题目描述"></a>题目描述</h3><p>将链表按值 x 分成两部分：小于 x 的在前，大于等于 x 的在后。</p>
+<h3 id="🎨-图解思路-9"><a href="#🎨-图解思路-9" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>1 → 4 → 3 → 2 → 5 → 2, x = 3
+
+分成两个链表：
+小于3: 1 → 2 → 2
+≥3:    4 → 3 → 5
+
+合并: 1 → 2 → 2 → 4 → 3 → 5
+</code></pre>
+<h3 id="💻-代码实现-9"><a href="#💻-代码实现-9" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">partition</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> x<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> ListNode<span class="token punctuation">:</span>
+    <span class="token comment" spellcheck="true"># 两个虚拟头节点</span>
+    small_dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    large_dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+    small <span class="token operator">=</span> small_dummy
+    large <span class="token operator">=</span> large_dummy
+    
+    <span class="token keyword">while</span> head<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> head<span class="token punctuation">.</span>val <span class="token operator">&lt;</span> x<span class="token punctuation">:</span>
+            small<span class="token punctuation">.</span>next <span class="token operator">=</span> head
+            small <span class="token operator">=</span> small<span class="token punctuation">.</span>next
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            large<span class="token punctuation">.</span>next <span class="token operator">=</span> head
+            large <span class="token operator">=</span> large<span class="token punctuation">.</span>next
+        head <span class="token operator">=</span> head<span class="token punctuation">.</span>next
+    
+    <span class="token comment" spellcheck="true"># 连接两个链表</span>
+    large<span class="token punctuation">.</span>next <span class="token operator">=</span> None  <span class="token comment" spellcheck="true"># 防止成环</span>
+    small<span class="token punctuation">.</span>next <span class="token operator">=</span> large_dummy<span class="token punctuation">.</span>next
+    
+    <span class="token keyword">return</span> small_dummy<span class="token punctuation">.</span>next
+</code></pre>
+<h3 id="🧠-记忆口诀-9"><a href="#🧠-记忆口诀-9" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“分两队，再合并”</strong></p>
+</blockquote>
+<hr>
+<h2 id="1️⃣1️⃣-LC-146-LRU-缓存-🟡"><a href="#1️⃣1️⃣-LC-146-LRU-缓存-🟡" class="headerlink" title="1️⃣1️⃣ LC 146. LRU 缓存 🟡"></a>1️⃣1️⃣ LC 146. LRU 缓存 🟡</h2><h3 id="题目描述-10"><a href="#题目描述-10" class="headerlink" title="题目描述"></a>题目描述</h3><p>实现 LRU (最近最少使用) 缓存机制。</p>
+<h3 id="🎨-图解思路-10"><a href="#🎨-图解思路-10" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>使用双向链表 + 哈希表
+
+双向链表（按使用时间排序）:
+head ⇄ [最近用] ⇄ [次近用] ⇄ ... ⇄ [最久未用] ⇄ tail
+
+哈希表: key → 链表节点
+
+get/put 操作:
+1. 通过哈希表 O(1) 找到节点
+2. 移动到链表头部（最近使用）
+3. 超容量时删除链表尾部
+</code></pre>
+<h3 id="💻-代码实现-10"><a href="#💻-代码实现-10" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">DLinkedNode</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span> value<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>key <span class="token operator">=</span> key
+        self<span class="token punctuation">.</span>value <span class="token operator">=</span> value
+        self<span class="token punctuation">.</span>prev <span class="token operator">=</span> None
+        self<span class="token punctuation">.</span>next <span class="token operator">=</span> None
+
+<span class="token keyword">class</span> <span class="token class-name">LRUCache</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> capacity<span class="token punctuation">:</span> int<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        self<span class="token punctuation">.</span>cache <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#125;  # key → node</span>
+        self<span class="token punctuation">.</span>capacity <span class="token operator">=</span> capacity
+        
+        <span class="token comment" spellcheck="true"># 虚拟头尾节点</span>
+        self<span class="token punctuation">.</span>head <span class="token operator">=</span> DLinkedNode<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>tail <span class="token operator">=</span> DLinkedNode<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>head<span class="token punctuation">.</span>next <span class="token operator">=</span> self<span class="token punctuation">.</span>tail
+        self<span class="token punctuation">.</span>tail<span class="token punctuation">.</span>prev <span class="token operator">=</span> self<span class="token punctuation">.</span>head
+    
+    <span class="token keyword">def</span> <span class="token function">_remove</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""从链表中删除节点"""</span>
+        node<span class="token punctuation">.</span>prev<span class="token punctuation">.</span>next <span class="token operator">=</span> node<span class="token punctuation">.</span>next
+        node<span class="token punctuation">.</span>next<span class="token punctuation">.</span>prev <span class="token operator">=</span> node<span class="token punctuation">.</span>prev
+    
+    <span class="token keyword">def</span> <span class="token function">_add_to_head</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""添加到链表头部"""</span>
+        node<span class="token punctuation">.</span>prev <span class="token operator">=</span> self<span class="token punctuation">.</span>head
+        node<span class="token punctuation">.</span>next <span class="token operator">=</span> self<span class="token punctuation">.</span>head<span class="token punctuation">.</span>next
+        self<span class="token punctuation">.</span>head<span class="token punctuation">.</span>next<span class="token punctuation">.</span>prev <span class="token operator">=</span> node
+        self<span class="token punctuation">.</span>head<span class="token punctuation">.</span>next <span class="token operator">=</span> node
+    
+    <span class="token keyword">def</span> <span class="token function">_move_to_head</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""移动到头部"""</span>
+        self<span class="token punctuation">.</span>_remove<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>_add_to_head<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+    
+    <span class="token keyword">def</span> <span class="token function">_remove_tail</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">"""删除尾部节点"""</span>
+        node <span class="token operator">=</span> self<span class="token punctuation">.</span>tail<span class="token punctuation">.</span>prev
+        self<span class="token punctuation">.</span>_remove<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> node
+    
+    <span class="token keyword">def</span> <span class="token function">get</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> key<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> key <span class="token operator">not</span> <span class="token keyword">in</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">:</span>
+            <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span>
+        node <span class="token operator">=</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span>
+        self<span class="token punctuation">.</span>_move_to_head<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> node<span class="token punctuation">.</span>value
+    
+    <span class="token keyword">def</span> <span class="token function">put</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> key<span class="token punctuation">:</span> int<span class="token punctuation">,</span> value<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> None<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> key <span class="token keyword">in</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">:</span>
+            node <span class="token operator">=</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span>
+            node<span class="token punctuation">.</span>value <span class="token operator">=</span> value
+            self<span class="token punctuation">.</span>_move_to_head<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            node <span class="token operator">=</span> DLinkedNode<span class="token punctuation">(</span>key<span class="token punctuation">,</span> value<span class="token punctuation">)</span>
+            self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> node
+            self<span class="token punctuation">.</span>_add_to_head<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
+            
+            <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>cache<span class="token punctuation">)</span> <span class="token operator">&gt;</span> self<span class="token punctuation">.</span>capacity<span class="token punctuation">:</span>
+                tail <span class="token operator">=</span> self<span class="token punctuation">.</span>_remove_tail<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token keyword">del</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>tail<span class="token punctuation">.</span>key<span class="token punctuation">]</span>
+</code></pre>
+<h3 id="🧠-记忆口诀-10"><a href="#🧠-记忆口诀-10" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“双链表记顺序，哈希表快查找”</strong></p>
+</blockquote>
+<hr>
+<h2 id="📊-本章总结"><a href="#📊-本章总结" class="headerlink" title="📊 本章总结"></a>📊 本章总结</h2><h3 id="链表技巧速查表"><a href="#链表技巧速查表" class="headerlink" title="链表技巧速查表"></a>链表技巧速查表</h3><table>
+<thead>
+<tr>
+<th>技巧</th>
+<th>使用场景</th>
+<th>典型题目</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>虚拟头节点</td>
+<td>可能修改头节点</td>
+<td>21, 82, 86</td>
+</tr>
+<tr>
+<td>快慢指针</td>
+<td>找中点/判环</td>
+<td>141, 19</td>
+</tr>
+<tr>
+<td>反转链表</td>
+<td>翻转操作</td>
+<td>92, 25</td>
+</tr>
+<tr>
+<td>哈希表辅助</td>
+<td>复杂指针关系</td>
+<td>138, 146</td>
+</tr>
+<tr>
+<td>双指针</td>
+<td>合并/分隔</td>
+<td>21, 86</td>
+</tr>
+</tbody></table>
+<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><pre><code>环加合复反转组
+删倒删重旋分缓
+
+环 - 环形链表 (141)
+加 - 两数相加 (2)
+合 - 合并有序链表 (21)
+复 - 复制随机链表 (138)
+反 - 反转链表 II (92)
+组 - K个一组翻转 (25)
+删倒 - 删除倒数第N个 (19)
+删重 - 删除重复元素 II (82)
+旋 - 旋转链表 (61)
+分 - 分隔链表 (86)
+缓 - LRU缓存 (146)
+</code></pre>
+<hr>
+<blockquote>
+<p>📖 <strong>下一篇</strong>：<a href="/2026/01/18/leetcode-150-binary-tree/">二叉树专题</a></p>
+</blockquote>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/01/18/leetcode-150-linked-list/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/01/18/leetcode-150-linked-list/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-index/">🎯 LeetCode 面试经典 150 题 - 完全攻略</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-sliding-window/">🪟 LeetCode 150 - 滑动窗口专题</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%F0%9F%94%97-%E9%93%BE%E8%A1%A8%E4%B8%93%E9%A2%98-11%E9%A2%98"><span class="toc-text">🔗 链表专题 (11题)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%97%BA%EF%B8%8F-%E9%93%BE%E8%A1%A8%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C%E5%9B%BE%E8%A7%A3"><span class="toc-text">🗺️ 链表核心操作图解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%A7-%E9%93%BE%E8%A1%A8%E4%B8%87%E8%83%BD%E6%8A%80%E5%B7%A7"><span class="toc-text">🔧 链表万能技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%80%E5%B7%A71-%E8%99%9A%E6%8B%9F%E5%A4%B4%E8%8A%82%E7%82%B9-Dummy-Head"><span class="toc-text">技巧1: 虚拟头节点 (Dummy Head)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%80%E5%B7%A72-%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88"><span class="toc-text">技巧2: 快慢指针</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%80%E5%B7%A73-%E9%93%BE%E8%A1%A8%E5%8F%8D%E8%BD%AC"><span class="toc-text">技巧3: 链表反转</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%B8%8F%E2%83%A3-LC-141-%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8-%F0%9F%9F%A2"><span class="toc-text">1️⃣ LC 141. 环形链表 🟢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%EF%B8%8F%E2%83%A3-LC-2-%E4%B8%A4%E6%95%B0%E7%9B%B8%E5%8A%A0-%F0%9F%9F%A1"><span class="toc-text">2️⃣ LC 2. 两数相加 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-1"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-1"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-1"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%EF%B8%8F%E2%83%A3-LC-21-%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8-%F0%9F%9F%A2"><span class="toc-text">3️⃣ LC 21. 合并两个有序链表 🟢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-2"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-2"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-2"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-2"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%EF%B8%8F%E2%83%A3-LC-138-%E9%9A%8F%E6%9C%BA%E9%93%BE%E8%A1%A8%E7%9A%84%E5%A4%8D%E5%88%B6-%F0%9F%9F%A1"><span class="toc-text">4️⃣ LC 138. 随机链表的复制 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-3"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-3"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-3"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%94%A5-O-1-%E7%A9%BA%E9%97%B4%E8%A7%A3%E6%B3%95"><span class="toc-text">🔥 O(1) 空间解法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-3"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%EF%B8%8F%E2%83%A3-LC-92-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8-II-%F0%9F%9F%A1"><span class="toc-text">5️⃣ LC 92. 反转链表 II 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-4"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-4"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-4"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-4"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6%EF%B8%8F%E2%83%A3-LC-25-K-%E4%B8%AA%E4%B8%80%E7%BB%84%E7%BF%BB%E8%BD%AC%E9%93%BE%E8%A1%A8-%F0%9F%94%B4"><span class="toc-text">6️⃣ LC 25. K 个一组翻转链表 🔴</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-5"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-5"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-5"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-5"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7%EF%B8%8F%E2%83%A3-LC-19-%E5%88%A0%E9%99%A4%E9%93%BE%E8%A1%A8%E7%9A%84%E5%80%92%E6%95%B0%E7%AC%AC-N-%E4%B8%AA%E8%8A%82%E7%82%B9-%F0%9F%9F%A1"><span class="toc-text">7️⃣ LC 19. 删除链表的倒数第 N 个节点 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-6"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-6"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-6"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-6"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8%EF%B8%8F%E2%83%A3-LC-82-%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0-II-%F0%9F%9F%A1"><span class="toc-text">8️⃣ LC 82. 删除排序链表中的重复元素 II 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-7"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-7"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-7"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-7"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9%EF%B8%8F%E2%83%A3-LC-61-%E6%97%8B%E8%BD%AC%E9%93%BE%E8%A1%A8-%F0%9F%9F%A1"><span class="toc-text">9️⃣ LC 61. 旋转链表 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-8"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-8"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-8"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-8"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%9F-LC-86-%E5%88%86%E9%9A%94%E9%93%BE%E8%A1%A8-%F0%9F%9F%A1"><span class="toc-text">🔟 LC 86. 分隔链表 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-9"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-9"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-9"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-9"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%B8%8F%E2%83%A31%EF%B8%8F%E2%83%A3-LC-146-LRU-%E7%BC%93%E5%AD%98-%F0%9F%9F%A1"><span class="toc-text">1️⃣1️⃣ LC 146. LRU 缓存 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-10"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-10"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-10"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-10"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8A-%E6%9C%AC%E7%AB%A0%E6%80%BB%E7%BB%93"><span class="toc-text">📊 本章总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%93%BE%E8%A1%A8%E6%8A%80%E5%B7%A7%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="toc-text">链表技巧速查表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E5%85%A8%E7%AB%A0%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80"><span class="toc-text">🧠 全章记忆口诀</span></a></li></ol></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/01/18/leetcode-150-linked-list/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

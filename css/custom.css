@@ -1,0 +1,159 @@
+/* ==========================================
+   相机几何文章样式优化
+   ========================================== */
+
+/* 1. 数学公式样式优化 - 放大字体 */
+.katex, .katex-display, .katex-html {
+  font-size: 1.2em !important;
+}
+
+/* 行内公式 */
+p .katex, span.katex {
+  font-size: 1.15em !important;
+  color: #2c3e50;
+}
+
+/* 块级公式 - 更大更清晰 */
+.katex-display {
+  font-size: 1.3em !important;
+  margin: 2em 0 !important;
+  padding: 1em 0;
+}
+
+/* MathJax 支持 */
+.MathJax {
+  font-size: 125% !important;
+}
+
+.MathJax_Display {
+  font-size: 130% !important;
+  margin: 2em 0 !important;
+}
+
+/* 2. 代码块样式优化 - 缩小字体 */
+pre {
+  font-size: 0.8em !important;
+  line-height: 1.6 !important;
+  padding: 1.2em !important;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+pre code {
+  font-size: 0.85em !important;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace !important;
+}
+
+/* 行内代码 - 适中大小 */
+p code, li code, td code {
+  font-size: 0.88em !important;
+  padding: 2px 6px !important;
+  background: rgba(27, 31, 35, 0.05);
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace !important;
+}
+
+/* 3. 图片样式优化 - 居中和响应式 */
+.markdown-body img,
+article img,
+.post-content img,
+#article-container img {
+  display: block !important;
+  margin: 2em auto !important;
+  max-width: 90% !important;
+  height: auto !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.markdown-body img:hover,
+article img:hover,
+.post-content img:hover,
+#article-container img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 4. 公式渲染优化 */
+.katex-display &gt; .katex {
+  text-align: center;
+  display: inline-block;
+}
+
+/* 确保公式不会被截断 */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5em 0;
+}
+
+/* 5. 标题和段落间距优化 */
+#article-container h2 {
+  margin-top: 2.5em;
+  margin-bottom: 1em;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid #e1e4e8;
+}
+
+#article-container h3 {
+  margin-top: 2em;
+  margin-bottom: 0.8em;
+}
+
+/* 6. 列表样式优化 */
+#article-container ul, 
+#article-container ol {
+  line-height: 1.8;
+  margin: 1em 0;
+}
+
+/* 7. 表格样式优化 */
+#article-container table {
+  margin: 2em auto;
+  border-collapse: collapse;
+  width: 95%;
+}
+
+#article-container table th,
+#article-container table td {
+  padding: 0.8em 1em;
+  border: 1px solid #ddd;
+}
+
+/* 8. 代码高亮优化 */
+.highlight {
+  margin: 1.5em 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.highlight table {
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* 9. 响应式设计 */
+@media (max-width: 768px) {
+  .katex-display {
+    font-size: 1.1em !important;
+  }
+  
+  pre {
+    font-size: 0.75em !important;
+  }
+  
+  #article-container img {
+    max-width: 100% !important;
+  }
+}
+
+/* 10. 深色模式适配 */
+[data-theme="dark"] .katex {
+  color: #e1e4e8;
+}
+
+[data-theme="dark"] p code,
+[data-theme="dark"] li code {
+  background: rgba(240, 246, 252, 0.1);
+}

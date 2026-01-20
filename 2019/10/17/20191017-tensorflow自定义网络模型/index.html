@@ -1,0 +1,1405 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>tensorflow自定义网络模型 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="SlimTF-Slim 模块是 TensorFlow 中最好用的 API 之一。尤其是里面引入的 arg_scope、model_variables、repeat、stack。TF-Slim 是 TensorFlow 中一个用来构建、训练、评估复杂模型的轻量化库。TF-Slim 模块可以和 TensorFlow 中其它API混合使用。 Slim模块的导入    import tensorflow.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorflow自定义网络模型">
+<meta property="og:url" content="https://caiusy.github.io/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="SlimTF-Slim 模块是 TensorFlow 中最好用的 API 之一。尤其是里面引入的 arg_scope、model_variables、repeat、stack。TF-Slim 是 TensorFlow 中一个用来构建、训练、评估复杂模型的轻量化库。TF-Slim 模块可以和 TensorFlow 中其它API混合使用。 Slim模块的导入    import tensorflow.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2019-10-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-20T17:22:45.847Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="深度学习 - python - tensorflow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="深度学习 - python - tensorflow">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2019-10-17T00:00:00+08:00","dateModified":"2026-01-21T01:22:45+08:00","datePublished":"2019-10-17T00:00:00+08:00","description":"","headline":"tensorflow自定义网络模型","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/","keywords":"深度学习 - python - tensorflow","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> AI探索者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a><a class="item title" href="/2019/12/19/20191219-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/"><span class="title">二叉树打印</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2019-10-16T16:00:00.000Z">2019-10-17</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-01-20T17:22:45.847Z">2026-01-21</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>tensorflow自定义网络模型</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h2 id="Slim"><a href="#Slim" class="headerlink" title="Slim"></a>Slim</h2><p>TF-Slim 模块是 TensorFlow 中最好用的 API 之一。尤其是里面引入的 arg_scope、model_variables、repeat、stack。<br>TF-Slim 是 TensorFlow 中一个用来构建、训练、评估复杂模型的轻量化库。TF-Slim 模块可以和 TensorFlow 中其它API混合使用。</p>
+<h3 id="Slim模块的导入"><a href="#Slim模块的导入" class="headerlink" title="Slim模块的导入"></a>Slim模块的导入</h3><pre class=" language-python"><code class="language-python">    <span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>contrib<span class="token punctuation">.</span>slim <span class="token keyword">as</span> slim
+</code></pre>
+<h3 id="Slim-构建模型"><a href="#Slim-构建模型" class="headerlink" title="Slim 构建模型"></a>Slim 构建模型</h3><p>可以用 slim、variables、layers 和 scopes 来十分简洁地定义模型。下面对各个部分进行了详细描述：</p>
+<h4 id="Slim变量（Variables）"><a href="#Slim变量（Variables）" class="headerlink" title="Slim变量（Variables）"></a>Slim变量（Variables）</h4><pre><code>    weights = slim.variable('weights',
+                            shape=[10, 10, 3 , 3],
+                            initializer=tf.truncated_normal_initializer(stddev=0.1),
+                            regularizer=slim.l2_regularizer(0.05),
+                            device='/CPU:0')
+    ~
+</code></pre>
+<h4 id="Slim-层（Layers）"><a href="#Slim-层（Layers）" class="headerlink" title="Slim 层（Layers）"></a>Slim 层（Layers）</h4><p>使用基础（plain）的 TensorFlow 代码：  </p>
+<pre><code>    input = ...
+    with tf.name_scope('conv1_1') as scope:
+      kernel = tf.Variable(tf.truncated_normal([3, 3, 64, 128], dtype=tf.float32,
+                                               stddev=1e-1), name='weights')
+      conv = tf.nn.conv2d(input, kernel, [1, 1, 1, 1], padding='SAME')
+      biases = tf.Variable(tf.constant(0.0, shape=[128], dtype=tf.float32),
+                           trainable=True, name='biases')
+      bias = tf.nn.bias_add(conv, biases)
+      conv1 = tf.nn.relu(bias, name=scope)
+</code></pre>
+<p>为了避免代码的重复。Slim 提供了很多方便的神经网络 layers 的高层 op。例如：与上面的代码对应的 Slim 版的代码：  </p>
+<pre><code>    input = ...
+    net = slim.conv2d(input, 128, [3, 3], scope='conv1_1')
+</code></pre>
+<h3 id="slim-arg-scope（）-函数的使用"><a href="#slim-arg-scope（）-函数的使用" class="headerlink" title="slim.arg_scope（） 函数的使用"></a>slim.arg_scope（） 函数的使用</h3><p>这个函数的作用是给list_ops中的内容设置默认值。但是每个list_ops中的每个成员需要用@add_arg_scope修饰才行。所以使用slim.arg_scope（）有两个步骤：</p>
+<ul>
+<li>使用@slim.add_arg_scope修饰目标函数</li>
+<li>用 slim.arg_scope（）为目标函数设置默认参数.<br>例如如下代码；首先用@slim.add_arg_scope修饰目标函数fun1（），然后利用slim.arg_scope（）为它设置默认参数。</li>
+</ul>
+<pre class=" language-python"><code class="language-python">```python
+<span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
+slim <span class="token operator">=</span>tf<span class="token punctuation">.</span>contrib<span class="token punctuation">.</span>slim
+@slim<span class="token punctuation">.</span>add_arg_scope
+<span class="token keyword">def</span> <span class="token function">fun1</span><span class="token punctuation">(</span>a<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span>b<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+<span class="token keyword">return</span> <span class="token punctuation">(</span>a<span class="token operator">+</span>b<span class="token punctuation">)</span>
+<span class="token keyword">with</span> slim<span class="token punctuation">.</span>arg_scope<span class="token punctuation">(</span><span class="token punctuation">[</span>fun1<span class="token punctuation">]</span><span class="token punctuation">,</span>a<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+x<span class="token operator">=</span>fun1<span class="token punctuation">(</span>b<span class="token operator">=</span><span class="token number">30</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+</code></pre>
+<p>运行结果:40<br>参考链接：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/u013921430/article/details/80915696">https://blog.csdn.net/u013921430/article/details/80915696</a></p>
+<h3 id="其他用法见参考链接"><a href="#其他用法见参考链接" class="headerlink" title="其他用法见参考链接"></a>其他用法见参考链接</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wanttifa/article/details/90208398">https://blog.csdn.net/wanttifa/article/details/90208398</a></p>
+<h2 id="查看ckpt中变量的几种方法"><a href="#查看ckpt中变量的几种方法" class="headerlink" title="查看ckpt中变量的几种方法"></a>查看ckpt中变量的几种方法</h2><p>查看ckpt中变量的方法有三种：</p>
+<ul>
+<li>在有model的情况下，使用tf.train.Saver进行restore</li>
+<li>使用tf.train.NewCheckpointReader直接读取ckpt文件，这种方法不需要model。</li>
+<li>使用tools里的freeze_graph来读取ckpt<br>Tips:</li>
+<li>如果模型保存为.ckpt的文件，则使用该文件就可以查看.ckpt文件里的变量。ckpt路径为 model.ckpt</li>
+<li>如果模型保存为.ckpt-xxx-data (图结构)、.ckpt-xxx.index (参数名)、.ckpt-xxx-meta (参数值)文件，则需要同时拥有这三个文件才行。并且ckpt的路径为 model.ckpt-xxx</li>
+</ul>
+<h3 id="1-基于model来读取ckpt文件里的变量"><a href="#1-基于model来读取ckpt文件里的变量" class="headerlink" title="1.基于model来读取ckpt文件里的变量"></a>1.基于model来读取ckpt文件里的变量</h3><p>1.首先建立起model<br>2.从ckpt中恢复变量<br>        1<br>        2<br>        3<br>        4<br>        5<br>        6<br>        7<br>        8<br>        9<br>        10<br>        with tf.Graph().as_default() as g:<br>          #建立model<br>          images, labels = cifar10.inputs(eval_data=eval_data)<br>          logits = cifar10.inference(images)<br>          top_k_op = tf.nn.in_top_k(logits, labels, 1)<br>          #从ckpt中恢复变量<br>          sess = tf.Session()<br>          saver = tf.train.Saver() #saver = tf.train.Saver(…variables…) # 恢复部分变量时，只需要在Saver里指定要恢复的变量<br>          save_path = ‘ckpt的路径’<br>          saver.restore(sess, save_path) # 从ckpt中恢复变量</p>
+<pre><code>
+
+注意：基于model来读取ckpt中变量时，model和ckpt必须匹配。
+
+### 2.使用tf.train.NewCheckpointReader直接读取ckpt文件里的变量，使用tools.inspect_checkpoint里的print_tensors_in_checkpoint_file函数打印ckpt里的东西
+    
+    
+
+```python
+    #使用NewCheckpointReader来读取ckpt里的变量
+    from tensorflow.python import pywrap_tensorflow
+    checkpoint_path = os.path.join(model_dir, "model.ckpt")
+    reader = pywrap_tensorflow.NewCheckpointReader(checkpoint_path) #tf.train.NewCheckpointReader
+    var_to_shape_map = reader.get_variable_to_shape_map()
+    for key in var_to_shape_map:
+      print("tensor_name: ", key)
+      #print(reader.get_tensor(key))
+    #使用print_tensors_in_checkpoint_file打印ckpt里的内容
+    from tensorflow.python.tools.inspect_checkpoint import print_tensors_in_checkpoint_file
+    print_tensors_in_checkpoint_file(file_name, #ckpt文件名字
+                     tensor_name, # 如果为None,则默认为ckpt里的所有变量
+                     all_tensors, # bool 是否打印所有的tensor，这里打印出的是tensor的值，一般不推荐这里设置为False
+                     all_tensor_names) # bool 是否打印所有的tensor的name
+    #上面的打印ckpt的内部使用的是pywrap_tensorflow.NewCheckpointReader所以要掌握NewCheckpointReader
+</code></pre>
+<h3 id="3-使用tools里的freeze-graph来读取ckpt"><a href="#3-使用tools里的freeze-graph来读取ckpt" class="headerlink" title="3.使用tools里的freeze_graph来读取ckpt"></a>3.使用tools里的freeze_graph来读取ckpt</h3><pre class=" language-python"><code class="language-python">    <span class="token keyword">from</span> tensorflow<span class="token punctuation">.</span>python<span class="token punctuation">.</span>tools <span class="token keyword">import</span> freeze_graph
+    freeze_graph<span class="token punctuation">(</span>input_graph<span class="token punctuation">,</span> <span class="token comment" spellcheck="true">#=some_graph_def.pb</span>
+           input_saver<span class="token punctuation">,</span>
+           input_binary<span class="token punctuation">,</span>
+           input_checkpoint<span class="token punctuation">,</span> <span class="token comment" spellcheck="true">#=model.ckpt</span>
+           output_node_names<span class="token punctuation">,</span> <span class="token comment" spellcheck="true">#=softmax</span>
+           restore_op_name<span class="token punctuation">,</span>
+           filename_tensor_name<span class="token punctuation">,</span>
+           output_graph<span class="token punctuation">,</span> <span class="token comment" spellcheck="true">#='./tmp/frozen_graph.pb'</span>
+           clear_devices<span class="token punctuation">,</span>
+           initializer_nodes<span class="token punctuation">,</span>
+           variable_names_whitelist<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">,</span>
+           variable_names_blacklist<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">,</span>
+           input_meta_graph<span class="token operator">=</span>None<span class="token punctuation">,</span>
+           input_saved_model_dir<span class="token operator">=</span>None<span class="token punctuation">,</span>
+           saved_model_tags<span class="token operator">=</span><span class="token string">'serve'</span><span class="token punctuation">,</span>
+           checkpoint_version<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+    <span class="token comment" spellcheck="true">#freeze_graph_test.py讲述了怎么使用freeze_grapg。</span>
+</code></pre>
+<p>参考链接：<br><a target="_blank" rel="noopener" href="https://www.jb51.net/article/142183.htm">https://www.jb51.net/article/142183.htm</a></p>
+<h2 id="control-dependencies"><a href="#control-dependencies" class="headerlink" title="control_dependencies"></a>control_dependencies</h2><p>tf.control_dependencies(control_inputs)<br>Wrapper for Graph.control_dependencies() using the default graph.<br>See Graph.control_dependencies() for more details.<br>此函数指定某些操作执行的依赖关系<br>返回一个控制依赖的上下文管理器，使用 with 关键字可以让在这个上下文环境中的操作都在 control_inputs 执行  </p>
+<pre><code>    1 with tf.control_dependencies([a, b]):
+    2     c = ....
+    3     d = ...
+</code></pre>
+<p>在执行完 a，b 操作之后，才能执行 c，d 操作。意思就是 c，d 操作依赖 a，b 操作  </p>
+<pre><code>    1 with tf.control_dependencies([train_step, variable_averages_op]):
+    2     train_op = tf.no_op(name='train')
+</code></pre>
+<p>tf.no_op()表示执行完 train_step, variable_averages_op 操作之后什么都不做<br>参考链接：<br><a target="_blank" rel="noopener" href="http://www.tensorfly.cn/tfdoc/api_docs/python/framework.html#Graph.control_dependencies">http://www.tensorfly.cn/tfdoc/api_docs/python/framework.html#Graph.control_dependencies</a></p>
+<h2 id="TensorBoard"><a href="#TensorBoard" class="headerlink" title="TensorBoard"></a>TensorBoard</h2><h3 id="在TensorBoard中可视化图形"><a href="#在TensorBoard中可视化图形" class="headerlink" title="在TensorBoard中可视化图形"></a>在TensorBoard中可视化图形</h3><p>构建您的网络，创建一个会话(session)，然后创建一个TensorFlow File Writer对象<br>File Writer定义存储TensorBoard文件的路径，以及TensorFlow graph对象sess.graph是第二个参数。  </p>
+<pre><code>    writer = tf.summary.FileWriter(STORE_PATH, sess.graph)
+</code></pre>
+<p>当创建一个TensorFlow网络后，定义并运行File Writer时，就可以启动TensorBoard来可视化图形。要定义File Writer并将图形发送给它，运行以下命令:  </p>
+<pre><code>    # start the session
+    with tf.Session() as sess:
+    writer = tf.summary.FileWriter(STORE_PATH, sess.graph)
+</code></pre>
+<h3 id="启动TensorBoard"><a href="#启动TensorBoard" class="headerlink" title="启动TensorBoard"></a>启动TensorBoard</h3><pre><code>    tensorboard --logdir=STORE_PATH
+</code></pre>
+<h3 id="名称空间（Namespaces）"><a href="#名称空间（Namespaces）" class="headerlink" title="名称空间（Namespaces）"></a>名称空间（Namespaces）</h3><p>名称空间是一种作用域，可以用它来包围图形组件，以便将它们组合在一起。通过这样的操作，名称空间中的细节将被折叠成TensorBoard计算图形可视化中的单个名称空间节点。要在TensorFlow中创建名称空间，可以使用Python with功能，如下所示：  </p>
+<pre><code>    with tf.name_scope("layer_1"):
+    # now declare the weights connecting the input to the hidden  layer
+     W1 = tf.Variable(tf.random_normal([784, 300], stddev=0.01), name='W')
+             b1 = tf.Variable(tf.random_normal([300]), name='b')
+             hidden_logits = tf.add(tf.matmul(x_sc, W1), b1)
+             hidden_out = tf.nn.sigmoid(hidden_logits)
+</code></pre>
+<p>还可以使用tf.variable_scope()代替tf.name_scope()。变量作用域是TensorFlow中的get_variable()变量共享机制的一部分。</p>
+<h3 id="标量总结（Scalar-summaries）"><a href="#标量总结（Scalar-summaries）" class="headerlink" title="标量总结（Scalar summaries）"></a>标量总结（Scalar summaries）</h3><p>在网络中的任何位置，都可以记录标量(即单个实值)数量，以便在TensorBoard中显示。这对于跟踪诸如训练准确率的提高或损失函数的减少，或研究分布的标准差等方面都很有用。执行起来很容易。例如，下面的代码展示了如何在这个图中记录accuracy标量:  </p>
+<pre><code>    # add a summary to store the
+    accuracytf.summary.scalar('acc_summary', accuracy)
+</code></pre>
+<p>第一个参数是要在TensorBoard可视化中给出标量的名称，第二个参数是要记录的操作(必须返回一个实值)。scalar()调用的输出是一个操作。在上面的代码中，我没有将这个操作分配给Python中的任何变量，但是如果用户愿意，可以这样做。然而，与TensorFlow中的其他操作一样，这些汇总操作在运行之前不会执行任何操作。根据开发人员想要观察的内容，在任何给定的图中通常都会运行许多可视化函数，因此有一个方便的助手函数merge_all()。这将把图中的所有函数调用合并在一起，这样您只需调用merge操作，它将为您收集所有其他函数操作并记录数据。它是这样的:  </p>
+<pre><code>    merged = tf.summary.merge_all()
+</code></pre>
+<h3 id="图像可视化"><a href="#图像可视化" class="headerlink" title="图像可视化"></a>图像可视化</h3><pre><code>    # add summary
+    if reuse_variables is None:
+        tf.summary.image('input', images)
+        tf.summary.image('score_map', score_maps)
+        tf.summary.image('score_map_pred', f_score * 255)
+        tf.summary.image('geo_map_0', geo_maps[:, :, :, 0:1])
+        tf.summary.image('geo_map_0_pred', f_geometry[:, :, :, 0:1])
+        tf.summary.image('training_masks', training_masks)
+        tf.summary.scalar('model_loss', model_loss)
+        tf.summary.scalar('total_loss', total_loss)
+</code></pre>
+<h2 id="文本检测模型EAST的搭建"><a href="#文本检测模型EAST的搭建" class="headerlink" title="文本检测模型EAST的搭建"></a>文本检测模型EAST的搭建</h2><h3 id="数据加载"><a href="#数据加载" class="headerlink" title="数据加载"></a>数据加载</h3><pre class=" language-python"><code class="language-python">    <span class="token keyword">def</span> <span class="token function">load_annoataion</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">'''
+        load annotation from the text file
+        :param p:
+        :return:
+        '''</span>
+        text_polys <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        text_tags <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">if</span> <span class="token operator">not</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>exists<span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">return</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>text_polys<span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+        <span class="token keyword">with</span> open<span class="token punctuation">(</span>p<span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
+            reader <span class="token operator">=</span> csv<span class="token punctuation">.</span>reader<span class="token punctuation">(</span>f<span class="token punctuation">)</span>
+            <span class="token keyword">for</span> line <span class="token keyword">in</span> reader<span class="token punctuation">:</span>
+                label <span class="token operator">=</span> line<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+                <span class="token comment" spellcheck="true"># strip BOM. \ufeff for python3,  \xef\xbb\bf for python2</span>
+                line <span class="token operator">=</span> <span class="token punctuation">[</span>i<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token string">'\ufeff'</span><span class="token punctuation">)</span><span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token string">'\xef\xbb\xbf'</span><span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> line<span class="token punctuation">]</span>
+                x1<span class="token punctuation">,</span> y1<span class="token punctuation">,</span> x2<span class="token punctuation">,</span> y2<span class="token punctuation">,</span> x3<span class="token punctuation">,</span> y3<span class="token punctuation">,</span> x4<span class="token punctuation">,</span> y4 <span class="token operator">=</span> list<span class="token punctuation">(</span>map<span class="token punctuation">(</span>float<span class="token punctuation">,</span> line<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                text_polys<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span>x1<span class="token punctuation">,</span> y1<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>x2<span class="token punctuation">,</span> y2<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>x3<span class="token punctuation">,</span> y3<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>x4<span class="token punctuation">,</span> y4<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                <span class="token keyword">if</span> label <span class="token operator">==</span> <span class="token string">'*'</span> <span class="token operator">or</span> label <span class="token operator">==</span> <span class="token string">'###'</span><span class="token punctuation">:</span>
+                    text_tags<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+                <span class="token keyword">else</span><span class="token punctuation">:</span>
+                    text_tags<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>text_polys<span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">,</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>text_tags<span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>bool<span class="token punctuation">)</span>
+    <span class="token keyword">def</span> <span class="token function">generator</span><span class="token punctuation">(</span>input_size<span class="token operator">=</span><span class="token number">512</span><span class="token punctuation">,</span> batch_size<span class="token operator">=</span><span class="token number">32</span><span class="token punctuation">,</span>
+                background_ratio<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">.</span><span class="token operator">/</span><span class="token number">8</span><span class="token punctuation">,</span>
+                random_scale<span class="token operator">=</span>np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">0.5</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2.0</span><span class="token punctuation">,</span> <span class="token number">3.0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                vis<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        image_list <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>get_images<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'&amp;#123;&amp;#125; training images in &amp;#123;&amp;#125;'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>
+            image_list<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> FLAGS<span class="token punctuation">.</span>training_data_path<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        index <span class="token operator">=</span> np<span class="token punctuation">.</span>arange<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> image_list<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
+            np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>shuffle<span class="token punctuation">(</span>index<span class="token punctuation">)</span>
+            images <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            image_fns <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            score_maps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            geo_maps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            training_masks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+            <span class="token keyword">for</span> i <span class="token keyword">in</span> index<span class="token punctuation">:</span>
+                <span class="token keyword">try</span><span class="token punctuation">:</span>
+                    im_fn <span class="token operator">=</span> image_list<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                    im <span class="token operator">=</span> cv2<span class="token punctuation">.</span>imread<span class="token punctuation">(</span>im_fn<span class="token punctuation">)</span>
+                    <span class="token comment" spellcheck="true"># print im_fn</span>
+                    h<span class="token punctuation">,</span> w<span class="token punctuation">,</span> _ <span class="token operator">=</span> im<span class="token punctuation">.</span>shape
+                    txt_fn <span class="token operator">=</span> im_fn<span class="token punctuation">.</span>replace<span class="token punctuation">(</span>os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>basename<span class="token punctuation">(</span>im_fn<span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">'.'</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">'txt'</span><span class="token punctuation">)</span>
+                    <span class="token keyword">if</span> <span class="token operator">not</span> os<span class="token punctuation">.</span>path<span class="token punctuation">.</span>exists<span class="token punctuation">(</span>txt_fn<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'text file &amp;#123;&amp;#125; does not exists'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>txt_fn<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                        <span class="token keyword">continue</span>
+                    text_polys<span class="token punctuation">,</span> text_tags <span class="token operator">=</span> load_annoataion<span class="token punctuation">(</span>txt_fn<span class="token punctuation">)</span>
+                    text_polys<span class="token punctuation">,</span> text_tags <span class="token operator">=</span> check_and_validate_polys<span class="token punctuation">(</span>text_polys<span class="token punctuation">,</span> text_tags<span class="token punctuation">,</span> <span class="token punctuation">(</span>h<span class="token punctuation">,</span> w<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    <span class="token comment" spellcheck="true"># if text_polys.shape[0] == 0:</span>
+                    <span class="token comment" spellcheck="true">#     continue</span>
+                    <span class="token comment" spellcheck="true"># random scale this image</span>
+                    rd_scale <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>random_scale<span class="token punctuation">)</span>
+                    im <span class="token operator">=</span> cv2<span class="token punctuation">.</span>resize<span class="token punctuation">(</span>im<span class="token punctuation">,</span> dsize<span class="token operator">=</span>None<span class="token punctuation">,</span> fx<span class="token operator">=</span>rd_scale<span class="token punctuation">,</span> fy<span class="token operator">=</span>rd_scale<span class="token punctuation">)</span>
+                    text_polys <span class="token operator">*=</span> rd_scale
+                    <span class="token comment" spellcheck="true"># print rd_scale</span>
+                    <span class="token comment" spellcheck="true"># random crop a area from image</span>
+                    <span class="token keyword">if</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>rand<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> background_ratio<span class="token punctuation">:</span>
+                        <span class="token comment" spellcheck="true"># crop background</span>
+                        im<span class="token punctuation">,</span> text_polys<span class="token punctuation">,</span> text_tags <span class="token operator">=</span> crop_area<span class="token punctuation">(</span>im<span class="token punctuation">,</span> text_polys<span class="token punctuation">,</span> text_tags<span class="token punctuation">,</span> crop_background<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+                        <span class="token keyword">if</span> text_polys<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                            <span class="token comment" spellcheck="true"># cannot find background</span>
+                            <span class="token keyword">continue</span>
+                        <span class="token comment" spellcheck="true"># pad and resize image</span>
+                        new_h<span class="token punctuation">,</span> new_w<span class="token punctuation">,</span> _ <span class="token operator">=</span> im<span class="token punctuation">.</span>shape
+                        max_h_w_i <span class="token operator">=</span> np<span class="token punctuation">.</span>max<span class="token punctuation">(</span><span class="token punctuation">[</span>new_h<span class="token punctuation">,</span> new_w<span class="token punctuation">,</span> input_size<span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        im_padded <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>max_h_w_i<span class="token punctuation">,</span> max_h_w_i<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>uint8<span class="token punctuation">)</span>
+                        im_padded<span class="token punctuation">[</span><span class="token punctuation">:</span>new_h<span class="token punctuation">,</span> <span class="token punctuation">:</span>new_w<span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token operator">=</span> im<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        im <span class="token operator">=</span> cv2<span class="token punctuation">.</span>resize<span class="token punctuation">(</span>im_padded<span class="token punctuation">,</span> dsize<span class="token operator">=</span><span class="token punctuation">(</span>input_size<span class="token punctuation">,</span> input_size<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                        score_map <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>input_size<span class="token punctuation">,</span> input_size<span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>uint8<span class="token punctuation">)</span>
+                        geo_map_channels <span class="token operator">=</span> <span class="token number">5</span> <span class="token keyword">if</span> FLAGS<span class="token punctuation">.</span>geometry <span class="token operator">==</span> <span class="token string">'RBOX'</span> <span class="token keyword">else</span> <span class="token number">8</span>
+                        geo_map <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>input_size<span class="token punctuation">,</span> input_size<span class="token punctuation">,</span> geo_map_channels<span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+                        training_mask <span class="token operator">=</span> np<span class="token punctuation">.</span>ones<span class="token punctuation">(</span><span class="token punctuation">(</span>input_size<span class="token punctuation">,</span> input_size<span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>uint8<span class="token punctuation">)</span>
+                    <span class="token keyword">else</span><span class="token punctuation">:</span>
+                        im<span class="token punctuation">,</span> text_polys<span class="token punctuation">,</span> text_tags <span class="token operator">=</span> crop_area<span class="token punctuation">(</span>im<span class="token punctuation">,</span> text_polys<span class="token punctuation">,</span> text_tags<span class="token punctuation">,</span> crop_background<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+                        <span class="token keyword">if</span> text_polys<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                            <span class="token keyword">continue</span>
+                        h<span class="token punctuation">,</span> w<span class="token punctuation">,</span> _ <span class="token operator">=</span> im<span class="token punctuation">.</span>shape
+                        <span class="token comment" spellcheck="true"># pad the image to the training input size or the longer side of image</span>
+                        new_h<span class="token punctuation">,</span> new_w<span class="token punctuation">,</span> _ <span class="token operator">=</span> im<span class="token punctuation">.</span>shape
+                        max_h_w_i <span class="token operator">=</span> np<span class="token punctuation">.</span>max<span class="token punctuation">(</span><span class="token punctuation">[</span>new_h<span class="token punctuation">,</span> new_w<span class="token punctuation">,</span> input_size<span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        im_padded <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>max_h_w_i<span class="token punctuation">,</span> max_h_w_i<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>np<span class="token punctuation">.</span>uint8<span class="token punctuation">)</span>
+                        im_padded<span class="token punctuation">[</span><span class="token punctuation">:</span>new_h<span class="token punctuation">,</span> <span class="token punctuation">:</span>new_w<span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token operator">=</span> im<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        im <span class="token operator">=</span> im_padded
+                        <span class="token comment" spellcheck="true"># resize the image to input size</span>
+                        new_h<span class="token punctuation">,</span> new_w<span class="token punctuation">,</span> _ <span class="token operator">=</span> im<span class="token punctuation">.</span>shape
+                        resize_h <span class="token operator">=</span> input_size
+                        resize_w <span class="token operator">=</span> input_size
+                        im <span class="token operator">=</span> cv2<span class="token punctuation">.</span>resize<span class="token punctuation">(</span>im<span class="token punctuation">,</span> dsize<span class="token operator">=</span><span class="token punctuation">(</span>resize_w<span class="token punctuation">,</span> resize_h<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                        resize_ratio_3_x <span class="token operator">=</span> resize_w<span class="token operator">/</span>float<span class="token punctuation">(</span>new_w<span class="token punctuation">)</span>
+                        resize_ratio_3_y <span class="token operator">=</span> resize_h<span class="token operator">/</span>float<span class="token punctuation">(</span>new_h<span class="token punctuation">)</span>
+                        text_polys<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*=</span> resize_ratio_3_x
+                        text_polys<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*=</span> resize_ratio_3_y
+                        new_h<span class="token punctuation">,</span> new_w<span class="token punctuation">,</span> _ <span class="token operator">=</span> im<span class="token punctuation">.</span>shape
+                        score_map<span class="token punctuation">,</span> geo_map<span class="token punctuation">,</span> training_mask <span class="token operator">=</span> generate_rbox<span class="token punctuation">(</span><span class="token punctuation">(</span>new_h<span class="token punctuation">,</span> new_w<span class="token punctuation">)</span><span class="token punctuation">,</span> text_polys<span class="token punctuation">,</span> text_tags<span class="token punctuation">)</span>
+                    <span class="token keyword">if</span> vis<span class="token punctuation">:</span>
+                        fig<span class="token punctuation">,</span> axs <span class="token operator">=</span> plt<span class="token punctuation">.</span>subplots<span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> figsize<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                        <span class="token comment" spellcheck="true"># axs[0].imshow(im[:, :, ::-1])</span>
+                        <span class="token comment" spellcheck="true"># axs[0].set_xticks([])</span>
+                        <span class="token comment" spellcheck="true"># axs[0].set_yticks([])</span>
+                        <span class="token comment" spellcheck="true"># for poly in text_polys:</span>
+                        <span class="token comment" spellcheck="true">#     poly_h = min(abs(poly[3, 1] - poly[0, 1]), abs(poly[2, 1] - poly[1, 1]))</span>
+                        <span class="token comment" spellcheck="true">#     poly_w = min(abs(poly[1, 0] - poly[0, 0]), abs(poly[2, 0] - poly[3, 0]))</span>
+                        <span class="token comment" spellcheck="true">#     axs[0].add_artist(Patches.Polygon(</span>
+                        <span class="token comment" spellcheck="true">#         poly * 4, facecolor='none', edgecolor='green', linewidth=2, linestyle='-', fill=True))</span>
+                        <span class="token comment" spellcheck="true">#     axs[0].text(poly[0, 0] * 4, poly[0, 1] * 4, '&amp;#123;:.0f&amp;#125;-&amp;#123;:.0f&amp;#125;'.format(poly_h * 4, poly_w * 4),</span>
+                        <span class="token comment" spellcheck="true">#                    color='purple')</span>
+                        <span class="token comment" spellcheck="true"># axs[1].imshow(score_map)</span>
+                        <span class="token comment" spellcheck="true"># axs[1].set_xticks([])</span>
+                        <span class="token comment" spellcheck="true"># axs[1].set_yticks([])</span>
+                        axs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>imshow<span class="token punctuation">(</span>im<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_xticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_yticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        <span class="token keyword">for</span> poly <span class="token keyword">in</span> text_polys<span class="token punctuation">:</span>
+                            poly_h <span class="token operator">=</span> min<span class="token punctuation">(</span>abs<span class="token punctuation">(</span>poly<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> poly<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> abs<span class="token punctuation">(</span>poly<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> poly<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                            poly_w <span class="token operator">=</span> min<span class="token punctuation">(</span>abs<span class="token punctuation">(</span>poly<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">-</span> poly<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> abs<span class="token punctuation">(</span>poly<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">-</span> poly<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                            axs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>add_artist<span class="token punctuation">(</span>Patches<span class="token punctuation">.</span>Polygon<span class="token punctuation">(</span>
+                                poly<span class="token punctuation">,</span> facecolor<span class="token operator">=</span><span class="token string">'none'</span><span class="token punctuation">,</span> edgecolor<span class="token operator">=</span><span class="token string">'green'</span><span class="token punctuation">,</span> linewidth<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">,</span> linestyle<span class="token operator">=</span><span class="token string">'-'</span><span class="token punctuation">,</span> fill<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                            axs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>text<span class="token punctuation">(</span>poly<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> poly<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">'&amp;#123;:.0f&amp;#125;-&amp;#123;:.0f&amp;#125;'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>poly_h<span class="token punctuation">,</span> poly_w<span class="token punctuation">)</span><span class="token punctuation">,</span> color<span class="token operator">=</span><span class="token string">'purple'</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>imshow<span class="token punctuation">(</span>score_map<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_xticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_yticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>imshow<span class="token punctuation">(</span>geo_map<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_xticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_yticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>imshow<span class="token punctuation">(</span>geo_map<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_xticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_yticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>imshow<span class="token punctuation">(</span>geo_map<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_xticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_yticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>imshow<span class="token punctuation">(</span>training_mask<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_xticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        axs<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_yticks<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+                        plt<span class="token punctuation">.</span>tight_layout<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                        plt<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    images<span class="token punctuation">.</span>append<span class="token punctuation">(</span>im<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    image_fns<span class="token punctuation">.</span>append<span class="token punctuation">(</span>im_fn<span class="token punctuation">)</span>
+                    score_maps<span class="token punctuation">.</span>append<span class="token punctuation">(</span>score_map<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">,</span> np<span class="token punctuation">.</span>newaxis<span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    geo_maps<span class="token punctuation">.</span>append<span class="token punctuation">(</span>geo_map<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    training_masks<span class="token punctuation">.</span>append<span class="token punctuation">(</span>training_mask<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token number">4</span><span class="token punctuation">,</span> np<span class="token punctuation">.</span>newaxis<span class="token punctuation">]</span><span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    <span class="token keyword">if</span> len<span class="token punctuation">(</span>images<span class="token punctuation">)</span> <span class="token operator">==</span> batch_size<span class="token punctuation">:</span>
+                        <span class="token keyword">yield</span> images<span class="token punctuation">,</span> image_fns<span class="token punctuation">,</span> score_maps<span class="token punctuation">,</span> geo_maps<span class="token punctuation">,</span> training_masks
+                        images <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+                        image_fns <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+                        score_maps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+                        geo_maps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+                        training_masks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+                <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
+                    <span class="token keyword">import</span> traceback
+                    traceback<span class="token punctuation">.</span>print_exc<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    <span class="token keyword">continue</span>
+</code></pre>
+<h3 id="网络模型的搭建"><a href="#网络模型的搭建" class="headerlink" title="网络模型的搭建"></a>网络模型的搭建</h3><pre class=" language-python"><code class="language-python">    <span class="token keyword">def</span> <span class="token function">model</span><span class="token punctuation">(</span>images<span class="token punctuation">,</span> weight_decay<span class="token operator">=</span><span class="token number">1e</span><span class="token operator">-</span><span class="token number">5</span><span class="token punctuation">,</span> is_training<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">'''
+        define the model, we use slim's implemention of resnet
+        '''</span>
+        images <span class="token operator">=</span> mean_image_subtraction<span class="token punctuation">(</span>images<span class="token punctuation">)</span>
+        <span class="token keyword">with</span> slim<span class="token punctuation">.</span>arg_scope<span class="token punctuation">(</span>resnet_v1<span class="token punctuation">.</span>resnet_arg_scope<span class="token punctuation">(</span>weight_decay<span class="token operator">=</span>weight_decay<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            logits<span class="token punctuation">,</span> end_points <span class="token operator">=</span> resnet_v1<span class="token punctuation">.</span>resnet_v1_50<span class="token punctuation">(</span>images<span class="token punctuation">,</span> is_training<span class="token operator">=</span>is_training<span class="token punctuation">,</span> scope<span class="token operator">=</span><span class="token string">'resnet_v1_50'</span><span class="token punctuation">)</span>
+        <span class="token keyword">with</span> tf<span class="token punctuation">.</span>variable_scope<span class="token punctuation">(</span><span class="token string">'feature_fusion'</span><span class="token punctuation">,</span> values<span class="token operator">=</span><span class="token punctuation">[</span>end_points<span class="token punctuation">.</span>values<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            batch_norm_params <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+            <span class="token string">'decay'</span><span class="token punctuation">:</span> <span class="token number">0.997</span><span class="token punctuation">,</span>
+            <span class="token string">'epsilon'</span><span class="token punctuation">:</span> <span class="token number">1e</span><span class="token operator">-</span><span class="token number">5</span><span class="token punctuation">,</span>
+            <span class="token string">'scale'</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>
+            <span class="token string">'is_training'</span><span class="token punctuation">:</span> is_training
+            <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+            <span class="token keyword">with</span> slim<span class="token punctuation">.</span>arg_scope<span class="token punctuation">(</span><span class="token punctuation">[</span>slim<span class="token punctuation">.</span>conv2d<span class="token punctuation">]</span><span class="token punctuation">,</span>
+                                activation_fn<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">,</span>
+                                normalizer_fn<span class="token operator">=</span>slim<span class="token punctuation">.</span>batch_norm<span class="token punctuation">,</span>
+                                normalizer_params<span class="token operator">=</span>batch_norm_params<span class="token punctuation">,</span>
+                                weights_regularizer<span class="token operator">=</span>slim<span class="token punctuation">.</span>l2_regularizer<span class="token punctuation">(</span>weight_decay<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                f <span class="token operator">=</span> <span class="token punctuation">[</span>end_points<span class="token punctuation">[</span><span class="token string">'pool5'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> end_points<span class="token punctuation">[</span><span class="token string">'pool4'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                     end_points<span class="token punctuation">[</span><span class="token string">'pool3'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> end_points<span class="token punctuation">[</span><span class="token string">'pool2'</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+                <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Shape of f_&amp;#123;&amp;#125; &amp;#123;&amp;#125;'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>i<span class="token punctuation">,</span> f<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                g <span class="token operator">=</span> <span class="token punctuation">[</span>None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">]</span>
+                h <span class="token operator">=</span> <span class="token punctuation">[</span>None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">]</span>
+                num_outputs <span class="token operator">=</span> <span class="token punctuation">[</span>None<span class="token punctuation">,</span> <span class="token number">128</span><span class="token punctuation">,</span> <span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">32</span><span class="token punctuation">]</span>
+                <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    <span class="token keyword">if</span> i <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                        h<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> f<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                    <span class="token keyword">else</span><span class="token punctuation">:</span>
+                        c1_1 <span class="token operator">=</span> slim<span class="token punctuation">.</span>conv2d<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>concat<span class="token punctuation">(</span><span class="token punctuation">[</span>g<span class="token punctuation">[</span>i<span class="token number">-1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> f<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span> num_outputs<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+                        h<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> slim<span class="token punctuation">.</span>conv2d<span class="token punctuation">(</span>c1_1<span class="token punctuation">,</span> num_outputs<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+                    <span class="token keyword">if</span> i <span class="token operator">&lt;=</span> <span class="token number">2</span><span class="token punctuation">:</span>
+                        g<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> unpool<span class="token punctuation">(</span>h<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+                    <span class="token keyword">else</span><span class="token punctuation">:</span>
+                        g<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> slim<span class="token punctuation">.</span>conv2d<span class="token punctuation">(</span>h<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> num_outputs<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+                    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Shape of h_&amp;#123;&amp;#125; &amp;#123;&amp;#125;, g_&amp;#123;&amp;#125; &amp;#123;&amp;#125;'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>i<span class="token punctuation">,</span> h<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>shape<span class="token punctuation">,</span> i<span class="token punctuation">,</span> g<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token comment" spellcheck="true"># here we use a slightly different way for regression part,</span>
+                <span class="token comment" spellcheck="true"># we first use a sigmoid to limit the regression range, and also</span>
+                <span class="token comment" spellcheck="true"># this is do with the angle map</span>
+                F_score <span class="token operator">=</span> slim<span class="token punctuation">.</span>conv2d<span class="token punctuation">(</span>g<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> activation_fn<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>sigmoid<span class="token punctuation">,</span> normalizer_fn<span class="token operator">=</span>None<span class="token punctuation">)</span>
+                <span class="token comment" spellcheck="true"># 4 channel of axis aligned bbox and 1 channel rotation angle</span>
+                geo_map <span class="token operator">=</span> slim<span class="token punctuation">.</span>conv2d<span class="token punctuation">(</span>g<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> activation_fn<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>sigmoid<span class="token punctuation">,</span> normalizer_fn<span class="token operator">=</span>None<span class="token punctuation">)</span> <span class="token operator">*</span> FLAGS<span class="token punctuation">.</span>text_scale
+                angle_map <span class="token operator">=</span> <span class="token punctuation">(</span>slim<span class="token punctuation">.</span>conv2d<span class="token punctuation">(</span>g<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> activation_fn<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>sigmoid<span class="token punctuation">,</span> normalizer_fn<span class="token operator">=</span>None<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token operator">*</span> np<span class="token punctuation">.</span>pi<span class="token operator">/</span><span class="token number">2</span> <span class="token comment" spellcheck="true"># angle is between [-45, 45]</span>
+                F_geometry <span class="token operator">=</span> tf<span class="token punctuation">.</span>concat<span class="token punctuation">(</span><span class="token punctuation">[</span>geo_map<span class="token punctuation">,</span> angle_map<span class="token punctuation">]</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> F_score<span class="token punctuation">,</span> F_geometry
+</code></pre>
+<h3 id="loss函数的设计"><a href="#loss函数的设计" class="headerlink" title="loss函数的设计"></a>loss函数的设计</h3><pre class=" language-python"><code class="language-python">    <span class="token keyword">def</span> <span class="token function">loss</span><span class="token punctuation">(</span>y_true_cls<span class="token punctuation">,</span> y_pred_cls<span class="token punctuation">,</span>
+             y_true_geo<span class="token punctuation">,</span> y_pred_geo<span class="token punctuation">,</span>
+             training_mask<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token triple-quoted-string string">'''
+        define the loss used for training, contraning two part,
+        the first part we use dice loss instead of weighted logloss,
+        the second part is the iou loss defined in the paper
+        :param y_true_cls: ground truth of text
+        :param y_pred_cls: prediction os text
+        :param y_true_geo: ground truth of geometry
+        :param y_pred_geo: prediction of geometry
+        :param training_mask: mask used in training, to ignore some text annotated by ###
+        :return:
+        '''</span>
+        classification_loss <span class="token operator">=</span> dice_coefficient<span class="token punctuation">(</span>y_true_cls<span class="token punctuation">,</span> y_pred_cls<span class="token punctuation">,</span> training_mask<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># scale classification loss to match the iou loss part</span>
+        classification_loss <span class="token operator">*=</span> <span class="token number">0.01</span>
+        <span class="token comment" spellcheck="true"># d1 -&gt; top, d2-&gt;right, d3-&gt;bottom, d4-&gt;left</span>
+        d1_gt<span class="token punctuation">,</span> d2_gt<span class="token punctuation">,</span> d3_gt<span class="token punctuation">,</span> d4_gt<span class="token punctuation">,</span> theta_gt <span class="token operator">=</span> tf<span class="token punctuation">.</span>split<span class="token punctuation">(</span>value<span class="token operator">=</span>y_true_geo<span class="token punctuation">,</span> num_or_size_splits<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+        d1_pred<span class="token punctuation">,</span> d2_pred<span class="token punctuation">,</span> d3_pred<span class="token punctuation">,</span> d4_pred<span class="token punctuation">,</span> theta_pred <span class="token operator">=</span> tf<span class="token punctuation">.</span>split<span class="token punctuation">(</span>value<span class="token operator">=</span>y_pred_geo<span class="token punctuation">,</span> num_or_size_splits<span class="token operator">=</span><span class="token number">5</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>
+        area_gt <span class="token operator">=</span> <span class="token punctuation">(</span>d1_gt <span class="token operator">+</span> d3_gt<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token punctuation">(</span>d2_gt <span class="token operator">+</span> d4_gt<span class="token punctuation">)</span>
+        area_pred <span class="token operator">=</span> <span class="token punctuation">(</span>d1_pred <span class="token operator">+</span> d3_pred<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token punctuation">(</span>d2_pred <span class="token operator">+</span> d4_pred<span class="token punctuation">)</span>
+        w_union <span class="token operator">=</span> tf<span class="token punctuation">.</span>minimum<span class="token punctuation">(</span>d2_gt<span class="token punctuation">,</span> d2_pred<span class="token punctuation">)</span> <span class="token operator">+</span> tf<span class="token punctuation">.</span>minimum<span class="token punctuation">(</span>d4_gt<span class="token punctuation">,</span> d4_pred<span class="token punctuation">)</span>
+        h_union <span class="token operator">=</span> tf<span class="token punctuation">.</span>minimum<span class="token punctuation">(</span>d1_gt<span class="token punctuation">,</span> d1_pred<span class="token punctuation">)</span> <span class="token operator">+</span> tf<span class="token punctuation">.</span>minimum<span class="token punctuation">(</span>d3_gt<span class="token punctuation">,</span> d3_pred<span class="token punctuation">)</span>
+        area_intersect <span class="token operator">=</span> w_union <span class="token operator">*</span> h_union
+        area_union <span class="token operator">=</span> area_gt <span class="token operator">+</span> area_pred <span class="token operator">-</span> area_intersect
+        L_AABB <span class="token operator">=</span> <span class="token operator">-</span>tf<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token punctuation">(</span>area_intersect <span class="token operator">+</span> <span class="token number">1.0</span><span class="token punctuation">)</span><span class="token operator">/</span><span class="token punctuation">(</span>area_union <span class="token operator">+</span> <span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        L_theta <span class="token operator">=</span> <span class="token number">1</span> <span class="token operator">-</span> tf<span class="token punctuation">.</span>cos<span class="token punctuation">(</span>theta_pred <span class="token operator">-</span> theta_gt<span class="token punctuation">)</span>
+        tf<span class="token punctuation">.</span>summary<span class="token punctuation">.</span>scalar<span class="token punctuation">(</span><span class="token string">'geometry_AABB'</span><span class="token punctuation">,</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>L_AABB <span class="token operator">*</span> y_true_cls <span class="token operator">*</span> training_mask<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        tf<span class="token punctuation">.</span>summary<span class="token punctuation">.</span>scalar<span class="token punctuation">(</span><span class="token string">'geometry_theta'</span><span class="token punctuation">,</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>L_theta <span class="token operator">*</span> y_true_cls <span class="token operator">*</span> training_mask<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        L_g <span class="token operator">=</span> L_AABB <span class="token operator">+</span> <span class="token number">20</span> <span class="token operator">*</span> L_theta
+        <span class="token keyword">return</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>L_g <span class="token operator">*</span> y_true_cls <span class="token operator">*</span> training_mask<span class="token punctuation">)</span> <span class="token operator">+</span> classification_loss
+</code></pre>
+<h3 id="train"><a href="#train" class="headerlink" title="train"></a>train</h3><pre class=" language-python"><code class="language-python">    <span class="token keyword">def</span> <span class="token function">main</span><span class="token punctuation">(</span>argv<span class="token operator">=</span>None<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">import</span> os
+        os<span class="token punctuation">.</span>environ<span class="token punctuation">[</span><span class="token string">'CUDA_VISIBLE_DEVICES'</span><span class="token punctuation">]</span> <span class="token operator">=</span> FLAGS<span class="token punctuation">.</span>gpu_list
+        config <span class="token operator">=</span> None
+        config<span class="token punctuation">.</span>batch_size <span class="token operator">=</span> FLAGS<span class="token punctuation">.</span>batch_size_per_gpu <span class="token operator">*</span> FLAGS<span class="token punctuation">.</span>num_gpus
+        <span class="token keyword">if</span> <span class="token operator">not</span> tf<span class="token punctuation">.</span>gfile<span class="token punctuation">.</span>Exists<span class="token punctuation">(</span>FLAGS<span class="token punctuation">.</span>checkpoint_path<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            tf<span class="token punctuation">.</span>gfile<span class="token punctuation">.</span>MkDir<span class="token punctuation">(</span>FLAGS<span class="token punctuation">.</span>checkpoint_path<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            <span class="token keyword">if</span> <span class="token operator">not</span> FLAGS<span class="token punctuation">.</span>restore<span class="token punctuation">:</span>
+                tf<span class="token punctuation">.</span>gfile<span class="token punctuation">.</span>DeleteRecursively<span class="token punctuation">(</span>FLAGS<span class="token punctuation">.</span>checkpoint_path<span class="token punctuation">)</span>
+                tf<span class="token punctuation">.</span>gfile<span class="token punctuation">.</span>MkDir<span class="token punctuation">(</span>FLAGS<span class="token punctuation">.</span>checkpoint_path<span class="token punctuation">)</span>
+        input_images <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32<span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">'input_images'</span><span class="token punctuation">)</span>
+        input_score_maps <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32<span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">'input_score_maps'</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> FLAGS<span class="token punctuation">.</span>geometry <span class="token operator">==</span> <span class="token string">'RBOX'</span><span class="token punctuation">:</span>
+            input_geo_maps <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32<span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">'input_geo_maps'</span><span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            input_geo_maps <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32<span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">'input_geo_maps'</span><span class="token punctuation">)</span>
+        input_training_masks <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32<span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> None<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> name<span class="token operator">=</span><span class="token string">'input_training_masks'</span><span class="token punctuation">)</span>
+        global_step <span class="token operator">=</span> tf<span class="token punctuation">.</span>get_variable<span class="token punctuation">(</span><span class="token string">'global_step'</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> initializer<span class="token operator">=</span>tf<span class="token punctuation">.</span>constant_initializer<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> trainable<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+        learning_rate <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>exponential_decay<span class="token punctuation">(</span>FLAGS<span class="token punctuation">.</span>learning_rate<span class="token punctuation">,</span> global_step<span class="token punctuation">,</span> decay_steps<span class="token operator">=</span><span class="token number">10000</span><span class="token punctuation">,</span> decay_rate<span class="token operator">=</span><span class="token number">0.94</span><span class="token punctuation">,</span> staircase<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># add summary</span>
+        tf<span class="token punctuation">.</span>summary<span class="token punctuation">.</span>scalar<span class="token punctuation">(</span><span class="token string">'learning_rate'</span><span class="token punctuation">,</span> learning_rate<span class="token punctuation">)</span>
+        opt <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>AdamOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># opt = tf.train.MomentumOptimizer(learning_rate, 0.9)</span>
+        <span class="token comment" spellcheck="true"># split</span>
+        input_images_split <span class="token operator">=</span> tf<span class="token punctuation">.</span>split<span class="token punctuation">(</span>input_images<span class="token punctuation">,</span> len<span class="token punctuation">(</span>gpus<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        input_score_maps_split <span class="token operator">=</span> tf<span class="token punctuation">.</span>split<span class="token punctuation">(</span>input_score_maps<span class="token punctuation">,</span> len<span class="token punctuation">(</span>gpus<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        input_geo_maps_split <span class="token operator">=</span> tf<span class="token punctuation">.</span>split<span class="token punctuation">(</span>input_geo_maps<span class="token punctuation">,</span> len<span class="token punctuation">(</span>gpus<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        input_training_masks_split <span class="token operator">=</span> tf<span class="token punctuation">.</span>split<span class="token punctuation">(</span>input_training_masks<span class="token punctuation">,</span> len<span class="token punctuation">(</span>gpus<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        tower_grads <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        reuse_variables <span class="token operator">=</span> None
+        <span class="token keyword">for</span> i<span class="token punctuation">,</span> gpu_id <span class="token keyword">in</span> enumerate<span class="token punctuation">(</span>gpus<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">with</span> tf<span class="token punctuation">.</span>device<span class="token punctuation">(</span><span class="token string">'/gpu:%d'</span> <span class="token operator">%</span> gpu_id<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'model_%d'</span> <span class="token operator">%</span> gpu_id<span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
+                    iis <span class="token operator">=</span> input_images_split<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                    isms <span class="token operator">=</span> input_score_maps_split<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                    igms <span class="token operator">=</span> input_geo_maps_split<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                    itms <span class="token operator">=</span> input_training_masks_split<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+                    total_loss<span class="token punctuation">,</span> model_loss <span class="token operator">=</span> tower_loss<span class="token punctuation">(</span>iis<span class="token punctuation">,</span> isms<span class="token punctuation">,</span> igms<span class="token punctuation">,</span> itms<span class="token punctuation">,</span> reuse_variables<span class="token punctuation">)</span>
+                    batch_norm_updates_op <span class="token operator">=</span> tf<span class="token punctuation">.</span>group<span class="token punctuation">(</span><span class="token operator">*</span>tf<span class="token punctuation">.</span>get_collection<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>GraphKeys<span class="token punctuation">.</span>UPDATE_OPS<span class="token punctuation">,</span> scope<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    reuse_variables <span class="token operator">=</span> <span class="token boolean">True</span>
+                    grads <span class="token operator">=</span> opt<span class="token punctuation">.</span>compute_gradients<span class="token punctuation">(</span>total_loss<span class="token punctuation">)</span>
+                    tower_grads<span class="token punctuation">.</span>append<span class="token punctuation">(</span>grads<span class="token punctuation">)</span>
+        grads <span class="token operator">=</span> average_gradients<span class="token punctuation">(</span>tower_grads<span class="token punctuation">)</span>
+        apply_gradient_op <span class="token operator">=</span> opt<span class="token punctuation">.</span>apply_gradients<span class="token punctuation">(</span>grads<span class="token punctuation">,</span> global_step<span class="token operator">=</span>global_step<span class="token punctuation">)</span>
+        summary_op <span class="token operator">=</span> tf<span class="token punctuation">.</span>summary<span class="token punctuation">.</span>merge_all<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># save moving average</span>
+        variable_averages <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>ExponentialMovingAverage<span class="token punctuation">(</span>
+            FLAGS<span class="token punctuation">.</span>moving_average_decay<span class="token punctuation">,</span> global_step<span class="token punctuation">)</span>
+        variables_averages_op <span class="token operator">=</span> variable_averages<span class="token punctuation">.</span>apply<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>trainable_variables<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># batch norm updates</span>
+        <span class="token keyword">with</span> tf<span class="token punctuation">.</span>control_dependencies<span class="token punctuation">(</span><span class="token punctuation">[</span>variables_averages_op<span class="token punctuation">,</span> apply_gradient_op<span class="token punctuation">,</span> batch_norm_updates_op<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            train_op <span class="token operator">=</span> tf<span class="token punctuation">.</span>no_op<span class="token punctuation">(</span>name<span class="token operator">=</span><span class="token string">'train_op'</span><span class="token punctuation">)</span>
+        saver <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>Saver<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>global_variables<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        summary_writer <span class="token operator">=</span> tf<span class="token punctuation">.</span>summary<span class="token punctuation">.</span>FileWriter<span class="token punctuation">(</span>FLAGS<span class="token punctuation">.</span>checkpoint_path<span class="token punctuation">,</span> tf<span class="token punctuation">.</span>get_default_graph<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        init <span class="token operator">=</span> tf<span class="token punctuation">.</span>global_variables_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">if</span> FLAGS<span class="token punctuation">.</span>pretrained_model_path <span class="token keyword">is</span> <span class="token operator">not</span> None<span class="token punctuation">:</span>
+            variable_restore_op <span class="token operator">=</span> slim<span class="token punctuation">.</span>assign_from_checkpoint_fn<span class="token punctuation">(</span>FLAGS<span class="token punctuation">.</span>pretrained_model_path<span class="token punctuation">,</span> slim<span class="token punctuation">.</span>get_trainable_variables<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                                                                ignore_missing_vars<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+        <span class="token keyword">with</span> tf<span class="token punctuation">.</span>Session<span class="token punctuation">(</span>config<span class="token operator">=</span>tf<span class="token punctuation">.</span>ConfigProto<span class="token punctuation">(</span>allow_soft_placement<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sess<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> FLAGS<span class="token punctuation">.</span>restore<span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'continue training from previous checkpoint'</span><span class="token punctuation">)</span>
+                ckpt <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>latest_checkpoint<span class="token punctuation">(</span>FLAGS<span class="token punctuation">.</span>checkpoint_path<span class="token punctuation">)</span>
+                saver<span class="token punctuation">.</span>restore<span class="token punctuation">(</span>sess<span class="token punctuation">,</span> ckpt<span class="token punctuation">)</span>
+            <span class="token keyword">else</span><span class="token punctuation">:</span>
+                sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>init<span class="token punctuation">)</span>
+                <span class="token keyword">if</span> FLAGS<span class="token punctuation">.</span>pretrained_model_path <span class="token keyword">is</span> <span class="token operator">not</span> None<span class="token punctuation">:</span>
+                    variable_restore_op<span class="token punctuation">(</span>sess<span class="token punctuation">)</span>
+            <span class="token comment" spellcheck="true"># data_generator = icdar.get_batch(num_workers=FLAGS.num_readers,</span>
+            <span class="token comment" spellcheck="true">#                                 input_size=FLAGS.input_size,</span>
+            <span class="token comment" spellcheck="true">#                                 batch_size=FLAGS.batch_size_per_gpu * len(gpus))</span>
+            train_data_generator <span class="token operator">=</span> icdar_single<span class="token punctuation">.</span>get_batch_seq<span class="token punctuation">(</span>num_workers<span class="token operator">=</span>FLAGS<span class="token punctuation">.</span>num_readers<span class="token punctuation">,</span> config<span class="token operator">=</span>config<span class="token punctuation">,</span> is_training<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+            start <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token keyword">for</span> step <span class="token keyword">in</span> range<span class="token punctuation">(</span>FLAGS<span class="token punctuation">.</span>max_steps<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                data <span class="token operator">=</span> next<span class="token punctuation">(</span>train_data_generator<span class="token punctuation">)</span>
+                ml<span class="token punctuation">,</span> tl<span class="token punctuation">,</span> _ <span class="token operator">=</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>model_loss<span class="token punctuation">,</span> total_loss<span class="token punctuation">,</span> train_op<span class="token punctuation">]</span><span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;input_images: data[0],</span>
+                                                                                    input_score_maps<span class="token punctuation">:</span> data<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                                                                                    input_geo_maps<span class="token punctuation">:</span> data<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                                                                                    input_training_masks<span class="token punctuation">:</span> data<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;)</span>
+                <span class="token keyword">if</span> np<span class="token punctuation">.</span>isnan<span class="token punctuation">(</span>tl<span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Loss diverged, stop training'</span><span class="token punctuation">)</span>
+                    <span class="token keyword">break</span>
+                <span class="token keyword">if</span> step <span class="token operator">%</span> <span class="token number">10</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                    avg_time_per_step <span class="token operator">=</span> <span class="token punctuation">(</span>time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> start<span class="token punctuation">)</span><span class="token operator">/</span><span class="token number">10</span>
+                    avg_examples_per_second <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">10</span> <span class="token operator">*</span> FLAGS<span class="token punctuation">.</span>batch_size_per_gpu <span class="token operator">*</span> len<span class="token punctuation">(</span>gpus<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">/</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> start<span class="token punctuation">)</span>
+                    start <span class="token operator">=</span> time<span class="token punctuation">.</span>time<span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Step &amp;#123;:06d&amp;#125;, model loss &amp;#123;:.4f&amp;#125;, total loss &amp;#123;:.4f&amp;#125;, &amp;#123;:.2f&amp;#125; seconds/step, &amp;#123;:.2f&amp;#125; examples/second'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>
+                        step<span class="token punctuation">,</span> ml<span class="token punctuation">,</span> tl<span class="token punctuation">,</span> avg_time_per_step<span class="token punctuation">,</span> avg_examples_per_second<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token keyword">if</span> step <span class="token operator">%</span> FLAGS<span class="token punctuation">.</span>save_checkpoint_steps <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                    saver<span class="token punctuation">.</span>save<span class="token punctuation">(</span>sess<span class="token punctuation">,</span> FLAGS<span class="token punctuation">.</span>checkpoint_path <span class="token operator">+</span> <span class="token string">'model.ckpt'</span><span class="token punctuation">,</span> global_step<span class="token operator">=</span>global_step<span class="token punctuation">)</span>
+                <span class="token keyword">if</span> step <span class="token operator">%</span> FLAGS<span class="token punctuation">.</span>save_summary_steps <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                    _<span class="token punctuation">,</span> tl<span class="token punctuation">,</span> summary_str <span class="token operator">=</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>train_op<span class="token punctuation">,</span> total_loss<span class="token punctuation">,</span> summary_op<span class="token punctuation">]</span><span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;input_images: data[0],</span>
+                                                                                                input_score_maps<span class="token punctuation">:</span> data<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                                                                                                input_geo_maps<span class="token punctuation">:</span> data<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                                                                                                input_training_masks<span class="token punctuation">:</span> data<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;)</span>
+                    summary_writer<span class="token punctuation">.</span>add_summary<span class="token punctuation">(</span>summary_str<span class="token punctuation">,</span> global_step<span class="token operator">=</span>step<span class="token punctuation">)</span>
+</code></pre>
+<p>参考链接：<br><a target="_blank" rel="noopener" href="https://github.com/argman/EAST">https://github.com/argman/EAST</a></p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/10/20/20191020-knn%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/">knn手写数字识别</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/10/14/20191014-%E5%9B%BE%E5%83%8F%E5%A2%9E%E5%BC%BA%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">图像增强常用函数</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Slim"><span class="toc-text">Slim</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Slim%E6%A8%A1%E5%9D%97%E7%9A%84%E5%AF%BC%E5%85%A5"><span class="toc-text">Slim模块的导入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slim-%E6%9E%84%E5%BB%BA%E6%A8%A1%E5%9E%8B"><span class="toc-text">Slim 构建模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Slim%E5%8F%98%E9%87%8F%EF%BC%88Variables%EF%BC%89"><span class="toc-text">Slim变量（Variables）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Slim-%E5%B1%82%EF%BC%88Layers%EF%BC%89"><span class="toc-text">Slim 层（Layers）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#slim-arg-scope%EF%BC%88%EF%BC%89-%E5%87%BD%E6%95%B0%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">slim.arg_scope（） 函数的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E7%94%A8%E6%B3%95%E8%A7%81%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">其他用法见参考链接</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8Bckpt%E4%B8%AD%E5%8F%98%E9%87%8F%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95"><span class="toc-text">查看ckpt中变量的几种方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%9F%BA%E4%BA%8Emodel%E6%9D%A5%E8%AF%BB%E5%8F%96ckpt%E6%96%87%E4%BB%B6%E9%87%8C%E7%9A%84%E5%8F%98%E9%87%8F"><span class="toc-text">1.基于model来读取ckpt文件里的变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%BD%BF%E7%94%A8tools%E9%87%8C%E7%9A%84freeze-graph%E6%9D%A5%E8%AF%BB%E5%8F%96ckpt"><span class="toc-text">3.使用tools里的freeze_graph来读取ckpt</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#control-dependencies"><span class="toc-text">control_dependencies</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TensorBoard"><span class="toc-text">TensorBoard</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8TensorBoard%E4%B8%AD%E5%8F%AF%E8%A7%86%E5%8C%96%E5%9B%BE%E5%BD%A2"><span class="toc-text">在TensorBoard中可视化图形</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8TensorBoard"><span class="toc-text">启动TensorBoard</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8D%E7%A7%B0%E7%A9%BA%E9%97%B4%EF%BC%88Namespaces%EF%BC%89"><span class="toc-text">名称空间（Namespaces）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%87%E9%87%8F%E6%80%BB%E7%BB%93%EF%BC%88Scalar-summaries%EF%BC%89"><span class="toc-text">标量总结（Scalar summaries）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%8F%AF%E8%A7%86%E5%8C%96"><span class="toc-text">图像可视化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E6%9C%AC%E6%A3%80%E6%B5%8B%E6%A8%A1%E5%9E%8BEAST%E7%9A%84%E6%90%AD%E5%BB%BA"><span class="toc-text">文本检测模型EAST的搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD"><span class="toc-text">数据加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%90%AD%E5%BB%BA"><span class="toc-text">网络模型的搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#loss%E5%87%BD%E6%95%B0%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="toc-text">loss函数的设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#train"><span class="toc-text">train</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

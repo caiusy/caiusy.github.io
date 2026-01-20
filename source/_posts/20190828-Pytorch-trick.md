@@ -1,7 +1,8 @@
 ---
 title: Pytorch trick
+categories: 深度学习
 date: 2019-08-28 00:00:00
-tags:
+tags: 深度学习
   - pytorch
 ---
 
@@ -31,48 +32,29 @@ Keras有一个简洁的API来查看模型的每一层输出尺寸，这在调试
 
     
     
-    1  
-    2  
-    
 
-| 
-    
-    
-    from torchsummary import summary  
-    summary(your_model, input_size=(channels, H, W))  
-      
-  
----|---  
+```python
+    from torchsummary import summary
+    summary(your_model, input_size=(channels, H, W))
+```
+
   
 input_size 是根据你自己的网络模型的输入尺寸进行设置。
 
 ## 3.梯度裁剪（Gradient Clipping）
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    
 
-| 
-    
-    
-    import torch.nn as nn  
-      
-    outputs = model(data)  
-    loss= loss_fn(outputs, target)  
-    optimizer.zero_grad()  
-    loss.backward()  
-    nn.utils.clip_grad_norm_(model.parameters(), max_norm=20, norm_type=2)  
-    optimizer.step()  
-      
-  
----|---  
+```python
+    import torch.nn as nn
+    outputs = model(data)
+    loss= loss_fn(outputs, target)
+    optimizer.zero_grad()
+    loss.backward()
+    nn.utils.clip_grad_norm_(model.parameters(), max_norm=20, norm_type=2)
+    optimizer.step()
+```
+
   
 nn.utils.clip_grad_norm_ 的参数：
 
@@ -87,122 +69,60 @@ nn.utils.clip_grad_norm_ 的参数：
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    
 
-| 
-    
-    
-    import cv2  
-    import torch  
-      
-    image = cv2.imread(img_path)  
-    image = torch.tensor(image)  
-    print(image.size())  
-      
-    img = image.view(1, *image.size())  
-    print(img.size())  
-      
-    # output:  
-    # torch.Size([h, w, c])  
-    # torch.Size([1, h, w, c])  
-      
-  
----|---  
+```python
+    import cv2
+    import torch
+    image = cv2.imread(img_path)
+    image = torch.tensor(image)
+    print(image.size())
+    img = image.view(1, *image.size())
+    print(img.size())
+    # output:
+    # torch.Size([h, w, c])
+    # torch.Size([1, h, w, c])
+```
+
   
 或者  
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    
 
-| 
-    
-    
-    import cv2  
-    import numpy as np  
-      
-    image = cv2.imread(img_path)  
-    print(image.shape)  
-    img = image[np.newaxis, :, :, :]  
-    print(img.shape)  
-      
-    # output:  
-    # (h, w, c)  
-    # (1, h, w, c)  
-      
-  
----|---  
+```python
+    import cv2
+    import numpy as np
+    image = cv2.imread(img_path)
+    print(image.shape)
+    img = image[np.newaxis, :, :, :]
+    print(img.shape)
+    # output:
+    # (h, w, c)
+    # (1, h, w, c)
+```
+
   
 或者  
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    15  
-    16  
-    17  
-    
 
-| 
-    
-    
-    import cv2  
-    import torch  
-      
-    image = cv2.imread(img_path)  
-    image = torch.tensor(image)  
-    print(image.size())  
-      
-    img = image.unsqueeze(dim=0)    
-    print(img.size())  
-      
-    img = img.squeeze(dim=0)  
-    print(img.size())  
-      
-    # output:  
-    # torch.Size([(h, w, c)])  
-    # torch.Size([1, h, w, c])  
-    # torch.Size([h, w, c])  
-      
-  
----|---  
+```python
+    import cv2
+    import torch
+    image = cv2.imread(img_path)
+    image = torch.tensor(image)
+    print(image.size())
+    img = image.unsqueeze(dim=0)
+    print(img.size())
+    img = img.squeeze(dim=0)
+    print(img.size())
+    # output:
+    # torch.Size([(h, w, c)])
+    # torch.Size([1, h, w, c])
+    # torch.Size([h, w, c])
+```
+
   
 tensor.unsqueeze(dim)：扩展维度，dim指定扩展哪个维度。
 
@@ -214,60 +134,29 @@ tensor.squeeze(dim)：去除dim指定的且size为1的维度，维度大于1时�
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    15  
-    16  
-    17  
-    18  
-    19  
-    20  
-    21  
-    22  
-    23  
-    
 
-| 
-    
-    
-    import torch  
-    class_num = 8  
-    batch_size = 4  
-      
-    def one_hot(label):  
-        """  
-        将一维列表转换为独热编码  
-        """  
-        label = label.resize_(batch_size, 1)  
-        m_zeros = torch.zeros(batch_size, class_num)  
-        # 从 value 中取值，然后根据 dim 和 index 给相应位置赋值  
-        onehot = m_zeros.scatter_(1, label, 1)  # (dim,index,value)  
-      
-        return onehot.numpy()  # Tensor -> Numpy  
-      
-    label = torch.LongTensor(batch_size).random_() % class_num  # 对随机数取余  
-    print(one_hot(label))  
-      
-    # output:  
-    [[0. 0. 0. 1. 0. 0. 0. 0.]  
-     [0. 0. 0. 0. 1. 0. 0. 0.]  
-     [0. 0. 1. 0. 0. 0. 0. 0.]  
-     [0. 1. 0. 0. 0. 0. 0. 0.]]  
-      
-  
----|---  
+```python
+    import torch
+    class_num = 8
+    batch_size = 4
+    def one_hot(label):
+        """
+        将一维列表转换为独热编码
+        """
+        label = label.resize_(batch_size, 1)
+        m_zeros = torch.zeros(batch_size, class_num)
+        # 从 value 中取值，然后根据 dim 和 index 给相应位置赋值
+        onehot = m_zeros.scatter_(1, label, 1)  # (dim,index,value)
+        return onehot.numpy()  # Tensor -> Numpy
+    label = torch.LongTensor(batch_size).random_() % class_num  # 对随机数取余
+    print(one_hot(label))
+    # output:
+    [[0. 0. 0. 1. 0. 0. 0. 0.]
+     [0. 0. 0. 0. 1. 0. 0. 0.]
+     [0. 0. 1. 0. 0. 0. 0. 0.]
+     [0. 1. 0. 0. 0. 0. 0. 0.]]
+```
+
   
 ## 6\. 防止验证模型时爆显存
 
@@ -275,20 +164,13 @@ tensor.squeeze(dim)：去除dim指定的且size为1的维度，维度大于1时�
 
     
     
-    1  
-    2  
-    3  
-    
 
-| 
-    
-    
-    with torch.no_grad():  
-        # 使用model进行预测的代码  
-        pass  
-      
-  
----|---  
+```python
+    with torch.no_grad():
+        # 使用model进行预测的代码
+        pass
+```
+
   
 感谢知乎用户zhaz 的提醒，我把 torch.cuda.empty_cache() 的使用原因更新一下。
 
@@ -309,36 +191,19 @@ Releases all unoccupied cached memory currently held by the caching allocator so
 ## 7\. 学习率衰减
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    
 
-| 
-    
-    
-    import torch.optim as optim  
-    from torch.optim import lr_scheduler  
-      
-    # 训练前的初始化  
-    optimizer = optim.Adam(net.parameters(), lr=0.001)  
-    scheduler = lr_scheduler.StepLR(optimizer, 10, 0.1)  # # 每过10个epoch，学习率乘以0.1  
-      
-    # 训练过程中  
-    for n in n_epoch:  
-        scheduler.step()  
-        ...  
-      
-  
----|---  
+```python
+    import torch.optim as optim
+    from torch.optim import lr_scheduler
+    # 训练前的初始化
+    optimizer = optim.Adam(net.parameters(), lr=0.001)
+    scheduler = lr_scheduler.StepLR(optimizer, 10, 0.1)  # # 每过10个epoch，学习率乘以0.1
+    # 训练过程中
+    for n in n_epoch:
+        scheduler.step()
+        ...
+```
+
   
 ## 8\. 冻结某些层的参数
 
@@ -348,144 +213,88 @@ Releases all unoccupied cached memory currently held by the caching allocator so
 
     
     
-    1  
-    2  
-    3  
-    
 
-| 
-    
-    
-    net = Network()  # 获取自定义网络结构  
-    for name, value in net.named_parameters():  
-        print('name: {0},	 grad: {1}'.format(name, value.requires_grad))  
-      
-  
----|---  
+```python
+    net = Network()  # 获取自定义网络结构
+    for name, value in net.named_parameters():
+        print('name: {0},	 grad: {1}'.format(name, value.requires_grad))
+```
+
   
 假设前几层信息如下：  
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    
 
-| 
-    
-    
-    name: cnn.VGG_16.convolution1_1.weight, grad: True  
-    name: cnn.VGG_16.convolution1_1.bias, grad: True  
-    name: cnn.VGG_16.convolution1_2.weight, grad: True  
-    name: cnn.VGG_16.convolution1_2.bias, grad: True  
-    name: cnn.VGG_16.convolution2_1.weight, grad: True  
-    name: cnn.VGG_16.convolution2_1.bias, grad: True  
-    name: cnn.VGG_16.convolution2_2.weight, grad: True  
-    name: cnn.VGG_16.convolution2_2.bias, grad: True  
-      
-  
----|---  
+```
+    name: cnn.VGG_16.convolution1_1.weight, grad: True
+    name: cnn.VGG_16.convolution1_1.bias, grad: True
+    name: cnn.VGG_16.convolution1_2.weight, grad: True
+    name: cnn.VGG_16.convolution1_2.bias, grad: True
+    name: cnn.VGG_16.convolution2_1.weight, grad: True
+    name: cnn.VGG_16.convolution2_1.bias, grad: True
+    name: cnn.VGG_16.convolution2_2.weight, grad: True
+    name: cnn.VGG_16.convolution2_2.bias, grad: True
+```
+
   
 后面的True表示该层的参数可训练，然后我们定义一个要冻结的层的列表：  
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    
 
-| 
-    
-    
-    no_grad = [  
-        'cnn.VGG_16.convolution1_1.weight',  
-        'cnn.VGG_16.convolution1_1.bias',  
-        'cnn.VGG_16.convolution1_2.weight',  
-        'cnn.VGG_16.convolution1_2.bias'  
-    ]  
-      
-  
----|---  
+```
+    no_grad = [
+        'cnn.VGG_16.convolution1_1.weight',
+        'cnn.VGG_16.convolution1_1.bias',
+        'cnn.VGG_16.convolution1_2.weight',
+        'cnn.VGG_16.convolution1_2.bias'
+    ]
+```
+
   
 冻结方法如下：  
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    
 
-| 
-    
-    
-    net = Net.CTPN()  # 获取网络结构  
-    for name, value in net.named_parameters():  
-        if name in no_grad:  
-            value.requires_grad = False  
-        else:  
-            value.requires_grad = True  
-      
-  
----|---  
+```
+    net = Net.CTPN()  # 获取网络结构
+    for name, value in net.named_parameters():
+        if name in no_grad:
+            value.requires_grad = False
+        else:
+            value.requires_grad = True
+```
+
   
 冻结后我们再打印每层的信息：  
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    
 
-| 
-    
-    
-    name: cnn.VGG_16.convolution1_1.weight, grad: False  
-    name: cnn.VGG_16.convolution1_1.bias, grad: False  
-    name: cnn.VGG_16.convolution1_2.weight, grad: False  
-    name: cnn.VGG_16.convolution1_2.bias, grad: False  
-    name: cnn.VGG_16.convolution2_1.weight, grad: True  
-    name: cnn.VGG_16.convolution2_1.bias, grad: True  
-    name: cnn.VGG_16.convolution2_2.weight, grad: True  
-    name: cnn.VGG_16.convolution2_2.bias, grad: True  
-      
-  
----|---  
+```
+    name: cnn.VGG_16.convolution1_1.weight, grad: False
+    name: cnn.VGG_16.convolution1_1.bias, grad: False
+    name: cnn.VGG_16.convolution1_2.weight, grad: False
+    name: cnn.VGG_16.convolution1_2.bias, grad: False
+    name: cnn.VGG_16.convolution2_1.weight, grad: True
+    name: cnn.VGG_16.convolution2_1.bias, grad: True
+    name: cnn.VGG_16.convolution2_2.weight, grad: True
+    name: cnn.VGG_16.convolution2_2.bias, grad: True
+```
+
   
 可以看到前两层的weight和bias的requires_grad都为False，表示它们不可训练。  
 最后在定义优化器时，只对requires_grad为True的层的参数进行更新。  
 
     
     
-    1  
-    
 
-| 
-    
-    
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), lr=0.01)  
-      
-  
----|---  
+```
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), lr=0.01)
+```
+
   
 ## 9\. 对不同层使用不同学习率
 
@@ -495,87 +304,46 @@ Releases all unoccupied cached memory currently held by the caching allocator so
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    
 
-| 
-    
-    
-    net = Network()  # 获取自定义网络结构  
-    for name, value in net.named_parameters():  
-        print('name: {}'.format(name))  
-      
-    # 输出：  
-    # name: cnn.VGG_16.convolution1_1.weight  
-    # name: cnn.VGG_16.convolution1_1.bias  
-    # name: cnn.VGG_16.convolution1_2.weight  
-    # name: cnn.VGG_16.convolution1_2.bias  
-    # name: cnn.VGG_16.convolution2_1.weight  
-    # name: cnn.VGG_16.convolution2_1.bias  
-    # name: cnn.VGG_16.convolution2_2.weight  
-    # name: cnn.VGG_16.convolution2_2.bias  
-      
-  
----|---  
+```python
+    net = Network()  # 获取自定义网络结构
+    for name, value in net.named_parameters():
+        print('name: {}'.format(name))
+    # 输出：
+    # name: cnn.VGG_16.convolution1_1.weight
+    # name: cnn.VGG_16.convolution1_1.bias
+    # name: cnn.VGG_16.convolution1_2.weight
+    # name: cnn.VGG_16.convolution1_2.bias
+    # name: cnn.VGG_16.convolution2_1.weight
+    # name: cnn.VGG_16.convolution2_1.bias
+    # name: cnn.VGG_16.convolution2_2.weight
+    # name: cnn.VGG_16.convolution2_2.bias
+```
+
   
 对 convolution1 和 convolution2 设置不同的学习率，首先将它们分开，即放到不同的列表里：  
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    15  
-    16  
-    17  
-    
 
-| 
-    
-    
-    conv1_params = []  
-    conv2_params = []  
-      
-    for name, parms in net.named_parameters():  
-        if "convolution1" in name:  
-            conv1_params += [parms]  
-        else:  
-            conv2_params += [parms]  
-      
-    # 然后在优化器中进行如下操作：  
-    optimizer = optim.Adam(  
-        [  
-            {"params": conv1_params, 'lr': 0.01},  
-            {"params": conv2_params, 'lr': 0.001},  
-        ],  
-        weight_decay=1e-3,  
-    )  
-      
-  
----|---  
+```
+    conv1_params = []
+    conv2_params = []
+    for name, parms in net.named_parameters():
+        if "convolution1" in name:
+            conv1_params += [parms]
+        else:
+            conv2_params += [parms]
+    # 然后在优化器中进行如下操作：
+    optimizer = optim.Adam(
+        [
+            {"params": conv1_params, 'lr': 0.01},
+            {"params": conv2_params, 'lr': 0.001},
+        ],
+        weight_decay=1e-3,
+    )
+```
+
   
 我们将模型划分为两部分，存放到一个列表里，每部分就对应上面的一个字典，在字典里设置不同的学习率。当这两部分有相同的其他参数时，就将该参数放到列表外面作为全局参数，如上面的`weight_decay`。
 
@@ -584,25 +352,15 @@ Releases all unoccupied cached memory currently held by the caching allocator so
 ## 显示训练时间
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    
 
-| 
-    
-    
-    for epoch in range(start_epoch, config.epochs):  
-                start = time.time()  
-                train_loss, lr = train_epoch(model, optimizer, scheduler, train_loader, device, criterion, epoch, all_step,  
-                                             writer, logger)  
-                logger.info('[{}/{}], train_loss: {:.4f}, time: {:.4f}, lr: {}'.format(  
-                    epoch, config.epochs, train_loss, time.time() - start, lr))  
-      
-  
----|---  
+```
+    for epoch in range(start_epoch, config.epochs):
+                start = time.time()
+                train_loss, lr = train_epoch(model, optimizer, scheduler, train_loader, device, criterion, epoch, all_step,
+                                             writer, logger)
+                logger.info('[{}/{}], train_loss: {:.4f}, time: {:.4f}, lr: {}'.format(
+                    epoch, config.epochs, train_loss, time.time() - start, lr))
+```
+
   
 参考：[https://mp.weixin.qq.com/s?__biz=MzU3NjE4NjQ4MA==&mid=2247485953&idx=2&sn=3ae788b7d643541254ba311f7a7faced&chksm=fd16fb1eca61720870bc58c1a465a346cf2c6a7e8bea39e4b3d582474b595021f3a5b635086d&mpshare=1&scene=1&srcid=&sharer_sharetime=1566885137387&sharer_shareid=285785c5623899db73795495779fe8be#rd](https://mp.weixin.qq.com/s?__biz=MzU3NjE4NjQ4MA==&mid=2247485953&idx=2&sn=3ae788b7d643541254ba311f7a7faced&chksm=fd16fb1eca61720870bc58c1a465a346cf2c6a7e8bea39e4b3d582474b595021f3a5b635086d&mpshare=1&scene=1&srcid=&sharer_sharetime=1566885137387&sharer_shareid=285785c5623899db73795495779fe8be#rd)

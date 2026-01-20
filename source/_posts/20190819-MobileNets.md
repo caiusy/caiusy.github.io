@@ -1,7 +1,8 @@
 ---
 title: MobileNets
+categories: 深度学习
 date: 2019-08-19 00:00:00
-tags:
+tags: 深度学习
   - Deep Learning
   - 论文阅读
 ---

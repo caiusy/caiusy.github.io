@@ -1,8 +1,9 @@
 ---
 title: shell学习
+categories: 技术
 typora-copy-images-to: ./shell学习
 date: 2023-01-22 16:55:53
-tags: [工具,shell]
+tags: 技术
 ---
 ## shell学习
 
@@ -481,7 +482,6 @@ shell mei
 ~~~
 
 
-
 ##### 7.2 case 断句
 
 case $变量名 in
@@ -731,7 +731,6 @@ input your paramter1: 10
 input your paramter1: 20
 30
 ~~~
-
 
 
 #### 第十章 shell工具（重点）

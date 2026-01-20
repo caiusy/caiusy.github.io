@@ -1,7 +1,8 @@
 ---
 title: object_detection_xmind
+categories: 技术
 date: 2019-10-31 00:00:00
-tags:
+tags: 目标检测
   - object_detection
 ---
 

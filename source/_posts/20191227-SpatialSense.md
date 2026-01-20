@@ -1,7 +1,8 @@
 ---
 title: SpatialSense
+categories: 计算机视觉
 date: 2019-12-27 00:00:00
-tags:
+tags: 计算机视觉
   - Deep Learning
   - 论文阅读
 ---

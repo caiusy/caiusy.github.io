@@ -1,8 +1,9 @@
 ---
 title: 从视频标定到SLAM
+categories: 技术
 typora-copy-images-to: ./从视频标定到SLAM
 date: 2023-01-22 16:55:53
-tags: [SLAM,计算机视觉]
+tags: 技术
 ---
 ## 浙江大学视觉SLAM公开课-从视频标定到SLAM
 
@@ -55,11 +56,7 @@ Shringking the Aperture（收缩光圈）
 depth of filed。 光圈的作用
 
 
-
 光圈的速度， 光圈越小， 比较长时间曝光， 光圈越大F = 1/直径 
-
-
-
 
 
 filed of view 跟相机的焦距直接相关。

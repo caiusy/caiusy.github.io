@@ -1,8 +1,9 @@
 ---
 title: RANSAC算法
+categories: 算法
 typora-copy-images-to: ./RANSAC算法
 date: 2023-01-22 16:55:53
-tags: 机器学习
+tags: 算法
 ---
 ### RANSAC算法
 
@@ -143,6 +144,5 @@ plt.show()
 ~~~~
 
 ![image-20220718002303153](./images/image-20220718002303153.png)
-
 
 

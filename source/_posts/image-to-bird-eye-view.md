@@ -2,13 +2,13 @@
 title: 从图像到俯视图：完整实现指南
 date: 2026-01-19 00:36:00
 updated: 2026-01-19 00:36:00
-tags:
+tags: 计算机视觉
   - 计算机视觉
   - OpenCV
   - Python
   - 图像处理
   - 单应性变换
-categories:
+categories: 计算机视觉
   - 计算机视觉
 description: 详细讲解如何将透视图像转换为鸟瞰图，涵盖从基础概念到完整代码实现，适合所有水平的学习者。
 ---
@@ -361,7 +361,6 @@ def normalize_points(points):
     
     return T
 
-
 def compute_homography_dlt(src_pts, dst_pts):
     """
     使用DLT算法计算单应性矩阵
@@ -515,7 +514,6 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
-
 
 class InteractiveBirdEyeView:
     """
@@ -696,7 +694,6 @@ class InteractiveBirdEyeView:
         
         return result
 
-
 def visualize_results(result, save_path=None):
     """
     可视化结果
@@ -758,7 +755,6 @@ def visualize_results(result, save_path=None):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-
 def main():
     """
     主函数
@@ -803,7 +799,6 @@ def main():
     
     print("\n📁 所有文件已保存到 output/ 目录")
     print("\n✨ 完成！")
-
 
 if __name__ == "__main__":
     main()

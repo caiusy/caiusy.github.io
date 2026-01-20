@@ -1,7 +1,8 @@
 ---
 title: mx-maskrcnn环境搭建
+categories: 工具
 date: 2019-09-06 00:00:00
-tags:
+tags: 工具
   - python
 ---
 

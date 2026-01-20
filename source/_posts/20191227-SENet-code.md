@@ -1,7 +1,8 @@
 ---
 title: Attention机制中SEnet CBAM以及Dual pooling的pytorch实现
+categories: 深度学习
 date: 2019-12-27 00:00:00
-tags:
+tags: 深度学习
   - python
 ---
 
@@ -18,48 +19,26 @@ SEnet 模块
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    15  
-    16  
-    17  
-    
 
-| 
-    
-    
-     from torch import nn  
-    class SELayer(nn.Module):  
-        def __init__(self, channel, reduction=16):  
-            super(SELayer, self).__init__()  
-            self.avg_pool = nn.AdaptiveAvgPool2d(1)  
-            self.fc = nn.Sequential(  
-                nn.Linear(channel, channel // reduction, bias=False),  
-                nn.ReLU(inplace=True),  
-                nn.Linear(channel // reduction, channel, bias=False),  
-                nn.Sigmoid()  
-            )  
-      
-        def forward(self, x):  
-            b, c, _, _ = x.size()  
-            y = self.avg_pool(x).view(b, c)  
-            y = self.fc(y).view(b, c, 1, 1)  
-            return x * y. (x)  
-      
-  
----|---  
+```python
+     from torch import nn
+    class SELayer(nn.Module):
+        def __init__(self, channel, reduction=16):
+            super(SELayer, self).__init__()
+            self.avg_pool = nn.AdaptiveAvgPool2d(1)
+            self.fc = nn.Sequential(
+                nn.Linear(channel, channel // reduction, bias=False),
+                nn.ReLU(inplace=True),
+                nn.Linear(channel // reduction, channel, bias=False),
+                nn.Sigmoid()
+            )
+        def forward(self, x):
+            b, c, _, _ = x.size()
+            y = self.avg_pool(x).view(b, c)
+            y = self.fc(y).view(b, c, 1, 1)
+            return x * y. (x)
+```
+
   
 ![senet2](//caius-lu.github.io/2019/12/27/SENet-code/images/20191227_SENet-code_senet2.png)  
 以上代码设计到的API：
@@ -85,21 +64,20 @@ SEnet 模块
         10  
         
 
-| 
-        
-        In [1]: import torch  
-        In [2]:  x = torch.zeros((16,256,256,256))  
-        In [3]:  import torch.nn as nn  
-        In [4]: avg_pool = nn.AdaptiveAvgPool2d(1)  
-        In [5]: avg_pool(x).shape  
-        Out[5]: torch.Size([16, 256, 1, 1])  
-        In [6]: avg_pool(x).view((16,256)).shape  
-        Out[6]: torch.Size([16, 256])  
-        In [7]: avg_pool(x).squeeze().shape # squeeze()函数也可以将所有通道个数为1的进行挤压  
-        Out[7]: torch.Size([16, 256])  
-          
+
+```python
+In [1]: import torch
+In [2]:  x = torch.zeros((16,256,256,256))
+In [3]:  import torch.nn as nn
+In [4]: avg_pool = nn.AdaptiveAvgPool2d(1)
+In [5]: avg_pool(x).shape
+Out[5]: torch.Size([16, 256, 1, 1])
+In [6]: avg_pool(x).view((16,256)).shape
+Out[6]: torch.Size([16, 256])
+In [7]: avg_pool(x).squeeze().shape # squeeze()函数也可以将所有通道个数为1的进行挤压
+Out[7]: torch.Size([16, 256])
+```
   
----|---  
   * 然后形状为【16, 256】的tensor经过fc:
 
   * (1) Linear: from 256(channel) to 256/16
@@ -132,115 +110,59 @@ SEnet 模块
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    15  
-    16  
-    17  
-    18  
-    19  
-    20  
-    21  
-    22  
-    23  
-    24  
-    25  
-    26  
-    27  
-    28  
-    29  
-    30  
-    
 
-| 
-    
-    
-    class CifarSEBasicBlock(nn.Module):  
-       def __init__(self, inplanes, planes, stride=1, reduction=16):  
-           super(CifarSEBasicBlock, self).__init__()  
-           self.conv1 = conv3x3(inplanes, planes, stride)  
-           self.bn1 = nn.BatchNorm2d(planes)  
-           self.relu = nn.ReLU(inplace=True)  
-           self.conv2 = conv3x3(planes, planes)  
-           self.bn2 = nn.BatchNorm2d(planes)  
-           self.se = SELayer(planes, reduction)  
-           if inplanes != planes:  
-               self.downsample = nn.Sequential(nn.Conv2d(inplanes, planes, kernel_size=1, stride=stride, bias=False),  
-                                               nn.BatchNorm2d(planes))  
-           else:  
-               self.downsample = lambda x: x  
-           self.stride = stride  
-      
-       def forward(self, x):  
-           residual = self.downsample(x)  
-           out = self.conv1(x)  
-           out = self.bn1(out)  
-           out = self.relu(out)  
-      
-           out = self.conv2(out)  
-           out = self.bn2(out)  
-           out = self.se(out)  
-      
-           out += residual  
-           out = self.relu(out)  
-      
-           return out  
-      
-  
----|---  
+```python
+    class CifarSEBasicBlock(nn.Module):
+       def __init__(self, inplanes, planes, stride=1, reduction=16):
+           super(CifarSEBasicBlock, self).__init__()
+           self.conv1 = conv3x3(inplanes, planes, stride)
+           self.bn1 = nn.BatchNorm2d(planes)
+           self.relu = nn.ReLU(inplace=True)
+           self.conv2 = conv3x3(planes, planes)
+           self.bn2 = nn.BatchNorm2d(planes)
+           self.se = SELayer(planes, reduction)
+           if inplanes != planes:
+               self.downsample = nn.Sequential(nn.Conv2d(inplanes, planes, kernel_size=1, stride=stride, bias=False),
+                                               nn.BatchNorm2d(planes))
+           else:
+               self.downsample = lambda x: x
+           self.stride = stride
+       def forward(self, x):
+           residual = self.downsample(x)
+           out = self.conv1(x)
+           out = self.bn1(out)
+           out = self.relu(out)
+           out = self.conv2(out)
+           out = self.bn2(out)
+           out = self.se(out)
+           out += residual
+           out = self.relu(out)
+           return out
+```
+
   
 正常的resent的BasicBlock  
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    
 
-| 
-    
-    
-    class BasicBlock(nn.Module):  
-        def __init__(self, inplanes, planes, stride=1):  
-            super(BasicBlock, self).__init__()  
-            self.conv1 = conv3x3(inplanes, planes, stride)  
-            self.bn1 = nn.BatchNorm2d(planes)  
-            self.relu = nn.ReLU(inplace=True)  
-            self.conv2 = conv3x3(planes, planes)  
-            self.bn2 = nn.BatchNorm2d(planes)  
-            if inplanes != planes:  
-                self.downsample = nn.Sequential(nn.Conv2d(inplanes, planes, kernel_size=1, stride=stride, bias=False),  
-                                                nn.BatchNorm2d(planes))  
-            else:  
-                self.downsample = lambda x: x  
-            self.stride = stride  
-      
-  
----|---  
+```python
+    class BasicBlock(nn.Module):
+        def __init__(self, inplanes, planes, stride=1):
+            super(BasicBlock, self).__init__()
+            self.conv1 = conv3x3(inplanes, planes, stride)
+            self.bn1 = nn.BatchNorm2d(planes)
+            self.relu = nn.ReLU(inplace=True)
+            self.conv2 = conv3x3(planes, planes)
+            self.bn2 = nn.BatchNorm2d(planes)
+            if inplanes != planes:
+                self.downsample = nn.Sequential(nn.Conv2d(inplanes, planes, kernel_size=1, stride=stride, bias=False),
+                                                nn.BatchNorm2d(planes))
+            else:
+                self.downsample = lambda x: x
+            self.stride = stride
+```
+
   
 baseline:0.888  
 se+baseline:0.892
@@ -252,48 +174,24 @@ channel-attention-module跟以上内容想法有一点像，给每个channel进�
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    15  
-    16  
-    17  
-    
 
-| 
-    
-    
-    class ChannelAttention(nn.Module):  
-        def __init__(self, in_planes, ratio=16):  
-            super(ChannelAttention, self).__init__()  
-            self.avg_pool = nn.AdaptiveAvgPool2d(1)  
-            self.max_pool = nn.AdaptiveMaxPool2d(1)  
-      
-            self.fc1   = nn.Conv2d(in_planes, in_planes // 16, 1, bias=False)  
-            self.relu1 = nn.ReLU()  
-            self.fc2   = nn.Conv2d(in_planes // 16, in_planes, 1, bias=False)  
-      
-            self.sigmoid = nn.Sigmoid()  
-      
-        def forward(self, x):  
-            avg_out = self.fc2(self.relu1(self.fc1(self.avg_pool(x))))  
-            max_out = self.fc2(self.relu1(self.fc1(self.max_pool(x))))  
-            out = avg_out + max_out  
-            return self.sigmoid(out)  
-      
-  
----|---  
+```python
+    class ChannelAttention(nn.Module):
+        def __init__(self, in_planes, ratio=16):
+            super(ChannelAttention, self).__init__()
+            self.avg_pool = nn.AdaptiveAvgPool2d(1)
+            self.max_pool = nn.AdaptiveMaxPool2d(1)
+            self.fc1   = nn.Conv2d(in_planes, in_planes // 16, 1, bias=False)
+            self.relu1 = nn.ReLU()
+            self.fc2   = nn.Conv2d(in_planes // 16, in_planes, 1, bias=False)
+            self.sigmoid = nn.Sigmoid()
+        def forward(self, x):
+            avg_out = self.fc2(self.relu1(self.fc1(self.avg_pool(x))))
+            max_out = self.fc2(self.relu1(self.fc1(self.max_pool(x))))
+            out = avg_out + max_out
+            return self.sigmoid(out)
+```
+
   
 API跟上边类似，只添加了卷积，也很简单。需要说明的是貌似Linear和Conv2d中的参数很相似，但是实际上，两者还是很不一样的，Linear接受的是线性的2维数组（batch, 一维特征），Con2d接受的是4维数组（batch, 通道，w, h）。  
 ![ch](//caius-lu.github.io/2019/12/27/SENet-code/images/20191227_SENet-code_ch.png)  
@@ -308,45 +206,25 @@ forward函数：
 
 参考来源：[CBMA.pytorch](https://github.com/luuuyi/CBAM.PyTorch/blob/master/model/resnet_cbam.py)
         
-        1  
-        2  
-        3  
-        4  
-        5  
-        6  
-        7  
-        8  
-        9  
-        10  
-        11  
-        12  
-        13  
-        14  
-        15  
-        16  
         
 
-| 
-        
-        class SpatialAttention(nn.Module):  
-            def __init__(self, kernel_size=7):  
-                super(SpatialAttention, self).__init__()  
-          
-                assert kernel_size in (3, 7), 'kernel size must be 3 or 7'  
-                padding = 3 if kernel_size == 7 else 1  
-          
-                self.conv1 = nn.Conv2d(2, 1, kernel_size, padding=padding, bias=False)  
-                self.sigmoid = nn.Sigmoid()  
-          
-            def forward(self, x):  
-                avg_out = torch.mean(x, dim=1, keepdim=True)  
-                max_out, _ = torch.max(x, dim=1, keepdim=True)  
-                x = torch.cat([avg_out, max_out], dim=1)  
-                x = self.conv1(x)  
-                return self.sigmoid(x)  
-          
+
+```python
+class SpatialAttention(nn.Module):
+def __init__(self, kernel_size=7):
+super(SpatialAttention, self).__init__()
+assert kernel_size in (3, 7), 'kernel size must be 3 or 7'
+padding = 3 if kernel_size == 7 else 1
+self.conv1 = nn.Conv2d(2, 1, kernel_size, padding=padding, bias=False)
+self.sigmoid = nn.Sigmoid()
+def forward(self, x):
+avg_out = torch.mean(x, dim=1, keepdim=True)
+max_out, _ = torch.max(x, dim=1, keepdim=True)
+x = torch.cat([avg_out, max_out], dim=1)
+x = self.conv1(x)
+return self.sigmoid(x)
+```
   
----|---  
 
 ![sa](//caius-lu.github.io/2019/12/27/SENet-code/images/20191227_SENet-code_sa.png)  
 Spatial attention module中支持kernel_size=3或者7，默认设置为7。  
@@ -368,84 +246,37 @@ forward函数：
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    15  
-    16  
-    17  
-    18  
-    19  
-    20  
-    21  
-    22  
-    23  
-    24  
-    25  
-    26  
-    27  
-    28  
-    29  
-    30  
-    31  
-    32  
-    33  
-    34  
-    35  
-    
 
-| 
-    
-    
-    class BasicBlock(nn.Module):  
-        expansion = 1  
-      
-        def __init__(self, inplanes, planes, stride=1, downsample=None):  
-            super(BasicBlock, self).__init__()  
-            self.conv1 = conv3x3(inplanes, planes, stride)  
-            self.bn1 = nn.BatchNorm2d(planes)  
-            self.relu = nn.ReLU(inplace=True)  
-            self.conv2 = conv3x3(planes, planes)  
-            self.bn2 = nn.BatchNorm2d(planes)  
-      
-            self.ca = ChannelAttention(planes)  
-            self.sa = SpatialAttention()  
-      
-            self.downsample = downsample  
-            self.stride = stride  
-      
-        def forward(self, x):  
-            residual = x  
-      
-            out = self.conv1(x)  
-            out = self.bn1(out)  
-            out = self.relu(out)  
-      
-            out = self.conv2(out)  
-            out = self.bn2(out)  
-      
-            out = self.ca(out) * out # 广播机制  
-            out = self.sa(out) * out # 广播机制  
-      
-            if self.downsample is not None:  
-                residual = self.downsample(x)  
-            out += residual  
-            out = self.relu(out)  
-            return out  
-      
-  
----|---  
+```python
+    class BasicBlock(nn.Module):
+        expansion = 1
+        def __init__(self, inplanes, planes, stride=1, downsample=None):
+            super(BasicBlock, self).__init__()
+            self.conv1 = conv3x3(inplanes, planes, stride)
+            self.bn1 = nn.BatchNorm2d(planes)
+            self.relu = nn.ReLU(inplace=True)
+            self.conv2 = conv3x3(planes, planes)
+            self.bn2 = nn.BatchNorm2d(planes)
+            self.ca = ChannelAttention(planes)
+            self.sa = SpatialAttention()
+            self.downsample = downsample
+            self.stride = stride
+        def forward(self, x):
+            residual = x
+            out = self.conv1(x)
+            out = self.bn1(out)
+            out = self.relu(out)
+            out = self.conv2(out)
+            out = self.bn2(out)
+            out = self.ca(out) * out # 广播机制
+            out = self.sa(out) * out # 广播机制
+            if self.downsample is not None:
+                residual = self.downsample(x)
+            out += residual
+            out = self.relu(out)
+            return out
+```
+
   
 ![cbam](//caius-lu.github.io/2019/12/27/SENet-code/images/20191227_SENet-code_cbam.png)  
 resnet50+cbam: 0.902
@@ -456,74 +287,40 @@ max pooling更注重重要的局部特征, average pooling更关注全局特征.
 参考链接:[GaryLIU](https://zhuanlan.zhihu.com/p/93806755)
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    15  
-    16  
-    17  
-    18  
-    19  
-    20  
-    21  
-    22  
-    23  
-    24  
-    25  
-    26  
-    27  
-    28  
-    29  
-    30  
-    
 
-| 
-    
-    
-    class res18(nn.Module):  
-        def __init__(self, num_classes):  
-            super(res18, self).__init__()  
-            self.base = resnet18(pretrained=True)  
-            self.feature = nn.Sequential(  
-                self.base.conv1,  
-                self.base.bn1,  
-                self.base.relu,  
-                self.base.maxpool,  
-                self.base.layer1,  
-                self.base.layer2,  
-                self.base.layer3,  
-                self.base.layer4  
-            )  
-            self.avg_pool = nn.AdaptiveAvgPool2d(1)  
-            self.max_pool = nn.AdaptiveMaxPool2d(1)  
-            self.reduce_layer = nn.Conv2d(1024, 512, 1)  
-            self.fc  = nn.Sequential(  
-                nn.Dropout(0.5),  
-                nn.Linear(512, num_classes)  
-                )  
-        def forward(self, x):  
-            bs = x.shape[0]  
-            x = self.feature(x)  
-            x1 = self.avg_pool(x)  
-            x2 = self.max_pool(x)  
-            x = torch.cat([x1, x2], dim=1)  
-            x = self.reduce_layer(x).view(bs, -1)  
-            logits = self.fc(x)  
-            return logits  
-      
-  
----|---  
+```python
+    class res18(nn.Module):
+        def __init__(self, num_classes):
+            super(res18, self).__init__()
+            self.base = resnet18(pretrained=True)
+            self.feature = nn.Sequential(
+                self.base.conv1,
+                self.base.bn1,
+                self.base.relu,
+                self.base.maxpool,
+                self.base.layer1,
+                self.base.layer2,
+                self.base.layer3,
+                self.base.layer4
+            )
+            self.avg_pool = nn.AdaptiveAvgPool2d(1)
+            self.max_pool = nn.AdaptiveMaxPool2d(1)
+            self.reduce_layer = nn.Conv2d(1024, 512, 1)
+            self.fc  = nn.Sequential(
+                nn.Dropout(0.5),
+                nn.Linear(512, num_classes)
+                )
+        def forward(self, x):
+            bs = x.shape[0]
+            x = self.feature(x)
+            x1 = self.avg_pool(x)
+            x2 = self.max_pool(x)
+            x = torch.cat([x1, x2], dim=1)
+            x = self.reduce_layer(x).view(bs, -1)
+            logits = self.fc(x)
+            return logits
+```
+
   
 > 这种是在模型层进行改造的一种小trick了，常见的做法：global max/average pooling + fc layer，这里试concat(global max-pooling, global average pooling) + fc layer，其实就是为了丰富特征层，max pooling更加关注重要的局部特征，而average pooling试更加关注全局的特征。不一定有效，我试过不少次，有效的次数比较少，但不少人喜欢这样用.  
 > -gray  

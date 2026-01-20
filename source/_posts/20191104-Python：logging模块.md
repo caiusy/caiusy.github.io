@@ -1,43 +1,26 @@
 ---
 title: Python：logging模块
+categories: Python
+tags: Python
 date: 2019-11-04 00:00:00
 ---
 
 
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    
+```python
+    In [12]: import logging
+        ...:
+        ...: logging.basicConfig(level=logging.DEBUG,
+        ...:                     filename='output.log',
+        ...:                     datefmt='%Y/%m/%d %H:%M:%S',
+        ...:                     format='%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(module)s - %(message)s')
+        ...: logger = logging.getLogger(__name__)
+        ...:
+        ...: logger.info('This is a log info')
+        ...: logger.debug('Debugging')
+        ...: logger.warning('Warning exists')
+        ...: logger.info('Finish')
+```
 
-| 
-    
-    
-      
-    In [12]: import logging  
-        ...:  
-        ...: logging.basicConfig(level=logging.DEBUG,  
-        ...:                     filename='output.log',  
-        ...:                     datefmt='%Y/%m/%d %H:%M:%S',  
-        ...:                     format='%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(module)s - %(message)s')  
-        ...: logger = logging.getLogger(__name__)  
-        ...:  
-        ...: logger.info('This is a log info')  
-        ...: logger.debug('Debugging')  
-        ...: logger.warning('Warning exists')  
-        ...: logger.info('Finish')  
-      
-  
----|---  
   
 2019-11-04 13:00:45,976 - **main** \- INFO - This is a log info  
 2019-11-04 13:00:45,977 - **main** \- WARNING - Warning exists  
@@ -46,38 +29,22 @@ date: 2019-11-04 00:00:00
 设置level等级，从而控制log输出的级别。
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    
 
-| 
-    
-    
-    In [13]: import logging  
-        ...:  
-        ...: logging.basicConfig(level=logging.DEBUG,  
-        ...:                     filename='output.log',  
-        ...:                     datefmt='%Y/%m/%d %H:%M:%S',  
-        ...:                     format='%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(module)s - %(message)s')  
-        ...: logger = logging.getLogger(__name__)  
-        ...: logger.setLevel(level=logging.DEBUG)  
-        ...: logger.info('This is a log info')  
-        ...: logger.debug('Debugging')  
-        ...: logger.warning('Warning exists')  
-        ...: logger.info('Finish')  
-      
-  
----|---  
+```python
+    In [13]: import logging
+        ...:
+        ...: logging.basicConfig(level=logging.DEBUG,
+        ...:                     filename='output.log',
+        ...:                     datefmt='%Y/%m/%d %H:%M:%S',
+        ...:                     format='%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(module)s - %(message)s')
+        ...: logger = logging.getLogger(__name__)
+        ...: logger.setLevel(level=logging.DEBUG)
+        ...: logger.info('This is a log info')
+        ...: logger.debug('Debugging')
+        ...: logger.warning('Warning exists')
+        ...: logger.info('Finish')
+```
+
   
 如果不设置logger的Level的话， debug’的信息也不会被输出。
 

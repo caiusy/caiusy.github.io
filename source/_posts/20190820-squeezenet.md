@@ -1,7 +1,8 @@
 ---
 title: SqueezeNet
+categories: 深度学习
 date: 2019-08-20 00:00:00
-tags:
+tags: 深度学习
   - Deep Learning
   - 论文阅读
 ---
@@ -37,82 +38,37 @@ Fire Module是将原来一层conv层变成两层：squeeze层+expand层，各自
 
     
     
-    1  
-    2  
-    3  
-    4  
-    5  
-    6  
-    7  
-    8  
-    9  
-    10  
-    11  
-    12  
-    13  
-    14  
-    15  
-    16  
-    17  
-    18  
-    19  
-    20  
-    21  
-    22  
-    23  
-    24  
-    25  
-    26  
-    27  
-    28  
-    29  
-    30  
-    31  
-    32  
-    33  
-    34  
-    
 
-| 
-    
-    
-      
-    class fire(nn.Module):  
-        def __init__(self, inplanes,squeeze_planes, expand_planes):  
-            super(fire,self).__init__()  
-            self.conv1 = nn.Conv2d(inplanes,squeeze_planes, kernel_size=1, stride=1)  
-            self.bn1 = nn.BatchNorm2d(squeeze_planes)  
-            self.relu1 = nn.ReLU(inplace=True)  
-            self.conv2 = nn.Conv2d(squeeze_planes, expand_planes, kernel_size=1, stride=1)  
-            self.bn2 = nn.BatchNorm2d(expand_planes)  
-            self.conv3 = nn.Conv2d(squeeze_planes,expand_planes,kernel_size=3, stride=1,padding=1)  
-            self.bn3 = nn.BatchNorm2d(expand_planes)  
-            self.relu2 = nn.ReLU(inplace=True)  
-      
-      
-            # using MSR initialization  
-      
-      
-            for m in self.modules():  
-                if isinstance(m,nn.Conv2d):  
-                    n = m.kernel_size[0]*m.kernel_size[1]*m.in_channels  
-                    m.weight.data.normal_(0,math.sqrt(2./n))  
-        def forward(self,x):  
-            x = self.conv1(x)  
-            x = self.bn1(x)  
-            x = self.relu1(x)  
-            out1 = self.conv2(x)  
-            out1 = self.bn2(out1)  
-            out2 = self.conv3(x)  
-            out2 = self.bn3(out2)  
-      
-            out = torch.cat([out1,out2],1)  
-            out = self.relu2(out)  
-      
-            return out  
-      
-  
----|---  
+```python
+    class fire(nn.Module):
+        def __init__(self, inplanes,squeeze_planes, expand_planes):
+            super(fire,self).__init__()
+            self.conv1 = nn.Conv2d(inplanes,squeeze_planes, kernel_size=1, stride=1)
+            self.bn1 = nn.BatchNorm2d(squeeze_planes)
+            self.relu1 = nn.ReLU(inplace=True)
+            self.conv2 = nn.Conv2d(squeeze_planes, expand_planes, kernel_size=1, stride=1)
+            self.bn2 = nn.BatchNorm2d(expand_planes)
+            self.conv3 = nn.Conv2d(squeeze_planes,expand_planes,kernel_size=3, stride=1,padding=1)
+            self.bn3 = nn.BatchNorm2d(expand_planes)
+            self.relu2 = nn.ReLU(inplace=True)
+            # using MSR initialization
+            for m in self.modules():
+                if isinstance(m,nn.Conv2d):
+                    n = m.kernel_size[0]*m.kernel_size[1]*m.in_channels
+                    m.weight.data.normal_(0,math.sqrt(2./n))
+        def forward(self,x):
+            x = self.conv1(x)
+            x = self.bn1(x)
+            x = self.relu1(x)
+            out1 = self.conv2(x)
+            out1 = self.bn2(out1)
+            out2 = self.conv3(x)
+            out2 = self.bn3(out2)
+            out = torch.cat([out1,out2],1)
+            out = self.relu2(out)
+            return out
+```
+
   
 ## SqueezeNet的具体网络结构
 

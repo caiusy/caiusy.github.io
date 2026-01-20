@@ -1,12 +1,12 @@
 ---
 title: 单应矩阵H求解
+categories: 技术
 typora-copy-images-to: ./单应矩阵H求解
 date: 2023-01-22 16:55:53
-tags: 多视几何
+tags: 技术
 ---
 单应矩阵H求解
 ---
-
 
 
 所需求解的单应矩阵：
@@ -89,4 +89,4 @@ $$
 
 通过多选几组点， 结合RANSAC等算法可进行全局优化。
 
-![image-20220717235918026](D:\HEXO\source\_posts\从视频标定到SLAM\image-20220717235918026.png)
+![image-20220717235918026](./images/image-20220717235918026.png)

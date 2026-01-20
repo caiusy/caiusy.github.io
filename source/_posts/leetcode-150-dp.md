@@ -2,10 +2,14 @@
 title: 📈 LeetCode 150 - 动态规划专题
 date: 2026-01-18
 updated: 2026-01-18
-categories: 
+categories:
   - 算法
   - LeetCode
-tags: 
+  - 算法
+  - LeetCode
+tags:
+  - LeetCode
+  - 算法
   - LeetCode
   - leetcode面试150
   - 动态规划

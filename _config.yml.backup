@@ -125,3 +125,13 @@ mathjax:
   cjk_width: 0.9 # 中文字符宽度
   normal_width: 0.6 # 普通字符宽度
   append_css: true # 添加自定义CSS
+  every_page: false # 不是每页都加载，只在需要时加载
+
+# MathJax 数学公式支持
+mathjax:
+  tags: none
+  single_dollars: true
+  cjk_width: 0.9
+  normal_width: 0.6
+  append_css: true
+  every_page: false

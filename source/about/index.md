@@ -24,19 +24,15 @@ layout: page
 
 ## 🔗 联系方式
 
-{% grid %}
-<!-- cell -->
 ### GitHub
 [![GitHub](https://img.shields.io/badge/GitHub-caiusy-181717?style=for-the-badge&logo=github)](https://github.com/caiusy)
 
 访问我的 GitHub 主页，查看开源项目和代码。
 
-<!-- cell -->
 ### 博客
 [![Blog](https://img.shields.io/badge/Blog-caiusy.github.io-6366F1?style=for-the-badge&logo=hexo)](https://caiusy.github.io)
 
 这里记录我的技术笔记和学习心得。
-{% endgrid %}
 
 ---
 

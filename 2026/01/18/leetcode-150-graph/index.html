@@ -51,9 +51,9 @@
 
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-01-18T00:00:00+08:00","dateModified":"2026-01-18T00:00:00+08:00","datePublished":"2026-01-18T00:00:00+08:00","description":"","headline":"🔍 LeetCode 150 - 图论与搜索专题","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/01/18/leetcode-150-graph/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/01/18/leetcode-150-graph/","keywords":"LeetCode - LeetCode - leetcode面试150 - 图论 - BFS - DFS - 拓扑排序 - 面试","image":[]}</script>
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -70,7 +70,7 @@
 
 
 
-<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a><a class="item title" href="/2019/12/19/20191219-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/"><span class="title">二叉树打印</span></a></div></widget>
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/01/25/deep-dive-into-lora/"><span class="title">深入浅出 LoRA：大模型微调的核心原理、数学直觉与实战指南</span></a><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a></div></widget>
 </div>
 <footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
 </div></aside><div class="l_main" id="main">
@@ -122,7 +122,7 @@
 
 <span class="token keyword">def</span> <span class="token function">bfs</span><span class="token punctuation">(</span>start<span class="token punctuation">)</span><span class="token punctuation">:</span>
     queue <span class="token operator">=</span> deque<span class="token punctuation">(</span><span class="token punctuation">[</span>start<span class="token punctuation">]</span><span class="token punctuation">)</span>
-    visited <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;start&amp;#125;</span>
+    visited <span class="token operator">=</span> <span class="token punctuation">{</span>start<span class="token punctuation">}</span>
     level <span class="token operator">=</span> <span class="token number">0</span>
     
     <span class="token keyword">while</span> queue<span class="token punctuation">:</span>
@@ -169,7 +169,7 @@
 策略：遍历网格，遇到 '1' 就启动 DFS/BFS
 把整个岛屿标记为已访问，计数 +1
 </code></pre>
-<h3 id="💻-代码实现-DFS"><a href="#💻-代码实现-DFS" class="headerlink" title="💻 代码实现 (DFS)"></a>💻 代码实现 (DFS)</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">numIslands</span><span class="token punctuation">(</span>grid<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-DFS"><a href="#💻-代码实现-DFS" class="headerlink" title="💻 代码实现 (DFS)"></a>💻 代码实现 (DFS)</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">numIslands</span><span class="token punctuation">(</span>grid<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     <span class="token keyword">if</span> <span class="token operator">not</span> grid<span class="token punctuation">:</span>
         <span class="token keyword">return</span> <span class="token number">0</span>
     
@@ -178,7 +178,7 @@
     
     <span class="token keyword">def</span> <span class="token function">dfs</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">)</span><span class="token punctuation">:</span>
         <span class="token comment" spellcheck="true"># 边界检查 &amp; 是否为陆地</span>
-        <span class="token keyword">if</span> i <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> i <span class="token operator">&gt;=</span> m <span class="token operator">or</span> j <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> j <span class="token operator">&gt;=</span> n <span class="token operator">or</span> grid<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">'1'</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> i <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> i <span class="token operator">>=</span> m <span class="token operator">or</span> j <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> j <span class="token operator">>=</span> n <span class="token operator">or</span> grid<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">'1'</span><span class="token punctuation">:</span>
             <span class="token keyword">return</span>
         
         <span class="token comment" spellcheck="true"># 标记为已访问</span>
@@ -215,14 +215,14 @@ X O X X            X O X X
    - 'O' → 'X' (被围绕)
    - '#' → 'O' (恢复)
 </code></pre>
-<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">solve</span><span class="token punctuation">(</span>board<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> None<span class="token punctuation">:</span>
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">solve</span><span class="token punctuation">(</span>board<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> None<span class="token punctuation">:</span>
     <span class="token keyword">if</span> <span class="token operator">not</span> board<span class="token punctuation">:</span>
         <span class="token keyword">return</span>
     
     m<span class="token punctuation">,</span> n <span class="token operator">=</span> len<span class="token punctuation">(</span>board<span class="token punctuation">)</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>board<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
     
     <span class="token keyword">def</span> <span class="token function">dfs</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> i <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> i <span class="token operator">&gt;=</span> m <span class="token operator">or</span> j <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> j <span class="token operator">&gt;=</span> n <span class="token operator">or</span> board<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">'O'</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> i <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> i <span class="token operator">>=</span> m <span class="token operator">or</span> j <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> j <span class="token operator">>=</span> n <span class="token operator">or</span> board<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">!=</span> <span class="token string">'O'</span><span class="token punctuation">:</span>
             <span class="token keyword">return</span>
         board<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'#'</span>
         dfs<span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> j<span class="token punctuation">)</span>
@@ -259,12 +259,12 @@ X O X X            X O X X
 使用哈希表记录 原节点 → 克隆节点 的映射
 BFS 或 DFS 遍历并克隆
 </code></pre>
-<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">cloneGraph</span><span class="token punctuation">(</span>node<span class="token punctuation">:</span> <span class="token string">'Node'</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> <span class="token string">'Node'</span><span class="token punctuation">:</span>
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">cloneGraph</span><span class="token punctuation">(</span>node<span class="token punctuation">:</span> <span class="token string">'Node'</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token string">'Node'</span><span class="token punctuation">:</span>
     <span class="token keyword">if</span> <span class="token operator">not</span> node<span class="token punctuation">:</span>
         <span class="token keyword">return</span> None
     
     <span class="token comment" spellcheck="true"># 哈希表：原节点 → 克隆节点</span>
-    cloned <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;&amp;#125;</span>
+    cloned <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
     
     <span class="token keyword">def</span> <span class="token function">dfs</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">:</span>
         <span class="token keyword">if</span> node <span class="token keyword">in</span> cloned<span class="token punctuation">:</span>
@@ -313,7 +313,7 @@ a &lt;--0.5-- b &lt;--0.33-- c
             <span class="token keyword">return</span> <span class="token number">1.0</span>
         
         queue <span class="token operator">=</span> deque<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">(</span>start<span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-        visited <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;start&amp;#125;</span>
+        visited <span class="token operator">=</span> <span class="token punctuation">{</span>start<span class="token punctuation">}</span>
         
         <span class="token keyword">while</span> queue<span class="token punctuation">:</span>
             node<span class="token punctuation">,</span> product <span class="token operator">=</span> queue<span class="token punctuation">.</span>popleft<span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -349,7 +349,7 @@ prerequisites = [[1,0],[2,0],[3,1],[3,2]]
 4. 入度变为 0 的节点入队
 5. 如果处理的节点数 = 总课程数，则无环
 </code></pre>
-<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">canFinish</span><span class="token punctuation">(</span>numCourses<span class="token punctuation">:</span> int<span class="token punctuation">,</span> prerequisites<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> bool<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">canFinish</span><span class="token punctuation">(</span>numCourses<span class="token punctuation">:</span> int<span class="token punctuation">,</span> prerequisites<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> bool<span class="token punctuation">:</span>
     <span class="token keyword">from</span> collections <span class="token keyword">import</span> defaultdict<span class="token punctuation">,</span> deque
     
     <span class="token comment" spellcheck="true"># 构建图和入度表</span>
@@ -380,7 +380,7 @@ prerequisites = [[1,0],[2,0],[3,1],[3,2]]
 </blockquote>
 <hr>
 <h2 id="6️⃣-LC-210-课程表-II-🟡"><a href="#6️⃣-LC-210-课程表-II-🟡" class="headerlink" title="6️⃣ LC 210. 课程表 II 🟡"></a>6️⃣ LC 210. 课程表 II 🟡</h2><h3 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h3><p>返回完成所有课程的学习顺序（拓扑排序结果）。</p>
-<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">findOrder</span><span class="token punctuation">(</span>numCourses<span class="token punctuation">:</span> int<span class="token punctuation">,</span> prerequisites<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> list<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">findOrder</span><span class="token punctuation">(</span>numCourses<span class="token punctuation">:</span> int<span class="token punctuation">,</span> prerequisites<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
     <span class="token keyword">from</span> collections <span class="token keyword">import</span> defaultdict<span class="token punctuation">,</span> deque
     
     graph <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span>list<span class="token punctuation">)</span>
@@ -415,7 +415,7 @@ prerequisites = [[1,0],[2,0],[3,1],[3,2]]
 每次可以走 1-6 步（掷骰子）
 遇到蛇/梯子则传送到对应位置
 </code></pre>
-<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">snakesAndLadders</span><span class="token punctuation">(</span>board<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">snakesAndLadders</span><span class="token punctuation">(</span>board<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     <span class="token keyword">from</span> collections <span class="token keyword">import</span> deque
     
     n <span class="token operator">=</span> len<span class="token punctuation">(</span>board<span class="token punctuation">)</span>
@@ -428,7 +428,7 @@ prerequisites = [[1,0],[2,0],[3,1],[3,2]]
         <span class="token keyword">return</span> row<span class="token punctuation">,</span> col
     
     queue <span class="token operator">=</span> deque<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># (位置, 步数)</span>
-    visited <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;1&amp;#125;</span>
+    visited <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">}</span>
     
     <span class="token keyword">while</span> queue<span class="token punctuation">:</span>
         curr<span class="token punctuation">,</span> steps <span class="token operator">=</span> queue<span class="token punctuation">.</span>popleft<span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -436,7 +436,7 @@ prerequisites = [[1,0],[2,0],[3,1],[3,2]]
         <span class="token keyword">for</span> dice <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
             next_pos <span class="token operator">=</span> curr <span class="token operator">+</span> dice
             
-            <span class="token keyword">if</span> next_pos <span class="token operator">&gt;</span> n <span class="token operator">*</span> n<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> next_pos <span class="token operator">></span> n <span class="token operator">*</span> n<span class="token punctuation">:</span>
                 <span class="token keyword">continue</span>
             
             r<span class="token punctuation">,</span> c <span class="token operator">=</span> get_position<span class="token punctuation">(</span>next_pos<span class="token punctuation">)</span>
@@ -464,7 +464,7 @@ bank = ["AACCGGTA","AACCGCTA","AAACGGTA"]
 每次只能变一个字符，且结果必须在 bank 中
 使用 BFS 搜索最短路径
 </code></pre>
-<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minMutation</span><span class="token punctuation">(</span>startGene<span class="token punctuation">:</span> str<span class="token punctuation">,</span> endGene<span class="token punctuation">:</span> str<span class="token punctuation">,</span> bank<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minMutation</span><span class="token punctuation">(</span>startGene<span class="token punctuation">:</span> str<span class="token punctuation">,</span> endGene<span class="token punctuation">:</span> str<span class="token punctuation">,</span> bank<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     <span class="token keyword">from</span> collections <span class="token keyword">import</span> deque
     
     bank_set <span class="token operator">=</span> set<span class="token punctuation">(</span>bank<span class="token punctuation">)</span>
@@ -472,7 +472,7 @@ bank = ["AACCGGTA","AACCGCTA","AAACGGTA"]
         <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span>
     
     queue <span class="token operator">=</span> deque<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">(</span>startGene<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    visited <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;startGene&amp;#125;</span>
+    visited <span class="token operator">=</span> <span class="token punctuation">{</span>startGene<span class="token punctuation">}</span>
     chars <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'A'</span><span class="token punctuation">,</span> <span class="token string">'C'</span><span class="token punctuation">,</span> <span class="token string">'G'</span><span class="token punctuation">,</span> <span class="token string">'T'</span><span class="token punctuation">]</span>
     
     <span class="token keyword">while</span> queue<span class="token punctuation">:</span>
@@ -563,7 +563,7 @@ bank = ["AACCGGTA","AACCGCTA","AAACGGTA"]
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-dp/">📈 LeetCode 150 - 动态规划专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-heap/">⛰️ LeetCode 150 - 堆/优先队列专题</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-binary-tree/">🌳 LeetCode 150 - 二叉树专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-dp/">📈 LeetCode 150 - 动态规划专题</a></div></section></div>
 
 
 

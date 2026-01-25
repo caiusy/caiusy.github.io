@@ -20,12 +20,12 @@
   <title>算法竞赛入门经典第四章 - Caius的日常博客</title>
 
   
-    <meta name="description" content="&#x2F;&#x2F; t4.cpp : 定义控制台应用程序的入口点。     &#x2F;&#x2F;     #include &quot;stdafx.h&quot;     &#x2F;&#x2F;素数判断方法2     #include&lt;stdio.h&gt;     #include&lt;stdlib.h&gt;     #include&lt;time.h&gt;     #include&lt;math.h&gt;     #include&amp;">
+    <meta name="description" content="&#x2F;&#x2F; t4.cpp : 定义控制台应用程序的入口点。     &#x2F;&#x2F;     #include &quot;stdafx.h&quot;     &#x2F;&#x2F;素数判断方法2     #include&lt;stdio.h&gt;     #include&lt;stdlib.h&gt;     #include&lt;time.h&gt;     #include&lt;math.h&gt;     #include&lt;string.h&gt;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="算法竞赛入门经典第四章">
 <meta property="og:url" content="https://caiusy.github.io/2019/08/18/20190818-algorithm4/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="&#x2F;&#x2F; t4.cpp : 定义控制台应用程序的入口点。     &#x2F;&#x2F;     #include &quot;stdafx.h&quot;     &#x2F;&#x2F;素数判断方法2     #include&lt;stdio.h&gt;     #include&lt;stdlib.h&gt;     #include&lt;time.h&gt;     #include&lt;math.h&gt;     #include&amp;">
+<meta property="og:description" content="&#x2F;&#x2F; t4.cpp : 定义控制台应用程序的入口点。     &#x2F;&#x2F;     #include &quot;stdafx.h&quot;     &#x2F;&#x2F;素数判断方法2     #include&lt;stdio.h&gt;     #include&lt;stdlib.h&gt;     #include&lt;time.h&gt;     #include&lt;math.h&gt;     #include&lt;string.h&gt;">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-08-17T16:00:00.000Z">
@@ -51,9 +51,9 @@
 
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2019-08-18T00:00:00+08:00","dateModified":"2026-01-20T20:25:58+08:00","datePublished":"2019-08-18T00:00:00+08:00","description":"","headline":"算法竞赛入门经典第四章","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2019/08/18/20190818-algorithm4/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2019/08/18/20190818-algorithm4/","keywords":"算法 - c++","image":[]}</script>
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -70,7 +70,7 @@
 
 
 
-<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a><a class="item title" href="/2019/12/19/20191219-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/"><span class="title">二叉树打印</span></a></div></widget>
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/01/25/deep-dive-into-lora/"><span class="title">深入浅出 LoRA：大模型微调的核心原理、数学直觉与实战指南</span></a><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a></div></widget>
 </div>
 <footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
 </div></aside><div class="l_main" id="main">
@@ -98,71 +98,71 @@
     <span class="token comment" spellcheck="true">//</span>
     <span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">"stdafx.h"</span></span>
     <span class="token comment" spellcheck="true">//素数判断方法2</span>
-    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;stdio.h&gt;</span></span>
-    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;stdlib.h&gt;</span></span>
-    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;time.h&gt;</span></span>
-    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;math.h&gt;</span></span>
-    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;string.h&gt;</span></span>
+    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;stdio.h></span></span>
+    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;stdlib.h></span></span>
+    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;time.h></span></span>
+    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;math.h></span></span>
+    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;string.h></span></span>
     <span class="token macro property">#<span class="token directive keyword">define</span> Max 1000000</span>
     <span class="token macro property">#<span class="token directive keyword">define</span> maxn 100</span>
     <span class="token keyword">int</span> left<span class="token punctuation">,</span> chance<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//还需要left位置，错chance之后就会输</span>
     <span class="token keyword">char</span> s<span class="token punctuation">[</span>maxn<span class="token punctuation">]</span><span class="token punctuation">,</span> s2<span class="token punctuation">[</span>maxn<span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//答案是字符串s, 玩家猜的字母序列是s2</span>
     <span class="token keyword">int</span> win<span class="token punctuation">,</span> lose<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// win=1 表示已经赢了; lose=1 表示已经输了</span>
     <span class="token keyword">long</span> <span class="token function">fac</span><span class="token punctuation">(</span><span class="token keyword">int</span> n<span class="token punctuation">)</span>
-    <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+    <span class="token punctuation">{</span>
         <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token number">0</span> <span class="token operator">==</span> n <span class="token operator">||</span> <span class="token number">1</span> <span class="token operator">==</span> n<span class="token punctuation">)</span>
-        <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+        <span class="token punctuation">{</span>
             <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
         <span class="token keyword">else</span>
-        <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+        <span class="token punctuation">{</span>
             <span class="token keyword">return</span> <span class="token function">fac</span><span class="token punctuation">(</span>n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token operator">*</span>n<span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
     <span class="token comment" spellcheck="true">// 非递归的阶乘方法</span>
     <span class="token keyword">long</span> <span class="token function">fact</span><span class="token punctuation">(</span><span class="token keyword">int</span> n<span class="token punctuation">)</span>
-    <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+    <span class="token punctuation">{</span>
         <span class="token keyword">long</span> iRes <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
         <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
-        <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+        <span class="token punctuation">{</span>
             iRes <span class="token operator">*</span><span class="token operator">=</span> i<span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
         <span class="token keyword">return</span> iRes<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
     <span class="token keyword">int</span> <span class="token function">combination</span><span class="token punctuation">(</span><span class="token keyword">int</span> m<span class="token punctuation">,</span> <span class="token keyword">int</span> n<span class="token punctuation">)</span>
-    <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+    <span class="token punctuation">{</span>
         <span class="token keyword">long</span> iRes <span class="token operator">=</span> <span class="token function">fac</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token function">fac</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token operator">*</span><span class="token function">fac</span><span class="token punctuation">(</span>n <span class="token operator">-</span> m<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token comment" spellcheck="true">// long iRes = fact(n) /(fac(m)*fac(n-m));</span>
         <span class="token function">printf_s</span><span class="token punctuation">(</span><span class="token string">"%ld %.2lf \n"</span><span class="token punctuation">,</span> iRes<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">double</span><span class="token punctuation">)</span><span class="token function">clock</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">/</span> CLOCKS_PER_SEC<span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token keyword">return</span> iRes<span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
     <span class="token comment" spellcheck="true">// 刽子手游戏---guess函数</span>
     <span class="token keyword">void</span> <span class="token function">guess</span><span class="token punctuation">(</span><span class="token keyword">char</span> ch<span class="token punctuation">)</span>
-    <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+    <span class="token punctuation">{</span>
         <span class="token keyword">int</span> bad <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
         <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token function">strlen</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
-            <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> ch<span class="token punctuation">)</span> <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span> left<span class="token operator">--</span><span class="token punctuation">;</span> s<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">' '</span><span class="token punctuation">;</span> bad <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>s<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> ch<span class="token punctuation">)</span> <span class="token punctuation">{</span> left<span class="token operator">--</span><span class="token punctuation">;</span> s<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">' '</span><span class="token punctuation">;</span> bad <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
         <span class="token keyword">if</span> <span class="token punctuation">(</span>bad<span class="token punctuation">)</span> <span class="token operator">--</span>chance<span class="token punctuation">;</span>
         <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>chance<span class="token punctuation">)</span> lose <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
         <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>left<span class="token punctuation">)</span> win <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
     <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+    <span class="token punctuation">{</span>
         <span class="token comment" spellcheck="true">/*
         关键:
-        1 用素数筛选法先预处理，默认刚开始全为素数，然后对素数的倍数标记为非素数，			for(int j = i*i ; j &lt;= 10000 ; j += i)&amp;#123;iPrimeArr[j] = 1;&amp;#125;
+        1 用素数筛选法先预处理，默认刚开始全为素数，然后对素数的倍数标记为非素数，			for(int j = i*i ; j &lt;= 10000 ; j += i){iPrimeArr[j] = 1;}
         2 通过开根号判断素数时，可以用floor,注意浮点数加上0.5，int iRadical = floor(sqrt(n*1.0) + 0.5);
-        3 可以用assert()对输入的合法性进行校验，assert(n &gt;= 5 &amp;&amp; n &lt;= 10000);void assert(int exp),如果表达式的值为0则退出。*/</span>
+        3 可以用assert()对输入的合法性进行校验，assert(n >= 5 &amp;&amp; n &lt;= 10000);void assert(int exp),如果表达式的值为0则退出。*/</span>
         <span class="token comment" spellcheck="true">//int sum = 1;</span>
         <span class="token comment" spellcheck="true">//for (int i = 3; i &lt;= Max; i += 2)</span>
-        <span class="token comment" spellcheck="true">//&amp;#123;</span>
+        <span class="token comment" spellcheck="true">//{</span>
         <span class="token comment" spellcheck="true">//	//因为偶数除了2 都不是质数</span>
         <span class="token comment" spellcheck="true">//	int j;</span>
         <span class="token comment" spellcheck="true">//	for (j = 2; j &lt;= (int)sqrt(i); j++)//利用上述结论判断</span>
         <span class="token comment" spellcheck="true">//		if (i%j == 0) break;</span>
-        <span class="token comment" spellcheck="true">//	if (j &gt; (int)sqrt(i))</span>
+        <span class="token comment" spellcheck="true">//	if (j > (int)sqrt(i))</span>
         <span class="token comment" spellcheck="true">//		sum++;</span>
-        <span class="token comment" spellcheck="true">//&amp;#125;</span>
+        <span class="token comment" spellcheck="true">//}</span>
         <span class="token comment" spellcheck="true">//printf_s("Time used = %0.2f s\n", (double)clock() / CLOCKS_PER_SEC);</span>
         <span class="token comment" spellcheck="true">//printf_s("%d\n", sum);</span>
         <span class="token comment" spellcheck="true">//int a, b;</span>
@@ -181,65 +181,65 @@
         <span class="token comment" spellcheck="true">//int lose = 0;</span>
         <span class="token comment" spellcheck="true">//scanf_s("%d", &amp;times);</span>
         <span class="token comment" spellcheck="true">//while (times != -1)</span>
-        <span class="token comment" spellcheck="true">//&amp;#123;</span>
+        <span class="token comment" spellcheck="true">//{</span>
         <span class="token comment" spellcheck="true">//	printf_s("Round %d\n", times);</span>
         <span class="token comment" spellcheck="true">//	scanf_s("%s\n %s", ans, gus);</span>
         <span class="token comment" spellcheck="true">//	printf_s("Round %s &amp;s\n", ans, gus);</span>
         <span class="token comment" spellcheck="true">//	yes = 0;</span>
         <span class="token comment" spellcheck="true">//	win = 0, lose = 0, chances = 7;</span>
         <span class="token comment" spellcheck="true">//	for (int i = 0; i &lt; strlen(gus); i++)</span>
-        <span class="token comment" spellcheck="true">//	&amp;#123;</span>
+        <span class="token comment" spellcheck="true">//	{</span>
         <span class="token comment" spellcheck="true">//		int flag = 0;</span>
         <span class="token comment" spellcheck="true">//		for (int j = 0; j &lt; strlen(ans); j++)</span>
-        <span class="token comment" spellcheck="true">//		&amp;#123;</span>
+        <span class="token comment" spellcheck="true">//		{</span>
         <span class="token comment" spellcheck="true">//			if (ans[j] == gus[i])</span>
-        <span class="token comment" spellcheck="true">//			&amp;#123;</span>
+        <span class="token comment" spellcheck="true">//			{</span>
         <span class="token comment" spellcheck="true">//				yes++;</span>
         <span class="token comment" spellcheck="true">//				flag = 1;//找到之后不退出，因为有一个有相同的字母</span>
-        <span class="token comment" spellcheck="true">//			&amp;#125;</span>
+        <span class="token comment" spellcheck="true">//			}</span>
         <span class="token comment" spellcheck="true">//			if (flag == 0)</span>
-        <span class="token comment" spellcheck="true">//			&amp;#123;</span>
+        <span class="token comment" spellcheck="true">//			{</span>
         <span class="token comment" spellcheck="true">//				chances--;</span>
-        <span class="token comment" spellcheck="true">//			&amp;#125;</span>
+        <span class="token comment" spellcheck="true">//			}</span>
         <span class="token comment" spellcheck="true">//			if (chances == 0)</span>
-        <span class="token comment" spellcheck="true">//			&amp;#123;</span>
+        <span class="token comment" spellcheck="true">//			{</span>
         <span class="token comment" spellcheck="true">//				lose = 1;</span>
         <span class="token comment" spellcheck="true">//				printf_s("You lose.\n");</span>
-        <span class="token comment" spellcheck="true">//			&amp;#125;</span>
+        <span class="token comment" spellcheck="true">//			}</span>
         <span class="token comment" spellcheck="true">//			else if (yes == strlen(ans))</span>
-        <span class="token comment" spellcheck="true">//			&amp;#123;</span>
+        <span class="token comment" spellcheck="true">//			{</span>
         <span class="token comment" spellcheck="true">//				win = 1;</span>
         <span class="token comment" spellcheck="true">//				printf_s("You win.\n");</span>
         <span class="token comment" spellcheck="true">//				break;</span>
-        <span class="token comment" spellcheck="true">//			&amp;#125;</span>
+        <span class="token comment" spellcheck="true">//			}</span>
         <span class="token comment" spellcheck="true">//			if (win != 1 &amp;&amp; lose != 1)</span>
-        <span class="token comment" spellcheck="true">//			&amp;#123;</span>
+        <span class="token comment" spellcheck="true">//			{</span>
         <span class="token comment" spellcheck="true">//				printf("You chickened out.\n");</span>
-        <span class="token comment" spellcheck="true">//			&amp;#125;</span>
+        <span class="token comment" spellcheck="true">//			}</span>
         <span class="token comment" spellcheck="true">//			scanf_s("%d", &amp;times);</span>
-        <span class="token comment" spellcheck="true">//		&amp;#125;</span>
-        <span class="token comment" spellcheck="true">//	&amp;#125;</span>
-        <span class="token comment" spellcheck="true">//&amp;#125;</span>
+        <span class="token comment" spellcheck="true">//		}</span>
+        <span class="token comment" spellcheck="true">//	}</span>
+        <span class="token comment" spellcheck="true">//}</span>
         <span class="token keyword">int</span> rnd<span class="token punctuation">;</span>
         <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token function">scanf_s</span><span class="token punctuation">(</span><span class="token string">"%d%s%s"</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>rnd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>s<span class="token punctuation">,</span> <span class="token operator">&amp;</span>s2<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">3</span> <span class="token operator">&amp;&amp;</span> rnd <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
-        <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+        <span class="token punctuation">{</span>
             <span class="token function">printf_s</span><span class="token punctuation">(</span><span class="token string">"%Round %d\n"</span><span class="token punctuation">,</span> rnd<span class="token punctuation">)</span><span class="token punctuation">;</span>
             win <span class="token operator">=</span> lose <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
             left <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
             chance <span class="token operator">=</span> <span class="token number">7</span><span class="token punctuation">;</span>
             <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token function">strlen</span><span class="token punctuation">(</span>s2<span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
-            <span class="token operator">&amp;</span>#<span class="token number">123</span><span class="token punctuation">;</span>
+            <span class="token punctuation">{</span>
                 <span class="token function">guess</span><span class="token punctuation">(</span>s2<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//猜一个字母</span>
                 <span class="token keyword">if</span> <span class="token punctuation">(</span>win <span class="token operator">||</span> lose<span class="token punctuation">)</span> <span class="token keyword">break</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//检查状态</span>
-            <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
             <span class="token comment" spellcheck="true">//根据结果进行输出</span>
             <span class="token keyword">if</span> <span class="token punctuation">(</span>win<span class="token punctuation">)</span> <span class="token function">printf_s</span><span class="token punctuation">(</span><span class="token string">"You win.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>lose<span class="token punctuation">)</span> <span class="token function">printf_s</span><span class="token punctuation">(</span><span class="token string">"You lose.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token keyword">else</span> <span class="token function">printf_s</span><span class="token punctuation">(</span><span class="token string">"You chickened out.\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
         <span class="token function">system</span><span class="token punctuation">(</span><span class="token string">"pause"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-    <span class="token operator">&amp;</span>#<span class="token number">125</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 </code></pre>
 </article>
 <div class="article-footer slide-up">
@@ -259,7 +259,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/19/20190819-%E5%88%86%E6%B2%BB%E7%AE%97%E6%B3%95/">分治算法</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/16/20190816-algorithm3/">算法竞赛入门经典第三章</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/19/20190819-%E5%88%86%E6%B2%BB%E7%AE%97%E6%B3%95/">分治算法</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/16/20190816-LNMS/">LNMS</a></div></section></div>
 
 
 

@@ -34,15 +34,15 @@
 <meta property="article:tag" content="算法">
 <meta property="article:tag" content="LeetCode">
 <meta property="article:tag" content="leetcode面试150">
+<meta property="article:tag" content="面试">
 <meta property="article:tag" content="动态规划">
 <meta property="article:tag" content="DP">
-<meta property="article:tag" content="面试">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
   
   
   
-  <meta name="keywords" content="算法,LeetCode,leetcode面试150,动态规划,DP,面试">
+  <meta name="keywords" content="算法,LeetCode,leetcode面试150,面试,动态规划,DP">
 
   <!-- feed -->
   
@@ -54,11 +54,11 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-01-18T00:00:00+08:00","dateModified":"2026-01-18T00:00:00+08:00","datePublished":"2026-01-18T00:00:00+08:00","description":"","headline":"📈 LeetCode 150 - 动态规划专题","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/01/18/leetcode-150-dp/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/01/18/leetcode-150-dp/","keywords":"算法, LeetCode, leetcode面试150, 动态规划, DP, 面试","image":[]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-01-18T00:00:00+08:00","dateModified":"2026-01-18T00:00:00+08:00","datePublished":"2026-01-18T00:00:00+08:00","description":"","headline":"📈 LeetCode 150 - 动态规划专题","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/01/18/leetcode-150-dp/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/01/18/leetcode-150-dp/","keywords":"算法, LeetCode, leetcode面试150, 面试, 动态规划, DP","image":[]}</script>
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -75,7 +75,7 @@
 
 
 
-<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a><a class="item title" href="/2019/12/19/20191219-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/"><span class="title">二叉树打印</span></a></div></widget>
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/01/25/deep-dive-into-lora/"><span class="title">深入浅出 LoRA：大模型微调的核心原理、数学直觉与实战指南</span></a><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a></div></widget>
 </div>
 <footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
 </div></aside><div class="l_main" id="main">
@@ -154,7 +154,7 @@
 
 dp[n] = dp[n-1] + dp[n-2]  (斐波那契数列!)
 </code></pre>
-<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">climbStairs</span><span class="token punctuation">(</span>n<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">climbStairs</span><span class="token punctuation">(</span>n<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     <span class="token keyword">if</span> n <span class="token operator">&lt;=</span> <span class="token number">2</span><span class="token punctuation">:</span>
         <span class="token keyword">return</span> n
     
@@ -185,7 +185,7 @@ dp:     2   7  11  11  12
         ↑   ↑   ↑   ↑   ↑
        偷  偷 偷0+9 不偷 偷2+1
 </code></pre>
-<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">rob</span><span class="token punctuation">(</span>nums<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">rob</span><span class="token punctuation">(</span>nums<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     <span class="token keyword">if</span> len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">:</span>
         <span class="token keyword">return</span> nums<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
     
@@ -216,7 +216,7 @@ dp T  F  F  F  T  F  F  F  T
                ↑           ↑
             "leet"      "code"
 </code></pre>
-<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">wordBreak</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">,</span> wordDict<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> bool<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">wordBreak</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">,</span> wordDict<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> bool<span class="token punctuation">:</span>
     word_set <span class="token operator">=</span> set<span class="token punctuation">(</span>wordDict<span class="token punctuation">)</span>
     n <span class="token operator">=</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
     dp <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token boolean">False</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
@@ -247,7 +247,7 @@ dp:      0  1  1  2  2  1  2  2  3  3   2   3
             ↑  ↑  ↑  ↑  ↑  ↑  ↑  ↑  ↑   ↑   ↑
            +1 +2 +1 +2 +5 +1 +2 +1 +2  +5  +5
 </code></pre>
-<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">coinChange</span><span class="token punctuation">(</span>coins<span class="token punctuation">:</span> list<span class="token punctuation">,</span> amount<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">coinChange</span><span class="token punctuation">(</span>coins<span class="token punctuation">:</span> list<span class="token punctuation">,</span> amount<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     dp <span class="token operator">=</span> <span class="token punctuation">[</span>float<span class="token punctuation">(</span><span class="token string">'inf'</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>amount <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
     dp<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0</span>
     
@@ -279,7 +279,7 @@ dp:     1   1   1   2   2   3    4   4
 LIS = 4 (如 [2, 3, 7, 101])
 </code></pre>
 <h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># O(n²) 解法</span>
-<span class="token keyword">def</span> <span class="token function">lengthOfLIS</span><span class="token punctuation">(</span>nums<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<span class="token keyword">def</span> <span class="token function">lengthOfLIS</span><span class="token punctuation">(</span>nums<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     n <span class="token operator">=</span> len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
     dp <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> n
     
@@ -290,12 +290,12 @@ LIS = 4 (如 [2, 3, 7, 101])
     
     <span class="token keyword">return</span> max<span class="token punctuation">(</span>dp<span class="token punctuation">)</span>
 </code></pre>
-<h3 id="🔥-O-n-log-n-二分解法"><a href="#🔥-O-n-log-n-二分解法" class="headerlink" title="🔥 O(n log n) 二分解法"></a>🔥 O(n log n) 二分解法</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lengthOfLIS</span><span class="token punctuation">(</span>nums<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="🔥-O-n-log-n-二分解法"><a href="#🔥-O-n-log-n-二分解法" class="headerlink" title="🔥 O(n log n) 二分解法"></a>🔥 O(n log n) 二分解法</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lengthOfLIS</span><span class="token punctuation">(</span>nums<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     <span class="token comment" spellcheck="true"># tails[i] = 长度为 i+1 的 LIS 的最小结尾元素</span>
     tails <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
     
     <span class="token keyword">for</span> num <span class="token keyword">in</span> nums<span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 二分查找第一个 &gt;= num 的位置</span>
+        <span class="token comment" spellcheck="true"># 二分查找第一个 >= num 的位置</span>
         left<span class="token punctuation">,</span> right <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>tails<span class="token punctuation">)</span>
         <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right<span class="token punctuation">:</span>
             mid <span class="token operator">=</span> <span class="token punctuation">(</span>left <span class="token operator">+</span> right<span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">2</span>
@@ -331,7 +331,7 @@ dp[i][j] = min(dp[i+1][j], dp[i+1][j+1]) + triangle[i][j]
 
 最小路径和 = 11
 </code></pre>
-<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minimumTotal</span><span class="token punctuation">(</span>triangle<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minimumTotal</span><span class="token punctuation">(</span>triangle<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     n <span class="token operator">=</span> len<span class="token punctuation">(</span>triangle<span class="token punctuation">)</span>
     <span class="token comment" spellcheck="true"># 从最后一行开始</span>
     dp <span class="token operator">=</span> triangle<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
@@ -362,7 +362,7 @@ dp:
 
 最小路径和 = 7 (1→3→1→1→1)
 </code></pre>
-<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minPathSum</span><span class="token punctuation">(</span>grid<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minPathSum</span><span class="token punctuation">(</span>grid<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     m<span class="token punctuation">,</span> n <span class="token operator">=</span> len<span class="token punctuation">(</span>grid<span class="token punctuation">)</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>grid<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
     dp <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> n <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">]</span>
     
@@ -392,7 +392,7 @@ dp:
 障碍物位置 dp = 0
 其他位置 dp = dp[上] + dp[左]
 </code></pre>
-<h3 id="💻-代码实现-7"><a href="#💻-代码实现-7" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">uniquePathsWithObstacles</span><span class="token punctuation">(</span>obstacleGrid<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-7"><a href="#💻-代码实现-7" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">uniquePathsWithObstacles</span><span class="token punctuation">(</span>obstacleGrid<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     m<span class="token punctuation">,</span> n <span class="token operator">=</span> len<span class="token punctuation">(</span>obstacleGrid<span class="token punctuation">)</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>obstacleGrid<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
     
     <span class="token keyword">if</span> obstacleGrid<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">:</span>
@@ -436,7 +436,7 @@ dp[i][j] = s[i:j+1] 是否为回文
 长度2: s[i] == s[i+1]
 长度3+: s[i] == s[j] and dp[i+1][j-1]
 </code></pre>
-<h3 id="💻-代码实现-8"><a href="#💻-代码实现-8" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">longestPalindrome</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> str<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-8"><a href="#💻-代码实现-8" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">longestPalindrome</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> str<span class="token punctuation">:</span>
     n <span class="token operator">=</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
     <span class="token keyword">if</span> n <span class="token operator">&lt;</span> <span class="token number">2</span><span class="token punctuation">:</span>
         <span class="token keyword">return</span> s
@@ -459,14 +459,14 @@ dp[i][j] = s[i:j+1] 是否为回文
                 <span class="token keyword">else</span><span class="token punctuation">:</span>
                     dp<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> dp<span class="token punctuation">[</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">[</span>j <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span>
             
-            <span class="token keyword">if</span> dp<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">and</span> length <span class="token operator">&gt;</span> max_len<span class="token punctuation">:</span>
+            <span class="token keyword">if</span> dp<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">and</span> length <span class="token operator">></span> max_len<span class="token punctuation">:</span>
                 start<span class="token punctuation">,</span> max_len <span class="token operator">=</span> i<span class="token punctuation">,</span> length
     
     <span class="token keyword">return</span> s<span class="token punctuation">[</span>start<span class="token punctuation">:</span>start <span class="token operator">+</span> max_len<span class="token punctuation">]</span>
 </code></pre>
-<h3 id="🔥-中心扩展法-更优"><a href="#🔥-中心扩展法-更优" class="headerlink" title="🔥 中心扩展法 (更优)"></a>🔥 中心扩展法 (更优)</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">longestPalindrome</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> str<span class="token punctuation">:</span>
+<h3 id="🔥-中心扩展法-更优"><a href="#🔥-中心扩展法-更优" class="headerlink" title="🔥 中心扩展法 (更优)"></a>🔥 中心扩展法 (更优)</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">longestPalindrome</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> str<span class="token punctuation">:</span>
     <span class="token keyword">def</span> <span class="token function">expand</span><span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">while</span> left <span class="token operator">&gt;=</span> <span class="token number">0</span> <span class="token operator">and</span> right <span class="token operator">&lt;</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">and</span> s<span class="token punctuation">[</span>left<span class="token punctuation">]</span> <span class="token operator">==</span> s<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">:</span>
+        <span class="token keyword">while</span> left <span class="token operator">>=</span> <span class="token number">0</span> <span class="token operator">and</span> right <span class="token operator">&lt;</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">and</span> s<span class="token punctuation">[</span>left<span class="token punctuation">]</span> <span class="token operator">==</span> s<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">:</span>
             left <span class="token operator">-=</span> <span class="token number">1</span>
             right <span class="token operator">+=</span> <span class="token number">1</span>
         <span class="token keyword">return</span> s<span class="token punctuation">[</span>left <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">:</span>right<span class="token punctuation">]</span>
@@ -495,7 +495,7 @@ dp[i][j] = s1[0:i] 和 s2[0:j] 能否交错组成 s3[0:i+j]
 dp[i][j] = (dp[i-1][j] and s1[i-1]==s3[i+j-1]) or
            (dp[i][j-1] and s2[j-1]==s3[i+j-1])
 </code></pre>
-<h3 id="💻-代码实现-9"><a href="#💻-代码实现-9" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">isInterleave</span><span class="token punctuation">(</span>s1<span class="token punctuation">:</span> str<span class="token punctuation">,</span> s2<span class="token punctuation">:</span> str<span class="token punctuation">,</span> s3<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> bool<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-9"><a href="#💻-代码实现-9" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">isInterleave</span><span class="token punctuation">(</span>s1<span class="token punctuation">:</span> str<span class="token punctuation">,</span> s2<span class="token punctuation">:</span> str<span class="token punctuation">,</span> s3<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> bool<span class="token punctuation">:</span>
     m<span class="token punctuation">,</span> n <span class="token operator">=</span> len<span class="token punctuation">(</span>s1<span class="token punctuation">)</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>s2<span class="token punctuation">)</span>
     
     <span class="token keyword">if</span> m <span class="token operator">+</span> n <span class="token operator">!=</span> len<span class="token punctuation">(</span>s3<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -543,7 +543,7 @@ dp 表:
   s    4  3  3  2
   e    5  4  4  3
 </code></pre>
-<h3 id="💻-代码实现-10"><a href="#💻-代码实现-10" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minDistance</span><span class="token punctuation">(</span>word1<span class="token punctuation">:</span> str<span class="token punctuation">,</span> word2<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> int<span class="token punctuation">:</span>
+<h3 id="💻-代码实现-10"><a href="#💻-代码实现-10" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minDistance</span><span class="token punctuation">(</span>word1<span class="token punctuation">:</span> str<span class="token punctuation">,</span> word2<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
     m<span class="token punctuation">,</span> n <span class="token operator">=</span> len<span class="token punctuation">(</span>word1<span class="token punctuation">)</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>word2<span class="token punctuation">)</span>
     dp <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>m <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
     
@@ -617,7 +617,7 @@ dp 表:
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-binary-search/">🔢 LeetCode 150 - 二分查找专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-graph/">🔍 LeetCode 150 - 图论与搜索专题</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-graph/">🔍 LeetCode 150 - 图论与搜索专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-index/">🎯 LeetCode 面试经典 150 题 - 完全攻略</a></div></section></div>
 
 
 

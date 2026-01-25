@@ -51,9 +51,9 @@
 
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-01-19T00:36:00+08:00","dateModified":"2026-01-19T00:36:00+08:00","datePublished":"2026-01-19T00:36:00+08:00","description":"\n从输入图像到输出鸟瞰图的完整实现 - 适合所有水平的学习者\n","headline":"从图像到俯视图：完整实现指南","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/01/19/image-to-bird-eye-view/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/01/19/image-to-bird-eye-view/","keywords":"计算机视觉 - 计算机视觉 - OpenCV - Python - 图像处理 - 单应性变换","image":[]}</script>
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -70,7 +70,7 @@
 
 
 
-<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a><a class="item title" href="/2019/12/19/20191219-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/"><span class="title">二叉树打印</span></a></div></widget>
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/01/25/deep-dive-into-lora/"><span class="title">深入浅出 LoRA：大模型微调的核心原理、数学直觉与实战指南</span></a><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a></div></widget>
 </div>
 <footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
 </div></aside><div class="l_main" id="main">
@@ -347,7 +347,7 @@ H =  │  h21   h22   h23  │
     返回：
         H: 3×3 单应性矩阵
     """</span>
-    <span class="token keyword">assert</span> len<span class="token punctuation">(</span>src_pts<span class="token punctuation">)</span> <span class="token operator">&gt;=</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token string">"至少需要4个点！"</span>
+    <span class="token keyword">assert</span> len<span class="token punctuation">(</span>src_pts<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token string">"至少需要4个点！"</span>
     
     <span class="token comment" spellcheck="true"># 归一化（提高数值稳定性）</span>
     T_src <span class="token operator">=</span> normalize_points<span class="token punctuation">(</span>src_pts<span class="token punctuation">)</span>
@@ -420,9 +420,9 @@ data
 Python 3.7+
 
 <span class="token comment" spellcheck="true"># 核心库</span>
-numpy<span class="token operator">&gt;=</span>1.19.0
-opencv-python<span class="token operator">&gt;=</span>4.5.0
-matplotlib<span class="token operator">&gt;=</span>3.3.0
+numpy<span class="token operator">>=</span>1.19.0
+opencv-python<span class="token operator">>=</span>4.5.0
+matplotlib<span class="token operator">>=</span>3.3.0
 </code></pre>
 <p><strong>安装步骤：</strong></p>
 <pre class=" language-bash"><code class="language-bash"><span class="token comment" spellcheck="true"># 创建虚拟环境（推荐）</span>
@@ -490,7 +490,7 @@ python -c <span class="token string">"import cv2; print(cv2.__version__)"</span>
         <span class="token keyword">if</span> event <span class="token operator">==</span> cv2<span class="token punctuation">.</span>EVENT_LBUTTONDOWN<span class="token punctuation">:</span>
             <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">)</span> <span class="token operator">&lt;</span> self<span class="token punctuation">.</span>max_points<span class="token punctuation">:</span>
                 self<span class="token punctuation">.</span>points<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>x<span class="token punctuation">,</span> y<span class="token punctuation">]</span><span class="token punctuation">)</span>
-                <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"点 &amp;#123;len(self.points)&amp;#125;: (&amp;#123;x&amp;#125;, &amp;#123;y&amp;#125;)"</span><span class="token punctuation">)</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"点 {len(self.points)}: ({x}, {y})"</span><span class="token punctuation">)</span>
                 self<span class="token punctuation">.</span>draw_points<span class="token punctuation">(</span><span class="token punctuation">)</span>
                 
                 <span class="token comment" spellcheck="true"># 如果已经选择了4个点，自动处理</span>
@@ -518,7 +518,7 @@ python -c <span class="token string">"import cv2; print(cv2.__version__)"</span>
 ```python
             <span class="token punctuation">)</span>
         <span class="token comment" spellcheck="true"># 绘制连线</span>
-        <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">1</span><span class="token punctuation">:</span>
+        <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">:</span>
             pts <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>self<span class="token punctuation">.</span>points<span class="token punctuation">,</span> np<span class="token punctuation">.</span>int32<span class="token punctuation">)</span>
             cv2<span class="token punctuation">.</span>polylines<span class="token punctuation">(</span>
                 self<span class="token punctuation">.</span>display_img<span class="token punctuation">,</span>
@@ -527,7 +527,7 @@ python -c <span class="token string">"import cv2; print(cv2.__version__)"</span>
                 <span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
             <span class="token punctuation">)</span>
         <span class="token comment" spellcheck="true"># 显示提示信息</span>
-        info <span class="token operator">=</span> f<span class="token string">"已选择 &amp;#123;len(self.points)&amp;#125;/&amp;#123;self.max_points&amp;#125; 个点"</span>
+        info <span class="token operator">=</span> f<span class="token string">"已选择 {len(self.points)}/{self.max_points} 个点"</span>
         cv2<span class="token punctuation">.</span>putText<span class="token punctuation">(</span>
             self<span class="token punctuation">.</span>display_img<span class="token punctuation">,</span>
             info<span class="token punctuation">,</span>
@@ -607,14 +607,14 @@ python -c <span class="token string">"import cv2; print(cv2.__version__)"</span>
                 <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
             <span class="token punctuation">)</span>
         <span class="token comment" spellcheck="true"># 返回结果</span>
-        result <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        result <span class="token operator">=</span> <span class="token punctuation">{</span>
             <span class="token string">'original'</span><span class="token punctuation">:</span> self<span class="token punctuation">.</span>img<span class="token punctuation">,</span>
             <span class="token string">'marked'</span><span class="token punctuation">:</span> marked_img<span class="token punctuation">,</span>
             <span class="token string">'bird_view'</span><span class="token punctuation">:</span> bird_view<span class="token punctuation">,</span>
             <span class="token string">'homography'</span><span class="token punctuation">:</span> H<span class="token punctuation">,</span>
             <span class="token string">'src_points'</span><span class="token punctuation">:</span> src_pts<span class="token punctuation">,</span>
             <span class="token string">'dst_points'</span><span class="token punctuation">:</span> dst_pts
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
+        <span class="token punctuation">}</span>
         <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n✅ 处理完成！"</span><span class="token punctuation">)</span>
         <span class="token keyword">return</span> result
 <span class="token keyword">def</span> <span class="token function">visualize_results</span><span class="token punctuation">(</span>result<span class="token punctuation">,</span> save_path<span class="token operator">=</span>None<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -661,7 +661,7 @@ python -c <span class="token string">"import cv2; print(cv2.__version__)"</span>
     <span class="token comment" spellcheck="true"># 保存</span>
     <span class="token keyword">if</span> save_path<span class="token punctuation">:</span>
         cv2<span class="token punctuation">.</span>imwrite<span class="token punctuation">(</span>str<span class="token punctuation">(</span>save_path<span class="token punctuation">)</span><span class="token punctuation">,</span> combined<span class="token punctuation">)</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"\n💾 结果已保存到: &amp;#123;save_path&amp;#125;"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"\n💾 结果已保存到: {save_path}"</span><span class="token punctuation">)</span>
     <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"\n按任意键关闭..."</span><span class="token punctuation">)</span>
     cv2<span class="token punctuation">.</span>waitKey<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
     cv2<span class="token punctuation">.</span>destroyAllWindows<span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -676,12 +676,12 @@ python -c <span class="token string">"import cv2; print(cv2.__version__)"</span>
     img_path <span class="token operator">=</span> input<span class="token punctuation">(</span><span class="token string">"\n请输入图像路径（或按回车使用默认）: "</span><span class="token punctuation">)</span><span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span>
     <span class="token keyword">if</span> <span class="token operator">not</span> img_path<span class="token punctuation">:</span>
         img_path <span class="token operator">=</span> <span class="token string">"input/dashcam.jpg"</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"\n📂 读取图像: &amp;#123;img_path&amp;#125;"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"\n📂 读取图像: {img_path}"</span><span class="token punctuation">)</span>
     img <span class="token operator">=</span> cv2<span class="token punctuation">.</span>imread<span class="token punctuation">(</span>img_path<span class="token punctuation">)</span>
     <span class="token keyword">if</span> img <span class="token keyword">is</span> None<span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"❌ 无法读取图像: &amp;#123;img_path&amp;#125;"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"❌ 无法读取图像: {img_path}"</span><span class="token punctuation">)</span>
         <span class="token keyword">return</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"✅ 图像大小: &amp;#123;img.shape[1]&amp;#125; × &amp;#123;img.shape[0]&amp;#125;"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"✅ 图像大小: {img.shape[1]} × {img.shape[0]}"</span><span class="token punctuation">)</span>
     <span class="token comment" spellcheck="true"># 2. 创建交互式界面</span>
     bev <span class="token operator">=</span> InteractiveBirdEyeView<span class="token punctuation">(</span>img<span class="token punctuation">)</span>
     <span class="token comment" spellcheck="true"># 3. 计算鸟瞰图</span>
@@ -731,7 +731,7 @@ data
     <span class="token comment" spellcheck="true"># 创建输出视频</span>
     fourcc <span class="token operator">=</span> cv2<span class="token punctuation">.</span>VideoWriter_fourcc<span class="token punctuation">(</span><span class="token operator">*</span><span class="token string">'mp4v'</span><span class="token punctuation">)</span>
     out <span class="token operator">=</span> cv2<span class="token punctuation">.</span>VideoWriter<span class="token punctuation">(</span><span class="token string">'output.mp4'</span><span class="token punctuation">,</span> fourcc<span class="token punctuation">,</span> fps<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">600</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"处理视频：&amp;#123;fps&amp;#125; FPS, &amp;#123;w&amp;#125;x&amp;#123;h&amp;#125;"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"处理视频：{fps} FPS, {w}x{h}"</span><span class="token punctuation">)</span>
     frame_count <span class="token operator">=</span> <span class="token number">0</span>
     <span class="token keyword">while</span> cap<span class="token punctuation">.</span>isOpened<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
         ret<span class="token punctuation">,</span> frame <span class="token operator">=</span> cap<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -743,11 +743,11 @@ data
         out<span class="token punctuation">.</span>write<span class="token punctuation">(</span>bird_view<span class="token punctuation">)</span>
         frame_count <span class="token operator">+=</span> <span class="token number">1</span>
         <span class="token keyword">if</span> frame_count <span class="token operator">%</span> <span class="token number">30</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
-            <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"已处理 &amp;#123;frame_count&amp;#125; 帧"</span><span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"已处理 {frame_count} 帧"</span><span class="token punctuation">)</span>
     cap<span class="token punctuation">.</span>release<span class="token punctuation">(</span><span class="token punctuation">)</span>
     out<span class="token punctuation">.</span>release<span class="token punctuation">(</span><span class="token punctuation">)</span>
     cv2<span class="token punctuation">.</span>destroyAllWindows<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"✅ 完成！共处理 &amp;#123;frame_count&amp;#125; 帧"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>f<span class="token string">"✅ 完成！共处理 {frame_count} 帧"</span><span class="token punctuation">)</span>
 </code></pre>
 <hr>
 <h3 id="6-2-实时相机标定"><a href="#6-2-实时相机标定" class="headerlink" title="6.2 实时相机标定"></a>6.2 实时相机标定</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">realtime_calibration</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>

@@ -20,12 +20,12 @@
   <title>合并两个排序的链表 - Caius的日常博客</title>
 
   
-    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：587032本题知识点： 链表 题目描述输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。     &#x2F;*     struct ListNode &amp;#123;         int val;         struct ListNode *next;         ListNode(int x">
+    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：587032本题知识点： 链表 题目描述输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。     &#x2F;*     struct ListNode {         int val;         struct ListNode *next;         ListNode(int x) :">
 <meta property="og:type" content="article">
 <meta property="og:title" content="合并两个排序的链表">
 <meta property="og:url" content="https://caiusy.github.io/2019/09/14/20190914-%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%8E%92%E5%BA%8F%E7%9A%84%E9%93%BE%E8%A1%A8/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：587032本题知识点： 链表 题目描述输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。     &#x2F;*     struct ListNode &amp;#123;         int val;         struct ListNode *next;         ListNode(int x">
+<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：587032本题知识点： 链表 题目描述输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。     &#x2F;*     struct ListNode {         int val;         struct ListNode *next;         ListNode(int x) :">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-09-13T16:00:00.000Z">
@@ -51,9 +51,9 @@
 
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2019-09-14T00:00:00+08:00","dateModified":"2026-01-20T20:17:03+08:00","datePublished":"2019-09-14T00:00:00+08:00","description":"","headline":"合并两个排序的链表","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2019/09/14/20190914-%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%8E%92%E5%BA%8F%E7%9A%84%E9%93%BE%E8%A1%A8/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2019/09/14/20190914-%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%8E%92%E5%BA%8F%E7%9A%84%E9%93%BE%E8%A1%A8/","keywords":"算法 - c++","image":[]}</script>
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -70,7 +70,7 @@
 
 
 
-<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a><a class="item title" href="/2019/12/19/20191219-%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/"><span class="title">二叉树打印</span></a></div></widget>
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/01/25/deep-dive-into-lora/"><span class="title">深入浅出 LoRA：大模型微调的核心原理、数学直觉与实战指南</span></a><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2019/07/26/20190726-STLqueue/"><span class="title">c++中级教程  STL queue</span></a><a class="item title" href="/2019/10/17/20191017-tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/"><span class="title">tensorflow自定义网络模型</span></a><a class="item title" href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/"><span class="title">xml解析</span></a><a class="item title" href="/2019/07/25/20190725-STL-stack/"><span class="title">c++中级教程  STL stack</span></a><a class="item title" href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/"><span class="title">python手册</span></a><a class="item title" href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/"><span class="title">Pytorch手册</span></a><a class="item title" href="/2019/11/17/20191117-rnn/"><span class="title">rnn</span></a><a class="item title" href="/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/"><span class="title">图像处理-1</span></a></div></widget>
 </div>
 <footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
 </div></aside><div class="l_main" id="main">
@@ -97,28 +97,28 @@
   </div><article class="md-text content slide-up"><p>时间限制：1秒 空间限制：32768K 热度指数：587032<br>本题知识点： 链表</p>
 <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。</p>
 <pre class=" language-python"><code class="language-python">    <span class="token operator">/</span><span class="token operator">*</span>
-    struct ListNode <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+    struct ListNode <span class="token punctuation">{</span>
         int val<span class="token punctuation">;</span>
         struct ListNode <span class="token operator">*</span>next<span class="token punctuation">;</span>
         ListNode<span class="token punctuation">(</span>int x<span class="token punctuation">)</span> <span class="token punctuation">:</span>
-                val<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> next<span class="token punctuation">(</span>NULL<span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;;*/</span>
-    <span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+                val<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> next<span class="token punctuation">(</span>NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token operator">*</span><span class="token operator">/</span>
+    <span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">{</span>
     public<span class="token punctuation">:</span>
         ListNode<span class="token operator">*</span> Merge<span class="token punctuation">(</span>ListNode<span class="token operator">*</span> pHead1<span class="token punctuation">,</span> ListNode<span class="token operator">*</span> pHead2<span class="token punctuation">)</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
+        <span class="token punctuation">{</span>
             <span class="token keyword">if</span><span class="token punctuation">(</span>!pHead1<span class="token punctuation">)</span><span class="token keyword">return</span> pHead2<span class="token punctuation">;</span>
             <span class="token keyword">if</span><span class="token punctuation">(</span>!pHead2<span class="token punctuation">)</span><span class="token keyword">return</span> pHead1<span class="token punctuation">;</span>
-            <span class="token keyword">if</span><span class="token punctuation">(</span>pHead1<span class="token operator">-</span><span class="token operator">&gt;</span>val<span class="token operator">&lt;=</span>pHead2<span class="token operator">-</span><span class="token operator">&gt;</span>val<span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#123;</span>
-                pHead1<span class="token operator">-</span><span class="token operator">&gt;</span>next<span class="token operator">=</span> Merge<span class="token punctuation">(</span>pHead1<span class="token operator">-</span><span class="token operator">&gt;</span>next<span class="token punctuation">,</span>pHead2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>pHead1<span class="token operator">-</span><span class="token operator">></span>val<span class="token operator">&lt;=</span>pHead2<span class="token operator">-</span><span class="token operator">></span>val<span class="token punctuation">)</span><span class="token punctuation">{</span>
+                pHead1<span class="token operator">-</span><span class="token operator">></span>next<span class="token operator">=</span> Merge<span class="token punctuation">(</span>pHead1<span class="token operator">-</span><span class="token operator">></span>next<span class="token punctuation">,</span>pHead2<span class="token punctuation">)</span><span class="token punctuation">;</span>
                 <span class="token keyword">return</span> pHead1<span class="token punctuation">;</span>
-            <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;else&amp;#123;</span>
-                pHead2<span class="token operator">-</span><span class="token operator">&gt;</span>next<span class="token operator">=</span> Merge<span class="token punctuation">(</span>pHead1<span class="token punctuation">,</span>pHead2<span class="token operator">-</span><span class="token operator">&gt;</span>next<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+                pHead2<span class="token operator">-</span><span class="token operator">></span>next<span class="token operator">=</span> Merge<span class="token punctuation">(</span>pHead1<span class="token punctuation">,</span>pHead2<span class="token operator">-</span><span class="token operator">></span>next<span class="token punctuation">)</span><span class="token punctuation">;</span>
                 <span class="token keyword">return</span> pHead2<span class="token punctuation">;</span>
-            <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-        <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;</span>
-    <span class="token operator">&amp;</span><span class="token comment" spellcheck="true">#125;;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
 </code></pre>
 <pre class=" language-python"><code class="language-python">    <span class="token comment" spellcheck="true"># -*- coding:utf-8 -*-</span>
     <span class="token comment" spellcheck="true"># class ListNode:</span>

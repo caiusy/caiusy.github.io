@@ -57,7 +57,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -148,12 +148,8 @@
 <li><strong>Instruction + Input</strong> $\rightarrow$ <strong>X (模型输入)</strong></li>
 <li><strong>Output</strong> $\rightarrow$ <strong>Y (预期输出)</strong></li>
 </ul>
-<pre class=" language-json"><code class="language-json"><span class="token punctuation">{</span>
-    <span class="token property">"instruction"</span><span class="token operator">:</span> <span class="token string">"请分析以下案情中的法律责任。"</span><span class="token punctuation">,</span>
-    <span class="token property">"input"</span><span class="token operator">:</span> <span class="token string">"张三在喝酒后驾驶机动车..."</span><span class="token punctuation">,</span>
-    <span class="token property">"output"</span><span class="token operator">:</span> <span class="token string">"张三的行为构成危险驾驶罪..."</span>
-<span class="token punctuation">}</span>
-</code></pre>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">    <span class="attr">"instruction"</span><span class="punctuation">:</span> <span class="string">"请分析以下案情中的法律责任。"</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"input"</span><span class="punctuation">:</span> <span class="string">"张三在喝酒后驾驶机动车..."</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"output"</span><span class="punctuation">:</span> <span class="string">"张三的行为构成危险驾驶罪..."</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="3-2-System-Prompt"><a href="#3-2-System-Prompt" class="headerlink" title="3.2 System Prompt"></a>3.2 System Prompt</h3><p>“System Prompt”（如 “You are a helpful assistant…”）通常不直接出现在 JSON 里的字段中，而是作为 Template 的一部分，拼接在 Instruction 之前。它充当了 <strong>“背景设定”</strong> 的角色。</p>
 <hr>
 <h2 id="四、-总结"><a href="#四、-总结" class="headerlink" title="四、 总结"></a>四、 总结</h2><p>LoRA 是大模型微调领域的里程碑。它不仅仅是一个省显存的工具，更是一套优雅的数学解决方案。</p>

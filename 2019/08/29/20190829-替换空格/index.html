@@ -20,12 +20,12 @@
   <title>替换空格 - Caius的日常博客</title>
 
   
-    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：1142927本题知识点： 字符串 题目描述请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。 代码    class Solution {     public:         void replaceSpace(char *str,in">
+    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：1142927本题知识点： 字符串 题目描述请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。 代码12345678910111213141516171819202122232425262728293031323334353637383940">
 <meta property="og:type" content="article">
 <meta property="og:title" content="替换空格">
 <meta property="og:url" content="https://caiusy.github.io/2019/08/29/20190829-%E6%9B%BF%E6%8D%A2%E7%A9%BA%E6%A0%BC/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：1142927本题知识点： 字符串 题目描述请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。 代码    class Solution {     public:         void replaceSpace(char *str,in">
+<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：1142927本题知识点： 字符串 题目描述请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。 代码12345678910111213141516171819202122232425262728293031323334353637383940">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-08-28T16:00:00.000Z">
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -96,58 +96,8 @@
   </div>
   </div><article class="md-text content slide-up"><p>时间限制：1秒 空间限制：32768K 热度指数：1142927<br>本题知识点： 字符串</p>
 <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。</p>
-<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><pre class=" language-python"><code class="language-python">    <span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">{</span>
-    public<span class="token punctuation">:</span>
-        void replaceSpace<span class="token punctuation">(</span>char <span class="token operator">*</span>str<span class="token punctuation">,</span>int length<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-               <span class="token keyword">if</span><span class="token punctuation">(</span>str<span class="token operator">==</span>NULL<span class="token punctuation">)</span>
-                 <span class="token keyword">return</span> <span class="token punctuation">;</span>
-             int CountOfBlanks<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
-             int Originallength<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
-             <span class="token keyword">for</span><span class="token punctuation">(</span>int i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>str<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">!=</span><span class="token string">'\0'</span><span class="token punctuation">;</span>i<span class="token operator">+</span><span class="token operator">+</span><span class="token punctuation">)</span>
-                 <span class="token punctuation">{</span>
-                 Originallength<span class="token operator">+</span><span class="token operator">+</span><span class="token punctuation">;</span>
-                 <span class="token keyword">if</span><span class="token punctuation">(</span>str<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">==</span><span class="token string">' '</span><span class="token punctuation">)</span>
-                     <span class="token operator">+</span><span class="token operator">+</span>CountOfBlanks<span class="token punctuation">;</span>
-             <span class="token punctuation">}</span>
-             int len <span class="token operator">=</span>Originallength<span class="token operator">+</span><span class="token number">2</span><span class="token operator">*</span>CountOfBlanks<span class="token punctuation">;</span>
-             <span class="token keyword">if</span><span class="token punctuation">(</span>len<span class="token operator">+</span><span class="token number">1</span><span class="token operator">></span>length<span class="token punctuation">)</span>
-                 <span class="token keyword">return</span> <span class="token punctuation">;</span>
-              <span class="token operator">/</span><span class="token operator">*</span>   int pOrignallength<span class="token operator">=</span>orignallength<span class="token punctuation">;</span>
-                   int pNewlength<span class="token operator">=</span>newlength<span class="token punctuation">;</span>
-                <span class="token keyword">while</span><span class="token punctuation">(</span>pOrignallength<span class="token operator">>=</span><span class="token number">0</span> <span class="token operator">&amp;</span><span class="token operator">&amp;</span> pNewlength<span class="token operator">></span>pOrignallength<span class="token punctuation">)</span>
-            <span class="token punctuation">{</span>
-                <span class="token keyword">if</span><span class="token punctuation">(</span>str<span class="token punctuation">[</span>pOrignallength<span class="token punctuation">]</span><span class="token operator">==</span><span class="token string">' '</span><span class="token punctuation">)</span>
-                <span class="token punctuation">{</span>
-                    str<span class="token punctuation">[</span>pNewlength<span class="token operator">-</span><span class="token operator">-</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">'0'</span><span class="token punctuation">;</span>
-                    str<span class="token punctuation">[</span>pNewlength<span class="token operator">-</span><span class="token operator">-</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">'2'</span><span class="token punctuation">;</span>
-                    str<span class="token punctuation">[</span>pNewlength<span class="token operator">-</span><span class="token operator">-</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">'%'</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-                <span class="token keyword">else</span>
-                <span class="token punctuation">{</span>
-                    str<span class="token punctuation">[</span>pNewlength<span class="token operator">-</span><span class="token operator">-</span><span class="token punctuation">]</span><span class="token operator">=</span>str<span class="token punctuation">[</span>pOrignallength<span class="token punctuation">]</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-                pOrignallength<span class="token operator">-</span><span class="token operator">-</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-              <span class="token operator">*</span><span class="token operator">/</span>
-             char<span class="token operator">*</span>pStr1<span class="token operator">=</span>str<span class="token operator">+</span>Originallength<span class="token punctuation">;</span><span class="token operator">//</span>复制结束符‘\<span class="token number">0</span>’
-             char<span class="token operator">*</span>pStr2<span class="token operator">=</span>str<span class="token operator">+</span>len<span class="token punctuation">;</span>
-            <span class="token keyword">while</span><span class="token punctuation">(</span>pStr1<span class="token operator">&lt;</span>pStr2<span class="token punctuation">)</span>
-                <span class="token punctuation">{</span>
-                <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">*</span>pStr1<span class="token operator">==</span><span class="token string">' '</span><span class="token punctuation">)</span>
-                    <span class="token punctuation">{</span>
-                    <span class="token operator">*</span>pStr2<span class="token operator">-</span><span class="token operator">-=</span><span class="token string">'0'</span><span class="token punctuation">;</span>
-                    <span class="token operator">*</span>pStr2<span class="token operator">-</span><span class="token operator">-=</span><span class="token string">'2'</span><span class="token punctuation">;</span>
-                    <span class="token operator">*</span>pStr2<span class="token operator">-</span><span class="token operator">-=</span><span class="token string">'%'</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-                <span class="token keyword">else</span>
-                 <span class="token punctuation">{</span>
-                     <span class="token operator">*</span>pStr2<span class="token operator">-</span><span class="token operator">-=</span><span class="token operator">*</span>pStr1<span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-                <span class="token operator">-</span><span class="token operator">-</span>pStr1<span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">;</span>
-</code></pre>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br><span class="line">public:</span><br><span class="line">	void replaceSpace(char *<span class="built_in">str</span>,<span class="built_in">int</span> length) {</span><br><span class="line">           <span class="keyword">if</span>(<span class="built_in">str</span>==NULL)</span><br><span class="line">             <span class="keyword">return</span> ;</span><br><span class="line">         <span class="built_in">int</span> CountOfBlanks=<span class="number">0</span>;</span><br><span class="line">         <span class="built_in">int</span> Originallength=<span class="number">0</span>;</span><br><span class="line">         <span class="keyword">for</span>(<span class="built_in">int</span> i=<span class="number">0</span>;<span class="built_in">str</span>[i]!=<span class="string">'\0'</span>;i++)</span><br><span class="line">             {</span><br><span class="line">             Originallength++;</span><br><span class="line">             <span class="keyword">if</span>(<span class="built_in">str</span>[i]==<span class="string">' '</span>)</span><br><span class="line">                 ++CountOfBlanks;</span><br><span class="line">         }</span><br><span class="line">         <span class="built_in">int</span> <span class="built_in">len</span> =Originallength+<span class="number">2</span>*CountOfBlanks;</span><br><span class="line">         <span class="keyword">if</span>(<span class="built_in">len</span>+<span class="number">1</span>&gt;length)</span><br><span class="line">             <span class="keyword">return</span> ;</span><br><span class="line">          /*   <span class="built_in">int</span> pOrignallength=orignallength;</span><br><span class="line">               <span class="built_in">int</span> pNewlength=newlength;</span><br><span class="line">            <span class="keyword">while</span>(pOrignallength&gt;=<span class="number">0</span> &amp;&amp; pNewlength&gt;pOrignallength)</span><br><span class="line">        {</span><br><span class="line">            <span class="keyword">if</span>(<span class="built_in">str</span>[pOrignallength]==<span class="string">' '</span>)</span><br><span class="line">            {</span><br><span class="line">                <span class="built_in">str</span>[pNewlength--]=<span class="string">'0'</span>;</span><br><span class="line">                <span class="built_in">str</span>[pNewlength--]=<span class="string">'2'</span>;</span><br><span class="line">                <span class="built_in">str</span>[pNewlength--]=<span class="string">'%'</span>;</span><br><span class="line">            }</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            {</span><br><span class="line">                <span class="built_in">str</span>[pNewlength--]=<span class="built_in">str</span>[pOrignallength];</span><br><span class="line">            }</span><br><span class="line">            pOrignallength--;</span><br><span class="line">        }</span><br><span class="line">          */</span><br><span class="line">         char*pStr1=<span class="built_in">str</span>+Originallength;//复制结束符‘\<span class="number">0</span>’</span><br><span class="line">         char*pStr2=<span class="built_in">str</span>+<span class="built_in">len</span>;</span><br><span class="line">        <span class="keyword">while</span>(pStr1&lt;pStr2)</span><br><span class="line">            {</span><br><span class="line">            <span class="keyword">if</span>(*pStr1==<span class="string">' '</span>)</span><br><span class="line">                {</span><br><span class="line">                *pStr2--=<span class="string">'0'</span>;</span><br><span class="line">                *pStr2--=<span class="string">'2'</span>;</span><br><span class="line">                *pStr2--=<span class="string">'%'</span>;</span><br><span class="line">            }</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">             {</span><br><span class="line">                 *pStr2--=*pStr1;</span><br><span class="line">            }</span><br><span class="line">            --pStr1;</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
 </article>
 <div class="article-footer slide-up">
 
@@ -166,7 +116,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/">用两个栈实现队列</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/29/20190829-%E4%BB%8E%E5%B0%BE%E5%88%B0%E5%A4%B4%E6%89%93%E5%8D%B0%E9%93%BE%E8%A1%A8/">从尾到头打印链表</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/29/20190829-%E4%BB%8E%E5%B0%BE%E5%88%B0%E5%A4%B4%E6%89%93%E5%8D%B0%E9%93%BE%E8%A1%A8/">从尾到头打印链表</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/29/20190829-%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/">透视变换</a></div></section></div>
 
 
 

@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -98,252 +98,56 @@
 <p>🎯 <strong>核心技巧</strong>：相向双指针、同向双指针、快慢指针</p>
 </blockquote>
 <hr>
-<h2 id="🗺️-双指针三大模式"><a href="#🗺️-双指针三大模式" class="headerlink" title="🗺️ 双指针三大模式"></a>🗺️ 双指针三大模式</h2><pre><code>┌─────────────────────────────────────────────────────────────┐
-│                      双指针模式                              │
-├───────────────────┬───────────────────┬─────────────────────┤
-│    相向双指针      │    同向双指针      │     背向双指针       │
-│   (对撞指针)       │   (快慢指针)       │   (中心扩展)        │
-├───────────────────┼───────────────────┼─────────────────────┤
-│  L ──────▶ ◀── R  │  S ──▶ F ──▶     │     ◀── C ──▶      │
-├───────────────────┼───────────────────┼─────────────────────┤
-│ • 两数之和        │ • 移除元素         │ • 最长回文子串       │
-│ • 盛水容器        │ • 删除重复         │ • 回文判断          │
-│ • 三数之和        │ • 链表快慢         │                    │
-└───────────────────┴───────────────────┴─────────────────────┘
-</code></pre>
+<h2 id="🗺️-双指针三大模式"><a href="#🗺️-双指针三大模式" class="headerlink" title="🗺️ 双指针三大模式"></a>🗺️ 双指针三大模式</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│                      双指针模式                              │</span><br><span class="line">├───────────────────┬───────────────────┬─────────────────────┤</span><br><span class="line">│    相向双指针      │    同向双指针      │     背向双指针       │</span><br><span class="line">│   (对撞指针)       │   (快慢指针)       │   (中心扩展)        │</span><br><span class="line">├───────────────────┼───────────────────┼─────────────────────┤</span><br><span class="line">│  L ──────▶ ◀── R  │  S ──▶ F ──▶     │     ◀── C ──▶      │</span><br><span class="line">├───────────────────┼───────────────────┼─────────────────────┤</span><br><span class="line">│ • 两数之和        │ • 移除元素         │ • 最长回文子串       │</span><br><span class="line">│ • 盛水容器        │ • 删除重复         │ • 回文判断          │</span><br><span class="line">│ • 三数之和        │ • 链表快慢         │                    │</span><br><span class="line">└───────────────────┴───────────────────┴─────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <h2 id="1️⃣-LC-125-验证回文串-🟢"><a href="#1️⃣-LC-125-验证回文串-🟢" class="headerlink" title="1️⃣ LC 125. 验证回文串 🟢"></a>1️⃣ LC 125. 验证回文串 🟢</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>判断字符串是否为回文串（只考虑字母和数字，忽略大小写）。</p>
-<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>相向双指针，跳过非字母数字字符
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">相向双指针，跳过非字母数字字符</span><br><span class="line"></span><br><span class="line">s = "A man, a plan, a canal: Panama"</span><br><span class="line">     ↑                           ↑</span><br><span class="line">     L                           R</span><br><span class="line"></span><br><span class="line">Step 1: 'A' vs 'a' → 相等，L++, R--</span><br><span class="line">Step 2: ' ' 跳过，L++</span><br><span class="line">Step 3: 'm' vs 'm' → 相等</span><br><span class="line">...</span><br><span class="line">最终 L &gt;= R，是回文串 ✓</span><br></pre></td></tr></tbody></table></figure>
 
-s = "A man, a plan, a canal: Panama"
-     ↑                           ↑
-     L                           R
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">isPalindrome</span>(<span class="params">s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">bool</span>:</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(s) - <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        <span class="comment"># 跳过非字母数字</span></span><br><span class="line">        <span class="keyword">while</span> left &lt; right <span class="keyword">and</span> <span class="keyword">not</span> s[left].isalnum():</span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> left &lt; right <span class="keyword">and</span> <span class="keyword">not</span> s[right].isalnum():</span><br><span class="line">            right -= <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 比较（忽略大小写）</span></span><br><span class="line">        <span class="keyword">if</span> s[left].lower() != s[right].lower():</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        </span><br><span class="line">        left += <span class="number">1</span></span><br><span class="line">        right -= <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></tbody></table></figure>
 
-Step 1: 'A' vs 'a' → 相等，L++, R--
-Step 2: ' ' 跳过，L++
-Step 3: 'm' vs 'm' → 相等
-...
-最终 L &gt;= R，是回文串 ✓
-</code></pre>
-<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">isPalindrome</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> bool<span class="token punctuation">:</span>
-    left<span class="token punctuation">,</span> right <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
-    
-    <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right<span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 跳过非字母数字</span>
-        <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right <span class="token operator">and</span> <span class="token operator">not</span> s<span class="token punctuation">[</span>left<span class="token punctuation">]</span><span class="token punctuation">.</span>isalnum<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            left <span class="token operator">+=</span> <span class="token number">1</span>
-        <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right <span class="token operator">and</span> <span class="token operator">not</span> s<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">.</span>isalnum<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            right <span class="token operator">-=</span> <span class="token number">1</span>
-        
-        <span class="token comment" spellcheck="true"># 比较（忽略大小写）</span>
-        <span class="token keyword">if</span> s<span class="token punctuation">[</span>left<span class="token punctuation">]</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> s<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            <span class="token keyword">return</span> <span class="token boolean">False</span>
-        
-        left <span class="token operator">+=</span> <span class="token number">1</span>
-        right <span class="token operator">-=</span> <span class="token number">1</span>
-    
-    <span class="token keyword">return</span> <span class="token boolean">True</span>
-</code></pre>
 <h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“两头往中走，不同就说No”</strong></p>
 </blockquote>
 <hr>
 <h2 id="2️⃣-LC-392-判断子序列-🟢"><a href="#2️⃣-LC-392-判断子序列-🟢" class="headerlink" title="2️⃣ LC 392. 判断子序列 🟢"></a>2️⃣ LC 392. 判断子序列 🟢</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>判断 <code>s</code> 是否为 <code>t</code> 的子序列。</p>
-<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>同向双指针：i 遍历 s，j 遍历 t
+<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">同向双指针：i 遍历 s，j 遍历 t</span><br><span class="line"></span><br><span class="line">s = "ace", t = "abcde"</span><br><span class="line">     ↑          ↑</span><br><span class="line">     i          j</span><br><span class="line"></span><br><span class="line">j=0: t[0]='a' = s[0], i++, j++</span><br><span class="line">j=1: t[1]='b' ≠ s[1]='c', j++</span><br><span class="line">j=2: t[2]='c' = s[1], i++, j++</span><br><span class="line">j=3: t[3]='d' ≠ s[2]='e', j++</span><br><span class="line">j=4: t[4]='e' = s[2], i++, j++</span><br><span class="line"></span><br><span class="line">i = 3 = len(s) ✓ 是子序列</span><br></pre></td></tr></tbody></table></figure>
 
-s = "ace", t = "abcde"
-     ↑          ↑
-     i          j
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">isSubsequence</span>(<span class="params">s: <span class="built_in">str</span>, t: <span class="built_in">str</span></span>) -&gt; <span class="built_in">bool</span>:</span><br><span class="line">    i, j = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> i &lt; <span class="built_in">len</span>(s) <span class="keyword">and</span> j &lt; <span class="built_in">len</span>(t):</span><br><span class="line">        <span class="keyword">if</span> s[i] == t[j]:</span><br><span class="line">            i += <span class="number">1</span></span><br><span class="line">        j += <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> i == <span class="built_in">len</span>(s)</span><br></pre></td></tr></tbody></table></figure>
 
-j=0: t[0]='a' = s[0], i++, j++
-j=1: t[1]='b' ≠ s[1]='c', j++
-j=2: t[2]='c' = s[1], i++, j++
-j=3: t[3]='d' ≠ s[2]='e', j++
-j=4: t[4]='e' = s[2], i++, j++
-
-i = 3 = len(s) ✓ 是子序列
-</code></pre>
-<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">isSubsequence</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">,</span> t<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> bool<span class="token punctuation">:</span>
-    i<span class="token punctuation">,</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span>
-    
-    <span class="token keyword">while</span> i <span class="token operator">&lt;</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">and</span> j <span class="token operator">&lt;</span> len<span class="token punctuation">(</span>t<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> s<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> t<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">:</span>
-            i <span class="token operator">+=</span> <span class="token number">1</span>
-        j <span class="token operator">+=</span> <span class="token number">1</span>
-    
-    <span class="token keyword">return</span> i <span class="token operator">==</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-1"><a href="#🧠-记忆口诀-1" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“s 指针只在匹配时前进”</strong></p>
 </blockquote>
 <hr>
 <h2 id="3️⃣-LC-167-两数之和-II-输入有序数组-🟡"><a href="#3️⃣-LC-167-两数之和-II-输入有序数组-🟡" class="headerlink" title="3️⃣ LC 167. 两数之和 II - 输入有序数组 🟡"></a>3️⃣ LC 167. 两数之和 II - 输入有序数组 🟡</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>在有序数组中找两个数，使它们的和等于目标值。</p>
-<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>有序数组 + 两数之和 = 相向双指针！
+<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">有序数组 + 两数之和 = 相向双指针！</span><br><span class="line"></span><br><span class="line">numbers = [2, 7, 11, 15], target = 9</span><br><span class="line">           ↑          ↑</span><br><span class="line">           L          R</span><br><span class="line"></span><br><span class="line">sum = 2 + 15 = 17 &gt; 9 → R-- (和太大，减小右边)</span><br><span class="line">sum = 2 + 11 = 13 &gt; 9 → R--</span><br><span class="line">sum = 2 + 7 = 9 = target ✓</span><br><span class="line"></span><br><span class="line">返回 [1, 2] (1-indexed)</span><br></pre></td></tr></tbody></table></figure>
 
-numbers = [2, 7, 11, 15], target = 9
-           ↑          ↑
-           L          R
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">twoSum</span>(<span class="params">numbers: <span class="built_in">list</span>, target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(numbers) - <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        total = numbers[left] + numbers[right]</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> total == target:</span><br><span class="line">            <span class="keyword">return</span> [left + <span class="number">1</span>, right + <span class="number">1</span>]  <span class="comment"># 1-indexed</span></span><br><span class="line">        <span class="keyword">elif</span> total &lt; target:</span><br><span class="line">            left += <span class="number">1</span>   <span class="comment"># 和太小，增大左边</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            right -= <span class="number">1</span>  <span class="comment"># 和太大，减小右边</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> []</span><br></pre></td></tr></tbody></table></figure>
 
-sum = 2 + 15 = 17 &gt; 9 → R-- (和太大，减小右边)
-sum = 2 + 11 = 13 &gt; 9 → R--
-sum = 2 + 7 = 9 = target ✓
-
-返回 [1, 2] (1-indexed)
-</code></pre>
-<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">twoSum</span><span class="token punctuation">(</span>numbers<span class="token punctuation">:</span> list<span class="token punctuation">,</span> target<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
-    left<span class="token punctuation">,</span> right <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>numbers<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
-    
-    <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right<span class="token punctuation">:</span>
-        total <span class="token operator">=</span> numbers<span class="token punctuation">[</span>left<span class="token punctuation">]</span> <span class="token operator">+</span> numbers<span class="token punctuation">[</span>right<span class="token punctuation">]</span>
-        
-        <span class="token keyword">if</span> total <span class="token operator">==</span> target<span class="token punctuation">:</span>
-            <span class="token keyword">return</span> <span class="token punctuation">[</span>left <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> right <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 1-indexed</span>
-        <span class="token keyword">elif</span> total <span class="token operator">&lt;</span> target<span class="token punctuation">:</span>
-            left <span class="token operator">+=</span> <span class="token number">1</span>   <span class="token comment" spellcheck="true"># 和太小，增大左边</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            right <span class="token operator">-=</span> <span class="token number">1</span>  <span class="token comment" spellcheck="true"># 和太大，减小右边</span>
-    
-    <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-2"><a href="#🧠-记忆口诀-2" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“小了左移，大了右移”</strong></p>
 </blockquote>
 <hr>
 <h2 id="4️⃣-LC-11-盛最多水的容器-🟡"><a href="#4️⃣-LC-11-盛最多水的容器-🟡" class="headerlink" title="4️⃣ LC 11. 盛最多水的容器 🟡"></a>4️⃣ LC 11. 盛最多水的容器 🟡</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><p>找两条线，使构成的容器盛水最多。</p>
-<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>面积 = min(左高, 右高) × 宽度
+<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">面积 = min(左高, 右高) × 宽度</span><br><span class="line"></span><br><span class="line">    │           │</span><br><span class="line">    │     │     │</span><br><span class="line">    │  │  │  │  │</span><br><span class="line">    │  │  │  │  │</span><br><span class="line">   [1, 8, 6, 2, 5, 4, 8, 3, 7]</span><br><span class="line">    ↑                       ↑</span><br><span class="line">    L                       R</span><br><span class="line"></span><br><span class="line">关键洞察：移动较矮的那边！</span><br><span class="line">为什么？因为宽度必然减小，只有高度增加才可能面积增大</span><br><span class="line">而高度由矮的决定，所以移动矮的才有可能找到更高的</span><br><span class="line"></span><br><span class="line">Step 1: height[L]=1 &lt; height[R]=7</span><br><span class="line">        area = 1 × 8 = 8</span><br><span class="line">        移动 L (因为左边矮)</span><br><span class="line"></span><br><span class="line">Step 2: height[L]=8 &gt; height[R]=7  </span><br><span class="line">        area = 7 × 7 = 49</span><br><span class="line">        移动 R</span><br><span class="line"></span><br><span class="line">... 最大面积 = 49</span><br></pre></td></tr></tbody></table></figure>
 
-    │           │
-    │     │     │
-    │  │  │  │  │
-    │  │  │  │  │
-   [1, 8, 6, 2, 5, 4, 8, 3, 7]
-    ↑                       ↑
-    L                       R
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">maxArea</span>(<span class="params">height: <span class="built_in">list</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(height) - <span class="number">1</span></span><br><span class="line">    max_area = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        <span class="comment"># 计算当前面积</span></span><br><span class="line">        width = right - left</span><br><span class="line">        h = <span class="built_in">min</span>(height[left], height[right])</span><br><span class="line">        max_area = <span class="built_in">max</span>(max_area, width * h)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 移动较矮的一边</span></span><br><span class="line">        <span class="keyword">if</span> height[left] &lt; height[right]:</span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            right -= <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> max_area</span><br></pre></td></tr></tbody></table></figure>
 
-关键洞察：移动较矮的那边！
-为什么？因为宽度必然减小，只有高度增加才可能面积增大
-而高度由矮的决定，所以移动矮的才有可能找到更高的
-
-Step 1: height[L]=1 &lt; height[R]=7
-        area = 1 × 8 = 8
-        移动 L (因为左边矮)
-
-Step 2: height[L]=8 &gt; height[R]=7  
-        area = 7 × 7 = 49
-        移动 R
-
-... 最大面积 = 49
-</code></pre>
-<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">maxArea</span><span class="token punctuation">(</span>height<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    left<span class="token punctuation">,</span> right <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>height<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
-    max_area <span class="token operator">=</span> <span class="token number">0</span>
-    
-    <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right<span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 计算当前面积</span>
-        width <span class="token operator">=</span> right <span class="token operator">-</span> left
-        h <span class="token operator">=</span> min<span class="token punctuation">(</span>height<span class="token punctuation">[</span>left<span class="token punctuation">]</span><span class="token punctuation">,</span> height<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">)</span>
-        max_area <span class="token operator">=</span> max<span class="token punctuation">(</span>max_area<span class="token punctuation">,</span> width <span class="token operator">*</span> h<span class="token punctuation">)</span>
-        
-        <span class="token comment" spellcheck="true"># 移动较矮的一边</span>
-        <span class="token keyword">if</span> height<span class="token punctuation">[</span>left<span class="token punctuation">]</span> <span class="token operator">&lt;</span> height<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">:</span>
-            left <span class="token operator">+=</span> <span class="token number">1</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            right <span class="token operator">-=</span> <span class="token number">1</span>
-    
-    <span class="token keyword">return</span> max_area
-</code></pre>
 <h3 id="🧠-记忆口诀-3"><a href="#🧠-记忆口诀-3" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“矮的先走，高的等着”</strong></p>
 </blockquote>
 <hr>
 <h2 id="5️⃣-LC-15-三数之和-🟡"><a href="#5️⃣-LC-15-三数之和-🟡" class="headerlink" title="5️⃣ LC 15. 三数之和 🟡"></a>5️⃣ LC 15. 三数之和 🟡</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><p>找出所有和为 0 的三元组（不能重复）。</p>
-<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>排序 + 固定一个数 + 双指针找另外两个
+<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">排序 + 固定一个数 + 双指针找另外两个</span><br><span class="line"></span><br><span class="line">nums = [-4, -1, -1, 0, 1, 2]</span><br><span class="line">        ↑</span><br><span class="line">        i (固定)</span><br><span class="line">            ↑           ↑</span><br><span class="line">            L           R</span><br><span class="line"></span><br><span class="line">target = -nums[i] = 4</span><br><span class="line"></span><br><span class="line">找 L + R = 4:</span><br><span class="line">  -1 + 2 = 1 &lt; 4 → L++</span><br><span class="line">  -1 + 2 = 1 &lt; 4 → L++</span><br><span class="line">  0 + 2 = 2 &lt; 4 → L++</span><br><span class="line">  1 + 2 = 3 &lt; 4 → L++</span><br><span class="line">  L &gt;= R，结束</span><br><span class="line"></span><br><span class="line">i++ 继续...</span><br><span class="line"></span><br><span class="line">去重技巧：</span><br><span class="line">1. nums[i] == nums[i-1] 时跳过</span><br><span class="line">2. 找到解后，L++/R-- 跳过重复值</span><br></pre></td></tr></tbody></table></figure>
 
-nums = [-4, -1, -1, 0, 1, 2]
-        ↑
-        i (固定)
-            ↑           ↑
-            L           R
+<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">threeSum</span>(<span class="params">nums: <span class="built_in">list</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    nums.sort()</span><br><span class="line">    result = []</span><br><span class="line">    n = <span class="built_in">len</span>(nums)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n - <span class="number">2</span>):</span><br><span class="line">        <span class="comment"># 去重：跳过重复的第一个数</span></span><br><span class="line">        <span class="keyword">if</span> i &gt; <span class="number">0</span> <span class="keyword">and</span> nums[i] == nums[i - <span class="number">1</span>]:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 双指针找另外两个数</span></span><br><span class="line">        left, right = i + <span class="number">1</span>, n - <span class="number">1</span></span><br><span class="line">        target = -nums[i]</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span> left &lt; right:</span><br><span class="line">            total = nums[left] + nums[right]</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> total == target:</span><br><span class="line">                result.append([nums[i], nums[left], nums[right]])</span><br><span class="line">                </span><br><span class="line">                <span class="comment"># 去重：跳过重复的第二、三个数</span></span><br><span class="line">                <span class="keyword">while</span> left &lt; right <span class="keyword">and</span> nums[left] == nums[left + <span class="number">1</span>]:</span><br><span class="line">                    left += <span class="number">1</span></span><br><span class="line">                <span class="keyword">while</span> left &lt; right <span class="keyword">and</span> nums[right] == nums[right - <span class="number">1</span>]:</span><br><span class="line">                    right -= <span class="number">1</span></span><br><span class="line">                </span><br><span class="line">                left += <span class="number">1</span></span><br><span class="line">                right -= <span class="number">1</span></span><br><span class="line">            <span class="keyword">elif</span> total &lt; target:</span><br><span class="line">                left += <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                right -= <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
 
-target = -nums[i] = 4
-
-找 L + R = 4:
-  -1 + 2 = 1 &lt; 4 → L++
-  -1 + 2 = 1 &lt; 4 → L++
-  0 + 2 = 2 &lt; 4 → L++
-  1 + 2 = 3 &lt; 4 → L++
-  L &gt;= R，结束
-
-i++ 继续...
-
-去重技巧：
-1. nums[i] == nums[i-1] 时跳过
-2. 找到解后，L++/R-- 跳过重复值
-</code></pre>
-<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">threeSum</span><span class="token punctuation">(</span>nums<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
-    nums<span class="token punctuation">.</span>sort<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    n <span class="token operator">=</span> len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
-    
-    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>n <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 去重：跳过重复的第一个数</span>
-        <span class="token keyword">if</span> i <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">and</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> nums<span class="token punctuation">[</span>i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
-            <span class="token keyword">continue</span>
-        
-        <span class="token comment" spellcheck="true"># 双指针找另外两个数</span>
-        left<span class="token punctuation">,</span> right <span class="token operator">=</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> n <span class="token operator">-</span> <span class="token number">1</span>
-        target <span class="token operator">=</span> <span class="token operator">-</span>nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
-        
-        <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right<span class="token punctuation">:</span>
-            total <span class="token operator">=</span> nums<span class="token punctuation">[</span>left<span class="token punctuation">]</span> <span class="token operator">+</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span>
-            
-            <span class="token keyword">if</span> total <span class="token operator">==</span> target<span class="token punctuation">:</span>
-                result<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>left<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-                
-                <span class="token comment" spellcheck="true"># 去重：跳过重复的第二、三个数</span>
-                <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right <span class="token operator">and</span> nums<span class="token punctuation">[</span>left<span class="token punctuation">]</span> <span class="token operator">==</span> nums<span class="token punctuation">[</span>left <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
-                    left <span class="token operator">+=</span> <span class="token number">1</span>
-                <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right <span class="token operator">and</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span> <span class="token operator">==</span> nums<span class="token punctuation">[</span>right <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
-                    right <span class="token operator">-=</span> <span class="token number">1</span>
-                
-                left <span class="token operator">+=</span> <span class="token number">1</span>
-                right <span class="token operator">-=</span> <span class="token number">1</span>
-            <span class="token keyword">elif</span> total <span class="token operator">&lt;</span> target<span class="token punctuation">:</span>
-                left <span class="token operator">+=</span> <span class="token number">1</span>
-            <span class="token keyword">else</span><span class="token punctuation">:</span>
-                right <span class="token operator">-=</span> <span class="token number">1</span>
-    
-    <span class="token keyword">return</span> result
-</code></pre>
 <h3 id="🧠-记忆口诀-4"><a href="#🧠-记忆口诀-4" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“排序固定一，双指针找二三，遇重复就跳过”</strong></p>
 </blockquote>
 <hr>
-<h2 id="📊-本章总结"><a href="#📊-本章总结" class="headerlink" title="📊 本章总结"></a>📊 本章总结</h2><h3 id="双指针模板速查"><a href="#双指针模板速查" class="headerlink" title="双指针模板速查"></a>双指针模板速查</h3><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 模板1: 相向双指针</span>
-<span class="token keyword">def</span> <span class="token function">two_pointer_opposite</span><span class="token punctuation">(</span>arr<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    left<span class="token punctuation">,</span> right <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>arr<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
-    <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> condition<span class="token punctuation">:</span>
-            left <span class="token operator">+=</span> <span class="token number">1</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            right <span class="token operator">-=</span> <span class="token number">1</span>
+<h2 id="📊-本章总结"><a href="#📊-本章总结" class="headerlink" title="📊 本章总结"></a>📊 本章总结</h2><h3 id="双指针模板速查"><a href="#双指针模板速查" class="headerlink" title="双指针模板速查"></a>双指针模板速查</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 模板1: 相向双指针</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">two_pointer_opposite</span>(<span class="params">arr</span>):</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(arr) - <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        <span class="keyword">if</span> condition:</span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            right -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 模板2: 同向双指针</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">two_pointer_same</span>(<span class="params">arr</span>):</span><br><span class="line">    slow = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> fast <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(arr)):</span><br><span class="line">        <span class="keyword">if</span> condition:</span><br><span class="line">            arr[slow] = arr[fast]</span><br><span class="line">            slow += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> slow</span><br><span class="line"></span><br><span class="line"><span class="comment"># 模板3: 背向双指针（中心扩展）</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">expand_from_center</span>(<span class="params">s, left, right</span>):</span><br><span class="line">    <span class="keyword">while</span> left &gt;= <span class="number">0</span> <span class="keyword">and</span> right &lt; <span class="built_in">len</span>(s) <span class="keyword">and</span> s[left] == s[right]:</span><br><span class="line">        left -= <span class="number">1</span></span><br><span class="line">        right += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> s[left+<span class="number">1</span>:right]</span><br></pre></td></tr></tbody></table></figure>
 
-<span class="token comment" spellcheck="true"># 模板2: 同向双指针</span>
-<span class="token keyword">def</span> <span class="token function">two_pointer_same</span><span class="token punctuation">(</span>arr<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    slow <span class="token operator">=</span> <span class="token number">0</span>
-    <span class="token keyword">for</span> fast <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>arr<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> condition<span class="token punctuation">:</span>
-            arr<span class="token punctuation">[</span>slow<span class="token punctuation">]</span> <span class="token operator">=</span> arr<span class="token punctuation">[</span>fast<span class="token punctuation">]</span>
-            slow <span class="token operator">+=</span> <span class="token number">1</span>
-    <span class="token keyword">return</span> slow
-
-<span class="token comment" spellcheck="true"># 模板3: 背向双指针（中心扩展）</span>
-<span class="token keyword">def</span> <span class="token function">expand_from_center</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> left<span class="token punctuation">,</span> right<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">while</span> left <span class="token operator">>=</span> <span class="token number">0</span> <span class="token operator">and</span> right <span class="token operator">&lt;</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">and</span> s<span class="token punctuation">[</span>left<span class="token punctuation">]</span> <span class="token operator">==</span> s<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">:</span>
-        left <span class="token operator">-=</span> <span class="token number">1</span>
-        right <span class="token operator">+=</span> <span class="token number">1</span>
-    <span class="token keyword">return</span> s<span class="token punctuation">[</span>left<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">:</span>right<span class="token punctuation">]</span>
-</code></pre>
 <h3 id="题目模式识别"><a href="#题目模式识别" class="headerlink" title="题目模式识别"></a>题目模式识别</h3><table>
 <thead>
 <tr>
@@ -383,14 +187,8 @@ i++ 继续...
 <td>5, 647</td>
 </tr>
 </tbody></table>
-<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><pre><code>验判两盛三，双指针五关
+<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">验判两盛三，双指针五关</span><br><span class="line"></span><br><span class="line">验 - 验证回文串 (125)</span><br><span class="line">判 - 判断子序列 (392)</span><br><span class="line">两 - 两数之和 II (167)</span><br><span class="line">盛 - 盛最多水的容器 (11)</span><br><span class="line">三 - 三数之和 (15)</span><br></pre></td></tr></tbody></table></figure>
 
-验 - 验证回文串 (125)
-判 - 判断子序列 (392)
-两 - 两数之和 II (167)
-盛 - 盛最多水的容器 (11)
-三 - 三数之和 (15)
-</code></pre>
 <hr>
 <blockquote>
 <p>📖 <strong>下一篇</strong>：<a href="/2026/01/18/leetcode-150-sliding-window/">滑动窗口专题</a></p>
@@ -413,7 +211,7 @@ i++ 继续...
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-stack/">📦 LeetCode 150 - 栈与队列专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2023/03/17/mmdetection/">mmdetection</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-stack/">📦 LeetCode 150 - 栈与队列专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-binary-search/">🔢 LeetCode 150 - 二分查找专题</a></div></section></div>
 
 
 

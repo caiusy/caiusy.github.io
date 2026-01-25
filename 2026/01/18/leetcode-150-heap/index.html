@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -98,274 +98,53 @@
 <p>🎯 <strong>核心特性</strong>：快速获取最大/最小值，O(log n) 插入删除</p>
 </blockquote>
 <hr>
-<h2 id="🗺️-堆的基础知识"><a href="#🗺️-堆的基础知识" class="headerlink" title="🗺️ 堆的基础知识"></a>🗺️ 堆的基础知识</h2><pre><code>┌─────────────────────────────────────────────────────────────┐
-│                     堆的结构                                 │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  最小堆 (Min Heap)           最大堆 (Max Heap)              │
-│       1                           9                         │
-│      / \                         / \                        │
-│     3   5                       7   8                       │
-│    / \                         / \                          │
-│   7   8                       3   5                         │
-│                                                             │
-│  父节点 ≤ 子节点              父节点 ≥ 子节点               │
-│  堆顶是最小值                 堆顶是最大值                   │
-│                                                             │
-├─────────────────────────────────────────────────────────────┤
-│  Python 中使用 heapq（默认最小堆）                          │
-│                                                             │
-│  import heapq                                               │
-│  heapq.heappush(heap, item)    # 入堆                       │
-│  heapq.heappop(heap)           # 出堆                       │
-│  heapq.heapify(list)           # 列表转堆                   │
-│  heap[0]                       # 查看堆顶                   │
-│                                                             │
-│  最大堆技巧：存入负数                                        │
-│  heapq.heappush(heap, -item)                                │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-</code></pre>
+<h2 id="🗺️-堆的基础知识"><a href="#🗺️-堆的基础知识" class="headerlink" title="🗺️ 堆的基础知识"></a>🗺️ 堆的基础知识</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│                     堆的结构                                 │</span><br><span class="line">├─────────────────────────────────────────────────────────────┤</span><br><span class="line">│                                                             │</span><br><span class="line">│  最小堆 (Min Heap)           最大堆 (Max Heap)              │</span><br><span class="line">│       1                           9                         │</span><br><span class="line">│      / \                         / \                        │</span><br><span class="line">│     3   5                       7   8                       │</span><br><span class="line">│    / \                         / \                          │</span><br><span class="line">│   7   8                       3   5                         │</span><br><span class="line">│                                                             │</span><br><span class="line">│  父节点 ≤ 子节点              父节点 ≥ 子节点               │</span><br><span class="line">│  堆顶是最小值                 堆顶是最大值                   │</span><br><span class="line">│                                                             │</span><br><span class="line">├─────────────────────────────────────────────────────────────┤</span><br><span class="line">│  Python 中使用 heapq（默认最小堆）                          │</span><br><span class="line">│                                                             │</span><br><span class="line">│  import heapq                                               │</span><br><span class="line">│  heapq.heappush(heap, item)    # 入堆                       │</span><br><span class="line">│  heapq.heappop(heap)           # 出堆                       │</span><br><span class="line">│  heapq.heapify(list)           # 列表转堆                   │</span><br><span class="line">│  heap[0]                       # 查看堆顶                   │</span><br><span class="line">│                                                             │</span><br><span class="line">│  最大堆技巧：存入负数                                        │</span><br><span class="line">│  heapq.heappush(heap, -item)                                │</span><br><span class="line">│                                                             │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
-<h2 id="🔧-堆的常见应用"><a href="#🔧-堆的常见应用" class="headerlink" title="🔧 堆的常见应用"></a>🔧 堆的常见应用</h2><pre><code>┌─────────────────────────────────────────────────────────────┐
-│                 堆的典型应用场景                             │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  1. Top K 问题                                              │
-│     找第K大 → 维护大小为K的最小堆                           │
-│     找第K小 → 维护大小为K的最大堆                           │
-│                                                             │
-│  2. 合并K个有序列表                                         │
-│     用堆维护K个列表的当前最小元素                           │
-│                                                             │
-│  3. 数据流中的中位数                                        │
-│     两个堆：最大堆（左半部分）+ 最小堆（右半部分）          │
-│                                                             │
-│  4. 任务调度                                                │
-│     按优先级处理任务                                        │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-</code></pre>
+<h2 id="🔧-堆的常见应用"><a href="#🔧-堆的常见应用" class="headerlink" title="🔧 堆的常见应用"></a>🔧 堆的常见应用</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│                 堆的典型应用场景                             │</span><br><span class="line">├─────────────────────────────────────────────────────────────┤</span><br><span class="line">│                                                             │</span><br><span class="line">│  1. Top K 问题                                              │</span><br><span class="line">│     找第K大 → 维护大小为K的最小堆                           │</span><br><span class="line">│     找第K小 → 维护大小为K的最大堆                           │</span><br><span class="line">│                                                             │</span><br><span class="line">│  2. 合并K个有序列表                                         │</span><br><span class="line">│     用堆维护K个列表的当前最小元素                           │</span><br><span class="line">│                                                             │</span><br><span class="line">│  3. 数据流中的中位数                                        │</span><br><span class="line">│     两个堆：最大堆（左半部分）+ 最小堆（右半部分）          │</span><br><span class="line">│                                                             │</span><br><span class="line">│  4. 任务调度                                                │</span><br><span class="line">│     按优先级处理任务                                        │</span><br><span class="line">│                                                             │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <h2 id="1️⃣-LC-215-数组中的第K个最大元素-🟡"><a href="#1️⃣-LC-215-数组中的第K个最大元素-🟡" class="headerlink" title="1️⃣ LC 215. 数组中的第K个最大元素 🟡"></a>1️⃣ LC 215. 数组中的第K个最大元素 🟡</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>在未排序的数组中找到第 k 个最大的元素。</p>
-<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>nums = [3,2,1,5,6,4], k = 2
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">nums = [3,2,1,5,6,4], k = 2</span><br><span class="line"></span><br><span class="line">方法1：排序后取第k个 O(n log n)</span><br><span class="line">方法2：最小堆维护k个最大元素 O(n log k)</span><br><span class="line">方法3：快速选择 O(n) 平均</span><br><span class="line"></span><br><span class="line">最小堆方法：</span><br><span class="line">维护大小为k的最小堆，堆顶就是第k大</span><br><span class="line"></span><br><span class="line">遍历: 3 → [3]</span><br><span class="line">      2 → [2,3]    (k=2)</span><br><span class="line">      1 → [2,3]    (1&lt;2，不入堆)</span><br><span class="line">      5 → [3,5]    (5入堆，弹出2)</span><br><span class="line">      6 → [5,6]    (6入堆，弹出3)</span><br><span class="line">      4 → [5,6]    (4&lt;5，不入堆)</span><br><span class="line"></span><br><span class="line">结果: 堆顶 5</span><br></pre></td></tr></tbody></table></figure>
 
-方法1：排序后取第k个 O(n log n)
-方法2：最小堆维护k个最大元素 O(n log k)
-方法3：快速选择 O(n) 平均
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">findKthLargest</span>(<span class="params">nums: <span class="built_in">list</span>, k: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    <span class="comment"># 方法1：最小堆</span></span><br><span class="line">    heap = []</span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> nums:</span><br><span class="line">        heapq.heappush(heap, num)</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(heap) &gt; k:</span><br><span class="line">            heapq.heappop(heap)</span><br><span class="line">    <span class="keyword">return</span> heap[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 方法2：直接用 nlargest</span></span><br><span class="line">    <span class="comment"># return heapq.nlargest(k, nums)[-1]</span></span><br></pre></td></tr></tbody></table></figure>
 
-最小堆方法：
-维护大小为k的最小堆，堆顶就是第k大
-
-遍历: 3 → [3]
-      2 → [2,3]    (k=2)
-      1 → [2,3]    (1&lt;2，不入堆)
-      5 → [3,5]    (5入堆，弹出2)
-      6 → [5,6]    (6入堆，弹出3)
-      4 → [5,6]    (4&lt;5，不入堆)
-
-结果: 堆顶 5
-</code></pre>
-<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> heapq
-
-<span class="token keyword">def</span> <span class="token function">findKthLargest</span><span class="token punctuation">(</span>nums<span class="token punctuation">:</span> list<span class="token punctuation">,</span> k<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    <span class="token comment" spellcheck="true"># 方法1：最小堆</span>
-    heap <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    <span class="token keyword">for</span> num <span class="token keyword">in</span> nums<span class="token punctuation">:</span>
-        heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>heap<span class="token punctuation">,</span> num<span class="token punctuation">)</span>
-        <span class="token keyword">if</span> len<span class="token punctuation">(</span>heap<span class="token punctuation">)</span> <span class="token operator">></span> k<span class="token punctuation">:</span>
-            heapq<span class="token punctuation">.</span>heappop<span class="token punctuation">(</span>heap<span class="token punctuation">)</span>
-    <span class="token keyword">return</span> heap<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
-
-    <span class="token comment" spellcheck="true"># 方法2：直接用 nlargest</span>
-    <span class="token comment" spellcheck="true"># return heapq.nlargest(k, nums)[-1]</span>
-</code></pre>
 <h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“第K大用最小堆，堆顶就是答案”</strong></p>
 </blockquote>
 <hr>
 <h2 id="2️⃣-LC-502-IPO-🔴"><a href="#2️⃣-LC-502-IPO-🔴" class="headerlink" title="2️⃣ LC 502. IPO 🔴"></a>2️⃣ LC 502. IPO 🔴</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>给定若干项目（利润和资本需求），初始资本 w，最多做 k 个项目，求最大资本。</p>
-<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>k = 2, w = 0
-profits = [1,2,3]
-capitals = [0,1,1]
+<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">k = 2, w = 0</span><br><span class="line">profits = [1,2,3]</span><br><span class="line">capitals = [0,1,1]</span><br><span class="line"></span><br><span class="line">贪心 + 堆：</span><br><span class="line">每次选择当前资本能做的项目中利润最大的</span><br><span class="line"></span><br><span class="line">初始 w=0:</span><br><span class="line">  可做项目: (profit=1, capital=0)</span><br><span class="line">  做项目1 → w=1</span><br><span class="line"></span><br><span class="line">w=1:</span><br><span class="line">  可做项目: (profit=2, capital=1), (profit=3, capital=1)</span><br><span class="line">  选最大 → 做项目3 → w=4</span><br><span class="line"></span><br><span class="line">结果: 4</span><br></pre></td></tr></tbody></table></figure>
 
-贪心 + 堆：
-每次选择当前资本能做的项目中利润最大的
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">findMaximizedCapital</span>(<span class="params">k: <span class="built_in">int</span>, w: <span class="built_in">int</span>, profits: <span class="built_in">list</span>, capital: <span class="built_in">list</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    <span class="comment"># 按资本排序的项目列表</span></span><br><span class="line">    projects = <span class="built_in">sorted</span>(<span class="built_in">zip</span>(capital, profits))</span><br><span class="line">    </span><br><span class="line">    max_heap = []  <span class="comment"># 最大堆存可做项目的利润</span></span><br><span class="line">    i = <span class="number">0</span></span><br><span class="line">    n = <span class="built_in">len</span>(projects)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(k):</span><br><span class="line">        <span class="comment"># 把当前资本能做的项目加入堆</span></span><br><span class="line">        <span class="keyword">while</span> i &lt; n <span class="keyword">and</span> projects[i][<span class="number">0</span>] &lt;= w:</span><br><span class="line">            heapq.heappush(max_heap, -projects[i][<span class="number">1</span>])  <span class="comment"># 负数模拟最大堆</span></span><br><span class="line">            i += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> max_heap:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 选利润最大的项目</span></span><br><span class="line">        w += -heapq.heappop(max_heap)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> w</span><br></pre></td></tr></tbody></table></figure>
 
-初始 w=0:
-  可做项目: (profit=1, capital=0)
-  做项目1 → w=1
-
-w=1:
-  可做项目: (profit=2, capital=1), (profit=3, capital=1)
-  选最大 → 做项目3 → w=4
-
-结果: 4
-</code></pre>
-<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> heapq
-
-<span class="token keyword">def</span> <span class="token function">findMaximizedCapital</span><span class="token punctuation">(</span>k<span class="token punctuation">:</span> int<span class="token punctuation">,</span> w<span class="token punctuation">:</span> int<span class="token punctuation">,</span> profits<span class="token punctuation">:</span> list<span class="token punctuation">,</span> capital<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    <span class="token comment" spellcheck="true"># 按资本排序的项目列表</span>
-    projects <span class="token operator">=</span> sorted<span class="token punctuation">(</span>zip<span class="token punctuation">(</span>capital<span class="token punctuation">,</span> profits<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    
-    max_heap <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 最大堆存可做项目的利润</span>
-    i <span class="token operator">=</span> <span class="token number">0</span>
-    n <span class="token operator">=</span> len<span class="token punctuation">(</span>projects<span class="token punctuation">)</span>
-    
-    <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>k<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 把当前资本能做的项目加入堆</span>
-        <span class="token keyword">while</span> i <span class="token operator">&lt;</span> n <span class="token operator">and</span> projects<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">&lt;=</span> w<span class="token punctuation">:</span>
-            heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>max_heap<span class="token punctuation">,</span> <span class="token operator">-</span>projects<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 负数模拟最大堆</span>
-            i <span class="token operator">+=</span> <span class="token number">1</span>
-        
-        <span class="token keyword">if</span> <span class="token operator">not</span> max_heap<span class="token punctuation">:</span>
-            <span class="token keyword">break</span>
-        
-        <span class="token comment" spellcheck="true"># 选利润最大的项目</span>
-        w <span class="token operator">+=</span> <span class="token operator">-</span>heapq<span class="token punctuation">.</span>heappop<span class="token punctuation">(</span>max_heap<span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> w
-</code></pre>
 <h3 id="🧠-记忆口诀-1"><a href="#🧠-记忆口诀-1" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“资本够就入堆，贪心选最大利润”</strong></p>
 </blockquote>
 <hr>
 <h2 id="3️⃣-LC-373-查找和最小的-K-对数字-🟡"><a href="#3️⃣-LC-373-查找和最小的-K-对数字-🟡" class="headerlink" title="3️⃣ LC 373. 查找和最小的 K 对数字 🟡"></a>3️⃣ LC 373. 查找和最小的 K 对数字 🟡</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>从两个升序数组中找出和最小的 k 对数字。</p>
-<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>nums1 = [1,7,11], nums2 = [2,4,6], k = 3
+<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">nums1 = [1,7,11], nums2 = [2,4,6], k = 3</span><br><span class="line"></span><br><span class="line">可视化矩阵（和）:</span><br><span class="line">      2   4   6</span><br><span class="line">  1   3   5   7</span><br><span class="line">  7   9  11  13</span><br><span class="line"> 11  13  15  17</span><br><span class="line"></span><br><span class="line">BFS思想：从(0,0)开始，每次扩展右边和下边</span><br><span class="line"></span><br><span class="line">初始: (1+2=3, i=0, j=0)</span><br><span class="line">弹出(3), 加入(1+4=5, 0,1) 和 (7+2=9, 1,0)</span><br><span class="line">弹出(5), 加入(1+6=7, 0,2)</span><br><span class="line">弹出(7), ...</span><br><span class="line"></span><br><span class="line">结果: [(1,2), (1,4), (1,6)]</span><br></pre></td></tr></tbody></table></figure>
 
-可视化矩阵（和）:
-      2   4   6
-  1   3   5   7
-  7   9  11  13
- 11  13  15  17
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">kSmallestPairs</span>(<span class="params">nums1: <span class="built_in">list</span>, nums2: <span class="built_in">list</span>, k: <span class="built_in">int</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> nums1 <span class="keyword">or</span> <span class="keyword">not</span> nums2:</span><br><span class="line">        <span class="keyword">return</span> []</span><br><span class="line">    </span><br><span class="line">    result = []</span><br><span class="line">    heap = [(nums1[<span class="number">0</span>] + nums2[<span class="number">0</span>], <span class="number">0</span>, <span class="number">0</span>)]  <span class="comment"># (sum, i, j)</span></span><br><span class="line">    visited = {(<span class="number">0</span>, <span class="number">0</span>)}</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> heap <span class="keyword">and</span> <span class="built_in">len</span>(result) &lt; k:</span><br><span class="line">        _, i, j = heapq.heappop(heap)</span><br><span class="line">        result.append([nums1[i], nums2[j]])</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 扩展到右边</span></span><br><span class="line">        <span class="keyword">if</span> i + <span class="number">1</span> &lt; <span class="built_in">len</span>(nums1) <span class="keyword">and</span> (i + <span class="number">1</span>, j) <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">            heapq.heappush(heap, (nums1[i + <span class="number">1</span>] + nums2[j], i + <span class="number">1</span>, j))</span><br><span class="line">            visited.add((i + <span class="number">1</span>, j))</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 扩展到下边</span></span><br><span class="line">        <span class="keyword">if</span> j + <span class="number">1</span> &lt; <span class="built_in">len</span>(nums2) <span class="keyword">and</span> (i, j + <span class="number">1</span>) <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">            heapq.heappush(heap, (nums1[i] + nums2[j + <span class="number">1</span>], i, j + <span class="number">1</span>))</span><br><span class="line">            visited.add((i, j + <span class="number">1</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
 
-BFS思想：从(0,0)开始，每次扩展右边和下边
-
-初始: (1+2=3, i=0, j=0)
-弹出(3), 加入(1+4=5, 0,1) 和 (7+2=9, 1,0)
-弹出(5), 加入(1+6=7, 0,2)
-弹出(7), ...
-
-结果: [(1,2), (1,4), (1,6)]
-</code></pre>
-<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> heapq
-
-<span class="token keyword">def</span> <span class="token function">kSmallestPairs</span><span class="token punctuation">(</span>nums1<span class="token punctuation">:</span> list<span class="token punctuation">,</span> nums2<span class="token punctuation">:</span> list<span class="token punctuation">,</span> k<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
-    <span class="token keyword">if</span> <span class="token operator">not</span> nums1 <span class="token operator">or</span> <span class="token operator">not</span> nums2<span class="token punctuation">:</span>
-        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    heap <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">(</span>nums1<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> nums2<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># (sum, i, j)</span>
-    visited <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
-    
-    <span class="token keyword">while</span> heap <span class="token operator">and</span> len<span class="token punctuation">(</span>result<span class="token punctuation">)</span> <span class="token operator">&lt;</span> k<span class="token punctuation">:</span>
-        _<span class="token punctuation">,</span> i<span class="token punctuation">,</span> j <span class="token operator">=</span> heapq<span class="token punctuation">.</span>heappop<span class="token punctuation">(</span>heap<span class="token punctuation">)</span>
-        result<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>nums1<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> nums2<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-        
-        <span class="token comment" spellcheck="true"># 扩展到右边</span>
-        <span class="token keyword">if</span> i <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">&lt;</span> len<span class="token punctuation">(</span>nums1<span class="token punctuation">)</span> <span class="token operator">and</span> <span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> j<span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token keyword">in</span> visited<span class="token punctuation">:</span>
-            heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>heap<span class="token punctuation">,</span> <span class="token punctuation">(</span>nums1<span class="token punctuation">[</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> nums2<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> j<span class="token punctuation">)</span><span class="token punctuation">)</span>
-            visited<span class="token punctuation">.</span>add<span class="token punctuation">(</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> j<span class="token punctuation">)</span><span class="token punctuation">)</span>
-        
-        <span class="token comment" spellcheck="true"># 扩展到下边</span>
-        <span class="token keyword">if</span> j <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">&lt;</span> len<span class="token punctuation">(</span>nums2<span class="token punctuation">)</span> <span class="token operator">and</span> <span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">not</span> <span class="token keyword">in</span> visited<span class="token punctuation">:</span>
-            heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>heap<span class="token punctuation">,</span> <span class="token punctuation">(</span>nums1<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> nums2<span class="token punctuation">[</span>j <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> i<span class="token punctuation">,</span> j <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-            visited<span class="token punctuation">.</span>add<span class="token punctuation">(</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> result
-</code></pre>
 <h3 id="🧠-记忆口诀-2"><a href="#🧠-记忆口诀-2" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“矩阵BFS，堆取最小扩展”</strong></p>
 </blockquote>
 <hr>
 <h2 id="4️⃣-LC-295-数据流的中位数-🔴"><a href="#4️⃣-LC-295-数据流的中位数-🔴" class="headerlink" title="4️⃣ LC 295. 数据流的中位数 🔴"></a>4️⃣ LC 295. 数据流的中位数 🔴</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><p>设计一个支持添加数字和获取中位数的数据结构。</p>
-<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>用两个堆：
-- 最大堆 (left): 存较小的一半
-- 最小堆 (right): 存较大的一半
+<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">用两个堆：</span><br><span class="line">- 最大堆 (left): 存较小的一半</span><br><span class="line">- 最小堆 (right): 存较大的一半</span><br><span class="line"></span><br><span class="line">保持: len(left) == len(right) 或 len(left) == len(right) + 1</span><br><span class="line"></span><br><span class="line">数据流: [1, 2, 3]</span><br><span class="line"></span><br><span class="line">add(1): left=[1], right=[]</span><br><span class="line">add(2): left=[1], right=[2]</span><br><span class="line">add(3): left=[1,2], right=[3]</span><br><span class="line"></span><br><span class="line">       left(max)    right(min)</span><br><span class="line">          [2]          [3]</span><br><span class="line">          [1]</span><br><span class="line"></span><br><span class="line">中位数: </span><br><span class="line">- 奇数个: left堆顶</span><br><span class="line">- 偶数个: (left堆顶 + right堆顶) / 2</span><br></pre></td></tr></tbody></table></figure>
 
-保持: len(left) == len(right) 或 len(left) == len(right) + 1
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MedianFinder</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.left = []   <span class="comment"># 最大堆（存负数）</span></span><br><span class="line">        self.right = []  <span class="comment"># 最小堆</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">addNum</span>(<span class="params">self, num: <span class="built_in">int</span></span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        <span class="comment"># 先加入left</span></span><br><span class="line">        heapq.heappush(self.left, -num)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 把left最大的给right</span></span><br><span class="line">        heapq.heappush(self.right, -heapq.heappop(self.left))</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 平衡：保持left &gt;= right</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(self.left) &lt; <span class="built_in">len</span>(self.right):</span><br><span class="line">            heapq.heappush(self.left, -heapq.heappop(self.right))</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">findMedian</span>(<span class="params">self</span>) -&gt; <span class="built_in">float</span>:</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(self.left) &gt; <span class="built_in">len</span>(self.right):</span><br><span class="line">            <span class="keyword">return</span> -self.left[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">return</span> (-self.left[<span class="number">0</span>] + self.right[<span class="number">0</span>]) / <span class="number">2</span></span><br></pre></td></tr></tbody></table></figure>
 
-数据流: [1, 2, 3]
-
-add(1): left=[1], right=[]
-add(2): left=[1], right=[2]
-add(3): left=[1,2], right=[3]
-
-       left(max)    right(min)
-          [2]          [3]
-          [1]
-
-中位数: 
-- 奇数个: left堆顶
-- 偶数个: (left堆顶 + right堆顶) / 2
-</code></pre>
-<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> heapq
-
-<span class="token keyword">class</span> <span class="token class-name">MedianFinder</span><span class="token punctuation">:</span>
-    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>left <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>   <span class="token comment" spellcheck="true"># 最大堆（存负数）</span>
-        self<span class="token punctuation">.</span>right <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 最小堆</span>
-    
-    <span class="token keyword">def</span> <span class="token function">addNum</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> num<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> None<span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 先加入left</span>
-        heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>self<span class="token punctuation">.</span>left<span class="token punctuation">,</span> <span class="token operator">-</span>num<span class="token punctuation">)</span>
-        
-        <span class="token comment" spellcheck="true"># 把left最大的给right</span>
-        heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>self<span class="token punctuation">.</span>right<span class="token punctuation">,</span> <span class="token operator">-</span>heapq<span class="token punctuation">.</span>heappop<span class="token punctuation">(</span>self<span class="token punctuation">.</span>left<span class="token punctuation">)</span><span class="token punctuation">)</span>
-        
-        <span class="token comment" spellcheck="true"># 平衡：保持left >= right</span>
-        <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>left<span class="token punctuation">)</span> <span class="token operator">&lt;</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>right<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>self<span class="token punctuation">.</span>left<span class="token punctuation">,</span> <span class="token operator">-</span>heapq<span class="token punctuation">.</span>heappop<span class="token punctuation">(</span>self<span class="token punctuation">.</span>right<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">def</span> <span class="token function">findMedian</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> float<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>left<span class="token punctuation">)</span> <span class="token operator">></span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>right<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            <span class="token keyword">return</span> <span class="token operator">-</span>self<span class="token punctuation">.</span>left<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
-        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token operator">-</span>self<span class="token punctuation">.</span>left<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">+</span> self<span class="token punctuation">.</span>right<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-3"><a href="#🧠-记忆口诀-3" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“左大右小，平衡保持，堆顶找中位”</strong></p>
 </blockquote>
 <hr>
 <h2 id="5️⃣-LC-23-合并-K-个升序链表-🔴"><a href="#5️⃣-LC-23-合并-K-个升序链表-🔴" class="headerlink" title="5️⃣ LC 23. 合并 K 个升序链表 🔴"></a>5️⃣ LC 23. 合并 K 个升序链表 🔴</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><p>将 k 个升序链表合并成一个升序链表。</p>
-<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>lists = [[1,4,5], [1,3,4], [2,6]]
+<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">lists = [[1,4,5], [1,3,4], [2,6]]</span><br><span class="line"></span><br><span class="line">用最小堆维护k个链表的当前头节点</span><br><span class="line"></span><br><span class="line">初始堆: [1, 1, 2] (三个链表头)</span><br><span class="line"></span><br><span class="line">弹出1 → 结果[1]，加入4</span><br><span class="line">堆: [1, 2, 4]</span><br><span class="line"></span><br><span class="line">弹出1 → 结果[1,1]，加入3</span><br><span class="line">堆: [2, 3, 4]</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">结果: [1,1,2,3,4,4,5,6]</span><br></pre></td></tr></tbody></table></figure>
 
-用最小堆维护k个链表的当前头节点
+<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">mergeKLists</span>(<span class="params">lists</span>):</span><br><span class="line">    <span class="comment"># 自定义比较（避免链表节点直接比较）</span></span><br><span class="line">    heap = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i, lst <span class="keyword">in</span> <span class="built_in">enumerate</span>(lists):</span><br><span class="line">        <span class="keyword">if</span> lst:</span><br><span class="line">            heapq.heappush(heap, (lst.val, i, lst))</span><br><span class="line">    </span><br><span class="line">    dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    curr = dummy</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> heap:</span><br><span class="line">        val, i, node = heapq.heappop(heap)</span><br><span class="line">        curr.<span class="built_in">next</span> = node</span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> node.<span class="built_in">next</span>:</span><br><span class="line">            heapq.heappush(heap, (node.<span class="built_in">next</span>.val, i, node.<span class="built_in">next</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
 
-初始堆: [1, 1, 2] (三个链表头)
-
-弹出1 → 结果[1]，加入4
-堆: [1, 2, 4]
-
-弹出1 → 结果[1,1]，加入3
-堆: [2, 3, 4]
-
-...
-
-结果: [1,1,2,3,4,4,5,6]
-</code></pre>
-<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">import</span> heapq
-
-<span class="token keyword">def</span> <span class="token function">mergeKLists</span><span class="token punctuation">(</span>lists<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token comment" spellcheck="true"># 自定义比较（避免链表节点直接比较）</span>
-    heap <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    <span class="token keyword">for</span> i<span class="token punctuation">,</span> lst <span class="token keyword">in</span> enumerate<span class="token punctuation">(</span>lists<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> lst<span class="token punctuation">:</span>
-            heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>heap<span class="token punctuation">,</span> <span class="token punctuation">(</span>lst<span class="token punctuation">.</span>val<span class="token punctuation">,</span> i<span class="token punctuation">,</span> lst<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    
-    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
-    curr <span class="token operator">=</span> dummy
-    
-    <span class="token keyword">while</span> heap<span class="token punctuation">:</span>
-        val<span class="token punctuation">,</span> i<span class="token punctuation">,</span> node <span class="token operator">=</span> heapq<span class="token punctuation">.</span>heappop<span class="token punctuation">(</span>heap<span class="token punctuation">)</span>
-        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> node
-        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-        
-        <span class="token keyword">if</span> node<span class="token punctuation">.</span>next<span class="token punctuation">:</span>
-            heapq<span class="token punctuation">.</span>heappush<span class="token punctuation">(</span>heap<span class="token punctuation">,</span> <span class="token punctuation">(</span>node<span class="token punctuation">.</span>next<span class="token punctuation">.</span>val<span class="token punctuation">,</span> i<span class="token punctuation">,</span> node<span class="token punctuation">.</span>next<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
-</code></pre>
 <h3 id="🧠-记忆口诀-4"><a href="#🧠-记忆口诀-4" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“K个头入堆，弹最小接后继”</strong></p>
 </blockquote>
@@ -410,38 +189,10 @@ add(3): left=[1,2], right=[3]
 <td>多路归并</td>
 </tr>
 </tbody></table>
-<h3 id="堆的解题模式"><a href="#堆的解题模式" class="headerlink" title="堆的解题模式"></a>堆的解题模式</h3><pre><code>┌─────────────────────────────────────────────────────────────┐
-│                    堆的解题模式                              │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  Top K 问题:                                                │
-│  ─────────                                                  │
-│  第K大 → 大小为K的最小堆                                    │
-│  第K小 → 大小为K的最大堆                                    │
-│                                                             │
-│  多路归并:                                                  │
-│  ─────────                                                  │
-│  堆中维护每路的当前元素                                      │
-│  每次取最小，然后加入该路的下一个                           │
-│                                                             │
-│  双堆技巧:                                                  │
-│  ─────────                                                  │
-│  中位数：左半最大堆 + 右半最小堆                            │
-│  滑动窗口中位数同理                                         │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-</code></pre>
-<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><pre><code>TopK问题堆来凑
-第K大用小堆守
-多路归并维护头
-双堆中位数最溜
+<h3 id="堆的解题模式"><a href="#堆的解题模式" class="headerlink" title="堆的解题模式"></a>堆的解题模式</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│                    堆的解题模式                              │</span><br><span class="line">├─────────────────────────────────────────────────────────────┤</span><br><span class="line">│                                                             │</span><br><span class="line">│  Top K 问题:                                                │</span><br><span class="line">│  ─────────                                                  │</span><br><span class="line">│  第K大 → 大小为K的最小堆                                    │</span><br><span class="line">│  第K小 → 大小为K的最大堆                                    │</span><br><span class="line">│                                                             │</span><br><span class="line">│  多路归并:                                                  │</span><br><span class="line">│  ─────────                                                  │</span><br><span class="line">│  堆中维护每路的当前元素                                      │</span><br><span class="line">│  每次取最小，然后加入该路的下一个                           │</span><br><span class="line">│                                                             │</span><br><span class="line">│  双堆技巧:                                                  │</span><br><span class="line">│  ─────────                                                  │</span><br><span class="line">│  中位数：左半最大堆 + 右半最小堆                            │</span><br><span class="line">│  滑动窗口中位数同理                                         │</span><br><span class="line">│                                                             │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
 
-215 - 第K大元素
-502 - IPO项目选择
-373 - K对最小和
-295 - 数据流中位数
-23  - 合并K个链表
-</code></pre>
+<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">TopK问题堆来凑</span><br><span class="line">第K大用小堆守</span><br><span class="line">多路归并维护头</span><br><span class="line">双堆中位数最溜</span><br><span class="line"></span><br><span class="line">215 - 第K大元素</span><br><span class="line">502 - IPO项目选择</span><br><span class="line">373 - K对最小和</span><br><span class="line">295 - 数据流中位数</span><br><span class="line">23  - 合并K个链表</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <blockquote>
 <p>📖 <strong>下一篇</strong>：<a href="/2026/01/18/leetcode-150-binary-search/">二分查找专题</a></p>
@@ -464,7 +215,7 @@ add(3): left=[1,2], right=[3]
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-linked-list/">🔗 LeetCode 150 - 链表专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-sliding-window/">🪟 LeetCode 150 - 滑动窗口专题</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-graph/">🔍 LeetCode 150 - 图论与搜索专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-index/">🎯 LeetCode 面试经典 150 题 - 完全攻略</a></div></section></div>
 
 
 

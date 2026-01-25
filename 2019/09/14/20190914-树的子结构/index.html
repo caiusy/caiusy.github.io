@@ -20,12 +20,12 @@
   <title>树的子结构 - Caius的日常博客</title>
 
   
-    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：829537本题知识点： 链表 题目描述输入一个链表，输出该链表中倒数第k个结点。     # -*- coding:utf-8 -*-     # class TreeNode:     #     def __init__(self, x):     #         self.val &#x3D; x     #         self.left">
+    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：829537本题知识点： 链表 题目描述输入一个链表，输出该链表中倒数第k个结点。 12345678910111213141516171819202122232425# -*- coding:utf-8 -*-# class TreeNode:#     def __init__(self, x):#         self.val &#x3D; x#">
 <meta property="og:type" content="article">
 <meta property="og:title" content="树的子结构">
 <meta property="og:url" content="https://caiusy.github.io/2019/09/14/20190914-%E6%A0%91%E7%9A%84%E5%AD%90%E7%BB%93%E6%9E%84/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：829537本题知识点： 链表 题目描述输入一个链表，输出该链表中倒数第k个结点。     # -*- coding:utf-8 -*-     # class TreeNode:     #     def __init__(self, x):     #         self.val &#x3D; x     #         self.left">
+<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：829537本题知识点： 链表 题目描述输入一个链表，输出该链表中倒数第k个结点。 12345678910111213141516171819202122232425# -*- coding:utf-8 -*-# class TreeNode:#     def __init__(self, x):#         self.val &#x3D; x#">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-09-13T16:00:00.000Z">
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -96,32 +96,8 @@
   </div>
   </div><article class="md-text content slide-up"><p>时间限制：1秒 空间限制：32768K 热度指数：829537<br>本题知识点： 链表</p>
 <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>输入一个链表，输出该链表中倒数第k个结点。</p>
-<pre class=" language-python"><code class="language-python">    <span class="token comment" spellcheck="true"># -*- coding:utf-8 -*-</span>
-    <span class="token comment" spellcheck="true"># class TreeNode:</span>
-    <span class="token comment" spellcheck="true">#     def __init__(self, x):</span>
-    <span class="token comment" spellcheck="true">#         self.val = x</span>
-    <span class="token comment" spellcheck="true">#         self.left = None</span>
-    <span class="token comment" spellcheck="true">#         self.right = None</span>
-    <span class="token keyword">class</span> <span class="token class-name">Solution</span><span class="token punctuation">:</span>
-        <span class="token keyword">def</span> <span class="token function">HasSubtree</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> pRoot1<span class="token punctuation">,</span> pRoot2<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            <span class="token comment" spellcheck="true"># write code here</span>
-            <span class="token keyword">if</span> pRoot1 <span class="token keyword">is</span> None <span class="token operator">or</span> pRoot2 <span class="token keyword">is</span> None<span class="token punctuation">:</span>
-                <span class="token keyword">return</span> <span class="token boolean">False</span>
-            result <span class="token operator">=</span> <span class="token boolean">False</span>
-            <span class="token keyword">if</span> pRoot1<span class="token punctuation">.</span>val <span class="token operator">==</span> pRoot2<span class="token punctuation">.</span>val<span class="token punctuation">:</span>
-                result <span class="token operator">=</span> self<span class="token punctuation">.</span>isSubtree<span class="token punctuation">(</span>pRoot1<span class="token punctuation">,</span>pRoot2<span class="token punctuation">)</span>
-            <span class="token keyword">if</span> result <span class="token operator">==</span> <span class="token boolean">False</span><span class="token punctuation">:</span>
-                result <span class="token operator">=</span> self<span class="token punctuation">.</span>HasSubtree<span class="token punctuation">(</span>pRoot1<span class="token punctuation">.</span>left<span class="token punctuation">,</span> pRoot2<span class="token punctuation">)</span> <span class="token operator">|</span> self<span class="token punctuation">.</span>HasSubtree<span class="token punctuation">(</span>pRoot1<span class="token punctuation">.</span>right<span class="token punctuation">,</span> pRoot2<span class="token punctuation">)</span>
-            <span class="token keyword">return</span> result
-        <span class="token keyword">def</span> <span class="token function">isSubtree</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span>root1<span class="token punctuation">,</span>root2<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            <span class="token keyword">if</span> root2 <span class="token keyword">is</span> None<span class="token punctuation">:</span>
-                <span class="token keyword">return</span> <span class="token boolean">True</span>
-            <span class="token keyword">if</span> root1 <span class="token keyword">is</span> None<span class="token punctuation">:</span>
-                <span class="token keyword">return</span> <span class="token boolean">False</span>
-            <span class="token keyword">if</span> root1<span class="token punctuation">.</span>val <span class="token operator">==</span> root2<span class="token punctuation">.</span>val<span class="token punctuation">:</span>
-                <span class="token keyword">return</span> self<span class="token punctuation">.</span>isSubtree<span class="token punctuation">(</span>root1<span class="token punctuation">.</span>left<span class="token punctuation">,</span>root2<span class="token punctuation">.</span>left<span class="token punctuation">)</span> <span class="token operator">&amp;</span> self<span class="token punctuation">.</span>isSubtree<span class="token punctuation">(</span>root1<span class="token punctuation">.</span>right<span class="token punctuation">,</span>root2<span class="token punctuation">.</span>right<span class="token punctuation">)</span>
-            <span class="token keyword">return</span> <span class="token boolean">False</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="comment"># class TreeNode:</span></span><br><span class="line"><span class="comment">#     def __init__(self, x):</span></span><br><span class="line"><span class="comment">#         self.val = x</span></span><br><span class="line"><span class="comment">#         self.left = None</span></span><br><span class="line"><span class="comment">#         self.right = None</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">HasSubtree</span>(<span class="params">self, pRoot1, pRoot2</span>):</span><br><span class="line">        <span class="comment"># write code here</span></span><br><span class="line">        <span class="keyword">if</span> pRoot1 <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> pRoot2 <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        result = <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> pRoot1.val == pRoot2.val:</span><br><span class="line">            result = self.isSubtree(pRoot1,pRoot2)</span><br><span class="line">        <span class="keyword">if</span> result == <span class="literal">False</span>:</span><br><span class="line">            result = self.HasSubtree(pRoot1.left, pRoot2) | self.HasSubtree(pRoot1.right, pRoot2)</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">isSubtree</span>(<span class="params">self,root1,root2</span>):</span><br><span class="line">        <span class="keyword">if</span> root2 <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="keyword">if</span> root1 <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> root1.val == root2.val:</span><br><span class="line">            <span class="keyword">return</span> self.isSubtree(root1.left,root2.left) &amp; self.isSubtree(root1.right,root2.right)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></tbody></table></figure>
+
 <p>运行时间：24 ms<br>占用内存：5860K</p>
 </article>
 <div class="article-footer slide-up">
@@ -141,7 +117,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/14/20190914-mosse/">mosse</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/09/14/20190914-%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%8E%92%E5%BA%8F%E7%9A%84%E9%93%BE%E8%A1%A8/">合并两个排序的链表</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/14/20190914-mosse/">mosse</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/">反转链表</a></div></section></div>
 
 
 

@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -98,291 +98,86 @@
 <p>🎯 <strong>核心技巧</strong>：双指针、前缀和、贪心、模拟</p>
 </blockquote>
 <hr>
-<h2 id="🗺️-知识图谱"><a href="#🗺️-知识图谱" class="headerlink" title="🗺️ 知识图谱"></a>🗺️ 知识图谱</h2><pre><code>                    ┌─────────────────┐
-                    │   数组与字符串    │
-                    └────────┬────────┘
-           ┌─────────────────┼─────────────────┐
-           ▼                 ▼                 ▼
-    ┌──────────┐      ┌──────────┐      ┌──────────┐
-    │  双指针   │      │   贪心    │      │  前缀和   │
-    └────┬─────┘      └────┬─────┘      └────┬─────┘
-         │                 │                 │
-    ┌────┴────┐       ┌────┴────┐       ┌────┴────┐
-    │合并数组  │       │跳跃游戏  │       │除自身乘积│
-    │移除元素  │       │买卖股票  │       │         │
-    │删除重复  │       │分发糖果  │       │         │
-    └─────────┘       └─────────┘       └─────────┘
-</code></pre>
+<h2 id="🗺️-知识图谱"><a href="#🗺️-知识图谱" class="headerlink" title="🗺️ 知识图谱"></a>🗺️ 知识图谱</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">                ┌─────────────────┐</span><br><span class="line">                │   数组与字符串    │</span><br><span class="line">                └────────┬────────┘</span><br><span class="line">       ┌─────────────────┼─────────────────┐</span><br><span class="line">       ▼                 ▼                 ▼</span><br><span class="line">┌──────────┐      ┌──────────┐      ┌──────────┐</span><br><span class="line">│  双指针   │      │   贪心    │      │  前缀和   │</span><br><span class="line">└────┬─────┘      └────┬─────┘      └────┬─────┘</span><br><span class="line">     │                 │                 │</span><br><span class="line">┌────┴────┐       ┌────┴────┐       ┌────┴────┐</span><br><span class="line">│合并数组  │       │跳跃游戏  │       │除自身乘积│</span><br><span class="line">│移除元素  │       │买卖股票  │       │         │</span><br><span class="line">│删除重复  │       │分发糖果  │       │         │</span><br><span class="line">└─────────┘       └─────────┘       └─────────┘</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <h2 id="1️⃣-LC-88-合并两个有序数组-🟢"><a href="#1️⃣-LC-88-合并两个有序数组-🟢" class="headerlink" title="1️⃣ LC 88. 合并两个有序数组 🟢"></a>1️⃣ LC 88. 合并两个有序数组 🟢</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>将两个有序数组 <code>nums1</code> 和 <code>nums2</code> 合并到 <code>nums1</code> 中，使其有序。</p>
-<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>从后往前填充，避免覆盖！
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">从后往前填充，避免覆盖！</span><br><span class="line"></span><br><span class="line">nums1 = [1, 2, 3, 0, 0, 0]  nums2 = [2, 5, 6]</span><br><span class="line">              ↑                        ↑</span><br><span class="line">              p1                       p2</span><br><span class="line">                                              ↑</span><br><span class="line">                                              p (填充位置)</span><br><span class="line"></span><br><span class="line">Step 1: 比较 3 vs 6 → 填 6</span><br><span class="line">nums1 = [1, 2, 3, 0, 0, 6]</span><br><span class="line"></span><br><span class="line">Step 2: 比较 3 vs 5 → 填 5  </span><br><span class="line">nums1 = [1, 2, 3, 0, 5, 6]</span><br><span class="line"></span><br><span class="line">Step 3: 比较 3 vs 2 → 填 3</span><br><span class="line">nums1 = [1, 2, 3, 3, 5, 6]</span><br><span class="line"></span><br><span class="line">... 最终结果 [1, 2, 2, 3, 5, 6]</span><br></pre></td></tr></tbody></table></figure>
 
-nums1 = [1, 2, 3, 0, 0, 0]  nums2 = [2, 5, 6]
-              ↑                        ↑
-              p1                       p2
-                                              ↑
-                                              p (填充位置)
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">merge</span>(<span class="params">nums1, m, nums2, n</span>):</span><br><span class="line">    p1, p2, p = m - <span class="number">1</span>, n - <span class="number">1</span>, m + n - <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> p2 &gt;= <span class="number">0</span>:  <span class="comment"># nums2 还有元素</span></span><br><span class="line">        <span class="keyword">if</span> p1 &gt;= <span class="number">0</span> <span class="keyword">and</span> nums1[p1] &gt; nums2[p2]:</span><br><span class="line">            nums1[p] = nums1[p1]</span><br><span class="line">            p1 -= <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            nums1[p] = nums2[p2]</span><br><span class="line">            p2 -= <span class="number">1</span></span><br><span class="line">        p -= <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
 
-Step 1: 比较 3 vs 6 → 填 6
-nums1 = [1, 2, 3, 0, 0, 6]
-
-Step 2: 比较 3 vs 5 → 填 5  
-nums1 = [1, 2, 3, 0, 5, 6]
-
-Step 3: 比较 3 vs 2 → 填 3
-nums1 = [1, 2, 3, 3, 5, 6]
-
-... 最终结果 [1, 2, 2, 3, 5, 6]
-</code></pre>
-<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">merge</span><span class="token punctuation">(</span>nums1<span class="token punctuation">,</span> m<span class="token punctuation">,</span> nums2<span class="token punctuation">,</span> n<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    p1<span class="token punctuation">,</span> p2<span class="token punctuation">,</span> p <span class="token operator">=</span> m <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> m <span class="token operator">+</span> n <span class="token operator">-</span> <span class="token number">1</span>
-    
-    <span class="token keyword">while</span> p2 <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">:</span>  <span class="token comment" spellcheck="true"># nums2 还有元素</span>
-        <span class="token keyword">if</span> p1 <span class="token operator">>=</span> <span class="token number">0</span> <span class="token operator">and</span> nums1<span class="token punctuation">[</span>p1<span class="token punctuation">]</span> <span class="token operator">></span> nums2<span class="token punctuation">[</span>p2<span class="token punctuation">]</span><span class="token punctuation">:</span>
-            nums1<span class="token punctuation">[</span>p<span class="token punctuation">]</span> <span class="token operator">=</span> nums1<span class="token punctuation">[</span>p1<span class="token punctuation">]</span>
-            p1 <span class="token operator">-=</span> <span class="token number">1</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            nums1<span class="token punctuation">[</span>p<span class="token punctuation">]</span> <span class="token operator">=</span> nums2<span class="token punctuation">[</span>p2<span class="token punctuation">]</span>
-            p2 <span class="token operator">-=</span> <span class="token number">1</span>
-        p <span class="token operator">-=</span> <span class="token number">1</span>
-</code></pre>
 <h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“从后往前填，大的先落位”</strong></p>
 </blockquote>
 <hr>
 <h2 id="2️⃣-LC-27-移除元素-🟢"><a href="#2️⃣-LC-27-移除元素-🟢" class="headerlink" title="2️⃣ LC 27. 移除元素 🟢"></a>2️⃣ LC 27. 移除元素 🟢</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>原地移除数组中等于 <code>val</code> 的元素，返回新长度。</p>
-<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>快慢指针：慢指针标记有效位置，快指针遍历
+<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">快慢指针：慢指针标记有效位置，快指针遍历</span><br><span class="line"></span><br><span class="line">val = 3</span><br><span class="line">      s</span><br><span class="line">      f</span><br><span class="line">[3, 2, 2, 3, 4]</span><br><span class="line"></span><br><span class="line">f=0: nums[0]=3, 跳过</span><br><span class="line">f=1: nums[1]=2≠3, nums[s]=2, s++</span><br><span class="line">      s</span><br><span class="line">         f</span><br><span class="line">[2, 2, 2, 3, 4]</span><br><span class="line"></span><br><span class="line">f=2: nums[2]=2≠3, nums[s]=2, s++</span><br><span class="line">         s</span><br><span class="line">            f</span><br><span class="line">[2, 2, 2, 3, 4]</span><br><span class="line"></span><br><span class="line">f=3: nums[3]=3, 跳过</span><br><span class="line">f=4: nums[4]=4≠3, nums[s]=4, s++</span><br><span class="line"></span><br><span class="line">最终: [2, 2, 4, _, _], 返回 3</span><br></pre></td></tr></tbody></table></figure>
 
-val = 3
-      s
-      f
-[3, 2, 2, 3, 4]
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">removeElement</span>(<span class="params">nums, val</span>):</span><br><span class="line">    slow = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> fast <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(nums)):</span><br><span class="line">        <span class="keyword">if</span> nums[fast] != val:</span><br><span class="line">            nums[slow] = nums[fast]</span><br><span class="line">            slow += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> slow</span><br></pre></td></tr></tbody></table></figure>
 
-f=0: nums[0]=3, 跳过
-f=1: nums[1]=2≠3, nums[s]=2, s++
-      s
-         f
-[2, 2, 2, 3, 4]
-
-f=2: nums[2]=2≠3, nums[s]=2, s++
-         s
-            f
-[2, 2, 2, 3, 4]
-
-f=3: nums[3]=3, 跳过
-f=4: nums[4]=4≠3, nums[s]=4, s++
-
-最终: [2, 2, 4, _, _], 返回 3
-</code></pre>
-<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">removeElement</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span> val<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    slow <span class="token operator">=</span> <span class="token number">0</span>
-    <span class="token keyword">for</span> fast <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> nums<span class="token punctuation">[</span>fast<span class="token punctuation">]</span> <span class="token operator">!=</span> val<span class="token punctuation">:</span>
-            nums<span class="token punctuation">[</span>slow<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>fast<span class="token punctuation">]</span>
-            slow <span class="token operator">+=</span> <span class="token number">1</span>
-    <span class="token keyword">return</span> slow
-</code></pre>
 <h3 id="🧠-记忆口诀-1"><a href="#🧠-记忆口诀-1" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“快指针探路，慢指针收货”</strong></p>
 </blockquote>
 <hr>
-<h2 id="3️⃣-LC-26-删除有序数组中的重复项-🟢"><a href="#3️⃣-LC-26-删除有序数组中的重复项-🟢" class="headerlink" title="3️⃣ LC 26. 删除有序数组中的重复项 🟢"></a>3️⃣ LC 26. 删除有序数组中的重复项 🟢</h2><h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>有序数组，相同元素必相邻！
+<h2 id="3️⃣-LC-26-删除有序数组中的重复项-🟢"><a href="#3️⃣-LC-26-删除有序数组中的重复项-🟢" class="headerlink" title="3️⃣ LC 26. 删除有序数组中的重复项 🟢"></a>3️⃣ LC 26. 删除有序数组中的重复项 🟢</h2><h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">有序数组，相同元素必相邻！</span><br><span class="line"></span><br><span class="line">      s</span><br><span class="line">      f</span><br><span class="line">[1, 1, 2, 2, 3]</span><br><span class="line"></span><br><span class="line">f=1: nums[1]=nums[0], 跳过</span><br><span class="line">f=2: nums[2]≠nums[1], s++, nums[s]=2</span><br><span class="line">         s</span><br><span class="line">            f</span><br><span class="line">[1, 2, 2, 2, 3]</span><br><span class="line"></span><br><span class="line">f=4: nums[4]≠nums[3], s++, nums[s]=3</span><br><span class="line">            s</span><br><span class="line">[1, 2, 3, _, _]</span><br><span class="line"></span><br><span class="line">返回 s+1 = 3</span><br></pre></td></tr></tbody></table></figure>
 
-      s
-      f
-[1, 1, 2, 2, 3]
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">removeDuplicates</span>(<span class="params">nums</span>):</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> nums:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    slow = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> fast <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="built_in">len</span>(nums)):</span><br><span class="line">        <span class="keyword">if</span> nums[fast] != nums[slow]:</span><br><span class="line">            slow += <span class="number">1</span></span><br><span class="line">            nums[slow] = nums[fast]</span><br><span class="line">    <span class="keyword">return</span> slow + <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
 
-f=1: nums[1]=nums[0], 跳过
-f=2: nums[2]≠nums[1], s++, nums[s]=2
-         s
-            f
-[1, 2, 2, 2, 3]
-
-f=4: nums[4]≠nums[3], s++, nums[s]=3
-            s
-[1, 2, 3, _, _]
-
-返回 s+1 = 3
-</code></pre>
-<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">removeDuplicates</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">if</span> <span class="token operator">not</span> nums<span class="token punctuation">:</span>
-        <span class="token keyword">return</span> <span class="token number">0</span>
-    slow <span class="token operator">=</span> <span class="token number">0</span>
-    <span class="token keyword">for</span> fast <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> nums<span class="token punctuation">[</span>fast<span class="token punctuation">]</span> <span class="token operator">!=</span> nums<span class="token punctuation">[</span>slow<span class="token punctuation">]</span><span class="token punctuation">:</span>
-            slow <span class="token operator">+=</span> <span class="token number">1</span>
-            nums<span class="token punctuation">[</span>slow<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>fast<span class="token punctuation">]</span>
-    <span class="token keyword">return</span> slow <span class="token operator">+</span> <span class="token number">1</span>
-</code></pre>
 <hr>
 <h2 id="4️⃣-LC-80-删除有序数组中的重复项-II-🟡"><a href="#4️⃣-LC-80-删除有序数组中的重复项-II-🟡" class="headerlink" title="4️⃣ LC 80. 删除有序数组中的重复项 II 🟡"></a>4️⃣ LC 80. 删除有序数组中的重复项 II 🟡</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>每个元素最多出现 <strong>两次</strong>。</p>
-<h3 id="🎨-通用模板"><a href="#🎨-通用模板" class="headerlink" title="🎨 通用模板"></a>🎨 通用模板</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">removeDuplicates</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span> k<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token triple-quoted-string string">"""允许每个元素最多出现 k 次"""</span>
-    slow <span class="token operator">=</span> <span class="token number">0</span>
-    <span class="token keyword">for</span> num <span class="token keyword">in</span> nums<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> slow <span class="token operator">&lt;</span> k <span class="token operator">or</span> num <span class="token operator">!=</span> nums<span class="token punctuation">[</span>slow <span class="token operator">-</span> k<span class="token punctuation">]</span><span class="token punctuation">:</span>
-            nums<span class="token punctuation">[</span>slow<span class="token punctuation">]</span> <span class="token operator">=</span> num
-            slow <span class="token operator">+=</span> <span class="token number">1</span>
-    <span class="token keyword">return</span> slow
-</code></pre>
+<h3 id="🎨-通用模板"><a href="#🎨-通用模板" class="headerlink" title="🎨 通用模板"></a>🎨 通用模板</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">removeDuplicates</span>(<span class="params">nums, k=<span class="number">2</span></span>):</span><br><span class="line">    <span class="string">"""允许每个元素最多出现 k 次"""</span></span><br><span class="line">    slow = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> nums:</span><br><span class="line">        <span class="keyword">if</span> slow &lt; k <span class="keyword">or</span> num != nums[slow - k]:</span><br><span class="line">            nums[slow] = num</span><br><span class="line">            slow += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> slow</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-记忆口诀-2"><a href="#🧠-记忆口诀-2" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“检查 k 位之前，不同才能进”</strong></p>
 </blockquote>
 <hr>
 <h2 id="5️⃣-LC-169-多数元素-🟢"><a href="#5️⃣-LC-169-多数元素-🟢" class="headerlink" title="5️⃣ LC 169. 多数元素 🟢"></a>5️⃣ LC 169. 多数元素 🟢</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><p>找出出现次数超过 <code>n/2</code> 的元素。</p>
-<h3 id="🎨-Boyer-Moore-投票算法"><a href="#🎨-Boyer-Moore-投票算法" class="headerlink" title="🎨 Boyer-Moore 投票算法"></a>🎨 Boyer-Moore 投票算法</h3><pre><code>把多数元素看作 +1，其他元素看作 -1
-最终 +1 一定比 -1 多！
+<h3 id="🎨-Boyer-Moore-投票算法"><a href="#🎨-Boyer-Moore-投票算法" class="headerlink" title="🎨 Boyer-Moore 投票算法"></a>🎨 Boyer-Moore 投票算法</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">把多数元素看作 +1，其他元素看作 -1</span><br><span class="line">最终 +1 一定比 -1 多！</span><br><span class="line"></span><br><span class="line">nums = [2, 2, 1, 1, 1, 2, 2]</span><br><span class="line"></span><br><span class="line">candidate=2, count=1  → [2]</span><br><span class="line">candidate=2, count=2  → [2,2]</span><br><span class="line">candidate=2, count=1  → 遇到1，抵消</span><br><span class="line">candidate=2, count=0  → 遇到1，抵消</span><br><span class="line">candidate=1, count=1  → count=0时换人</span><br><span class="line">candidate=1, count=0  → 遇到2，抵消</span><br><span class="line">candidate=2, count=1  → count=0时换人</span><br><span class="line"></span><br><span class="line">最终 candidate = 2 ✓</span><br></pre></td></tr></tbody></table></figure>
 
-nums = [2, 2, 1, 1, 1, 2, 2]
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">majorityElement</span>(<span class="params">nums</span>):</span><br><span class="line">    candidate, count = <span class="literal">None</span>, <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> nums:</span><br><span class="line">        <span class="keyword">if</span> count == <span class="number">0</span>:</span><br><span class="line">            candidate = num</span><br><span class="line">        count += <span class="number">1</span> <span class="keyword">if</span> num == candidate <span class="keyword">else</span> -<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> candidate</span><br></pre></td></tr></tbody></table></figure>
 
-candidate=2, count=1  → [2]
-candidate=2, count=2  → [2,2]
-candidate=2, count=1  → 遇到1，抵消
-candidate=2, count=0  → 遇到1，抵消
-candidate=1, count=1  → count=0时换人
-candidate=1, count=0  → 遇到2，抵消
-candidate=2, count=1  → count=0时换人
-
-最终 candidate = 2 ✓
-</code></pre>
-<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">majorityElement</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    candidate<span class="token punctuation">,</span> count <span class="token operator">=</span> None<span class="token punctuation">,</span> <span class="token number">0</span>
-    <span class="token keyword">for</span> num <span class="token keyword">in</span> nums<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> count <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
-            candidate <span class="token operator">=</span> num
-        count <span class="token operator">+=</span> <span class="token number">1</span> <span class="token keyword">if</span> num <span class="token operator">==</span> candidate <span class="token keyword">else</span> <span class="token operator">-</span><span class="token number">1</span>
-    <span class="token keyword">return</span> candidate
-</code></pre>
 <h3 id="🧠-记忆口诀-3"><a href="#🧠-记忆口诀-3" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“同加异减，归零换帅”</strong></p>
 </blockquote>
 <hr>
 <h2 id="6️⃣-LC-189-轮转数组-🟡"><a href="#6️⃣-LC-189-轮转数组-🟡" class="headerlink" title="6️⃣ LC 189. 轮转数组 🟡"></a>6️⃣ LC 189. 轮转数组 🟡</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><p>将数组向右轮转 <code>k</code> 位。</p>
-<h3 id="🎨-三次翻转法"><a href="#🎨-三次翻转法" class="headerlink" title="🎨 三次翻转法"></a>🎨 三次翻转法</h3><pre><code>nums = [1,2,3,4,5,6,7], k = 3
+<h3 id="🎨-三次翻转法"><a href="#🎨-三次翻转法" class="headerlink" title="🎨 三次翻转法"></a>🎨 三次翻转法</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">nums = [1,2,3,4,5,6,7], k = 3</span><br><span class="line"></span><br><span class="line">Step 1: 整体翻转</span><br><span class="line">[7,6,5,4,3,2,1]</span><br><span class="line"></span><br><span class="line">Step 2: 翻转前 k 个</span><br><span class="line">[5,6,7,4,3,2,1]</span><br><span class="line"></span><br><span class="line">Step 3: 翻转后 n-k 个  </span><br><span class="line">[5,6,7,1,2,3,4] ✓</span><br></pre></td></tr></tbody></table></figure>
 
-Step 1: 整体翻转
-[7,6,5,4,3,2,1]
+<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">rotate</span>(<span class="params">nums, k</span>):</span><br><span class="line">    n = <span class="built_in">len</span>(nums)</span><br><span class="line">    k %= n  <span class="comment"># 处理 k &gt; n 的情况</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">reverse</span>(<span class="params">left, right</span>):</span><br><span class="line">        <span class="keyword">while</span> left &lt; right:</span><br><span class="line">            nums[left], nums[right] = nums[right], nums[left]</span><br><span class="line">            left, right = left + <span class="number">1</span>, right - <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    reverse(<span class="number">0</span>, n - <span class="number">1</span>)      <span class="comment"># 整体翻转</span></span><br><span class="line">    reverse(<span class="number">0</span>, k - <span class="number">1</span>)      <span class="comment"># 前k个</span></span><br><span class="line">    reverse(k, n - <span class="number">1</span>)      <span class="comment"># 后n-k个</span></span><br></pre></td></tr></tbody></table></figure>
 
-Step 2: 翻转前 k 个
-[5,6,7,4,3,2,1]
-
-Step 3: 翻转后 n-k 个  
-[5,6,7,1,2,3,4] ✓
-</code></pre>
-<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">rotate</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span> k<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    n <span class="token operator">=</span> len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
-    k <span class="token operator">%=</span> n  <span class="token comment" spellcheck="true"># 处理 k > n 的情况</span>
-    
-    <span class="token keyword">def</span> <span class="token function">reverse</span><span class="token punctuation">(</span>left<span class="token punctuation">,</span> right<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">while</span> left <span class="token operator">&lt;</span> right<span class="token punctuation">:</span>
-            nums<span class="token punctuation">[</span>left<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span><span class="token punctuation">,</span> nums<span class="token punctuation">[</span>left<span class="token punctuation">]</span>
-            left<span class="token punctuation">,</span> right <span class="token operator">=</span> left <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> right <span class="token operator">-</span> <span class="token number">1</span>
-    
-    reverse<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># 整体翻转</span>
-    reverse<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> k <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># 前k个</span>
-    reverse<span class="token punctuation">(</span>k<span class="token punctuation">,</span> n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># 后n-k个</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-4"><a href="#🧠-记忆口诀-4" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“全转前转后，三步到位”</strong></p>
 </blockquote>
 <hr>
 <h2 id="7️⃣-LC-121-买卖股票的最佳时机-🟢"><a href="#7️⃣-LC-121-买卖股票的最佳时机-🟢" class="headerlink" title="7️⃣ LC 121. 买卖股票的最佳时机 🟢"></a>7️⃣ LC 121. 买卖股票的最佳时机 🟢</h2><h3 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h3><p>只能买卖一次，求最大利润。</p>
-<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>维护「历史最低价」，计算当天卖出利润
+<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">维护「历史最低价」，计算当天卖出利润</span><br><span class="line"></span><br><span class="line">prices = [7, 1, 5, 3, 6, 4]</span><br><span class="line">          │  │  │  │  │  │</span><br><span class="line">min_price │  1  1  1  1  1</span><br><span class="line">profit    0  0  4  2  5  3</span><br><span class="line">                       ↑</span><br><span class="line">                    最大利润 = 5</span><br></pre></td></tr></tbody></table></figure>
 
-prices = [7, 1, 5, 3, 6, 4]
-          │  │  │  │  │  │
-min_price │  1  1  1  1  1
-profit    0  0  4  2  5  3
-                       ↑
-                    最大利润 = 5
-</code></pre>
-<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">maxProfit</span><span class="token punctuation">(</span>prices<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    min_price <span class="token operator">=</span> float<span class="token punctuation">(</span><span class="token string">'inf'</span><span class="token punctuation">)</span>
-    max_profit <span class="token operator">=</span> <span class="token number">0</span>
-    <span class="token keyword">for</span> price <span class="token keyword">in</span> prices<span class="token punctuation">:</span>
-        min_price <span class="token operator">=</span> min<span class="token punctuation">(</span>min_price<span class="token punctuation">,</span> price<span class="token punctuation">)</span>
-        max_profit <span class="token operator">=</span> max<span class="token punctuation">(</span>max_profit<span class="token punctuation">,</span> price <span class="token operator">-</span> min_price<span class="token punctuation">)</span>
-    <span class="token keyword">return</span> max_profit
-</code></pre>
+<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">maxProfit</span>(<span class="params">prices</span>):</span><br><span class="line">    min_price = <span class="built_in">float</span>(<span class="string">'inf'</span>)</span><br><span class="line">    max_profit = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> price <span class="keyword">in</span> prices:</span><br><span class="line">        min_price = <span class="built_in">min</span>(min_price, price)</span><br><span class="line">        max_profit = <span class="built_in">max</span>(max_profit, price - min_price)</span><br><span class="line">    <span class="keyword">return</span> max_profit</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-记忆口诀-5"><a href="#🧠-记忆口诀-5" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“记住最低点，时刻算差价”</strong></p>
 </blockquote>
 <hr>
 <h2 id="8️⃣-LC-55-跳跃游戏-🟡"><a href="#8️⃣-LC-55-跳跃游戏-🟡" class="headerlink" title="8️⃣ LC 55. 跳跃游戏 🟡"></a>8️⃣ LC 55. 跳跃游戏 🟡</h2><h3 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h3><p>判断能否跳到最后一个位置。</p>
-<h3 id="🎨-贪心思路"><a href="#🎨-贪心思路" class="headerlink" title="🎨 贪心思路"></a>🎨 贪心思路</h3><pre><code>维护能到达的最远位置 max_reach
+<h3 id="🎨-贪心思路"><a href="#🎨-贪心思路" class="headerlink" title="🎨 贪心思路"></a>🎨 贪心思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">维护能到达的最远位置 max_reach</span><br><span class="line"></span><br><span class="line">nums = [2, 3, 1, 1, 4]</span><br><span class="line">        ↑</span><br><span class="line">i=0: max_reach = max(0, 0+2) = 2</span><br><span class="line">i=1: max_reach = max(2, 1+3) = 4 ≥ 4 ✓ 可达！</span><br><span class="line"></span><br><span class="line">nums = [3, 2, 1, 0, 4]</span><br><span class="line">i=0: max_reach = 3</span><br><span class="line">i=1: max_reach = 3</span><br><span class="line">i=2: max_reach = 3</span><br><span class="line">i=3: max_reach = 3 &lt; 4 </span><br><span class="line">i=4: i &gt; max_reach，无法到达 ✗</span><br></pre></td></tr></tbody></table></figure>
 
-nums = [2, 3, 1, 1, 4]
-        ↑
-i=0: max_reach = max(0, 0+2) = 2
-i=1: max_reach = max(2, 1+3) = 4 ≥ 4 ✓ 可达！
+<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">canJump</span>(<span class="params">nums</span>):</span><br><span class="line">    max_reach = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(nums)):</span><br><span class="line">        <span class="keyword">if</span> i &gt; max_reach:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        max_reach = <span class="built_in">max</span>(max_reach, i + nums[i])</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></tbody></table></figure>
 
-nums = [3, 2, 1, 0, 4]
-i=0: max_reach = 3
-i=1: max_reach = 3
-i=2: max_reach = 3
-i=3: max_reach = 3 &lt; 4 
-i=4: i &gt; max_reach，无法到达 ✗
-</code></pre>
-<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">canJump</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    max_reach <span class="token operator">=</span> <span class="token number">0</span>
-    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> i <span class="token operator">></span> max_reach<span class="token punctuation">:</span>
-            <span class="token keyword">return</span> <span class="token boolean">False</span>
-        max_reach <span class="token operator">=</span> max<span class="token punctuation">(</span>max_reach<span class="token punctuation">,</span> i <span class="token operator">+</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> <span class="token boolean">True</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-6"><a href="#🧠-记忆口诀-6" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“走一步算一步，能到就更新”</strong></p>
 </blockquote>
 <hr>
 <h2 id="9️⃣-LC-45-跳跃游戏-II-🟡"><a href="#9️⃣-LC-45-跳跃游戏-II-🟡" class="headerlink" title="9️⃣ LC 45. 跳跃游戏 II 🟡"></a>9️⃣ LC 45. 跳跃游戏 II 🟡</h2><h3 id="题目描述-7"><a href="#题目描述-7" class="headerlink" title="题目描述"></a>题目描述</h3><p>求到达最后位置的最少跳跃次数。</p>
-<h3 id="🎨-BFS-思想"><a href="#🎨-BFS-思想" class="headerlink" title="🎨 BFS 思想"></a>🎨 BFS 思想</h3><pre><code>把每一跳能到的范围看作一层
+<h3 id="🎨-BFS-思想"><a href="#🎨-BFS-思想" class="headerlink" title="🎨 BFS 思想"></a>🎨 BFS 思想</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">把每一跳能到的范围看作一层</span><br><span class="line"></span><br><span class="line">nums = [2, 3, 1, 1, 4]</span><br><span class="line">        ↑</span><br><span class="line">层0: 位置0，能到 [1,2]</span><br><span class="line">层1: 位置1-2，能到 [2,3,4]  → 到达终点！</span><br><span class="line"></span><br><span class="line">跳跃次数 = 2</span><br></pre></td></tr></tbody></table></figure>
 
-nums = [2, 3, 1, 1, 4]
-        ↑
-层0: 位置0，能到 [1,2]
-层1: 位置1-2，能到 [2,3,4]  → 到达终点！
+<h3 id="💻-代码实现-7"><a href="#💻-代码实现-7" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">jump</span>(<span class="params">nums</span>):</span><br><span class="line">    jumps = <span class="number">0</span></span><br><span class="line">    cur_end = <span class="number">0</span>      <span class="comment"># 当前跳跃能到的边界</span></span><br><span class="line">    cur_farthest = <span class="number">0</span> <span class="comment"># 下一跳能到的最远</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(nums) - <span class="number">1</span>):</span><br><span class="line">        cur_farthest = <span class="built_in">max</span>(cur_farthest, i + nums[i])</span><br><span class="line">        <span class="keyword">if</span> i == cur_end:  <span class="comment"># 到达边界，必须跳</span></span><br><span class="line">            jumps += <span class="number">1</span></span><br><span class="line">            cur_end = cur_farthest</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> jumps</span><br></pre></td></tr></tbody></table></figure>
 
-跳跃次数 = 2
-</code></pre>
-<h3 id="💻-代码实现-7"><a href="#💻-代码实现-7" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">jump</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    jumps <span class="token operator">=</span> <span class="token number">0</span>
-    cur_end <span class="token operator">=</span> <span class="token number">0</span>      <span class="token comment" spellcheck="true"># 当前跳跃能到的边界</span>
-    cur_farthest <span class="token operator">=</span> <span class="token number">0</span> <span class="token comment" spellcheck="true"># 下一跳能到的最远</span>
-    
-    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        cur_farthest <span class="token operator">=</span> max<span class="token punctuation">(</span>cur_farthest<span class="token punctuation">,</span> i <span class="token operator">+</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
-        <span class="token keyword">if</span> i <span class="token operator">==</span> cur_end<span class="token punctuation">:</span>  <span class="token comment" spellcheck="true"># 到达边界，必须跳</span>
-            jumps <span class="token operator">+=</span> <span class="token number">1</span>
-            cur_end <span class="token operator">=</span> cur_farthest
-    
-    <span class="token keyword">return</span> jumps
-</code></pre>
 <hr>
 <h2 id="🔟-LC-238-除自身以外数组的乘积-🟡"><a href="#🔟-LC-238-除自身以外数组的乘积-🟡" class="headerlink" title="🔟 LC 238. 除自身以外数组的乘积 🟡"></a>🔟 LC 238. 除自身以外数组的乘积 🟡</h2><h3 id="题目描述-8"><a href="#题目描述-8" class="headerlink" title="题目描述"></a>题目描述</h3><p>返回数组，<code>answer[i]</code> 等于 <code>nums</code> 中除 <code>nums[i]</code> 之外其余各元素的乘积。</p>
-<h3 id="🎨-前缀积-×-后缀积"><a href="#🎨-前缀积-×-后缀积" class="headerlink" title="🎨 前缀积 × 后缀积"></a>🎨 前缀积 × 后缀积</h3><pre><code>nums =    [1,  2,  3,  4]
-前缀积 =   [1,  1,  2,  6]   (不含当前)
-后缀积 =   [24, 12, 4,  1]   (不含当前)
-结果 =    [24, 12, 8,  6]   (前缀 × 后缀)
-</code></pre>
-<h3 id="💻-代码实现-O-1-空间"><a href="#💻-代码实现-O-1-空间" class="headerlink" title="💻 代码实现 (O(1) 空间)"></a>💻 代码实现 (O(1) 空间)</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">productExceptSelf</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    n <span class="token operator">=</span> len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> n
-    
-    <span class="token comment" spellcheck="true"># 计算前缀积</span>
-    prefix <span class="token operator">=</span> <span class="token number">1</span>
-    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        result<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> prefix
-        prefix <span class="token operator">*=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
-    
-    <span class="token comment" spellcheck="true"># 计算后缀积并相乘</span>
-    suffix <span class="token operator">=</span> <span class="token number">1</span>
-    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        result<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">*=</span> suffix
-        suffix <span class="token operator">*=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
-    
-    <span class="token keyword">return</span> result
-</code></pre>
+<h3 id="🎨-前缀积-×-后缀积"><a href="#🎨-前缀积-×-后缀积" class="headerlink" title="🎨 前缀积 × 后缀积"></a>🎨 前缀积 × 后缀积</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nums =    [1,  2,  3,  4]</span><br><span class="line">前缀积 =   [1,  1,  2,  6]   (不含当前)</span><br><span class="line">后缀积 =   [24, 12, 4,  1]   (不含当前)</span><br><span class="line">结果 =    [24, 12, 8,  6]   (前缀 × 后缀)</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="💻-代码实现-O-1-空间"><a href="#💻-代码实现-O-1-空间" class="headerlink" title="💻 代码实现 (O(1) 空间)"></a>💻 代码实现 (O(1) 空间)</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">productExceptSelf</span>(<span class="params">nums</span>):</span><br><span class="line">    n = <span class="built_in">len</span>(nums)</span><br><span class="line">    result = [<span class="number">1</span>] * n</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 计算前缀积</span></span><br><span class="line">    prefix = <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">        result[i] = prefix</span><br><span class="line">        prefix *= nums[i]</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 计算后缀积并相乘</span></span><br><span class="line">    suffix = <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n - <span class="number">1</span>, -<span class="number">1</span>, -<span class="number">1</span>):</span><br><span class="line">        result[i] *= suffix</span><br><span class="line">        suffix *= nums[i]</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-记忆口诀-7"><a href="#🧠-记忆口诀-7" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“左边乘一遍，右边乘一遍”</strong></p>
 </blockquote>
@@ -426,22 +221,8 @@ nums = [2, 3, 1, 1, 4]
 <td>189</td>
 </tr>
 </tbody></table>
-<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><pre><code>合移删删多，轮买买跳跳
-H插除加糖，数组十五妙
+<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">合移删删多，轮买买跳跳</span><br><span class="line">H插除加糖，数组十五妙</span><br><span class="line"></span><br><span class="line">合 - 合并数组 (88)</span><br><span class="line">移 - 移除元素 (27)  </span><br><span class="line">删删 - 删除重复 I/II (26, 80)</span><br><span class="line">多 - 多数元素 (169)</span><br><span class="line">轮 - 轮转数组 (189)</span><br><span class="line">买买 - 买卖股票 I/II (121, 122)</span><br><span class="line">跳跳 - 跳跃游戏 I/II (55, 45)</span><br><span class="line">H - H指数 (274)</span><br><span class="line">插 - O(1)插入删除 (380)</span><br><span class="line">除 - 除自身乘积 (238)</span><br><span class="line">加 - 加油站 (134)</span><br><span class="line">糖 - 分发糖果 (135)</span><br></pre></td></tr></tbody></table></figure>
 
-合 - 合并数组 (88)
-移 - 移除元素 (27)  
-删删 - 删除重复 I/II (26, 80)
-多 - 多数元素 (169)
-轮 - 轮转数组 (189)
-买买 - 买卖股票 I/II (121, 122)
-跳跳 - 跳跃游戏 I/II (55, 45)
-H - H指数 (274)
-插 - O(1)插入删除 (380)
-除 - 除自身乘积 (238)
-加 - 加油站 (134)
-糖 - 分发糖果 (135)
-</code></pre>
 <hr>
 <blockquote>
 <p>📖 <strong>下一篇</strong>：<a href="/2026/01/18/leetcode-150-two-pointers/">双指针专题</a></p>

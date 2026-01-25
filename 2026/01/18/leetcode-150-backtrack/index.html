@@ -58,7 +58,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -103,341 +103,74 @@
 <p>🎯 <strong>核心思想</strong>：尝试所有可能，走不通就回头</p>
 </blockquote>
 <hr>
-<h2 id="🗺️-回溯算法的本质"><a href="#🗺️-回溯算法的本质" class="headerlink" title="🗺️ 回溯算法的本质"></a>🗺️ 回溯算法的本质</h2><pre><code>┌─────────────────────────────────────────────────────────────┐
-│                   回溯 = 决策树的遍历                        │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│                        []                                   │
-│                    /   |   \                                │
-│                  [1]  [2]  [3]     ← 第一层决策              │
-│                 / \    |                                    │
-│             [1,2][1,3][2,3]        ← 第二层决策              │
-│               |                                             │
-│            [1,2,3]                 ← 第三层决策              │
-│                                                             │
-│  回溯三要素：                                                │
-│  1. 路径：已经做出的选择                                     │
-│  2. 选择列表：当前可以做的选择                               │
-│  3. 结束条件：到达决策树底层                                 │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-</code></pre>
+<h2 id="🗺️-回溯算法的本质"><a href="#🗺️-回溯算法的本质" class="headerlink" title="🗺️ 回溯算法的本质"></a>🗺️ 回溯算法的本质</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│                   回溯 = 决策树的遍历                        │</span><br><span class="line">├─────────────────────────────────────────────────────────────┤</span><br><span class="line">│                                                             │</span><br><span class="line">│                        []                                   │</span><br><span class="line">│                    /   |   \                                │</span><br><span class="line">│                  [1]  [2]  [3]     ← 第一层决策              │</span><br><span class="line">│                 / \    |                                    │</span><br><span class="line">│             [1,2][1,3][2,3]        ← 第二层决策              │</span><br><span class="line">│               |                                             │</span><br><span class="line">│            [1,2,3]                 ← 第三层决策              │</span><br><span class="line">│                                                             │</span><br><span class="line">│  回溯三要素：                                                │</span><br><span class="line">│  1. 路径：已经做出的选择                                     │</span><br><span class="line">│  2. 选择列表：当前可以做的选择                               │</span><br><span class="line">│  3. 结束条件：到达决策树底层                                 │</span><br><span class="line">│                                                             │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
-<h2 id="🔧-回溯算法模板"><a href="#🔧-回溯算法模板" class="headerlink" title="🔧 回溯算法模板"></a>🔧 回溯算法模板</h2><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">backtrack</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> choices<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token comment" spellcheck="true"># 结束条件</span>
-    <span class="token keyword">if</span> 满足结束条件<span class="token punctuation">:</span>
-        result<span class="token punctuation">.</span>append<span class="token punctuation">(</span>path<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 注意拷贝！</span>
-        <span class="token keyword">return</span>
-    
-    <span class="token keyword">for</span> choice <span class="token keyword">in</span> choices<span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 1. 做选择</span>
-        path<span class="token punctuation">.</span>append<span class="token punctuation">(</span>choice<span class="token punctuation">)</span>
-        
-        <span class="token comment" spellcheck="true"># 2. 递归进入下一层决策</span>
-        backtrack<span class="token punctuation">(</span>path<span class="token punctuation">,</span> new_choices<span class="token punctuation">)</span>
-        
-        <span class="token comment" spellcheck="true"># 3. 撤销选择（回溯）</span>
-        path<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-</code></pre>
+<h2 id="🔧-回溯算法模板"><a href="#🔧-回溯算法模板" class="headerlink" title="🔧 回溯算法模板"></a>🔧 回溯算法模板</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">backtrack</span>(<span class="params">path, choices</span>):</span><br><span class="line">    <span class="comment"># 结束条件</span></span><br><span class="line">    <span class="keyword">if</span> 满足结束条件:</span><br><span class="line">        result.append(path[:])  <span class="comment"># 注意拷贝！</span></span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> choice <span class="keyword">in</span> choices:</span><br><span class="line">        <span class="comment"># 1. 做选择</span></span><br><span class="line">        path.append(choice)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 2. 递归进入下一层决策</span></span><br><span class="line">        backtrack(path, new_choices)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 3. 撤销选择（回溯）</span></span><br><span class="line">        path.pop()</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-回溯口诀"><a href="#🧠-回溯口诀" class="headerlink" title="🧠 回溯口诀"></a>🧠 回溯口诀</h3><blockquote>
 <p><strong>“选择、递归、撤销”</strong> —— 回溯三部曲</p>
 </blockquote>
 <hr>
 <h2 id="1️⃣-LC-17-电话号码的字母组合-🟡"><a href="#1️⃣-LC-17-电话号码的字母组合-🟡" class="headerlink" title="1️⃣ LC 17. 电话号码的字母组合 🟡"></a>1️⃣ LC 17. 电话号码的字母组合 🟡</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>给定电话号码，返回所有可能的字母组合。</p>
-<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>digits = "23"
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">digits = "23"</span><br><span class="line"></span><br><span class="line">2 → "abc"</span><br><span class="line">3 → "def"</span><br><span class="line"></span><br><span class="line">决策树:</span><br><span class="line">           ""</span><br><span class="line">       /   |   \</span><br><span class="line">      a    b    c      ← 选择2对应的字母</span><br><span class="line">     /|\  /|\  /|\</span><br><span class="line">    d e f d e f d e f  ← 选择3对应的字母</span><br><span class="line"></span><br><span class="line">结果: ["ad","ae","af","bd","be","bf","cd","ce","cf"]</span><br></pre></td></tr></tbody></table></figure>
 
-2 → "abc"
-3 → "def"
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">letterCombinations</span>(<span class="params">digits: <span class="built_in">str</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> digits:</span><br><span class="line">        <span class="keyword">return</span> []</span><br><span class="line">    </span><br><span class="line">    phone = {</span><br><span class="line">        <span class="string">'2'</span>: <span class="string">'abc'</span>, <span class="string">'3'</span>: <span class="string">'def'</span>, <span class="string">'4'</span>: <span class="string">'ghi'</span>, <span class="string">'5'</span>: <span class="string">'jkl'</span>,</span><br><span class="line">        <span class="string">'6'</span>: <span class="string">'mno'</span>, <span class="string">'7'</span>: <span class="string">'pqrs'</span>, <span class="string">'8'</span>: <span class="string">'tuv'</span>, <span class="string">'9'</span>: <span class="string">'wxyz'</span></span><br><span class="line">    }</span><br><span class="line">    </span><br><span class="line">    result = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">backtrack</span>(<span class="params">index, path</span>):</span><br><span class="line">        <span class="keyword">if</span> index == <span class="built_in">len</span>(digits):</span><br><span class="line">            result.append(<span class="string">''</span>.join(path))</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> char <span class="keyword">in</span> phone[digits[index]]:</span><br><span class="line">            path.append(char)</span><br><span class="line">            backtrack(index + <span class="number">1</span>, path)</span><br><span class="line">            path.pop()</span><br><span class="line">    </span><br><span class="line">    backtrack(<span class="number">0</span>, [])</span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
 
-决策树:
-           ""
-       /   |   \
-      a    b    c      ← 选择2对应的字母
-     /|\  /|\  /|\
-    d e f d e f d e f  ← 选择3对应的字母
-
-结果: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
-</code></pre>
-<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">letterCombinations</span><span class="token punctuation">(</span>digits<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
-    <span class="token keyword">if</span> <span class="token operator">not</span> digits<span class="token punctuation">:</span>
-        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    phone <span class="token operator">=</span> <span class="token punctuation">{</span>
-        <span class="token string">'2'</span><span class="token punctuation">:</span> <span class="token string">'abc'</span><span class="token punctuation">,</span> <span class="token string">'3'</span><span class="token punctuation">:</span> <span class="token string">'def'</span><span class="token punctuation">,</span> <span class="token string">'4'</span><span class="token punctuation">:</span> <span class="token string">'ghi'</span><span class="token punctuation">,</span> <span class="token string">'5'</span><span class="token punctuation">:</span> <span class="token string">'jkl'</span><span class="token punctuation">,</span>
-        <span class="token string">'6'</span><span class="token punctuation">:</span> <span class="token string">'mno'</span><span class="token punctuation">,</span> <span class="token string">'7'</span><span class="token punctuation">:</span> <span class="token string">'pqrs'</span><span class="token punctuation">,</span> <span class="token string">'8'</span><span class="token punctuation">:</span> <span class="token string">'tuv'</span><span class="token punctuation">,</span> <span class="token string">'9'</span><span class="token punctuation">:</span> <span class="token string">'wxyz'</span>
-    <span class="token punctuation">}</span>
-    
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    <span class="token keyword">def</span> <span class="token function">backtrack</span><span class="token punctuation">(</span>index<span class="token punctuation">,</span> path<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> index <span class="token operator">==</span> len<span class="token punctuation">(</span>digits<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            result<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">)</span>
-            <span class="token keyword">return</span>
-        
-        <span class="token keyword">for</span> char <span class="token keyword">in</span> phone<span class="token punctuation">[</span>digits<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
-            path<span class="token punctuation">.</span>append<span class="token punctuation">(</span>char<span class="token punctuation">)</span>
-            backtrack<span class="token punctuation">(</span>index <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> path<span class="token punctuation">)</span>
-            path<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    
-    backtrack<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> result
-</code></pre>
 <h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“每个数字选一个字母”</strong></p>
 </blockquote>
 <hr>
 <h2 id="2️⃣-LC-77-组合-🟡"><a href="#2️⃣-LC-77-组合-🟡" class="headerlink" title="2️⃣ LC 77. 组合 🟡"></a>2️⃣ LC 77. 组合 🟡</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>从 1 到 n 中选择 k 个数的所有组合。</p>
-<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>n = 4, k = 2
+<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">n = 4, k = 2</span><br><span class="line"></span><br><span class="line">决策树（每次只能选比自己大的数，避免重复）:</span><br><span class="line">              []</span><br><span class="line">         /  |  |  \</span><br><span class="line">       [1] [2] [3] [4]</span><br><span class="line">      / | \  |</span><br><span class="line">  [1,2][1,3][1,4] [2,3][2,4] [3,4]</span><br><span class="line"></span><br><span class="line">结果: [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]</span><br></pre></td></tr></tbody></table></figure>
 
-决策树（每次只能选比自己大的数，避免重复）:
-              []
-         /  |  |  \
-       [1] [2] [3] [4]
-      / | \  |
-  [1,2][1,3][1,4] [2,3][2,4] [3,4]
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">combine</span>(<span class="params">n: <span class="built_in">int</span>, k: <span class="built_in">int</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    result = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">backtrack</span>(<span class="params">start, path</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(path) == k:</span><br><span class="line">            result.append(path[:])</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 剪枝：剩余元素不够用了</span></span><br><span class="line">        <span class="keyword">if</span> k - <span class="built_in">len</span>(path) &gt; n - start + <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(start, n + <span class="number">1</span>):</span><br><span class="line">            path.append(i)</span><br><span class="line">            backtrack(i + <span class="number">1</span>, path)</span><br><span class="line">            path.pop()</span><br><span class="line">    </span><br><span class="line">    backtrack(<span class="number">1</span>, [])</span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
 
-结果: [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
-</code></pre>
-<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">combine</span><span class="token punctuation">(</span>n<span class="token punctuation">:</span> int<span class="token punctuation">,</span> k<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    <span class="token keyword">def</span> <span class="token function">backtrack</span><span class="token punctuation">(</span>start<span class="token punctuation">,</span> path<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> len<span class="token punctuation">(</span>path<span class="token punctuation">)</span> <span class="token operator">==</span> k<span class="token punctuation">:</span>
-            result<span class="token punctuation">.</span>append<span class="token punctuation">(</span>path<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-            <span class="token keyword">return</span>
-        
-        <span class="token comment" spellcheck="true"># 剪枝：剩余元素不够用了</span>
-        <span class="token keyword">if</span> k <span class="token operator">-</span> len<span class="token punctuation">(</span>path<span class="token punctuation">)</span> <span class="token operator">></span> n <span class="token operator">-</span> start <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">:</span>
-            <span class="token keyword">return</span>
-        
-        <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>start<span class="token punctuation">,</span> n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            path<span class="token punctuation">.</span>append<span class="token punctuation">(</span>i<span class="token punctuation">)</span>
-            backtrack<span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> path<span class="token punctuation">)</span>
-            path<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    
-    backtrack<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> result
-</code></pre>
 <h3 id="🧠-记忆口诀-1"><a href="#🧠-记忆口诀-1" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“从start开始选，选够k个停”</strong></p>
 </blockquote>
 <hr>
 <h2 id="3️⃣-LC-46-全排列-🟡"><a href="#3️⃣-LC-46-全排列-🟡" class="headerlink" title="3️⃣ LC 46. 全排列 🟡"></a>3️⃣ LC 46. 全排列 🟡</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>返回数组的所有排列。</p>
-<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>nums = [1, 2, 3]
+<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">nums = [1, 2, 3]</span><br><span class="line"></span><br><span class="line">决策树（每个数只能用一次）:</span><br><span class="line">                    []</span><br><span class="line">            /       |        \</span><br><span class="line">          [1]      [2]       [3]</span><br><span class="line">         /   \    /   \     /   \</span><br><span class="line">      [1,2] [1,3] [2,1] [2,3] [3,1] [3,2]</span><br><span class="line">        |     |     |     |     |     |</span><br><span class="line">    [1,2,3][1,3,2][2,1,3][2,3,1][3,1,2][3,2,1]</span><br></pre></td></tr></tbody></table></figure>
 
-决策树（每个数只能用一次）:
-                    []
-            /       |        \
-          [1]      [2]       [3]
-         /   \    /   \     /   \
-      [1,2] [1,3] [2,1] [2,3] [3,1] [3,2]
-        |     |     |     |     |     |
-    [1,2,3][1,3,2][2,1,3][2,3,1][3,1,2][3,2,1]
-</code></pre>
-<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">permute</span><span class="token punctuation">(</span>nums<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    <span class="token keyword">def</span> <span class="token function">backtrack</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> used<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> len<span class="token punctuation">(</span>path<span class="token punctuation">)</span> <span class="token operator">==</span> len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            result<span class="token punctuation">.</span>append<span class="token punctuation">(</span>path<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-            <span class="token keyword">return</span>
-        
-        <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            <span class="token keyword">if</span> used<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">:</span>
-                <span class="token keyword">continue</span>
-            
-            path<span class="token punctuation">.</span>append<span class="token punctuation">(</span>nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
-            used<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">True</span>
-            
-            backtrack<span class="token punctuation">(</span>path<span class="token punctuation">,</span> used<span class="token punctuation">)</span>
-            
-            path<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-            used<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">False</span>
-    
-    backtrack<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token boolean">False</span><span class="token punctuation">]</span> <span class="token operator">*</span> len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> result
-</code></pre>
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">permute</span>(<span class="params">nums: <span class="built_in">list</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    result = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">backtrack</span>(<span class="params">path, used</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(path) == <span class="built_in">len</span>(nums):</span><br><span class="line">            result.append(path[:])</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(nums)):</span><br><span class="line">            <span class="keyword">if</span> used[i]:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            </span><br><span class="line">            path.append(nums[i])</span><br><span class="line">            used[i] = <span class="literal">True</span></span><br><span class="line">            </span><br><span class="line">            backtrack(path, used)</span><br><span class="line">            </span><br><span class="line">            path.pop()</span><br><span class="line">            used[i] = <span class="literal">False</span></span><br><span class="line">    </span><br><span class="line">    backtrack([], [<span class="literal">False</span>] * <span class="built_in">len</span>(nums))</span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-记忆口诀-2"><a href="#🧠-记忆口诀-2" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“用过的标记，没用过的都能选”</strong></p>
 </blockquote>
 <hr>
 <h2 id="4️⃣-LC-39-组合总和-🟡"><a href="#4️⃣-LC-39-组合总和-🟡" class="headerlink" title="4️⃣ LC 39. 组合总和 🟡"></a>4️⃣ LC 39. 组合总和 🟡</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><p>找出所有和为 target 的组合（数字可以重复使用）。</p>
-<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>candidates = [2, 3, 6, 7], target = 7
+<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">candidates = [2, 3, 6, 7], target = 7</span><br><span class="line"></span><br><span class="line">决策树:</span><br><span class="line">                    []</span><br><span class="line">         /     |      \      \</span><br><span class="line">       [2]    [3]    [6]    [7] ✓</span><br><span class="line">      / | \    |      |</span><br><span class="line">   [2,2][2,3][2,6] [3,3]  [6,?]</span><br><span class="line">    /|\   |</span><br><span class="line">[2,2,2][2,2,3]✓ [2,3,?]</span><br><span class="line">  |</span><br><span class="line">[2,2,2,?] 超过7，剪枝</span><br></pre></td></tr></tbody></table></figure>
 
-决策树:
-                    []
-         /     |      \      \
-       [2]    [3]    [6]    [7] ✓
-      / | \    |      |
-   [2,2][2,3][2,6] [3,3]  [6,?]
-    /|\   |
-[2,2,2][2,2,3]✓ [2,3,?]
-  |
-[2,2,2,?] 超过7，剪枝
-</code></pre>
-<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">combinationSum</span><span class="token punctuation">(</span>candidates<span class="token punctuation">:</span> list<span class="token punctuation">,</span> target<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    candidates<span class="token punctuation">.</span>sort<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 排序便于剪枝</span>
-    
-    <span class="token keyword">def</span> <span class="token function">backtrack</span><span class="token punctuation">(</span>start<span class="token punctuation">,</span> path<span class="token punctuation">,</span> remaining<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> remaining <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
-            result<span class="token punctuation">.</span>append<span class="token punctuation">(</span>path<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-            <span class="token keyword">return</span>
-        
-        <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>start<span class="token punctuation">,</span> len<span class="token punctuation">(</span>candidates<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            <span class="token keyword">if</span> candidates<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">></span> remaining<span class="token punctuation">:</span>
-                <span class="token keyword">break</span>  <span class="token comment" spellcheck="true"># 剪枝</span>
-            
-            path<span class="token punctuation">.</span>append<span class="token punctuation">(</span>candidates<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
-            backtrack<span class="token punctuation">(</span>i<span class="token punctuation">,</span> path<span class="token punctuation">,</span> remaining <span class="token operator">-</span> candidates<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># i不是i+1，可重复</span>
-            path<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    
-    backtrack<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target<span class="token punctuation">)</span>
-    <span class="token keyword">return</span> result
-</code></pre>
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">combinationSum</span>(<span class="params">candidates: <span class="built_in">list</span>, target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    result = []</span><br><span class="line">    candidates.sort()  <span class="comment"># 排序便于剪枝</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">backtrack</span>(<span class="params">start, path, remaining</span>):</span><br><span class="line">        <span class="keyword">if</span> remaining == <span class="number">0</span>:</span><br><span class="line">            result.append(path[:])</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(start, <span class="built_in">len</span>(candidates)):</span><br><span class="line">            <span class="keyword">if</span> candidates[i] &gt; remaining:</span><br><span class="line">                <span class="keyword">break</span>  <span class="comment"># 剪枝</span></span><br><span class="line">            </span><br><span class="line">            path.append(candidates[i])</span><br><span class="line">            backtrack(i, path, remaining - candidates[i])  <span class="comment"># i不是i+1，可重复</span></span><br><span class="line">            path.pop()</span><br><span class="line">    </span><br><span class="line">    backtrack(<span class="number">0</span>, [], target)</span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-记忆口诀-3"><a href="#🧠-记忆口诀-3" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“可以重复选，但只能往后选”</strong></p>
 </blockquote>
 <hr>
 <h2 id="5️⃣-LC-52-N-皇后-II-🔴"><a href="#5️⃣-LC-52-N-皇后-II-🔴" class="headerlink" title="5️⃣ LC 52. N 皇后 II 🔴"></a>5️⃣ LC 52. N 皇后 II 🔴</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><p>返回 N 皇后问题的解的数量。</p>
-<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>n = 4
+<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">n = 4</span><br><span class="line"></span><br><span class="line">一个有效解:</span><br><span class="line">. Q . .</span><br><span class="line">. . . Q</span><br><span class="line">Q . . .</span><br><span class="line">. . Q .</span><br><span class="line"></span><br><span class="line">约束条件：</span><br><span class="line">1. 每行只能放一个皇后</span><br><span class="line">2. 每列只能放一个皇后</span><br><span class="line">3. 每条对角线只能放一个皇后</span><br><span class="line"></span><br><span class="line">对角线编号技巧:</span><br><span class="line">- 主对角线 (\): row - col 相同</span><br><span class="line">- 副对角线 (/): row + col 相同</span><br></pre></td></tr></tbody></table></figure>
 
-一个有效解:
-. Q . .
-. . . Q
-Q . . .
-. . Q .
+<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">totalNQueens</span>(<span class="params">n: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line">    cols = <span class="built_in">set</span>()       <span class="comment"># 列冲突</span></span><br><span class="line">    diag1 = <span class="built_in">set</span>()      <span class="comment"># 主对角线 (row - col)</span></span><br><span class="line">    diag2 = <span class="built_in">set</span>()      <span class="comment"># 副对角线 (row + col)</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">backtrack</span>(<span class="params">row</span>):</span><br><span class="line">        <span class="keyword">nonlocal</span> count</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> row == n:</span><br><span class="line">            count += <span class="number">1</span></span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> col <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">            <span class="keyword">if</span> col <span class="keyword">in</span> cols <span class="keyword">or</span> (row - col) <span class="keyword">in</span> diag1 <span class="keyword">or</span> (row + col) <span class="keyword">in</span> diag2:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            </span><br><span class="line">            cols.add(col)</span><br><span class="line">            diag1.add(row - col)</span><br><span class="line">            diag2.add(row + col)</span><br><span class="line">            </span><br><span class="line">            backtrack(row + <span class="number">1</span>)</span><br><span class="line">            </span><br><span class="line">            cols.remove(col)</span><br><span class="line">            diag1.remove(row - col)</span><br><span class="line">            diag2.remove(row + col)</span><br><span class="line">    </span><br><span class="line">    backtrack(<span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> count</span><br></pre></td></tr></tbody></table></figure>
 
-约束条件：
-1. 每行只能放一个皇后
-2. 每列只能放一个皇后
-3. 每条对角线只能放一个皇后
-
-对角线编号技巧:
-- 主对角线 (\): row - col 相同
-- 副对角线 (/): row + col 相同
-</code></pre>
-<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">totalNQueens</span><span class="token punctuation">(</span>n<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    count <span class="token operator">=</span> <span class="token number">0</span>
-    cols <span class="token operator">=</span> set<span class="token punctuation">(</span><span class="token punctuation">)</span>       <span class="token comment" spellcheck="true"># 列冲突</span>
-    diag1 <span class="token operator">=</span> set<span class="token punctuation">(</span><span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># 主对角线 (row - col)</span>
-    diag2 <span class="token operator">=</span> set<span class="token punctuation">(</span><span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># 副对角线 (row + col)</span>
-    
-    <span class="token keyword">def</span> <span class="token function">backtrack</span><span class="token punctuation">(</span>row<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        nonlocal count
-        
-        <span class="token keyword">if</span> row <span class="token operator">==</span> n<span class="token punctuation">:</span>
-            count <span class="token operator">+=</span> <span class="token number">1</span>
-            <span class="token keyword">return</span>
-        
-        <span class="token keyword">for</span> col <span class="token keyword">in</span> range<span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            <span class="token keyword">if</span> col <span class="token keyword">in</span> cols <span class="token operator">or</span> <span class="token punctuation">(</span>row <span class="token operator">-</span> col<span class="token punctuation">)</span> <span class="token keyword">in</span> diag1 <span class="token operator">or</span> <span class="token punctuation">(</span>row <span class="token operator">+</span> col<span class="token punctuation">)</span> <span class="token keyword">in</span> diag2<span class="token punctuation">:</span>
-                <span class="token keyword">continue</span>
-            
-            cols<span class="token punctuation">.</span>add<span class="token punctuation">(</span>col<span class="token punctuation">)</span>
-            diag1<span class="token punctuation">.</span>add<span class="token punctuation">(</span>row <span class="token operator">-</span> col<span class="token punctuation">)</span>
-            diag2<span class="token punctuation">.</span>add<span class="token punctuation">(</span>row <span class="token operator">+</span> col<span class="token punctuation">)</span>
-            
-            backtrack<span class="token punctuation">(</span>row <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
-            
-            cols<span class="token punctuation">.</span>remove<span class="token punctuation">(</span>col<span class="token punctuation">)</span>
-            diag1<span class="token punctuation">.</span>remove<span class="token punctuation">(</span>row <span class="token operator">-</span> col<span class="token punctuation">)</span>
-            diag2<span class="token punctuation">.</span>remove<span class="token punctuation">(</span>row <span class="token operator">+</span> col<span class="token punctuation">)</span>
-    
-    backtrack<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> count
-</code></pre>
 <h3 id="🧠-记忆口诀-4"><a href="#🧠-记忆口诀-4" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“列和两条对角线，都不能冲突”</strong></p>
 </blockquote>
 <hr>
 <h2 id="6️⃣-LC-22-括号生成-🟡"><a href="#6️⃣-LC-22-括号生成-🟡" class="headerlink" title="6️⃣ LC 22. 括号生成 🟡"></a>6️⃣ LC 22. 括号生成 🟡</h2><h3 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h3><p>生成 n 对有效的括号组合。</p>
-<h3 id="🎨-图解思路-5"><a href="#🎨-图解思路-5" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>n = 2
+<h3 id="🎨-图解思路-5"><a href="#🎨-图解思路-5" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">n = 2</span><br><span class="line"></span><br><span class="line">决策树（剪枝条件：右括号不能多于左括号）:</span><br><span class="line">                ""</span><br><span class="line">               /</span><br><span class="line">              (</span><br><span class="line">            /   \</span><br><span class="line">          ((    ()</span><br><span class="line">          |    /</span><br><span class="line">         (()  ()(</span><br><span class="line">          |    |</span><br><span class="line">        (()) ()()</span><br><span class="line"></span><br><span class="line">结果: ["(())", "()()"]</span><br></pre></td></tr></tbody></table></figure>
 
-决策树（剪枝条件：右括号不能多于左括号）:
-                ""
-               /
-              (
-            /   \
-          ((    ()
-          |    /
-         (()  ()(
-          |    |
-        (()) ()()
+<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">generateParenthesis</span>(<span class="params">n: <span class="built_in">int</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    result = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">backtrack</span>(<span class="params">path, left, right</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(path) == <span class="number">2</span> * n:</span><br><span class="line">            result.append(<span class="string">''</span>.join(path))</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> left &lt; n:</span><br><span class="line">            path.append(<span class="string">'('</span>)</span><br><span class="line">            backtrack(path, left + <span class="number">1</span>, right)</span><br><span class="line">            path.pop()</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> right &lt; left:</span><br><span class="line">            path.append(<span class="string">')'</span>)</span><br><span class="line">            backtrack(path, left, right + <span class="number">1</span>)</span><br><span class="line">            path.pop()</span><br><span class="line">    </span><br><span class="line">    backtrack([], <span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
 
-结果: ["(())", "()()"]
-</code></pre>
-<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">generateParenthesis</span><span class="token punctuation">(</span>n<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    <span class="token keyword">def</span> <span class="token function">backtrack</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> left<span class="token punctuation">,</span> right<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> len<span class="token punctuation">(</span>path<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">2</span> <span class="token operator">*</span> n<span class="token punctuation">:</span>
-            result<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">)</span>
-            <span class="token keyword">return</span>
-        
-        <span class="token keyword">if</span> left <span class="token operator">&lt;</span> n<span class="token punctuation">:</span>
-            path<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">'('</span><span class="token punctuation">)</span>
-            backtrack<span class="token punctuation">(</span>path<span class="token punctuation">,</span> left <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> right<span class="token punctuation">)</span>
-            path<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        
-        <span class="token keyword">if</span> right <span class="token operator">&lt;</span> left<span class="token punctuation">:</span>
-            path<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token string">')'</span><span class="token punctuation">)</span>
-            backtrack<span class="token punctuation">(</span>path<span class="token punctuation">,</span> left<span class="token punctuation">,</span> right <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
-            path<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    
-    backtrack<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> result
-</code></pre>
 <h3 id="🧠-记忆口诀-5"><a href="#🧠-记忆口诀-5" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“左括号随时加，右括号不超左”</strong></p>
 </blockquote>
 <hr>
 <h2 id="7️⃣-LC-79-单词搜索-🟡"><a href="#7️⃣-LC-79-单词搜索-🟡" class="headerlink" title="7️⃣ LC 79. 单词搜索 🟡"></a>7️⃣ LC 79. 单词搜索 🟡</h2><h3 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h3><p>在二维网格中搜索单词。</p>
-<h3 id="🎨-图解思路-6"><a href="#🎨-图解思路-6" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>board:
-A B C E
-S F C S
-A D E E
+<h3 id="🎨-图解思路-6"><a href="#🎨-图解思路-6" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">board:</span><br><span class="line">A B C E</span><br><span class="line">S F C S</span><br><span class="line">A D E E</span><br><span class="line"></span><br><span class="line">word = "ABCCED"</span><br><span class="line"></span><br><span class="line">从 A 开始，DFS + 回溯:</span><br><span class="line">A → B → C → C → E → D ✓</span><br></pre></td></tr></tbody></table></figure>
 
-word = "ABCCED"
+<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">exist</span>(<span class="params">board: <span class="built_in">list</span>, word: <span class="built_in">str</span></span>) -&gt; <span class="built_in">bool</span>:</span><br><span class="line">    m, n = <span class="built_in">len</span>(board), <span class="built_in">len</span>(board[<span class="number">0</span>])</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">backtrack</span>(<span class="params">i, j, k</span>):</span><br><span class="line">        <span class="keyword">if</span> k == <span class="built_in">len</span>(word):</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> i &lt; <span class="number">0</span> <span class="keyword">or</span> i &gt;= m <span class="keyword">or</span> j &lt; <span class="number">0</span> <span class="keyword">or</span> j &gt;= n:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> board[i][j] != word[k]:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 标记已访问</span></span><br><span class="line">        temp = board[i][j]</span><br><span class="line">        board[i][j] = <span class="string">'#'</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 四个方向搜索</span></span><br><span class="line">        found = (backtrack(i + <span class="number">1</span>, j, k + <span class="number">1</span>) <span class="keyword">or</span></span><br><span class="line">                 backtrack(i - <span class="number">1</span>, j, k + <span class="number">1</span>) <span class="keyword">or</span></span><br><span class="line">                 backtrack(i, j + <span class="number">1</span>, k + <span class="number">1</span>) <span class="keyword">or</span></span><br><span class="line">                 backtrack(i, j - <span class="number">1</span>, k + <span class="number">1</span>))</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 恢复</span></span><br><span class="line">        board[i][j] = temp</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> found</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(m):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">            <span class="keyword">if</span> backtrack(i, j, <span class="number">0</span>):</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></tbody></table></figure>
 
-从 A 开始，DFS + 回溯:
-A → B → C → C → E → D ✓
-</code></pre>
-<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">exist</span><span class="token punctuation">(</span>board<span class="token punctuation">:</span> list<span class="token punctuation">,</span> word<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> bool<span class="token punctuation">:</span>
-    m<span class="token punctuation">,</span> n <span class="token operator">=</span> len<span class="token punctuation">(</span>board<span class="token punctuation">)</span><span class="token punctuation">,</span> len<span class="token punctuation">(</span>board<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">def</span> <span class="token function">backtrack</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">,</span> k<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> k <span class="token operator">==</span> len<span class="token punctuation">(</span>word<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            <span class="token keyword">return</span> <span class="token boolean">True</span>
-        
-        <span class="token keyword">if</span> i <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> i <span class="token operator">>=</span> m <span class="token operator">or</span> j <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token operator">or</span> j <span class="token operator">>=</span> n<span class="token punctuation">:</span>
-            <span class="token keyword">return</span> <span class="token boolean">False</span>
-        
-        <span class="token keyword">if</span> board<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">!=</span> word<span class="token punctuation">[</span>k<span class="token punctuation">]</span><span class="token punctuation">:</span>
-            <span class="token keyword">return</span> <span class="token boolean">False</span>
-        
-        <span class="token comment" spellcheck="true"># 标记已访问</span>
-        temp <span class="token operator">=</span> board<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span>
-        board<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'#'</span>
-        
-        <span class="token comment" spellcheck="true"># 四个方向搜索</span>
-        found <span class="token operator">=</span> <span class="token punctuation">(</span>backtrack<span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> j<span class="token punctuation">,</span> k <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">or</span>
-                 backtrack<span class="token punctuation">(</span>i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> j<span class="token punctuation">,</span> k <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">or</span>
-                 backtrack<span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> k <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">or</span>
-                 backtrack<span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> k <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-        
-        <span class="token comment" spellcheck="true"># 恢复</span>
-        board<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> temp
-        
-        <span class="token keyword">return</span> found
-    
-    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">for</span> j <span class="token keyword">in</span> range<span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            <span class="token keyword">if</span> backtrack<span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-                <span class="token keyword">return</span> <span class="token boolean">True</span>
-    
-    <span class="token keyword">return</span> <span class="token boolean">False</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-6"><a href="#🧠-记忆口诀-6" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“DFS四方向，访问要标记”</strong></p>
 </blockquote>
@@ -481,27 +214,10 @@ A → B → C → C → E → D ✓
 <td>22</td>
 </tr>
 </tbody></table>
-<h3 id="回溯-vs-动态规划"><a href="#回溯-vs-动态规划" class="headerlink" title="回溯 vs 动态规划"></a>回溯 vs 动态规划</h3><pre><code>┌──────────────┬──────────────────────────────┐
-│    回溯      │         动态规划             │
-├──────────────┼──────────────────────────────┤
-│ 找所有解     │ 找最优解/计数                │
-│ 暴力穷举     │ 记忆化避免重复               │
-│ 时间换空间   │ 空间换时间                   │
-└──────────────┴──────────────────────────────┘
-</code></pre>
-<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><pre><code>电话组合全排列
-组合总和皇后解
-括号生成单词找
-回溯七题全拿下
+<h3 id="回溯-vs-动态规划"><a href="#回溯-vs-动态规划" class="headerlink" title="回溯 vs 动态规划"></a>回溯 vs 动态规划</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">┌──────────────┬──────────────────────────────┐</span><br><span class="line">│    回溯      │         动态规划             │</span><br><span class="line">├──────────────┼──────────────────────────────┤</span><br><span class="line">│ 找所有解     │ 找最优解/计数                │</span><br><span class="line">│ 暴力穷举     │ 记忆化避免重复               │</span><br><span class="line">│ 时间换空间   │ 空间换时间                   │</span><br><span class="line">└──────────────┴──────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
 
-电话 - 电话号码的字母组合 (17)
-组合 - 组合 (77)
-全排列 - 全排列 (46)
-组合总和 - 组合总和 (39)
-皇后 - N皇后 II (52)
-括号 - 括号生成 (22)
-单词 - 单词搜索 (79)
-</code></pre>
+<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">电话组合全排列</span><br><span class="line">组合总和皇后解</span><br><span class="line">括号生成单词找</span><br><span class="line">回溯七题全拿下</span><br><span class="line"></span><br><span class="line">电话 - 电话号码的字母组合 (17)</span><br><span class="line">组合 - 组合 (77)</span><br><span class="line">全排列 - 全排列 (46)</span><br><span class="line">组合总和 - 组合总和 (39)</span><br><span class="line">皇后 - N皇后 II (52)</span><br><span class="line">括号 - 括号生成 (22)</span><br><span class="line">单词 - 单词搜索 (79)</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <blockquote>
 <p>📖 <strong>返回</strong>：<a href="/2026/01/18/leetcode-150-index/">LeetCode 150 题总目录</a></p>
@@ -524,7 +240,7 @@ A → B → C → C → E → D ✓
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-array-string/">📚 LeetCode 150 - 数组与字符串专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-binary-search/">🔢 LeetCode 150 - 二分查找专题</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-array-string/">📚 LeetCode 150 - 数组与字符串专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-binary-tree/">🌳 LeetCode 150 - 二叉树专题</a></div></section></div>
 
 
 

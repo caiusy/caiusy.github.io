@@ -20,12 +20,12 @@
   <title>从csv中读取数据 - Caius的日常博客</title>
 
   
-    <meta name="description" content="import csv     import numpy as np     def loadDataSet(filename):  # 读取数据         with open(filename) as f:             dataMat &#x3D; []             labelMat &#x3D; []             f_csv &#x3D; csv.reader(f) ## 用">
+    <meta name="description" content="1234567891011121314151617181920212223242526import csvimport numpy as npdef loadDataSet(filename):  # 读取数据    with open(filename) as f:        dataMat &#x3D; []        labelMat &#x3D; []        f_csv &#x3D; csv.reade">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从csv中读取数据">
 <meta property="og:url" content="https://caiusy.github.io/2019/09/08/20190908-%E4%BB%8Ecsv%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%95%B0%E6%8D%AE/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="import csv     import numpy as np     def loadDataSet(filename):  # 读取数据         with open(filename) as f:             dataMat &#x3D; []             labelMat &#x3D; []             f_csv &#x3D; csv.reader(f) ## 用">
+<meta property="og:description" content="1234567891011121314151617181920212223242526import csvimport numpy as npdef loadDataSet(filename):  # 读取数据    with open(filename) as f:        dataMat &#x3D; []        labelMat &#x3D; []        f_csv &#x3D; csv.reade">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-09-07T16:00:00.000Z">
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -94,33 +94,8 @@
     </div>
     
   </div>
-  </div><article class="md-text content slide-up"><pre class=" language-python"><code class="language-python">    <span class="token keyword">import</span> csv
-    <span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
-    <span class="token keyword">def</span> <span class="token function">loadDataSet</span><span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token punctuation">:</span>  <span class="token comment" spellcheck="true"># 读取数据</span>
-        <span class="token keyword">with</span> open<span class="token punctuation">(</span>filename<span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
-            dataMat <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-            labelMat <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-            f_csv <span class="token operator">=</span> csv<span class="token punctuation">.</span>reader<span class="token punctuation">(</span>f<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">## 用csv读取直接是个list</span>
-            headers <span class="token operator">=</span> next<span class="token punctuation">(</span>f_csv<span class="token punctuation">)</span>
-            <span class="token keyword">for</span> row <span class="token keyword">in</span> f_csv<span class="token punctuation">:</span>
-                dataMat<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>float<span class="token punctuation">(</span>row<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> float<span class="token punctuation">(</span>row<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-                labelMat<span class="token punctuation">.</span>append<span class="token punctuation">(</span>float<span class="token punctuation">(</span>row<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-            f<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span>
-            <span class="token keyword">return</span> dataMat<span class="token punctuation">,</span> labelMat
-    <span class="token keyword">def</span> <span class="token function">loadData</span><span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token comment" spellcheck="true"># 读取数据</span>
-        dataMat<span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span>
-        labelMat<span class="token operator">=</span><span class="token punctuation">[</span><span class="token punctuation">]</span>
-        fr<span class="token operator">=</span>open<span class="token punctuation">(</span>filename<span class="token punctuation">)</span>
-        next<span class="token punctuation">(</span>fr<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 忽略第一行</span>
-        <span class="token keyword">for</span> line <span class="token keyword">in</span> fr<span class="token punctuation">.</span>readlines<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            lineArr<span class="token operator">=</span>line<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">','</span><span class="token punctuation">)</span>
-            dataMat<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>lineArr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>lineArr<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-            labelMat<span class="token punctuation">.</span>append<span class="token punctuation">(</span>lineArr<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-        <span class="token keyword">return</span> dataMat<span class="token punctuation">,</span>labelMat <span class="token comment" spellcheck="true"># 返回数据特征和数据类别</span>
-    <span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
-        dataMat<span class="token punctuation">,</span>labelMat <span class="token operator">=</span> loadData<span class="token punctuation">(</span><span class="token string">'test_data.csv'</span><span class="token punctuation">)</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span>dataMat<span class="token punctuation">,</span>labelMat<span class="token punctuation">)</span>
-</code></pre>
+  </div><article class="md-text content slide-up"><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">loadDataSet</span>(<span class="params">filename</span>):  <span class="comment"># 读取数据</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(filename) <span class="keyword">as</span> f:</span><br><span class="line">        dataMat = []</span><br><span class="line">        labelMat = []</span><br><span class="line">        f_csv = csv.reader(f) <span class="comment">## 用csv读取直接是个list</span></span><br><span class="line">        headers = <span class="built_in">next</span>(f_csv)</span><br><span class="line">        <span class="keyword">for</span> row <span class="keyword">in</span> f_csv:</span><br><span class="line">            dataMat.append([<span class="built_in">float</span>(row[<span class="number">0</span>]), <span class="built_in">float</span>(row[<span class="number">1</span>])])</span><br><span class="line">            labelMat.append(<span class="built_in">float</span>(row[<span class="number">2</span>]))</span><br><span class="line">        f.close()</span><br><span class="line">        <span class="keyword">return</span> dataMat, labelMat</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">loadData</span>(<span class="params">filename</span>): <span class="comment"># 读取数据</span></span><br><span class="line">    dataMat=[]</span><br><span class="line">    labelMat=[]</span><br><span class="line">    fr=<span class="built_in">open</span>(filename)</span><br><span class="line">    <span class="built_in">next</span>(fr) <span class="comment"># 忽略第一行</span></span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> fr.readlines():</span><br><span class="line">        lineArr=line.strip().split(<span class="string">','</span>)</span><br><span class="line">        dataMat.append([lineArr[<span class="number">0</span>],lineArr[<span class="number">1</span>]])</span><br><span class="line">        labelMat.append(lineArr[<span class="number">2</span>])</span><br><span class="line">    <span class="keyword">return</span> dataMat,labelMat <span class="comment"># 返回数据特征和数据类别</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    dataMat,labelMat = loadData(<span class="string">'test_data.csv'</span>)</span><br><span class="line">    <span class="built_in">print</span>(dataMat,labelMat)</span><br></pre></td></tr></tbody></table></figure>
+
 </article>
 <div class="article-footer slide-up">
 
@@ -139,7 +114,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/08/20190908-%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%AD1%E7%9A%84%E4%B8%AA%E6%95%B0/">二进制中1的个数</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/">支持向量机</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/">支持向量机</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/">xml解析</a></div></section></div>
 
 
 

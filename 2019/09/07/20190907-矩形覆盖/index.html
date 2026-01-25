@@ -20,12 +20,12 @@
   <title>矩形覆盖 - Caius的日常博客</title>
 
   
-    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：363840本题知识点： 递归   题目描述我们可以用21的小矩形横着或者竖着去覆盖更大的矩形。请问用n个21的小矩形无重叠地覆盖一个2*n的大矩形，总共有多少种方法？     class Solution {     public:         int rectCover(int number) {         if(number &amp;lt">
+    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：363840本题知识点： 递归   题目描述我们可以用21的小矩形横着或者竖着去覆盖更大的矩形。请问用n个21的小矩形无重叠地覆盖一个2*n的大矩形，总共有多少种方法？ 12345678class Solution {public:    int rectCover(int number) {    if(number &lt;&#x3D; 0) retur">
 <meta property="og:type" content="article">
 <meta property="og:title" content="矩形覆盖">
 <meta property="og:url" content="https://caiusy.github.io/2019/09/07/20190907-%E7%9F%A9%E5%BD%A2%E8%A6%86%E7%9B%96/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：363840本题知识点： 递归   题目描述我们可以用21的小矩形横着或者竖着去覆盖更大的矩形。请问用n个21的小矩形无重叠地覆盖一个2*n的大矩形，总共有多少种方法？     class Solution {     public:         int rectCover(int number) {         if(number &amp;lt">
+<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：363840本题知识点： 递归   题目描述我们可以用21的小矩形横着或者竖着去覆盖更大的矩形。请问用n个21的小矩形无重叠地覆盖一个2*n的大矩形，总共有多少种方法？ 12345678class Solution {public:    int rectCover(int number) {    if(number &lt;&#x3D; 0) retur">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-09-06T16:00:00.000Z">
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -96,15 +96,8 @@
   </div>
   </div><article class="md-text content slide-up"><p>时间限制：1秒 空间限制：32768K 热度指数：363840<br>本题知识点： 递归  </p>
 <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>我们可以用2<em>1的小矩形横着或者竖着去覆盖更大的矩形。请问用n个2</em>1的小矩形无重叠地覆盖一个2*n的大矩形，总共有多少种方法？</p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">{</span>
-    public<span class="token punctuation">:</span>
-        int rectCover<span class="token punctuation">(</span>int number<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span>number <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span>number <span class="token operator">==</span> <span class="token number">1</span> <span class="token operator">|</span><span class="token operator">|</span> number <span class="token operator">==</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">return</span> number<span class="token punctuation">;</span>
-        <span class="token keyword">return</span> rectCover<span class="token punctuation">(</span>number <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">+</span> rectCover<span class="token punctuation">(</span>number <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">;</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br><span class="line">public:</span><br><span class="line">    <span class="built_in">int</span> rectCover(<span class="built_in">int</span> number) {</span><br><span class="line">    <span class="keyword">if</span>(number &lt;= <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span>(number == <span class="number">1</span> || number == <span class="number">2</span>) <span class="keyword">return</span> number;</span><br><span class="line">    <span class="keyword">return</span> rectCover(number - <span class="number">1</span>) + rectCover(number - <span class="number">2</span>);</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
 <p>运行时间：538ms<br>占用内存：484k</p>
 </article>
 <div class="article-footer slide-up">
@@ -124,7 +117,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/">xml解析</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/09/07/20190907-PCA%E9%99%8D%E7%BB%B4/">PCA降维</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/07/20190907-kmeans%E7%AE%97%E6%B3%95/">kmeans算法</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/09/07/20190907-xml%E7%94%9F%E6%88%90/">xml生成</a></div></section></div>
 
 
 

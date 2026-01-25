@@ -20,12 +20,12 @@
   <title>算法竞赛入门经典第一章 - Caius的日常博客</title>
 
   
-    <meta name="description" content="&#x2F;&#x2F; t1.cpp : 定义控制台应用程序的入口点。     &#x2F;&#x2F;     #include &quot;stdafx.h&quot;     #include &quot;stdio.h&quot;     #include &lt;stdlib.h&gt;     #include&lt;math.h&gt;     int main()     {         &#x2F;&#x2F;printf(&quot;%.1f\n&quot;, 8.0 &#x2F; 5.0);  &#x2F;&#x2F;">
+    <meta name="description" content="12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697&#x2F;&#x2F; t1.cpp : 定义控">
 <meta property="og:type" content="article">
 <meta property="og:title" content="算法竞赛入门经典第一章">
 <meta property="og:url" content="https://caiusy.github.io/2019/08/14/20190814-algorithm1/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="&#x2F;&#x2F; t1.cpp : 定义控制台应用程序的入口点。     &#x2F;&#x2F;     #include &quot;stdafx.h&quot;     #include &quot;stdio.h&quot;     #include &lt;stdlib.h&gt;     #include&lt;math.h&gt;     int main()     {         &#x2F;&#x2F;printf(&quot;%.1f\n&quot;, 8.0 &#x2F; 5.0);  &#x2F;&#x2F;">
+<meta property="og:description" content="12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697&#x2F;&#x2F; t1.cpp : 定义控">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-08-13T16:00:00.000Z">
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -94,104 +94,8 @@
     </div>
     
   </div>
-  </div><article class="md-text content slide-up"><pre class=" language-cpp"><code class="language-cpp">    <span class="token comment" spellcheck="true">// t1.cpp : 定义控制台应用程序的入口点。</span>
-    <span class="token comment" spellcheck="true">//</span>
-    <span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">"stdafx.h"</span></span>
-    <span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">"stdio.h"</span></span>
-    <span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-    <span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;math.h></span></span>
-    <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">//printf("%.1f\n", 8.0 / 5.0);  // %点后面是保留几位浮点小数1.6</span>
-        <span class="token comment" spellcheck="true">//printf("%.1f\n", 8 / 5);  // %点后面是保留几位浮点小数 结果为0</span>
-        <span class="token comment" spellcheck="true">//printf("%d\n", 8.0 / 5.0);  // 整数值用%d输出，实数用%f输出 # int 是2字节 ，float是4字节 溢出</span>
-        <span class="token comment" spellcheck="true">//							//整数/整数等与整数，浮点数除以浮点数等于浮点数</span>
-        <span class="token comment" spellcheck="true">//printf("%.8f\n", 1 + 2 * sqrt(3) / (5 - 0.1));</span>
-        <span class="token comment" spellcheck="true">//int a, b;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%d%d", &amp;a, &amp;b);  //scanf_s 中的占位符要和变量的数据类型一一对应，要在变量前面加上“&amp;”符号</span>
-        <span class="token comment" spellcheck="true">//printf("%d\n", a+b);</span>
-        <span class="token comment" spellcheck="true">//const double pi = acos(-1.0);</span>
-        <span class="token comment" spellcheck="true">//double r, h, s1, s2, s;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%1f%1f", &amp;r, &amp;h);</span>
-        <span class="token comment" spellcheck="true">//s1 = pi*r*r;</span>
-        <span class="token comment" spellcheck="true">//s2 = 2 * pi*r*h;</span>
-        <span class="token comment" spellcheck="true">//s = s1*2.0 + s2;</span>
-        <span class="token comment" spellcheck="true">//printf_s("Area = %.3f\n", s);</span>
-        <span class="token comment" spellcheck="true">//交换变量</span>
-        <span class="token comment" spellcheck="true">//int a, b, m, n;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%d%d", &amp;a, &amp;b);</span>
-        <span class="token comment" spellcheck="true">//</span><span class="token comment" spellcheck="true">/*a = a + b;
-        //b = a - b;
-        //a = a - b;*/</span>
-        <span class="token comment" spellcheck="true">//printf_s("%d %d\n", b, a);</span>
-        <span class="token comment" spellcheck="true">//int a, b, m, n;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%d%d", &amp;n, &amp;m);</span>
-        <span class="token comment" spellcheck="true">//</span><span class="token comment" spellcheck="true">/*a = a + b;
-        //b = a - b;
-        //a = a - b;*/</span>
-        <span class="token comment" spellcheck="true">//a = (4*n-m) / 2;</span>
-        <span class="token comment" spellcheck="true">//b = n - a;</span>
-        <span class="token comment" spellcheck="true">//if (m % 2 == 1 || a &lt; 0 || b &lt; 0)</span>
-        <span class="token comment" spellcheck="true">//	printf_s("No answer!\n");</span>
-        <span class="token comment" spellcheck="true">//else</span>
-        <span class="token comment" spellcheck="true">//	printf_s("Answer is chicken %d   rabbit  %d\n", a, b);</span>
-        <span class="token comment" spellcheck="true">//exp1 输入三个整数，求出他们的平均数，保留三位小数</span>
-        <span class="token comment" spellcheck="true">//int a, b, c;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%d%d%d", &amp;a, &amp;b, &amp;c);</span>
-        <span class="token comment" spellcheck="true">//printf_s("%.3f", (a + b + c) / 3.0);</span>
-        <span class="token comment" spellcheck="true">//exp2 输入华氏温度f,输出对应的摄氏温度c,保留3位小数.提示 : c = 5(f-32)/9.</span>
-        <span class="token comment" spellcheck="true">//float f, c;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%f", &amp;f);</span>
-        <span class="token comment" spellcheck="true">//c = 5*(f - 32) / 9.0;</span>
-        <span class="token comment" spellcheck="true">//printf_s("摄制温度为： %.3f", c);</span>
-        <span class="token comment" spellcheck="true">//exp3</span>
-        <span class="token comment" spellcheck="true">//int  n;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%d", &amp;n);</span>
-        <span class="token comment" spellcheck="true">//printf_s("%d", n*(n + 1) / 2);</span>
-        <span class="token comment" spellcheck="true">//exp4  输入正整数《360 ，输出正弦余弦函数值。提示：使用数学函数</span>
-        <span class="token comment" spellcheck="true">//int  n;</span>
-     <span class="token comment" spellcheck="true">//   #define PI 3.1415926</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%d", &amp;n);</span>
-        <span class="token comment" spellcheck="true">//if (n &lt; 0 || n>360)</span>
-        <span class="token comment" spellcheck="true">//	printf_s("error");</span>
-        <span class="token comment" spellcheck="true">//else</span>
-        <span class="token comment" spellcheck="true">//{</span>
-        <span class="token comment" spellcheck="true">//	printf_s("%.2f\n", cos(n*PI/180));</span>
-        <span class="token comment" spellcheck="true">//	printf_s("%.2f", sin(n*PI / 180));</span>
-        <span class="token comment" spellcheck="true">//}</span>
-        <span class="token comment" spellcheck="true">//</span>
-        <span class="token comment" spellcheck="true">// exp5 一件衣服95元，若消费满300元可以打85折，输入购买衣服的简书，输出需要支付的金额。保留两位小数</span>
-        <span class="token comment" spellcheck="true">//int n,money;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%d", &amp;n);</span>
-        <span class="token comment" spellcheck="true">//money = n * 95;</span>
-        <span class="token comment" spellcheck="true">//if (money > 300)</span>
-        <span class="token comment" spellcheck="true">//	printf_s("%.2f", money* 0.85);</span>
-        <span class="token comment" spellcheck="true">//else</span>
-        <span class="token comment" spellcheck="true">//	printf_s("%.2f", money);</span>
-        <span class="token comment" spellcheck="true">//</span>
-        <span class="token comment" spellcheck="true">//exp6  判断三个边是否能构成直角三角形 边长均为正整数</span>
-        <span class="token comment" spellcheck="true">//int a, b, c;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%d%d%d", &amp;a, &amp;b, &amp;c);</span>
-        <span class="token comment" spellcheck="true">//if (((a*a + b*b)== c*c) || ((a*a + c*c) == b*b) || ((c*c + b*b) == a*a))</span>
-        <span class="token comment" spellcheck="true">//	printf_s("yes\n");</span>
-        <span class="token comment" spellcheck="true">//else</span>
-        <span class="token comment" spellcheck="true">//	printf_s("not a triangle\n");</span>
-        <span class="token comment" spellcheck="true">//exp7 判断一个年是不是闰年 能被4整除但是不能被100整除的年份</span>
-        <span class="token comment" spellcheck="true">//int n;</span>
-        <span class="token comment" spellcheck="true">//scanf_s("%d", &amp;n);</span>
-        <span class="token comment" spellcheck="true">//if (n % 4 == 0 &amp;&amp; n % 100 != 0)</span>
-        <span class="token comment" spellcheck="true">//	printf_s("yes\n");</span>
-        <span class="token comment" spellcheck="true">//else</span>
-        <span class="token comment" spellcheck="true">//	printf_s("no\n");</span>
-        <span class="token comment" spellcheck="true">//</span>
-        <span class="token comment" spellcheck="true">//q1: int类型的最大值和最小值是多少 2^(n - 1)   - 1 -2^(n - 1)</span>
-        <span class="token comment" spellcheck="true">//q2; double浮点数能精确到多少位小数？ 遵循IEEE标准的8字节（64位）的double能表示的有效数字的位数是：15 ~ 16</span>
-        <span class="token comment" spellcheck="true">//q3: double类型的最大正数值和最小正数值</span>
-        <span class="token comment" spellcheck="true">//q4: 逻辑运算符号的优先级</span>
-        <span class="token function">system</span><span class="token punctuation">(</span><span class="token string">"pause"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-</code></pre>
+  </div><article class="md-text content slide-up"><figure class="highlight cpp"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// t1.cpp : 定义控制台应用程序的入口点。</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">"stdafx.h"</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">"stdio.h"</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;math.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	<span class="comment">//printf("%.1f\n", 8.0 / 5.0);  // %点后面是保留几位浮点小数1.6</span></span><br><span class="line">	<span class="comment">//printf("%.1f\n", 8 / 5);  // %点后面是保留几位浮点小数 结果为0</span></span><br><span class="line">	<span class="comment">//printf("%d\n", 8.0 / 5.0);  // 整数值用%d输出，实数用%f输出 # int 是2字节 ，float是4字节 溢出</span></span><br><span class="line">	<span class="comment">//							//整数/整数等与整数，浮点数除以浮点数等于浮点数</span></span><br><span class="line">	<span class="comment">//printf("%.8f\n", 1 + 2 * sqrt(3) / (5 - 0.1));</span></span><br><span class="line">	<span class="comment">//int a, b;</span></span><br><span class="line">	<span class="comment">//scanf_s("%d%d", &amp;a, &amp;b);  //scanf_s 中的占位符要和变量的数据类型一一对应，要在变量前面加上“&amp;”符号</span></span><br><span class="line">	<span class="comment">//printf("%d\n", a+b);</span></span><br><span class="line">	<span class="comment">//const double pi = acos(-1.0);</span></span><br><span class="line">	<span class="comment">//double r, h, s1, s2, s;</span></span><br><span class="line">	<span class="comment">//scanf_s("%1f%1f", &amp;r, &amp;h);</span></span><br><span class="line">	<span class="comment">//s1 = pi*r*r;</span></span><br><span class="line">	<span class="comment">//s2 = 2 * pi*r*h;</span></span><br><span class="line">	<span class="comment">//s = s1*2.0 + s2;</span></span><br><span class="line">	<span class="comment">//printf_s("Area = %.3f\n", s);</span></span><br><span class="line">	<span class="comment">//交换变量</span></span><br><span class="line">	<span class="comment">//int a, b, m, n;</span></span><br><span class="line">	<span class="comment">//scanf_s("%d%d", &amp;a, &amp;b);</span></span><br><span class="line">	<span class="comment">///*a = a + b;</span></span><br><span class="line">	<span class="comment">//b = a - b;</span></span><br><span class="line">	<span class="comment">//a = a - b;*/</span></span><br><span class="line">	<span class="comment">//printf_s("%d %d\n", b, a);</span></span><br><span class="line">	<span class="comment">//int a, b, m, n;</span></span><br><span class="line">	<span class="comment">//scanf_s("%d%d", &amp;n, &amp;m);</span></span><br><span class="line">	<span class="comment">///*a = a + b;</span></span><br><span class="line">	<span class="comment">//b = a - b;</span></span><br><span class="line">	<span class="comment">//a = a - b;*/</span></span><br><span class="line">	<span class="comment">//a = (4*n-m) / 2;</span></span><br><span class="line">	<span class="comment">//b = n - a;</span></span><br><span class="line">	<span class="comment">//if (m % 2 == 1 || a &lt; 0 || b &lt; 0)</span></span><br><span class="line">	<span class="comment">//	printf_s("No answer!\n");</span></span><br><span class="line">	<span class="comment">//else</span></span><br><span class="line">	<span class="comment">//	printf_s("Answer is chicken %d   rabbit  %d\n", a, b);</span></span><br><span class="line">	<span class="comment">//exp1 输入三个整数，求出他们的平均数，保留三位小数</span></span><br><span class="line">	<span class="comment">//int a, b, c;</span></span><br><span class="line">	<span class="comment">//scanf_s("%d%d%d", &amp;a, &amp;b, &amp;c);</span></span><br><span class="line">	<span class="comment">//printf_s("%.3f", (a + b + c) / 3.0);</span></span><br><span class="line">	<span class="comment">//exp2 输入华氏温度f,输出对应的摄氏温度c,保留3位小数.提示 : c = 5(f-32)/9.</span></span><br><span class="line">	<span class="comment">//float f, c;</span></span><br><span class="line">	<span class="comment">//scanf_s("%f", &amp;f);</span></span><br><span class="line">	<span class="comment">//c = 5*(f - 32) / 9.0;</span></span><br><span class="line">	<span class="comment">//printf_s("摄制温度为： %.3f", c);</span></span><br><span class="line">	<span class="comment">//exp3</span></span><br><span class="line">	<span class="comment">//int  n;</span></span><br><span class="line">	<span class="comment">//scanf_s("%d", &amp;n);</span></span><br><span class="line">	<span class="comment">//printf_s("%d", n*(n + 1) / 2);</span></span><br><span class="line">	<span class="comment">//exp4  输入正整数《360 ，输出正弦余弦函数值。提示：使用数学函数</span></span><br><span class="line">	<span class="comment">//int  n;</span></span><br><span class="line"> <span class="comment">//   #define PI 3.1415926</span></span><br><span class="line">	<span class="comment">//scanf_s("%d", &amp;n);</span></span><br><span class="line">	<span class="comment">//if (n &lt; 0 || n&gt;360)</span></span><br><span class="line">	<span class="comment">//	printf_s("error");</span></span><br><span class="line">	<span class="comment">//else</span></span><br><span class="line">	<span class="comment">//{</span></span><br><span class="line">	<span class="comment">//	printf_s("%.2f\n", cos(n*PI/180));</span></span><br><span class="line">	<span class="comment">//	printf_s("%.2f", sin(n*PI / 180));</span></span><br><span class="line">	<span class="comment">//}</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">    <span class="comment">// exp5 一件衣服95元，若消费满300元可以打85折，输入购买衣服的简书，输出需要支付的金额。保留两位小数</span></span><br><span class="line">	<span class="comment">//int n,money;</span></span><br><span class="line">	<span class="comment">//scanf_s("%d", &amp;n);</span></span><br><span class="line">	<span class="comment">//money = n * 95;</span></span><br><span class="line">	<span class="comment">//if (money &gt; 300)</span></span><br><span class="line">	<span class="comment">//	printf_s("%.2f", money* 0.85);</span></span><br><span class="line">	<span class="comment">//else</span></span><br><span class="line">	<span class="comment">//	printf_s("%.2f", money);</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">//exp6  判断三个边是否能构成直角三角形 边长均为正整数</span></span><br><span class="line">	<span class="comment">//int a, b, c;</span></span><br><span class="line">	<span class="comment">//scanf_s("%d%d%d", &amp;a, &amp;b, &amp;c);</span></span><br><span class="line">	<span class="comment">//if (((a*a + b*b)== c*c) || ((a*a + c*c) == b*b) || ((c*c + b*b) == a*a))</span></span><br><span class="line">	<span class="comment">//	printf_s("yes\n");</span></span><br><span class="line">	<span class="comment">//else</span></span><br><span class="line">	<span class="comment">//	printf_s("not a triangle\n");</span></span><br><span class="line">	<span class="comment">//exp7 判断一个年是不是闰年 能被4整除但是不能被100整除的年份</span></span><br><span class="line">	<span class="comment">//int n;</span></span><br><span class="line">	<span class="comment">//scanf_s("%d", &amp;n);</span></span><br><span class="line">	<span class="comment">//if (n % 4 == 0 &amp;&amp; n % 100 != 0)</span></span><br><span class="line">	<span class="comment">//	printf_s("yes\n");</span></span><br><span class="line">	<span class="comment">//else</span></span><br><span class="line">	<span class="comment">//	printf_s("no\n");</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">//q1: int类型的最大值和最小值是多少 2^(n - 1)   - 1 -2^(n - 1)</span></span><br><span class="line">	<span class="comment">//q2; double浮点数能精确到多少位小数？ 遵循IEEE标准的8字节（64位）的double能表示的有效数字的位数是：15 ~ 16</span></span><br><span class="line">	<span class="comment">//q3: double类型的最大正数值和最小正数值</span></span><br><span class="line">	<span class="comment">//q4: 逻辑运算符号的优先级</span></span><br><span class="line">	<span class="built_in">system</span>(<span class="string">"pause"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
 <p>思考题解析： <a target="_blank" rel="noopener" href="https://blog.csdn.net/panderang/article/details/54096426">https://blog.csdn.net/panderang/article/details/54096426</a></p>
 </article>
 <div class="article-footer slide-up">

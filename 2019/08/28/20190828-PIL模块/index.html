@@ -20,12 +20,12 @@
   <title>PIL模块 - Caius的日常博客</title>
 
   
-    <meta name="description" content="导入    from PIL import Image  读取    img &#x3D; Image.open(filepath)  显示    img.show()  与 numpy 数组的互相转换PIL Image 转 numpy 数组       img_to_array &#x3D; np.array(img)  numpy 数组转 PIL Image (注意要确保数组内的值符合 PIL 的要求)">
+    <meta name="description" content="导入1from PIL import Image  读取1img &#x3D; Image.open(filepath)  显示1img.show()  与 numpy 数组的互相转换PIL Image 转 numpy 数组   1img_to_array &#x3D; np.array(img)  numpy 数组转 PIL Image (注意要确保数组内的值符合 PIL 的要求)   1array_to_img">
 <meta property="og:type" content="article">
 <meta property="og:title" content="PIL模块">
 <meta property="og:url" content="https://caiusy.github.io/2019/08/28/20190828-PIL%E6%A8%A1%E5%9D%97/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="导入    from PIL import Image  读取    img &#x3D; Image.open(filepath)  显示    img.show()  与 numpy 数组的互相转换PIL Image 转 numpy 数组       img_to_array &#x3D; np.array(img)  numpy 数组转 PIL Image (注意要确保数组内的值符合 PIL 的要求)">
+<meta property="og:description" content="导入1from PIL import Image  读取1img &#x3D; Image.open(filepath)  显示1img.show()  与 numpy 数组的互相转换PIL Image 转 numpy 数组   1img_to_array &#x3D; np.array(img)  numpy 数组转 PIL Image (注意要确保数组内的值符合 PIL 的要求)   1array_to_img">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-08-27T16:00:00.000Z">
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -94,29 +94,21 @@
     </div>
     
   </div>
-  </div><article class="md-text content slide-up"><h2 id="导入"><a href="#导入" class="headerlink" title="导入"></a>导入</h2><pre class=" language-python"><code class="language-python">    <span class="token keyword">from</span> PIL <span class="token keyword">import</span> Image
-</code></pre>
-<h2 id="读取"><a href="#读取" class="headerlink" title="读取"></a>读取</h2><pre><code>    img = Image.open(filepath)
-</code></pre>
-<h2 id="显示"><a href="#显示" class="headerlink" title="显示"></a>显示</h2><pre><code>    img.show()
-</code></pre>
+  </div><article class="md-text content slide-up"><h2 id="导入"><a href="#导入" class="headerlink" title="导入"></a>导入</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="读取"><a href="#读取" class="headerlink" title="读取"></a>读取</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">img = Image.open(filepath)</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="显示"><a href="#显示" class="headerlink" title="显示"></a>显示</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">img.show()</span><br></pre></td></tr></tbody></table></figure>
+
 <h2 id="与-numpy-数组的互相转换"><a href="#与-numpy-数组的互相转换" class="headerlink" title="与 numpy 数组的互相转换"></a>与 numpy 数组的互相转换</h2><p>PIL Image 转 numpy 数组  </p>
-<pre class=" language-python"><code class="language-python">    img_to_array <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>img<span class="token punctuation">)</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">img_to_array = np.array(img)</span><br></pre></td></tr></tbody></table></figure>
+
 <p>numpy 数组转 PIL Image (注意要确保数组内的值符合 PIL 的要求)  </p>
-<pre><code>    array_to_img = Image.fromarray(img_to_array)
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">array_to_img = Image.fromarray(img_to_array)</span><br></pre></td></tr></tbody></table></figure>
+
 <h2 id="PIL-与-cv2-格式互相转换"><a href="#PIL-与-cv2-格式互相转换" class="headerlink" title="PIL 与 cv2 格式互相转换"></a>PIL 与 cv2 格式互相转换</h2><p>PIL.Image读入的图片数据类型不是 numpy 数组, 它的size属性为 (w, h), 利用np.array转换成 numpy 数组后, 它的通道顺序为 (r, g, b)  </p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">from</span> PIL <span class="token keyword">import</span> Image
-    <span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
-    <span class="token comment" spellcheck="true"># PIL to cv2</span>
-    pil_img <span class="token operator">=</span> Image<span class="token punctuation">.</span>open<span class="token punctuation">(</span>img_path<span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>pil_img<span class="token punctuation">.</span>size<span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># (w, h)</span>
-    np_img <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span>pil_img<span class="token punctuation">)</span>
-    cv2_img <span class="token operator">=</span> np_img<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true"># 交换通道</span>
-    <span class="token comment" spellcheck="true"># cv2 to PIL</span>
-    pil_img <span class="token operator">=</span> Image<span class="token punctuation">.</span>fromarray<span class="token punctuation">(</span>cv2_img<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="comment"># PIL to cv2</span></span><br><span class="line">pil_img = Image.<span class="built_in">open</span>(img_path)</span><br><span class="line"><span class="built_in">print</span>(pil_img.size) <span class="comment"># (w, h)</span></span><br><span class="line">np_img = np.array(pil_img)</span><br><span class="line">cv2_img = np_img[:, :, ::-<span class="number">1</span>] <span class="comment"># 交换通道</span></span><br><span class="line"><span class="comment"># cv2 to PIL</span></span><br><span class="line">pil_img = Image.fromarray(cv2_img[:, :, ::-<span class="number">1</span>])</span><br></pre></td></tr></tbody></table></figure>
+
 </article>
 <div class="article-footer slide-up">
 
@@ -135,7 +127,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/">Pytorch手册</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/20190828-glob%E6%A8%A1%E5%9D%97/">glob模块</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-BFS/">广度/宽度优先搜索(BFS)</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/20190828-Pytorch-trick/">Pytorch trick</a></div></section></div>
 
 
 

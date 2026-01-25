@@ -20,12 +20,12 @@
   <title>反转链表 - Caius的日常博客</title>
 
   
-    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：606485本题知识点： 链表 题目描述输入一个链表，反转链表后，输出新链表的表头。     &#x2F;*     struct ListNode {         int val;         struct ListNode *next;         ListNode(int x) :                 val(x), next(">
+    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：606485本题知识点： 链表 题目描述输入一个链表，反转链表后，输出新链表的表头。 123456789101112131415161718192021222324&#x2F;*struct ListNode {	int val;	struct ListNode *next;	ListNode(int x) :			val(x), next(NULL) {">
 <meta property="og:type" content="article">
 <meta property="og:title" content="反转链表">
 <meta property="og:url" content="https://caiusy.github.io/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：606485本题知识点： 链表 题目描述输入一个链表，反转链表后，输出新链表的表头。     &#x2F;*     struct ListNode {         int val;         struct ListNode *next;         ListNode(int x) :                 val(x), next(">
+<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：606485本题知识点： 链表 题目描述输入一个链表，反转链表后，输出新链表的表头。 123456789101112131415161718192021222324&#x2F;*struct ListNode {	int val;	struct ListNode *next;	ListNode(int x) :			val(x), next(NULL) {">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-09-11T16:00:00.000Z">
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -96,31 +96,8 @@
   </div>
   </div><article class="md-text content slide-up"><p>时间限制：1秒 空间限制：32768K 热度指数：606485<br>本题知识点： 链表</p>
 <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>输入一个链表，反转链表后，输出新链表的表头。</p>
-<pre class=" language-python"><code class="language-python">    <span class="token operator">/</span><span class="token operator">*</span>
-    struct ListNode <span class="token punctuation">{</span>
-        int val<span class="token punctuation">;</span>
-        struct ListNode <span class="token operator">*</span>next<span class="token punctuation">;</span>
-        ListNode<span class="token punctuation">(</span>int x<span class="token punctuation">)</span> <span class="token punctuation">:</span>
-                val<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> next<span class="token punctuation">(</span>NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token operator">*</span><span class="token operator">/</span>
-    <span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">{</span>
-    public<span class="token punctuation">:</span>
-        ListNode<span class="token operator">*</span> ReverseList<span class="token punctuation">(</span>ListNode<span class="token operator">*</span> pHead<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            ListNode <span class="token operator">*</span>prev <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
-            ListNode <span class="token operator">*</span>curr <span class="token operator">=</span> pHead<span class="token punctuation">;</span>
-            ListNode <span class="token operator">*</span>next <span class="token operator">=</span> NULL<span class="token punctuation">;</span>
-            <span class="token keyword">while</span><span class="token punctuation">(</span>curr<span class="token operator">!=</span>NULL<span class="token punctuation">)</span>
-            <span class="token punctuation">{</span>
-                next <span class="token operator">=</span> curr<span class="token operator">-</span><span class="token operator">></span>next<span class="token punctuation">;</span>
-                curr<span class="token operator">-</span><span class="token operator">></span>next <span class="token operator">=</span> prev<span class="token punctuation">;</span>
-                prev <span class="token operator">=</span> curr<span class="token punctuation">;</span>
-                curr <span class="token operator">=</span> next<span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-            <span class="token keyword">return</span> prev<span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">;</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">struct ListNode {</span><br><span class="line">	<span class="built_in">int</span> val;</span><br><span class="line">	struct ListNode *<span class="built_in">next</span>;</span><br><span class="line">	ListNode(<span class="built_in">int</span> x) :</span><br><span class="line">			val(x), <span class="built_in">next</span>(NULL) {</span><br><span class="line">	}</span><br><span class="line">};*/</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br><span class="line">public:</span><br><span class="line">    ListNode* ReverseList(ListNode* pHead) {</span><br><span class="line">        ListNode *prev = NULL;</span><br><span class="line">        ListNode *curr = pHead;</span><br><span class="line">        ListNode *<span class="built_in">next</span> = NULL;</span><br><span class="line">        <span class="keyword">while</span>(curr!=NULL)</span><br><span class="line">        {</span><br><span class="line">            <span class="built_in">next</span> = curr-&gt;<span class="built_in">next</span>;</span><br><span class="line">            curr-&gt;<span class="built_in">next</span> = prev;</span><br><span class="line">            prev = curr;</span><br><span class="line">            curr = <span class="built_in">next</span>;</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">return</span> prev;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
 <p>运行时间：4ms<br>占用内存：488</p>
 </article>
 <div class="article-footer slide-up">
@@ -140,7 +117,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/14/20190914-%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%8E%92%E5%BA%8F%E7%9A%84%E9%93%BE%E8%A1%A8/">合并两个排序的链表</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/09/12/20190912-%E5%9B%9B%E8%BE%B9%E5%BD%A2%E6%8C%89%E7%85%A7%E9%A1%BA%E6%97%B6%E9%92%88%E6%8E%92%E5%BA%8F/">四边形按照顺时针排序</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/14/20190914-%E6%A0%91%E7%9A%84%E5%AD%90%E7%BB%93%E6%9E%84/">树的子结构</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/09/12/20190912-%E5%9B%9B%E8%BE%B9%E5%BD%A2%E6%8C%89%E7%85%A7%E9%A1%BA%E6%97%B6%E9%92%88%E6%8E%92%E5%BA%8F/">四边形按照顺时针排序</a></div></section></div>
 
 
 

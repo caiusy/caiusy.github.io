@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -97,41 +97,11 @@
   </div><article class="md-text content slide-up"><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。</p>
 <p>时间限制：1秒 空间限制：32768K 热度指数：1323359</p>
 <h2 id="题目解析"><a href="#题目解析" class="headerlink" title="题目解析"></a>题目解析</h2><p>已知从左到右、从上导线都呈递增关系，令行row为0，令列col为第一行最后一位，然后将target与第一行最后一个数进行比较，若大于这个数则，行数++，若小于这个数，则列数向前递减。题目的要求是 当目标数target既不大于也不小于array[row][col]，认为target==array[row][col]，返回true。其他的情况则返回false。<br>注： 在 c++中获取vector数组的行数和列数的代码与java不一样</p>
-<pre><code>    c++:
-    int col = array[0].size()-1;
-    int row = array.size();
-    java:
-    int col = array[0].length - 1;
-    int array_len = array.length;
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">c++:</span><br><span class="line">int col = array[0].size()-1;</span><br><span class="line">int row = array.size();</span><br><span class="line">java:</span><br><span class="line">int col = array[0].length - 1;</span><br><span class="line">int array_len = array.length;</span><br></pre></td></tr></tbody></table></figure>
+
 <p>c++代码 如下：  </p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">{</span>
-    public<span class="token punctuation">:</span>
-        <span class="token operator">//</span>行数：
-        <span class="token operator">//</span>example<span class="token punctuation">.</span>length
-        <span class="token operator">//</span> 列数：
-        <span class="token operator">//</span>example<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>length    <span class="token operator">//</span>第<span class="token number">0</span>行的列数
-        bool Find<span class="token punctuation">(</span>int target<span class="token punctuation">,</span> vector<span class="token operator">&lt;</span>vector<span class="token operator">&lt;</span>int<span class="token operator">></span> <span class="token operator">></span> array<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token keyword">if</span><span class="token punctuation">(</span>array<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">==</span><span class="token number">0</span><span class="token punctuation">)</span>
-            <span class="token punctuation">{</span>
-                <span class="token keyword">return</span>  false<span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-            int row <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-            int col <span class="token operator">=</span> array<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
-            int array_len <span class="token operator">=</span> array<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token keyword">while</span><span class="token punctuation">(</span>row <span class="token operator">&lt;</span>array_len <span class="token operator">&amp;</span><span class="token operator">&amp;</span> col<span class="token operator">>=</span><span class="token number">0</span> <span class="token punctuation">)</span>
-            <span class="token punctuation">{</span>
-                <span class="token keyword">if</span><span class="token punctuation">(</span>target<span class="token operator">></span> array<span class="token punctuation">[</span>row<span class="token punctuation">]</span><span class="token punctuation">[</span>col<span class="token punctuation">]</span><span class="token punctuation">)</span>
-                    row<span class="token operator">+</span><span class="token operator">+</span><span class="token punctuation">;</span>
-                <span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span>target<span class="token operator">&lt;</span> array<span class="token punctuation">[</span>row<span class="token punctuation">]</span><span class="token punctuation">[</span>col<span class="token punctuation">]</span><span class="token punctuation">)</span>
-                    col<span class="token operator">-</span><span class="token operator">-</span><span class="token punctuation">;</span>
-                <span class="token keyword">else</span>
-                    <span class="token keyword">return</span> true<span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-            <span class="token keyword">return</span> false<span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">;</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br><span class="line">public:</span><br><span class="line">    //行数：</span><br><span class="line">    //example.length</span><br><span class="line">    // 列数：</span><br><span class="line">    //example[<span class="number">0</span>].length    //第<span class="number">0</span>行的列数</span><br><span class="line">    <span class="built_in">bool</span> Find(<span class="built_in">int</span> target, vector&lt;vector&lt;<span class="built_in">int</span>&gt; &gt; array) {</span><br><span class="line">        <span class="keyword">if</span>(array.size()==<span class="number">0</span>)</span><br><span class="line">        {</span><br><span class="line">            <span class="keyword">return</span>  false;</span><br><span class="line">        }</span><br><span class="line">        <span class="built_in">int</span> row = <span class="number">0</span>;</span><br><span class="line">        <span class="built_in">int</span> col = array[<span class="number">0</span>].size()-<span class="number">1</span>;</span><br><span class="line">        <span class="built_in">int</span> array_len = array.size();</span><br><span class="line">        <span class="keyword">while</span>(row &lt;array_len &amp;&amp; col&gt;=<span class="number">0</span> )</span><br><span class="line">        {</span><br><span class="line">            <span class="keyword">if</span>(target&gt; array[row][col])</span><br><span class="line">                row++;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(target&lt; array[row][col])</span><br><span class="line">                col--;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> true;</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">return</span> false;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
 <p>运行时间：11ms<br>占用内存：1500k</p>
 </article>
 <div class="article-footer slide-up">
@@ -151,7 +121,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-%E4%BB%8E%E4%B8%8A%E5%BE%80%E4%B8%8B%E6%89%93%E5%8D%B0%E4%BA%8C%E5%8F%89%E6%A0%91/">从上往下打印二叉树</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/26/20190826-%E4%BB%BF%E5%B0%84%E5%8F%98%E6%8D%A2/">仿射变换</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/">python手册</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/26/20190826-%E4%BB%BF%E5%B0%84%E5%8F%98%E6%8D%A2/">仿射变换</a></div></section></div>
 
 
 

@@ -20,12 +20,12 @@
   <title>从上往下打印二叉树 - Caius的日常博客</title>
 
   
-    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：420679本题知识点： 队列 树   题目描述从上往下打印出二叉树的每个节点，同层节点从左至右打印。     &#x2F;*     struct TreeNode {         int val;         struct TreeNode *left;         struct TreeNode *right;         TreeNo">
+    <meta name="description" content="时间限制：1秒 空间限制：32768K 热度指数：420679本题知识点： 队列 树   题目描述从上往下打印出二叉树的每个节点，同层节点从左至右打印。 123456789101112131415161718192021222324252627282930&#x2F;*struct TreeNode {	int val;	struct TreeNode *left;	struct TreeNode *rig">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从上往下打印二叉树">
 <meta property="og:url" content="https://caiusy.github.io/2019/08/28/20190828-%E4%BB%8E%E4%B8%8A%E5%BE%80%E4%B8%8B%E6%89%93%E5%8D%B0%E4%BA%8C%E5%8F%89%E6%A0%91/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：420679本题知识点： 队列 树   题目描述从上往下打印出二叉树的每个节点，同层节点从左至右打印。     &#x2F;*     struct TreeNode {         int val;         struct TreeNode *left;         struct TreeNode *right;         TreeNo">
+<meta property="og:description" content="时间限制：1秒 空间限制：32768K 热度指数：420679本题知识点： 队列 树   题目描述从上往下打印出二叉树的每个节点，同层节点从左至右打印。 123456789101112131415161718192021222324252627282930&#x2F;*struct TreeNode {	int val;	struct TreeNode *left;	struct TreeNode *rig">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-08-27T16:00:00.000Z">
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -96,37 +96,8 @@
   </div>
   </div><article class="md-text content slide-up"><p>时间限制：1秒 空间限制：32768K 热度指数：420679<br>本题知识点： 队列 树  </p>
 <h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>从上往下打印出二叉树的每个节点，同层节点从左至右打印。</p>
-<pre class=" language-python"><code class="language-python">    <span class="token operator">/</span><span class="token operator">*</span>
-    struct TreeNode <span class="token punctuation">{</span>
-        int val<span class="token punctuation">;</span>
-        struct TreeNode <span class="token operator">*</span>left<span class="token punctuation">;</span>
-        struct TreeNode <span class="token operator">*</span>right<span class="token punctuation">;</span>
-        TreeNode<span class="token punctuation">(</span>int x<span class="token punctuation">)</span> <span class="token punctuation">:</span>
-                val<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">,</span> left<span class="token punctuation">(</span>NULL<span class="token punctuation">)</span><span class="token punctuation">,</span> right<span class="token punctuation">(</span>NULL<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">;</span><span class="token operator">*</span><span class="token operator">/</span>
-    <span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">{</span>
-    public<span class="token punctuation">:</span>
-        vector<span class="token operator">&lt;</span>int<span class="token operator">></span> PrintFromTopToBottom<span class="token punctuation">(</span>TreeNode<span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token operator">//</span>队列是先进先出
-            queue<span class="token operator">&lt;</span>TreeNode<span class="token operator">*</span><span class="token operator">></span> que<span class="token punctuation">;</span>
-            vector<span class="token operator">&lt;</span>int<span class="token operator">></span> vec<span class="token punctuation">;</span>
-            que<span class="token punctuation">.</span>push<span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token operator">//</span>先将整个二叉树放入队列
-            <span class="token keyword">while</span><span class="token punctuation">(</span>!que<span class="token punctuation">.</span>empty<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">//</span>当队列非空进行循环
-            <span class="token punctuation">{</span>
-                TreeNode<span class="token operator">*</span> p<span class="token punctuation">;</span>
-                p <span class="token operator">=</span> que<span class="token punctuation">.</span>front<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token operator">//</span>先读取队列的首元素
-                que<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token operator">//</span>弹出队列的首元素
-                <span class="token keyword">if</span><span class="token punctuation">(</span>p <span class="token operator">==</span> NULL<span class="token punctuation">)</span>
-                    <span class="token keyword">continue</span><span class="token punctuation">;</span><span class="token operator">//</span>所有元素存入vec后，由于队列中存放着空指针，依然进入循环，但此时p的值为NULL，不执行下面的操作，跳出循环结束
-                que<span class="token punctuation">.</span>push<span class="token punctuation">(</span>p<span class="token operator">-</span><span class="token operator">></span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                que<span class="token punctuation">.</span>push<span class="token punctuation">(</span>p<span class="token operator">-</span><span class="token operator">></span>right<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                vec<span class="token punctuation">.</span>push_back<span class="token punctuation">(</span>p<span class="token operator">-</span><span class="token operator">></span>val<span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-            <span class="token keyword">return</span> vec<span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span><span class="token punctuation">;</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">struct TreeNode {</span><br><span class="line">	<span class="built_in">int</span> val;</span><br><span class="line">	struct TreeNode *left;</span><br><span class="line">	struct TreeNode *right;</span><br><span class="line">	TreeNode(<span class="built_in">int</span> x) :</span><br><span class="line">			val(x), left(NULL), right(NULL) {</span><br><span class="line">	}</span><br><span class="line">};*/</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br><span class="line">public:</span><br><span class="line">    vector&lt;<span class="built_in">int</span>&gt; PrintFromTopToBottom(TreeNode* root) {</span><br><span class="line">        //队列是先进先出</span><br><span class="line">        queue&lt;TreeNode*&gt; que;</span><br><span class="line">		vector&lt;<span class="built_in">int</span>&gt; vec;</span><br><span class="line">		que.push(root);//先将整个二叉树放入队列</span><br><span class="line">		<span class="keyword">while</span>(!que.empty()) //当队列非空进行循环</span><br><span class="line">		{</span><br><span class="line">			TreeNode* p;</span><br><span class="line">			p = que.front();//先读取队列的首元素</span><br><span class="line">			que.pop();//弹出队列的首元素</span><br><span class="line">			<span class="keyword">if</span>(p == NULL)</span><br><span class="line">				<span class="keyword">continue</span>;//所有元素存入vec后，由于队列中存放着空指针，依然进入循环，但此时p的值为NULL，不执行下面的操作，跳出循环结束</span><br><span class="line">			que.push(p-&gt;left);</span><br><span class="line">			que.push(p-&gt;right);</span><br><span class="line">			vec.push_back(p-&gt;val);</span><br><span class="line">		}</span><br><span class="line">		<span class="keyword">return</span> vec;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
 <p>运行时间：3ms<br>占用内存：464k</p>
 </article>
 <div class="article-footer slide-up">
@@ -146,7 +117,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-skimage%E6%A8%A1%E5%9D%97/">skimage模块</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/27/20190827-%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9F%A5%E6%89%BE/">二维数组中的查找</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/">shutil模块</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/">python手册</a></div></section></div>
 
 
 

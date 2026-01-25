@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -98,319 +98,68 @@
 <p>🎯 <strong>核心特性</strong>：栈 LIFO（后进先出），队列 FIFO（先进先出）</p>
 </blockquote>
 <hr>
-<h2 id="🗺️-栈的核心应用场景"><a href="#🗺️-栈的核心应用场景" class="headerlink" title="🗺️ 栈的核心应用场景"></a>🗺️ 栈的核心应用场景</h2><pre><code>┌─────────────────────────────────────────────────────────────┐
-│                    栈的应用场景                              │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  1. 括号匹配                                                │
-│     遇到左括号入栈，遇到右括号出栈匹配                       │
-│                                                             │
-│  2. 表达式求值                                               │
-│     操作数栈 + 运算符栈                                      │
-│                                                             │
-│  3. 单调栈                                                   │
-│     找下一个更大/更小元素                                    │
-│                                                             │
-│  4. 路径简化                                                 │
-│     处理 "." 和 ".."                                        │
-│                                                             │
-│       ┌───┐                                                 │
-│       │ C │ ← Top (后进先出)                                │
-│       ├───┤                                                 │
-│       │ B │                                                 │
-│       ├───┤                                                 │
-│       │ A │                                                 │
-│       └───┘                                                 │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-</code></pre>
+<h2 id="🗺️-栈的核心应用场景"><a href="#🗺️-栈的核心应用场景" class="headerlink" title="🗺️ 栈的核心应用场景"></a>🗺️ 栈的核心应用场景</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│                    栈的应用场景                              │</span><br><span class="line">├─────────────────────────────────────────────────────────────┤</span><br><span class="line">│                                                             │</span><br><span class="line">│  1. 括号匹配                                                │</span><br><span class="line">│     遇到左括号入栈，遇到右括号出栈匹配                       │</span><br><span class="line">│                                                             │</span><br><span class="line">│  2. 表达式求值                                               │</span><br><span class="line">│     操作数栈 + 运算符栈                                      │</span><br><span class="line">│                                                             │</span><br><span class="line">│  3. 单调栈                                                   │</span><br><span class="line">│     找下一个更大/更小元素                                    │</span><br><span class="line">│                                                             │</span><br><span class="line">│  4. 路径简化                                                 │</span><br><span class="line">│     处理 "." 和 ".."                                        │</span><br><span class="line">│                                                             │</span><br><span class="line">│       ┌───┐                                                 │</span><br><span class="line">│       │ C │ ← Top (后进先出)                                │</span><br><span class="line">│       ├───┤                                                 │</span><br><span class="line">│       │ B │                                                 │</span><br><span class="line">│       ├───┤                                                 │</span><br><span class="line">│       │ A │                                                 │</span><br><span class="line">│       └───┘                                                 │</span><br><span class="line">│                                                             │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <h2 id="1️⃣-LC-20-有效的括号-🟢"><a href="#1️⃣-LC-20-有效的括号-🟢" class="headerlink" title="1️⃣ LC 20. 有效的括号 🟢"></a>1️⃣ LC 20. 有效的括号 🟢</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>判断括号字符串是否有效。</p>
-<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>s = "([{}])"
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">s = "([{}])"</span><br><span class="line"></span><br><span class="line">处理过程:</span><br><span class="line">字符    操作      栈状态</span><br><span class="line">(      入栈      [(]</span><br><span class="line">[      入栈      [(, []</span><br><span class="line">{      入栈      [(, [, {]</span><br><span class="line">}      出栈匹配   [(, []      ✓ { 匹配</span><br><span class="line">]      出栈匹配   [(]         ✓ [ 匹配</span><br><span class="line">)      出栈匹配   []          ✓ ( 匹配</span><br><span class="line"></span><br><span class="line">栈为空 → 有效！</span><br></pre></td></tr></tbody></table></figure>
 
-处理过程:
-字符    操作      栈状态
-(      入栈      [(]
-[      入栈      [(, []
-{      入栈      [(, [, {]
-}      出栈匹配   [(, []      ✓ { 匹配
-]      出栈匹配   [(]         ✓ [ 匹配
-)      出栈匹配   []          ✓ ( 匹配
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">isValid</span>(<span class="params">s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">bool</span>:</span><br><span class="line">    stack = []</span><br><span class="line">    mapping = {<span class="string">')'</span>: <span class="string">'('</span>, <span class="string">']'</span>: <span class="string">'['</span>, <span class="string">'}'</span>: <span class="string">'{'</span>}</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> char <span class="keyword">in</span> s:</span><br><span class="line">        <span class="keyword">if</span> char <span class="keyword">in</span> mapping:</span><br><span class="line">            <span class="comment"># 右括号：出栈匹配</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> stack <span class="keyword">or</span> stack.pop() != mapping[char]:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 左括号：入栈</span></span><br><span class="line">            stack.append(char)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(stack) == <span class="number">0</span></span><br></pre></td></tr></tbody></table></figure>
 
-栈为空 → 有效！
-</code></pre>
-<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">isValid</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> bool<span class="token punctuation">:</span>
-    stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    mapping <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">')'</span><span class="token punctuation">:</span> <span class="token string">'('</span><span class="token punctuation">,</span> <span class="token string">']'</span><span class="token punctuation">:</span> <span class="token string">'['</span><span class="token punctuation">,</span> <span class="token string">'}'</span><span class="token punctuation">:</span> <span class="token string">'{'</span><span class="token punctuation">}</span>
-    
-    <span class="token keyword">for</span> char <span class="token keyword">in</span> s<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> char <span class="token keyword">in</span> mapping<span class="token punctuation">:</span>
-            <span class="token comment" spellcheck="true"># 右括号：出栈匹配</span>
-            <span class="token keyword">if</span> <span class="token operator">not</span> stack <span class="token operator">or</span> stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> mapping<span class="token punctuation">[</span>char<span class="token punctuation">]</span><span class="token punctuation">:</span>
-                <span class="token keyword">return</span> <span class="token boolean">False</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            <span class="token comment" spellcheck="true"># 左括号：入栈</span>
-            stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>char<span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> len<span class="token punctuation">(</span>stack<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span>
-</code></pre>
 <h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“左入右出，空栈有效”</strong></p>
 </blockquote>
 <hr>
 <h2 id="2️⃣-LC-71-简化路径-🟡"><a href="#2️⃣-LC-71-简化路径-🟡" class="headerlink" title="2️⃣ LC 71. 简化路径 🟡"></a>2️⃣ LC 71. 简化路径 🟡</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>简化 Unix 风格的绝对路径。</p>
-<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>path = "/a/./b/../../c/"
+<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">path = "/a/./b/../../c/"</span><br><span class="line"></span><br><span class="line">处理规则:</span><br><span class="line">.   → 当前目录，忽略</span><br><span class="line">..  → 上级目录，出栈</span><br><span class="line">其他 → 目录名，入栈</span><br><span class="line"></span><br><span class="line">处理过程:</span><br><span class="line">a   → 入栈 → [a]</span><br><span class="line">.   → 忽略 → [a]</span><br><span class="line">b   → 入栈 → [a, b]</span><br><span class="line">..  → 出栈 → [a]</span><br><span class="line">..  → 出栈 → []</span><br><span class="line">c   → 入栈 → [c]</span><br><span class="line"></span><br><span class="line">结果: "/c"</span><br></pre></td></tr></tbody></table></figure>
 
-处理规则:
-.   → 当前目录，忽略
-..  → 上级目录，出栈
-其他 → 目录名，入栈
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">simplifyPath</span>(<span class="params">path: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    stack = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> part <span class="keyword">in</span> path.split(<span class="string">'/'</span>):</span><br><span class="line">        <span class="keyword">if</span> part == <span class="string">'..'</span>:</span><br><span class="line">            <span class="keyword">if</span> stack:</span><br><span class="line">                stack.pop()</span><br><span class="line">        <span class="keyword">elif</span> part <span class="keyword">and</span> part != <span class="string">'.'</span>:</span><br><span class="line">            stack.append(part)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="string">'/'</span> + <span class="string">'/'</span>.join(stack)</span><br></pre></td></tr></tbody></table></figure>
 
-处理过程:
-a   → 入栈 → [a]
-.   → 忽略 → [a]
-b   → 入栈 → [a, b]
-..  → 出栈 → [a]
-..  → 出栈 → []
-c   → 入栈 → [c]
-
-结果: "/c"
-</code></pre>
-<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">simplifyPath</span><span class="token punctuation">(</span>path<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> str<span class="token punctuation">:</span>
-    stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    <span class="token keyword">for</span> part <span class="token keyword">in</span> path<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> part <span class="token operator">==</span> <span class="token string">'..'</span><span class="token punctuation">:</span>
-            <span class="token keyword">if</span> stack<span class="token punctuation">:</span>
-                stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token keyword">elif</span> part <span class="token operator">and</span> part <span class="token operator">!=</span> <span class="token string">'.'</span><span class="token punctuation">:</span>
-            stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>part<span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> <span class="token string">'/'</span> <span class="token operator">+</span> <span class="token string">'/'</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>stack<span class="token punctuation">)</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-1"><a href="#🧠-记忆口诀-1" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“点忽略，双点出栈，其他入栈”</strong></p>
 </blockquote>
 <hr>
 <h2 id="3️⃣-LC-155-最小栈-🟡"><a href="#3️⃣-LC-155-最小栈-🟡" class="headerlink" title="3️⃣ LC 155. 最小栈 🟡"></a>3️⃣ LC 155. 最小栈 🟡</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>设计一个支持 O(1) 获取最小值的栈。</p>
-<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>使用辅助栈同步记录当前最小值
+<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">使用辅助栈同步记录当前最小值</span><br><span class="line"></span><br><span class="line">主栈      辅助栈（记录当前最小）</span><br><span class="line">push(5)   [5]       [5]</span><br><span class="line">push(3)   [5,3]     [5,3]      ← 3更小</span><br><span class="line">push(7)   [5,3,7]   [5,3,3]    ← 最小仍是3</span><br><span class="line">pop()     [5,3]     [5,3]</span><br><span class="line">getMin()  返回 3</span><br></pre></td></tr></tbody></table></figure>
 
-主栈      辅助栈（记录当前最小）
-push(5)   [5]       [5]
-push(3)   [5,3]     [5,3]      ← 3更小
-push(7)   [5,3,7]   [5,3,3]    ← 最小仍是3
-pop()     [5,3]     [5,3]
-getMin()  返回 3
-</code></pre>
-<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">MinStack</span><span class="token punctuation">:</span>
-    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-        self<span class="token punctuation">.</span>min_stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    <span class="token keyword">def</span> <span class="token function">push</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> val<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> None<span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>val<span class="token punctuation">)</span>
-        <span class="token comment" spellcheck="true"># 辅助栈：记录当前最小值</span>
-        <span class="token keyword">if</span> <span class="token operator">not</span> self<span class="token punctuation">.</span>min_stack <span class="token operator">or</span> val <span class="token operator">&lt;=</span> self<span class="token punctuation">.</span>min_stack<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
-            self<span class="token punctuation">.</span>min_stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>val<span class="token punctuation">)</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            self<span class="token punctuation">.</span>min_stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>self<span class="token punctuation">.</span>min_stack<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">def</span> <span class="token function">pop</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> None<span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>min_stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">def</span> <span class="token function">top</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-        <span class="token keyword">return</span> self<span class="token punctuation">.</span>stack<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
-    
-    <span class="token keyword">def</span> <span class="token function">getMin</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-        <span class="token keyword">return</span> self<span class="token punctuation">.</span>min_stack<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
-</code></pre>
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MinStack</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.stack = []</span><br><span class="line">        self.min_stack = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">push</span>(<span class="params">self, val: <span class="built_in">int</span></span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        self.stack.append(val)</span><br><span class="line">        <span class="comment"># 辅助栈：记录当前最小值</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self.min_stack <span class="keyword">or</span> val &lt;= self.min_stack[-<span class="number">1</span>]:</span><br><span class="line">            self.min_stack.append(val)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.min_stack.append(self.min_stack[-<span class="number">1</span>])</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">pop</span>(<span class="params">self</span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        self.stack.pop()</span><br><span class="line">        self.min_stack.pop()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">top</span>(<span class="params">self</span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">        <span class="keyword">return</span> self.stack[-<span class="number">1</span>]</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">getMin</span>(<span class="params">self</span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">        <span class="keyword">return</span> self.min_stack[-<span class="number">1</span>]</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-记忆口诀-2"><a href="#🧠-记忆口诀-2" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“辅助栈同步记录最小值”</strong></p>
 </blockquote>
 <hr>
 <h2 id="4️⃣-LC-150-逆波兰表达式求值-🟡"><a href="#4️⃣-LC-150-逆波兰表达式求值-🟡" class="headerlink" title="4️⃣ LC 150. 逆波兰表达式求值 🟡"></a>4️⃣ LC 150. 逆波兰表达式求值 🟡</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><p>计算逆波兰表达式（后缀表达式）的值。</p>
-<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>tokens = ["2","1","+","3","*"]
+<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">tokens = ["2","1","+","3","*"]</span><br><span class="line"></span><br><span class="line">等价于: (2 + 1) * 3 = 9</span><br><span class="line"></span><br><span class="line">处理过程（遇到运算符弹出两个操作数）:</span><br><span class="line">2   → 入栈 → [2]</span><br><span class="line">1   → 入栈 → [2, 1]</span><br><span class="line">+   → 弹出1,2，计算2+1=3 → [3]</span><br><span class="line">3   → 入栈 → [3, 3]</span><br><span class="line">*   → 弹出3,3，计算3*3=9 → [9]</span><br><span class="line"></span><br><span class="line">结果: 9</span><br></pre></td></tr></tbody></table></figure>
 
-等价于: (2 + 1) * 3 = 9
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">evalRPN</span>(<span class="params">tokens: <span class="built_in">list</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    stack = []</span><br><span class="line">    operators = {<span class="string">'+'</span>, <span class="string">'-'</span>, <span class="string">'*'</span>, <span class="string">'/'</span>}</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> token <span class="keyword">in</span> tokens:</span><br><span class="line">        <span class="keyword">if</span> token <span class="keyword">in</span> operators:</span><br><span class="line">            b, a = stack.pop(), stack.pop()</span><br><span class="line">            <span class="keyword">if</span> token == <span class="string">'+'</span>:</span><br><span class="line">                stack.append(a + b)</span><br><span class="line">            <span class="keyword">elif</span> token == <span class="string">'-'</span>:</span><br><span class="line">                stack.append(a - b)</span><br><span class="line">            <span class="keyword">elif</span> token == <span class="string">'*'</span>:</span><br><span class="line">                stack.append(a * b)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 注意：Python除法向零取整</span></span><br><span class="line">                stack.append(<span class="built_in">int</span>(a / b))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            stack.append(<span class="built_in">int</span>(token))</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> stack[<span class="number">0</span>]</span><br></pre></td></tr></tbody></table></figure>
 
-处理过程（遇到运算符弹出两个操作数）:
-2   → 入栈 → [2]
-1   → 入栈 → [2, 1]
-+   → 弹出1,2，计算2+1=3 → [3]
-3   → 入栈 → [3, 3]
-*   → 弹出3,3，计算3*3=9 → [9]
-
-结果: 9
-</code></pre>
-<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">evalRPN</span><span class="token punctuation">(</span>tokens<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    operators <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">'+'</span><span class="token punctuation">,</span> <span class="token string">'-'</span><span class="token punctuation">,</span> <span class="token string">'*'</span><span class="token punctuation">,</span> <span class="token string">'/'</span><span class="token punctuation">}</span>
-    
-    <span class="token keyword">for</span> token <span class="token keyword">in</span> tokens<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> token <span class="token keyword">in</span> operators<span class="token punctuation">:</span>
-            b<span class="token punctuation">,</span> a <span class="token operator">=</span> stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-            <span class="token keyword">if</span> token <span class="token operator">==</span> <span class="token string">'+'</span><span class="token punctuation">:</span>
-                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>a <span class="token operator">+</span> b<span class="token punctuation">)</span>
-            <span class="token keyword">elif</span> token <span class="token operator">==</span> <span class="token string">'-'</span><span class="token punctuation">:</span>
-                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>a <span class="token operator">-</span> b<span class="token punctuation">)</span>
-            <span class="token keyword">elif</span> token <span class="token operator">==</span> <span class="token string">'*'</span><span class="token punctuation">:</span>
-                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>a <span class="token operator">*</span> b<span class="token punctuation">)</span>
-            <span class="token keyword">else</span><span class="token punctuation">:</span>
-                <span class="token comment" spellcheck="true"># 注意：Python除法向零取整</span>
-                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>int<span class="token punctuation">(</span>a <span class="token operator">/</span> b<span class="token punctuation">)</span><span class="token punctuation">)</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>int<span class="token punctuation">(</span>token<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> stack<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-3"><a href="#🧠-记忆口诀-3" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“数字入栈，运算符弹两个算”</strong></p>
 </blockquote>
 <hr>
 <h2 id="5️⃣-LC-224-基本计算器-🔴"><a href="#5️⃣-LC-224-基本计算器-🔴" class="headerlink" title="5️⃣ LC 224. 基本计算器 🔴"></a>5️⃣ LC 224. 基本计算器 🔴</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><p>实现一个基本的计算器（支持 +、-、括号）。</p>
-<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>s = "1 + (2 - 3)"
+<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">s = "1 + (2 - 3)"</span><br><span class="line"></span><br><span class="line">使用栈保存括号外的状态</span><br><span class="line"></span><br><span class="line">遇到 ( → 保存当前 result 和 sign，重置</span><br><span class="line">遇到 ) → 恢复之前的状态并累加</span><br><span class="line"></span><br><span class="line">处理: 1 + (2 - 3)</span><br><span class="line">1      → result = 1</span><br><span class="line">+      → sign = 1</span><br><span class="line">(      → 保存(1, 1)，重置 result=0</span><br><span class="line">2      → result = 2</span><br><span class="line">-      → sign = -1</span><br><span class="line">3      → result = 2 + (-1)*3 = -1</span><br><span class="line">)      → result = 1 + 1*(-1) = 0</span><br></pre></td></tr></tbody></table></figure>
 
-使用栈保存括号外的状态
+<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">calculate</span>(<span class="params">s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    stack = []</span><br><span class="line">    result = <span class="number">0</span></span><br><span class="line">    num = <span class="number">0</span></span><br><span class="line">    sign = <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> char <span class="keyword">in</span> s:</span><br><span class="line">        <span class="keyword">if</span> char.isdigit():</span><br><span class="line">            num = num * <span class="number">10</span> + <span class="built_in">int</span>(char)</span><br><span class="line">        <span class="keyword">elif</span> char == <span class="string">'+'</span>:</span><br><span class="line">            result += sign * num</span><br><span class="line">            num = <span class="number">0</span></span><br><span class="line">            sign = <span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> char == <span class="string">'-'</span>:</span><br><span class="line">            result += sign * num</span><br><span class="line">            num = <span class="number">0</span></span><br><span class="line">            sign = -<span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> char == <span class="string">'('</span>:</span><br><span class="line">            <span class="comment"># 保存当前状态</span></span><br><span class="line">            stack.append(result)</span><br><span class="line">            stack.append(sign)</span><br><span class="line">            result = <span class="number">0</span></span><br><span class="line">            sign = <span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> char == <span class="string">')'</span>:</span><br><span class="line">            result += sign * num</span><br><span class="line">            num = <span class="number">0</span></span><br><span class="line">            <span class="comment"># 恢复状态</span></span><br><span class="line">            result = result * stack.pop() + stack.pop()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> result + sign * num</span><br></pre></td></tr></tbody></table></figure>
 
-遇到 ( → 保存当前 result 和 sign，重置
-遇到 ) → 恢复之前的状态并累加
-
-处理: 1 + (2 - 3)
-1      → result = 1
-+      → sign = 1
-(      → 保存(1, 1)，重置 result=0
-2      → result = 2
--      → sign = -1
-3      → result = 2 + (-1)*3 = -1
-)      → result = 1 + 1*(-1) = 0
-</code></pre>
-<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">calculate</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    result <span class="token operator">=</span> <span class="token number">0</span>
-    num <span class="token operator">=</span> <span class="token number">0</span>
-    sign <span class="token operator">=</span> <span class="token number">1</span>
-    
-    <span class="token keyword">for</span> char <span class="token keyword">in</span> s<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> char<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            num <span class="token operator">=</span> num <span class="token operator">*</span> <span class="token number">10</span> <span class="token operator">+</span> int<span class="token punctuation">(</span>char<span class="token punctuation">)</span>
-        <span class="token keyword">elif</span> char <span class="token operator">==</span> <span class="token string">'+'</span><span class="token punctuation">:</span>
-            result <span class="token operator">+=</span> sign <span class="token operator">*</span> num
-            num <span class="token operator">=</span> <span class="token number">0</span>
-            sign <span class="token operator">=</span> <span class="token number">1</span>
-        <span class="token keyword">elif</span> char <span class="token operator">==</span> <span class="token string">'-'</span><span class="token punctuation">:</span>
-            result <span class="token operator">+=</span> sign <span class="token operator">*</span> num
-            num <span class="token operator">=</span> <span class="token number">0</span>
-            sign <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span>
-        <span class="token keyword">elif</span> char <span class="token operator">==</span> <span class="token string">'('</span><span class="token punctuation">:</span>
-            <span class="token comment" spellcheck="true"># 保存当前状态</span>
-            stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>result<span class="token punctuation">)</span>
-            stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>sign<span class="token punctuation">)</span>
-            result <span class="token operator">=</span> <span class="token number">0</span>
-            sign <span class="token operator">=</span> <span class="token number">1</span>
-        <span class="token keyword">elif</span> char <span class="token operator">==</span> <span class="token string">')'</span><span class="token punctuation">:</span>
-            result <span class="token operator">+=</span> sign <span class="token operator">*</span> num
-            num <span class="token operator">=</span> <span class="token number">0</span>
-            <span class="token comment" spellcheck="true"># 恢复状态</span>
-            result <span class="token operator">=</span> result <span class="token operator">*</span> stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> result <span class="token operator">+</span> sign <span class="token operator">*</span> num
-</code></pre>
 <h3 id="🧠-记忆口诀-4"><a href="#🧠-记忆口诀-4" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“括号保存状态，出来恢复累加”</strong></p>
 </blockquote>
 <hr>
 <h2 id="6️⃣-LC-227-基本计算器-II-🟡"><a href="#6️⃣-LC-227-基本计算器-II-🟡" class="headerlink" title="6️⃣ LC 227. 基本计算器 II 🟡"></a>6️⃣ LC 227. 基本计算器 II 🟡</h2><h3 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h3><p>实现计算器（支持 +、-、*、/，无括号）。</p>
-<h3 id="🎨-图解思路-5"><a href="#🎨-图解思路-5" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>s = "3+2*2"
+<h3 id="🎨-图解思路-5"><a href="#🎨-图解思路-5" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">s = "3+2*2"</span><br><span class="line"></span><br><span class="line">* / 优先级高于 + -</span><br><span class="line"></span><br><span class="line">策略：用栈保存待加的数</span><br><span class="line">遇到 + 入栈正数</span><br><span class="line">遇到 - 入栈负数</span><br><span class="line">遇到 * / 弹出栈顶计算后入栈</span><br><span class="line"></span><br><span class="line">处理: 3 + 2 * 2</span><br><span class="line">3   → 栈 [3]</span><br><span class="line">+   → 记录 op = +</span><br><span class="line">2   → 栈 [3, 2]</span><br><span class="line">*   → 记录 op = *</span><br><span class="line">2   → 弹出2，计算2*2=4，栈 [3, 4]</span><br><span class="line"></span><br><span class="line">结果: sum([3, 4]) = 7</span><br></pre></td></tr></tbody></table></figure>
 
-* / 优先级高于 + -
+<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">calculate</span>(<span class="params">s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    stack = []</span><br><span class="line">    num = <span class="number">0</span></span><br><span class="line">    op = <span class="string">'+'</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i, char <span class="keyword">in</span> <span class="built_in">enumerate</span>(s):</span><br><span class="line">        <span class="keyword">if</span> char.isdigit():</span><br><span class="line">            num = num * <span class="number">10</span> + <span class="built_in">int</span>(char)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> char <span class="keyword">in</span> <span class="string">'+-*/'</span> <span class="keyword">or</span> i == <span class="built_in">len</span>(s) - <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">if</span> op == <span class="string">'+'</span>:</span><br><span class="line">                stack.append(num)</span><br><span class="line">            <span class="keyword">elif</span> op == <span class="string">'-'</span>:</span><br><span class="line">                stack.append(-num)</span><br><span class="line">            <span class="keyword">elif</span> op == <span class="string">'*'</span>:</span><br><span class="line">                stack.append(stack.pop() * num)</span><br><span class="line">            <span class="keyword">elif</span> op == <span class="string">'/'</span>:</span><br><span class="line">                stack.append(<span class="built_in">int</span>(stack.pop() / num))</span><br><span class="line">            </span><br><span class="line">            op = char</span><br><span class="line">            num = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">sum</span>(stack)</span><br></pre></td></tr></tbody></table></figure>
 
-策略：用栈保存待加的数
-遇到 + 入栈正数
-遇到 - 入栈负数
-遇到 * / 弹出栈顶计算后入栈
-
-处理: 3 + 2 * 2
-3   → 栈 [3]
-+   → 记录 op = +
-2   → 栈 [3, 2]
-*   → 记录 op = *
-2   → 弹出2，计算2*2=4，栈 [3, 4]
-
-结果: sum([3, 4]) = 7
-</code></pre>
-<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">calculate</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    num <span class="token operator">=</span> <span class="token number">0</span>
-    op <span class="token operator">=</span> <span class="token string">'+'</span>
-    
-    <span class="token keyword">for</span> i<span class="token punctuation">,</span> char <span class="token keyword">in</span> enumerate<span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">if</span> char<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            num <span class="token operator">=</span> num <span class="token operator">*</span> <span class="token number">10</span> <span class="token operator">+</span> int<span class="token punctuation">(</span>char<span class="token punctuation">)</span>
-        
-        <span class="token keyword">if</span> char <span class="token keyword">in</span> <span class="token string">'+-*/'</span> <span class="token operator">or</span> i <span class="token operator">==</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">:</span>
-            <span class="token keyword">if</span> op <span class="token operator">==</span> <span class="token string">'+'</span><span class="token punctuation">:</span>
-                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>num<span class="token punctuation">)</span>
-            <span class="token keyword">elif</span> op <span class="token operator">==</span> <span class="token string">'-'</span><span class="token punctuation">:</span>
-                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token operator">-</span>num<span class="token punctuation">)</span>
-            <span class="token keyword">elif</span> op <span class="token operator">==</span> <span class="token string">'*'</span><span class="token punctuation">:</span>
-                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> num<span class="token punctuation">)</span>
-            <span class="token keyword">elif</span> op <span class="token operator">==</span> <span class="token string">'/'</span><span class="token punctuation">:</span>
-                stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>int<span class="token punctuation">(</span>stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">/</span> num<span class="token punctuation">)</span><span class="token punctuation">)</span>
-            
-            op <span class="token operator">=</span> char
-            num <span class="token operator">=</span> <span class="token number">0</span>
-    
-    <span class="token keyword">return</span> sum<span class="token punctuation">(</span>stack<span class="token punctuation">)</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-5"><a href="#🧠-记忆口诀-5" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“加减入栈，乘除先算”</strong></p>
 </blockquote>
 <hr>
 <h2 id="7️⃣-LC-772-基本计算器-III-🔴"><a href="#7️⃣-LC-772-基本计算器-III-🔴" class="headerlink" title="7️⃣ LC 772. 基本计算器 III 🔴"></a>7️⃣ LC 772. 基本计算器 III 🔴</h2><h3 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h3><p>实现完整计算器（支持 +、-、*、/、括号）。</p>
-<h3 id="🎨-图解思路-6"><a href="#🎨-图解思路-6" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>结合 224 和 227 的思路
+<h3 id="🎨-图解思路-6"><a href="#🎨-图解思路-6" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">结合 224 和 227 的思路</span><br><span class="line"></span><br><span class="line">方法1：递归处理括号</span><br><span class="line">方法2：双栈（操作数栈 + 运算符栈）</span><br></pre></td></tr></tbody></table></figure>
 
-方法1：递归处理括号
-方法2：双栈（操作数栈 + 运算符栈）
-</code></pre>
-<h3 id="💻-代码实现（递归）"><a href="#💻-代码实现（递归）" class="headerlink" title="💻 代码实现（递归）"></a>💻 代码实现（递归）</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">calculate</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    <span class="token keyword">def</span> <span class="token function">helper</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> start<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-        num <span class="token operator">=</span> <span class="token number">0</span>
-        op <span class="token operator">=</span> <span class="token string">'+'</span>
-        i <span class="token operator">=</span> start
-        
-        <span class="token keyword">while</span> i <span class="token operator">&lt;</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            char <span class="token operator">=</span> s<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
-            
-            <span class="token keyword">if</span> char<span class="token punctuation">.</span>isdigit<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-                num <span class="token operator">=</span> num <span class="token operator">*</span> <span class="token number">10</span> <span class="token operator">+</span> int<span class="token punctuation">(</span>char<span class="token punctuation">)</span>
-            
-            <span class="token keyword">if</span> char <span class="token operator">==</span> <span class="token string">'('</span><span class="token punctuation">:</span>
-                num<span class="token punctuation">,</span> i <span class="token operator">=</span> helper<span class="token punctuation">(</span>s<span class="token punctuation">,</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
-            
-            <span class="token keyword">if</span> char <span class="token keyword">in</span> <span class="token string">'+-*/)'</span> <span class="token operator">or</span> i <span class="token operator">==</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">:</span>
-                <span class="token keyword">if</span> op <span class="token operator">==</span> <span class="token string">'+'</span><span class="token punctuation">:</span>
-                    stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>num<span class="token punctuation">)</span>
-                <span class="token keyword">elif</span> op <span class="token operator">==</span> <span class="token string">'-'</span><span class="token punctuation">:</span>
-                    stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token operator">-</span>num<span class="token punctuation">)</span>
-                <span class="token keyword">elif</span> op <span class="token operator">==</span> <span class="token string">'*'</span><span class="token punctuation">:</span>
-                    stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> num<span class="token punctuation">)</span>
-                <span class="token keyword">elif</span> op <span class="token operator">==</span> <span class="token string">'/'</span><span class="token punctuation">:</span>
-                    stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>int<span class="token punctuation">(</span>stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">/</span> num<span class="token punctuation">)</span><span class="token punctuation">)</span>
-                
-                <span class="token keyword">if</span> char <span class="token operator">==</span> <span class="token string">')'</span><span class="token punctuation">:</span>
-                    <span class="token keyword">return</span> sum<span class="token punctuation">(</span>stack<span class="token punctuation">)</span><span class="token punctuation">,</span> i
-                
-                op <span class="token operator">=</span> char
-                num <span class="token operator">=</span> <span class="token number">0</span>
-            
-            i <span class="token operator">+=</span> <span class="token number">1</span>
-        
-        <span class="token keyword">return</span> sum<span class="token punctuation">(</span>stack<span class="token punctuation">)</span><span class="token punctuation">,</span> i
-    
-    <span class="token keyword">return</span> helper<span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
-</code></pre>
+<h3 id="💻-代码实现（递归）"><a href="#💻-代码实现（递归）" class="headerlink" title="💻 代码实现（递归）"></a>💻 代码实现（递归）</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">calculate</span>(<span class="params">s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">helper</span>(<span class="params">s, start</span>):</span><br><span class="line">        stack = []</span><br><span class="line">        num = <span class="number">0</span></span><br><span class="line">        op = <span class="string">'+'</span></span><br><span class="line">        i = start</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span> i &lt; <span class="built_in">len</span>(s):</span><br><span class="line">            char = s[i]</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> char.isdigit():</span><br><span class="line">                num = num * <span class="number">10</span> + <span class="built_in">int</span>(char)</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> char == <span class="string">'('</span>:</span><br><span class="line">                num, i = helper(s, i + <span class="number">1</span>)</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> char <span class="keyword">in</span> <span class="string">'+-*/)'</span> <span class="keyword">or</span> i == <span class="built_in">len</span>(s) - <span class="number">1</span>:</span><br><span class="line">                <span class="keyword">if</span> op == <span class="string">'+'</span>:</span><br><span class="line">                    stack.append(num)</span><br><span class="line">                <span class="keyword">elif</span> op == <span class="string">'-'</span>:</span><br><span class="line">                    stack.append(-num)</span><br><span class="line">                <span class="keyword">elif</span> op == <span class="string">'*'</span>:</span><br><span class="line">                    stack.append(stack.pop() * num)</span><br><span class="line">                <span class="keyword">elif</span> op == <span class="string">'/'</span>:</span><br><span class="line">                    stack.append(<span class="built_in">int</span>(stack.pop() / num))</span><br><span class="line">                </span><br><span class="line">                <span class="keyword">if</span> char == <span class="string">')'</span>:</span><br><span class="line">                    <span class="keyword">return</span> <span class="built_in">sum</span>(stack), i</span><br><span class="line">                </span><br><span class="line">                op = char</span><br><span class="line">                num = <span class="number">0</span></span><br><span class="line">            </span><br><span class="line">            i += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">sum</span>(stack), i</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> helper(s, <span class="number">0</span>)[<span class="number">0</span>]</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-记忆口诀-6"><a href="#🧠-记忆口诀-6" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“遇括号递归，其他同227”</strong></p>
 </blockquote>
@@ -444,30 +193,10 @@ getMin()  返回 3
 <td>150, 224, 227</td>
 </tr>
 </tbody></table>
-<h3 id="单调栈模板（补充）"><a href="#单调栈模板（补充）" class="headerlink" title="单调栈模板（补充）"></a>单调栈模板（补充）</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">monotonic_stack</span><span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token triple-quoted-string string">"""找每个元素右边第一个更大的元素"""</span>
-    stack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>  <span class="token comment" spellcheck="true"># 存索引</span>
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">*</span> len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span>
-    
-    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">while</span> stack <span class="token operator">and</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">></span> nums<span class="token punctuation">[</span>stack<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">:</span>
-            idx <span class="token operator">=</span> stack<span class="token punctuation">.</span>pop<span class="token punctuation">(</span><span class="token punctuation">)</span>
-            result<span class="token punctuation">[</span>idx<span class="token punctuation">]</span> <span class="token operator">=</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
-        stack<span class="token punctuation">.</span>append<span class="token punctuation">(</span>i<span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> result
-</code></pre>
-<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><pre><code>括号路径最小栈
-逆波兰后计算器
-三道计算器升级
-栈的七题记心里
+<h3 id="单调栈模板（补充）"><a href="#单调栈模板（补充）" class="headerlink" title="单调栈模板（补充）"></a>单调栈模板（补充）</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">monotonic_stack</span>(<span class="params">nums</span>):</span><br><span class="line">    <span class="string">"""找每个元素右边第一个更大的元素"""</span></span><br><span class="line">    stack = []  <span class="comment"># 存索引</span></span><br><span class="line">    result = [-<span class="number">1</span>] * <span class="built_in">len</span>(nums)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(nums)):</span><br><span class="line">        <span class="keyword">while</span> stack <span class="keyword">and</span> nums[i] &gt; nums[stack[-<span class="number">1</span>]]:</span><br><span class="line">            idx = stack.pop()</span><br><span class="line">            result[idx] = nums[i]</span><br><span class="line">        stack.append(i)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
 
-括号 - 有效的括号 (20)
-路径 - 简化路径 (71)
-最小栈 - 最小栈 (155)
-逆波兰 - 逆波兰表达式求值 (150)
-计算器 - 基本计算器系列 (224, 227, 772)
-</code></pre>
+<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">括号路径最小栈</span><br><span class="line">逆波兰后计算器</span><br><span class="line">三道计算器升级</span><br><span class="line">栈的七题记心里</span><br><span class="line"></span><br><span class="line">括号 - 有效的括号 (20)</span><br><span class="line">路径 - 简化路径 (71)</span><br><span class="line">最小栈 - 最小栈 (155)</span><br><span class="line">逆波兰 - 逆波兰表达式求值 (150)</span><br><span class="line">计算器 - 基本计算器系列 (224, 227, 772)</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <blockquote>
 <p>📖 <strong>下一篇</strong>：<a href="/2026/01/18/leetcode-150-heap/">堆/优先队列专题</a></p>
@@ -490,7 +219,7 @@ getMin()  返回 3
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-index/">🎯 LeetCode 面试经典 150 题 - 完全攻略</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-two-pointers/">👆 LeetCode 150 - 双指针专题</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-sliding-window/">🪟 LeetCode 150 - 滑动窗口专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-two-pointers/">👆 LeetCode 150 - 双指针专题</a></div></section></div>
 
 
 

@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -98,537 +98,113 @@
 <p>🎯 <strong>核心技巧</strong>：虚拟头节点、快慢指针、链表反转、合并链表</p>
 </blockquote>
 <hr>
-<h2 id="🗺️-链表核心操作图解"><a href="#🗺️-链表核心操作图解" class="headerlink" title="🗺️ 链表核心操作图解"></a>🗺️ 链表核心操作图解</h2><pre><code>┌─────────────────────────────────────────────────────────────┐
-│                     链表基本操作                             │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  遍历:  [1] → [2] → [3] → [4] → None                       │
-│          ↑                                                  │
-│         cur (cur = cur.next)                               │
-│                                                             │
-│  插入:  [1] → [X] → [2]   (先接后断)                        │
-│              ↗   ↘                                         │
-│                                                             │
-│  删除:  [1] ──────→ [3]   (跨过中间节点)                    │
-│              ╳[2]                                          │
-│                                                             │
-│  反转:  [1] ← [2] ← [3] ← [4]                              │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-</code></pre>
+<h2 id="🗺️-链表核心操作图解"><a href="#🗺️-链表核心操作图解" class="headerlink" title="🗺️ 链表核心操作图解"></a>🗺️ 链表核心操作图解</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│                     链表基本操作                             │</span><br><span class="line">├─────────────────────────────────────────────────────────────┤</span><br><span class="line">│                                                             │</span><br><span class="line">│  遍历:  [1] → [2] → [3] → [4] → None                       │</span><br><span class="line">│          ↑                                                  │</span><br><span class="line">│         cur (cur = cur.next)                               │</span><br><span class="line">│                                                             │</span><br><span class="line">│  插入:  [1] → [X] → [2]   (先接后断)                        │</span><br><span class="line">│              ↗   ↘                                         │</span><br><span class="line">│                                                             │</span><br><span class="line">│  删除:  [1] ──────→ [3]   (跨过中间节点)                    │</span><br><span class="line">│              ╳[2]                                          │</span><br><span class="line">│                                                             │</span><br><span class="line">│  反转:  [1] ← [2] ← [3] ← [4]                              │</span><br><span class="line">│                                                             │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
-<h2 id="🔧-链表万能技巧"><a href="#🔧-链表万能技巧" class="headerlink" title="🔧 链表万能技巧"></a>🔧 链表万能技巧</h2><h3 id="技巧1-虚拟头节点-Dummy-Head"><a href="#技巧1-虚拟头节点-Dummy-Head" class="headerlink" title="技巧1: 虚拟头节点 (Dummy Head)"></a>技巧1: 虚拟头节点 (Dummy Head)</h3><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 避免处理头节点的特殊情况</span>
-dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
-dummy<span class="token punctuation">.</span>next <span class="token operator">=</span> head
-<span class="token comment" spellcheck="true"># ... 操作链表</span>
-<span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
-</code></pre>
-<h3 id="技巧2-快慢指针"><a href="#技巧2-快慢指针" class="headerlink" title="技巧2: 快慢指针"></a>技巧2: 快慢指针</h3><pre class=" language-python"><code class="language-python"><span class="token comment" spellcheck="true"># 找中点、判断环、找环入口</span>
-slow <span class="token operator">=</span> fast <span class="token operator">=</span> head
-<span class="token keyword">while</span> fast <span class="token operator">and</span> fast<span class="token punctuation">.</span>next<span class="token punctuation">:</span>
-    slow <span class="token operator">=</span> slow<span class="token punctuation">.</span>next
-    fast <span class="token operator">=</span> fast<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
-<span class="token comment" spellcheck="true"># slow 就是中点</span>
-</code></pre>
-<h3 id="技巧3-链表反转"><a href="#技巧3-链表反转" class="headerlink" title="技巧3: 链表反转"></a>技巧3: 链表反转</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">reverse</span><span class="token punctuation">(</span>head<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    prev<span class="token punctuation">,</span> curr <span class="token operator">=</span> None<span class="token punctuation">,</span> head
-    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
-        next_temp <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> prev
-        prev <span class="token operator">=</span> curr
-        curr <span class="token operator">=</span> next_temp
-    <span class="token keyword">return</span> prev
-</code></pre>
+<h2 id="🔧-链表万能技巧"><a href="#🔧-链表万能技巧" class="headerlink" title="🔧 链表万能技巧"></a>🔧 链表万能技巧</h2><h3 id="技巧1-虚拟头节点-Dummy-Head"><a href="#技巧1-虚拟头节点-Dummy-Head" class="headerlink" title="技巧1: 虚拟头节点 (Dummy Head)"></a>技巧1: 虚拟头节点 (Dummy Head)</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 避免处理头节点的特殊情况</span></span><br><span class="line">dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">dummy.<span class="built_in">next</span> = head</span><br><span class="line"><span class="comment"># ... 操作链表</span></span><br><span class="line"><span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="技巧2-快慢指针"><a href="#技巧2-快慢指针" class="headerlink" title="技巧2: 快慢指针"></a>技巧2: 快慢指针</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 找中点、判断环、找环入口</span></span><br><span class="line">slow = fast = head</span><br><span class="line"><span class="keyword">while</span> fast <span class="keyword">and</span> fast.<span class="built_in">next</span>:</span><br><span class="line">    slow = slow.<span class="built_in">next</span></span><br><span class="line">    fast = fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line"><span class="comment"># slow 就是中点</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="技巧3-链表反转"><a href="#技巧3-链表反转" class="headerlink" title="技巧3: 链表反转"></a>技巧3: 链表反转</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">reverse</span>(<span class="params">head</span>):</span><br><span class="line">    prev, curr = <span class="literal">None</span>, head</span><br><span class="line">    <span class="keyword">while</span> curr:</span><br><span class="line">        next_temp = curr.<span class="built_in">next</span></span><br><span class="line">        curr.<span class="built_in">next</span> = prev</span><br><span class="line">        prev = curr</span><br><span class="line">        curr = next_temp</span><br><span class="line">    <span class="keyword">return</span> prev</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <h2 id="1️⃣-LC-141-环形链表-🟢"><a href="#1️⃣-LC-141-环形链表-🟢" class="headerlink" title="1️⃣ LC 141. 环形链表 🟢"></a>1️⃣ LC 141. 环形链表 🟢</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>判断链表中是否有环。</p>
-<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>快慢指针：如果有环，快指针一定会追上慢指针
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">快慢指针：如果有环，快指针一定会追上慢指针</span><br><span class="line"></span><br><span class="line">    ┌───────────────┐</span><br><span class="line">    ▼               │</span><br><span class="line">[1] → [2] → [3] → [4]</span><br><span class="line">        ↑     ↑</span><br><span class="line">       slow  fast</span><br><span class="line"></span><br><span class="line">快指针每次走2步，慢指针每次走1步</span><br><span class="line">相对速度为1，一定会在环内相遇</span><br></pre></td></tr></tbody></table></figure>
 
-    ┌───────────────┐
-    ▼               │
-[1] → [2] → [3] → [4]
-        ↑     ↑
-       slow  fast
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">hasCycle</span>(<span class="params">head: ListNode</span>) -&gt; <span class="built_in">bool</span>:</span><br><span class="line">    slow = fast = head</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> fast <span class="keyword">and</span> fast.<span class="built_in">next</span>:</span><br><span class="line">        slow = slow.<span class="built_in">next</span></span><br><span class="line">        fast = fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> slow == fast:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></tbody></table></figure>
 
-快指针每次走2步，慢指针每次走1步
-相对速度为1，一定会在环内相遇
-</code></pre>
-<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">hasCycle</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> bool<span class="token punctuation">:</span>
-    slow <span class="token operator">=</span> fast <span class="token operator">=</span> head
-    
-    <span class="token keyword">while</span> fast <span class="token operator">and</span> fast<span class="token punctuation">.</span>next<span class="token punctuation">:</span>
-        slow <span class="token operator">=</span> slow<span class="token punctuation">.</span>next
-        fast <span class="token operator">=</span> fast<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
-        
-        <span class="token keyword">if</span> slow <span class="token operator">==</span> fast<span class="token punctuation">:</span>
-            <span class="token keyword">return</span> <span class="token boolean">True</span>
-    
-    <span class="token keyword">return</span> <span class="token boolean">False</span>
-</code></pre>
 <h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“快慢追逐，相遇有环”</strong></p>
 </blockquote>
 <hr>
 <h2 id="2️⃣-LC-2-两数相加-🟡"><a href="#2️⃣-LC-2-两数相加-🟡" class="headerlink" title="2️⃣ LC 2. 两数相加 🟡"></a>2️⃣ LC 2. 两数相加 🟡</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>两个逆序存储的链表相加，返回结果链表。</p>
-<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>   2 → 4 → 3  (表示 342)
- + 5 → 6 → 4  (表示 465)
- ─────────────
-   7 → 0 → 8  (表示 807)
+<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">   2 → 4 → 3  (表示 342)</span><br><span class="line"> + 5 → 6 → 4  (表示 465)</span><br><span class="line"> ─────────────</span><br><span class="line">   7 → 0 → 8  (表示 807)</span><br><span class="line"></span><br><span class="line">从头到尾逐位相加，注意进位！</span><br><span class="line"></span><br><span class="line">Step 1: 2 + 5 = 7, 进位0</span><br><span class="line">Step 2: 4 + 6 = 10, 写0进1  </span><br><span class="line">Step 3: 3 + 4 + 1 = 8, 进位0</span><br></pre></td></tr></tbody></table></figure>
 
-从头到尾逐位相加，注意进位！
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">addTwoNumbers</span>(<span class="params">l1: ListNode, l2: ListNode</span>) -&gt; ListNode:</span><br><span class="line">    dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    curr = dummy</span><br><span class="line">    carry = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> l1 <span class="keyword">or</span> l2 <span class="keyword">or</span> carry:</span><br><span class="line">        <span class="comment"># 取值（链表可能长度不同）</span></span><br><span class="line">        val1 = l1.val <span class="keyword">if</span> l1 <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        val2 = l2.val <span class="keyword">if</span> l2 <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 计算和与进位</span></span><br><span class="line">        total = val1 + val2 + carry</span><br><span class="line">        carry = total // <span class="number">10</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 创建新节点</span></span><br><span class="line">        curr.<span class="built_in">next</span> = ListNode(total % <span class="number">10</span>)</span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 移动指针</span></span><br><span class="line">        l1 = l1.<span class="built_in">next</span> <span class="keyword">if</span> l1 <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        l2 = l2.<span class="built_in">next</span> <span class="keyword">if</span> l2 <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
 
-Step 1: 2 + 5 = 7, 进位0
-Step 2: 4 + 6 = 10, 写0进1  
-Step 3: 3 + 4 + 1 = 8, 进位0
-</code></pre>
-<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">addTwoNumbers</span><span class="token punctuation">(</span>l1<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> l2<span class="token punctuation">:</span> ListNode<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> ListNode<span class="token punctuation">:</span>
-    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
-    curr <span class="token operator">=</span> dummy
-    carry <span class="token operator">=</span> <span class="token number">0</span>
-    
-    <span class="token keyword">while</span> l1 <span class="token operator">or</span> l2 <span class="token operator">or</span> carry<span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 取值（链表可能长度不同）</span>
-        val1 <span class="token operator">=</span> l1<span class="token punctuation">.</span>val <span class="token keyword">if</span> l1 <span class="token keyword">else</span> <span class="token number">0</span>
-        val2 <span class="token operator">=</span> l2<span class="token punctuation">.</span>val <span class="token keyword">if</span> l2 <span class="token keyword">else</span> <span class="token number">0</span>
-        
-        <span class="token comment" spellcheck="true"># 计算和与进位</span>
-        total <span class="token operator">=</span> val1 <span class="token operator">+</span> val2 <span class="token operator">+</span> carry
-        carry <span class="token operator">=</span> total <span class="token operator">//</span> <span class="token number">10</span>
-        
-        <span class="token comment" spellcheck="true"># 创建新节点</span>
-        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> ListNode<span class="token punctuation">(</span>total <span class="token operator">%</span> <span class="token number">10</span><span class="token punctuation">)</span>
-        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-        
-        <span class="token comment" spellcheck="true"># 移动指针</span>
-        l1 <span class="token operator">=</span> l1<span class="token punctuation">.</span>next <span class="token keyword">if</span> l1 <span class="token keyword">else</span> None
-        l2 <span class="token operator">=</span> l2<span class="token punctuation">.</span>next <span class="token keyword">if</span> l2 <span class="token keyword">else</span> None
-    
-    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
-</code></pre>
 <h3 id="🧠-记忆口诀-1"><a href="#🧠-记忆口诀-1" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“逐位相加，别忘进位”</strong></p>
 </blockquote>
 <hr>
 <h2 id="3️⃣-LC-21-合并两个有序链表-🟢"><a href="#3️⃣-LC-21-合并两个有序链表-🟢" class="headerlink" title="3️⃣ LC 21. 合并两个有序链表 🟢"></a>3️⃣ LC 21. 合并两个有序链表 🟢</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>将两个升序链表合并为一个新的升序链表。</p>
-<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>l1: 1 → 2 → 4
-l2: 1 → 3 → 4
+<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">l1: 1 → 2 → 4</span><br><span class="line">l2: 1 → 3 → 4</span><br><span class="line"></span><br><span class="line">比较头节点，小的接上去：</span><br><span class="line"></span><br><span class="line">dummy → 1 → 1 → 2 → 3 → 4 → 4</span><br><span class="line">        ↑   ↑   ↑   ↑   ↑   ↑</span><br><span class="line">       l1  l2  l1  l2  l1  l2</span><br></pre></td></tr></tbody></table></figure>
 
-比较头节点，小的接上去：
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">mergeTwoLists</span>(<span class="params">l1: ListNode, l2: ListNode</span>) -&gt; ListNode:</span><br><span class="line">    dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    curr = dummy</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> l1 <span class="keyword">and</span> l2:</span><br><span class="line">        <span class="keyword">if</span> l1.val &lt;= l2.val:</span><br><span class="line">            curr.<span class="built_in">next</span> = l1</span><br><span class="line">            l1 = l1.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            curr.<span class="built_in">next</span> = l2</span><br><span class="line">            l2 = l2.<span class="built_in">next</span></span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 接上剩余部分</span></span><br><span class="line">    curr.<span class="built_in">next</span> = l1 <span class="keyword">if</span> l1 <span class="keyword">else</span> l2</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
 
-dummy → 1 → 1 → 2 → 3 → 4 → 4
-        ↑   ↑   ↑   ↑   ↑   ↑
-       l1  l2  l1  l2  l1  l2
-</code></pre>
-<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">mergeTwoLists</span><span class="token punctuation">(</span>l1<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> l2<span class="token punctuation">:</span> ListNode<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> ListNode<span class="token punctuation">:</span>
-    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
-    curr <span class="token operator">=</span> dummy
-    
-    <span class="token keyword">while</span> l1 <span class="token operator">and</span> l2<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> l1<span class="token punctuation">.</span>val <span class="token operator">&lt;=</span> l2<span class="token punctuation">.</span>val<span class="token punctuation">:</span>
-            curr<span class="token punctuation">.</span>next <span class="token operator">=</span> l1
-            l1 <span class="token operator">=</span> l1<span class="token punctuation">.</span>next
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            curr<span class="token punctuation">.</span>next <span class="token operator">=</span> l2
-            l2 <span class="token operator">=</span> l2<span class="token punctuation">.</span>next
-        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-    
-    <span class="token comment" spellcheck="true"># 接上剩余部分</span>
-    curr<span class="token punctuation">.</span>next <span class="token operator">=</span> l1 <span class="token keyword">if</span> l1 <span class="token keyword">else</span> l2
-    
-    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
-</code></pre>
 <h3 id="🧠-记忆口诀-2"><a href="#🧠-记忆口诀-2" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“比较取小，剩余直接接”</strong></p>
 </blockquote>
 <hr>
 <h2 id="4️⃣-LC-138-随机链表的复制-🟡"><a href="#4️⃣-LC-138-随机链表的复制-🟡" class="headerlink" title="4️⃣ LC 138. 随机链表的复制 🟡"></a>4️⃣ LC 138. 随机链表的复制 🟡</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><p>深拷贝带有随机指针的链表。</p>
-<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>方法：哈希表存储映射关系
+<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">方法：哈希表存储映射关系</span><br><span class="line"></span><br><span class="line">原链表:  [1] → [2] → [3]</span><br><span class="line">          ↓     ↓     ↓ (random)</span><br><span class="line">         [3]   [1]   None</span><br><span class="line"></span><br><span class="line">Step 1: 创建所有新节点，建立 old→new 映射</span><br><span class="line">Step 2: 连接 next 和 random 指针</span><br></pre></td></tr></tbody></table></figure>
 
-原链表:  [1] → [2] → [3]
-          ↓     ↓     ↓ (random)
-         [3]   [1]   None
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">copyRandomList</span>(<span class="params">head: <span class="string">'Node'</span></span>) -&gt; <span class="string">'Node'</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> head:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 建立映射: 旧节点 → 新节点</span></span><br><span class="line">    old_to_new = {}</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 第一遍：创建所有新节点</span></span><br><span class="line">    curr = head</span><br><span class="line">    <span class="keyword">while</span> curr:</span><br><span class="line">        old_to_new[curr] = Node(curr.val)</span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 第二遍：连接 next 和 random</span></span><br><span class="line">    curr = head</span><br><span class="line">    <span class="keyword">while</span> curr:</span><br><span class="line">        new_node = old_to_new[curr]</span><br><span class="line">        new_node.<span class="built_in">next</span> = old_to_new.get(curr.<span class="built_in">next</span>)</span><br><span class="line">        new_node.random = old_to_new.get(curr.random)</span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> old_to_new[head]</span><br></pre></td></tr></tbody></table></figure>
 
-Step 1: 创建所有新节点，建立 old→new 映射
-Step 2: 连接 next 和 random 指针
-</code></pre>
-<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">copyRandomList</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> <span class="token string">'Node'</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token string">'Node'</span><span class="token punctuation">:</span>
-    <span class="token keyword">if</span> <span class="token operator">not</span> head<span class="token punctuation">:</span>
-        <span class="token keyword">return</span> None
-    
-    <span class="token comment" spellcheck="true"># 建立映射: 旧节点 → 新节点</span>
-    old_to_new <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
-    
-    <span class="token comment" spellcheck="true"># 第一遍：创建所有新节点</span>
-    curr <span class="token operator">=</span> head
-    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
-        old_to_new<span class="token punctuation">[</span>curr<span class="token punctuation">]</span> <span class="token operator">=</span> Node<span class="token punctuation">(</span>curr<span class="token punctuation">.</span>val<span class="token punctuation">)</span>
-        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-    
-    <span class="token comment" spellcheck="true"># 第二遍：连接 next 和 random</span>
-    curr <span class="token operator">=</span> head
-    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
-        new_node <span class="token operator">=</span> old_to_new<span class="token punctuation">[</span>curr<span class="token punctuation">]</span>
-        new_node<span class="token punctuation">.</span>next <span class="token operator">=</span> old_to_new<span class="token punctuation">.</span>get<span class="token punctuation">(</span>curr<span class="token punctuation">.</span>next<span class="token punctuation">)</span>
-        new_node<span class="token punctuation">.</span>random <span class="token operator">=</span> old_to_new<span class="token punctuation">.</span>get<span class="token punctuation">(</span>curr<span class="token punctuation">.</span>random<span class="token punctuation">)</span>
-        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-    
-    <span class="token keyword">return</span> old_to_new<span class="token punctuation">[</span>head<span class="token punctuation">]</span>
-</code></pre>
-<h3 id="🔥-O-1-空间解法"><a href="#🔥-O-1-空间解法" class="headerlink" title="🔥 O(1) 空间解法"></a>🔥 O(1) 空间解法</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">copyRandomList</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> <span class="token string">'Node'</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token string">'Node'</span><span class="token punctuation">:</span>
-    <span class="token keyword">if</span> <span class="token operator">not</span> head<span class="token punctuation">:</span>
-        <span class="token keyword">return</span> None
-    
-    <span class="token comment" spellcheck="true"># Step 1: 在每个节点后插入复制节点</span>
-    <span class="token comment" spellcheck="true"># A → A' → B → B' → C → C'</span>
-    curr <span class="token operator">=</span> head
-    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
-        new_node <span class="token operator">=</span> Node<span class="token punctuation">(</span>curr<span class="token punctuation">.</span>val<span class="token punctuation">,</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">)</span>
-        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> new_node
-        curr <span class="token operator">=</span> new_node<span class="token punctuation">.</span>next
-    
-    <span class="token comment" spellcheck="true"># Step 2: 设置 random 指针</span>
-    curr <span class="token operator">=</span> head
-    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> curr<span class="token punctuation">.</span>random<span class="token punctuation">:</span>
-            curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>random <span class="token operator">=</span> curr<span class="token punctuation">.</span>random<span class="token punctuation">.</span>next
-        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
-    
-    <span class="token comment" spellcheck="true"># Step 3: 拆分链表</span>
-    dummy <span class="token operator">=</span> Node<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
-    new_curr <span class="token operator">=</span> dummy
-    curr <span class="token operator">=</span> head
-    <span class="token keyword">while</span> curr<span class="token punctuation">:</span>
-        new_curr<span class="token punctuation">.</span>next <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-        new_curr <span class="token operator">=</span> new_curr<span class="token punctuation">.</span>next
-        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
-        curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-    
-    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
-</code></pre>
+<h3 id="🔥-O-1-空间解法"><a href="#🔥-O-1-空间解法" class="headerlink" title="🔥 O(1) 空间解法"></a>🔥 O(1) 空间解法</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">copyRandomList</span>(<span class="params">head: <span class="string">'Node'</span></span>) -&gt; <span class="string">'Node'</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> head:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 1: 在每个节点后插入复制节点</span></span><br><span class="line">    <span class="comment"># A → A' → B → B' → C → C'</span></span><br><span class="line">    curr = head</span><br><span class="line">    <span class="keyword">while</span> curr:</span><br><span class="line">        new_node = Node(curr.val, curr.<span class="built_in">next</span>)</span><br><span class="line">        curr.<span class="built_in">next</span> = new_node</span><br><span class="line">        curr = new_node.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 2: 设置 random 指针</span></span><br><span class="line">    curr = head</span><br><span class="line">    <span class="keyword">while</span> curr:</span><br><span class="line">        <span class="keyword">if</span> curr.random:</span><br><span class="line">            curr.<span class="built_in">next</span>.random = curr.random.<span class="built_in">next</span></span><br><span class="line">        curr = curr.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 3: 拆分链表</span></span><br><span class="line">    dummy = Node(<span class="number">0</span>)</span><br><span class="line">    new_curr = dummy</span><br><span class="line">    curr = head</span><br><span class="line">    <span class="keyword">while</span> curr:</span><br><span class="line">        new_curr.<span class="built_in">next</span> = curr.<span class="built_in">next</span></span><br><span class="line">        new_curr = new_curr.<span class="built_in">next</span></span><br><span class="line">        curr.<span class="built_in">next</span> = curr.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-记忆口诀-3"><a href="#🧠-记忆口诀-3" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“哈希映射，两遍搞定”</strong></p>
 </blockquote>
 <hr>
 <h2 id="5️⃣-LC-92-反转链表-II-🟡"><a href="#5️⃣-LC-92-反转链表-II-🟡" class="headerlink" title="5️⃣ LC 92. 反转链表 II 🟡"></a>5️⃣ LC 92. 反转链表 II 🟡</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><p>反转链表的第 left 到第 right 个节点。</p>
-<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>原链表: 1 → 2 → 3 → 4 → 5, left=2, right=4
+<h3 id="🎨-图解思路-4"><a href="#🎨-图解思路-4" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">原链表: 1 → 2 → 3 → 4 → 5, left=2, right=4</span><br><span class="line"></span><br><span class="line">Step 1: 找到 left 前一个节点</span><br><span class="line">        1 → [2 → 3 → 4] → 5</span><br><span class="line">        ↑    └─反转区间─┘</span><br><span class="line">       prev</span><br><span class="line"></span><br><span class="line">Step 2: 反转中间部分</span><br><span class="line">        1    2 ← 3 ← 4    5</span><br><span class="line">        ↑    ↓         ↑</span><br><span class="line">       prev  └─────────┘</span><br><span class="line"></span><br><span class="line">Step 3: 重新连接</span><br><span class="line">        1 → 4 → 3 → 2 → 5</span><br></pre></td></tr></tbody></table></figure>
 
-Step 1: 找到 left 前一个节点
-        1 → [2 → 3 → 4] → 5
-        ↑    └─反转区间─┘
-       prev
+<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">reverseBetween</span>(<span class="params">head: ListNode, left: <span class="built_in">int</span>, right: <span class="built_in">int</span></span>) -&gt; ListNode:</span><br><span class="line">    dummy = ListNode(<span class="number">0</span>, head)</span><br><span class="line">    prev = dummy</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 移动到 left 前一个位置</span></span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(left - <span class="number">1</span>):</span><br><span class="line">        prev = prev.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 反转 [left, right] 区间</span></span><br><span class="line">    curr = prev.<span class="built_in">next</span></span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(right - left):</span><br><span class="line">        <span class="comment"># 把 curr.next 插到 prev 后面</span></span><br><span class="line">        next_node = curr.<span class="built_in">next</span></span><br><span class="line">        curr.<span class="built_in">next</span> = next_node.<span class="built_in">next</span></span><br><span class="line">        next_node.<span class="built_in">next</span> = prev.<span class="built_in">next</span></span><br><span class="line">        prev.<span class="built_in">next</span> = next_node</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
 
-Step 2: 反转中间部分
-        1    2 ← 3 ← 4    5
-        ↑    ↓         ↑
-       prev  └─────────┘
-
-Step 3: 重新连接
-        1 → 4 → 3 → 2 → 5
-</code></pre>
-<h3 id="💻-代码实现-4"><a href="#💻-代码实现-4" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">reverseBetween</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> left<span class="token punctuation">:</span> int<span class="token punctuation">,</span> right<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> ListNode<span class="token punctuation">:</span>
-    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> head<span class="token punctuation">)</span>
-    prev <span class="token operator">=</span> dummy
-    
-    <span class="token comment" spellcheck="true"># 移动到 left 前一个位置</span>
-    <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>left <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        prev <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
-    
-    <span class="token comment" spellcheck="true"># 反转 [left, right] 区间</span>
-    curr <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
-    <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>right <span class="token operator">-</span> left<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 把 curr.next 插到 prev 后面</span>
-        next_node <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-        curr<span class="token punctuation">.</span>next <span class="token operator">=</span> next_node<span class="token punctuation">.</span>next
-        next_node<span class="token punctuation">.</span>next <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
-        prev<span class="token punctuation">.</span>next <span class="token operator">=</span> next_node
-    
-    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
-</code></pre>
 <h3 id="🧠-记忆口诀-4"><a href="#🧠-记忆口诀-4" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“头插法反转，一次遍历”</strong></p>
 </blockquote>
 <hr>
 <h2 id="6️⃣-LC-25-K-个一组翻转链表-🔴"><a href="#6️⃣-LC-25-K-个一组翻转链表-🔴" class="headerlink" title="6️⃣ LC 25. K 个一组翻转链表 🔴"></a>6️⃣ LC 25. K 个一组翻转链表 🔴</h2><h3 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h3><p>每 k 个节点一组进行翻转。</p>
-<h3 id="🎨-图解思路-5"><a href="#🎨-图解思路-5" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>链表: 1 → 2 → 3 → 4 → 5, k = 2
+<h3 id="🎨-图解思路-5"><a href="#🎨-图解思路-5" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">链表: 1 → 2 → 3 → 4 → 5, k = 2</span><br><span class="line"></span><br><span class="line">第1组: [1,2] → 反转 → [2,1]</span><br><span class="line">第2组: [3,4] → 反转 → [4,3]  </span><br><span class="line">第3组: [5] → 不足k个，保持原样</span><br><span class="line"></span><br><span class="line">结果: 2 → 1 → 4 → 3 → 5</span><br></pre></td></tr></tbody></table></figure>
 
-第1组: [1,2] → 反转 → [2,1]
-第2组: [3,4] → 反转 → [4,3]  
-第3组: [5] → 不足k个，保持原样
+<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">reverseKGroup</span>(<span class="params">head: ListNode, k: <span class="built_in">int</span></span>) -&gt; ListNode:</span><br><span class="line">    <span class="comment"># 检查是否有 k 个节点</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_kth</span>(<span class="params">node, k</span>):</span><br><span class="line">        <span class="keyword">while</span> node <span class="keyword">and</span> k &gt; <span class="number">0</span>:</span><br><span class="line">            node = node.<span class="built_in">next</span></span><br><span class="line">            k -= <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 反转链表</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">reverse</span>(<span class="params">head, tail</span>):</span><br><span class="line">        prev = tail.<span class="built_in">next</span></span><br><span class="line">        curr = head</span><br><span class="line">        <span class="keyword">while</span> prev != tail:</span><br><span class="line">            next_temp = curr.<span class="built_in">next</span></span><br><span class="line">            curr.<span class="built_in">next</span> = prev</span><br><span class="line">            prev = curr</span><br><span class="line">            curr = next_temp</span><br><span class="line">        <span class="keyword">return</span> tail, head  <span class="comment"># 新的头和尾</span></span><br><span class="line">    </span><br><span class="line">    dummy = ListNode(<span class="number">0</span>, head)</span><br><span class="line">    prev_group = dummy</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="comment"># 找到这一组的尾节点</span></span><br><span class="line">        kth = get_kth(prev_group, k)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> kth:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        </span><br><span class="line">        next_group = kth.<span class="built_in">next</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 反转这一组</span></span><br><span class="line">        head, tail = prev_group.<span class="built_in">next</span>, kth</span><br><span class="line">        new_head, new_tail = reverse(head, tail)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 连接</span></span><br><span class="line">        prev_group.<span class="built_in">next</span> = new_head</span><br><span class="line">        new_tail.<span class="built_in">next</span> = next_group</span><br><span class="line">        </span><br><span class="line">        prev_group = new_tail</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
 
-结果: 2 → 1 → 4 → 3 → 5
-</code></pre>
-<h3 id="💻-代码实现-5"><a href="#💻-代码实现-5" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">reverseKGroup</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> k<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> ListNode<span class="token punctuation">:</span>
-    <span class="token comment" spellcheck="true"># 检查是否有 k 个节点</span>
-    <span class="token keyword">def</span> <span class="token function">get_kth</span><span class="token punctuation">(</span>node<span class="token punctuation">,</span> k<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">while</span> node <span class="token operator">and</span> k <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">:</span>
-            node <span class="token operator">=</span> node<span class="token punctuation">.</span>next
-            k <span class="token operator">-=</span> <span class="token number">1</span>
-        <span class="token keyword">return</span> node
-    
-    <span class="token comment" spellcheck="true"># 反转链表</span>
-    <span class="token keyword">def</span> <span class="token function">reverse</span><span class="token punctuation">(</span>head<span class="token punctuation">,</span> tail<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        prev <span class="token operator">=</span> tail<span class="token punctuation">.</span>next
-        curr <span class="token operator">=</span> head
-        <span class="token keyword">while</span> prev <span class="token operator">!=</span> tail<span class="token punctuation">:</span>
-            next_temp <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-            curr<span class="token punctuation">.</span>next <span class="token operator">=</span> prev
-            prev <span class="token operator">=</span> curr
-            curr <span class="token operator">=</span> next_temp
-        <span class="token keyword">return</span> tail<span class="token punctuation">,</span> head  <span class="token comment" spellcheck="true"># 新的头和尾</span>
-    
-    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> head<span class="token punctuation">)</span>
-    prev_group <span class="token operator">=</span> dummy
-    
-    <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 找到这一组的尾节点</span>
-        kth <span class="token operator">=</span> get_kth<span class="token punctuation">(</span>prev_group<span class="token punctuation">,</span> k<span class="token punctuation">)</span>
-        <span class="token keyword">if</span> <span class="token operator">not</span> kth<span class="token punctuation">:</span>
-            <span class="token keyword">break</span>
-        
-        next_group <span class="token operator">=</span> kth<span class="token punctuation">.</span>next
-        
-        <span class="token comment" spellcheck="true"># 反转这一组</span>
-        head<span class="token punctuation">,</span> tail <span class="token operator">=</span> prev_group<span class="token punctuation">.</span>next<span class="token punctuation">,</span> kth
-        new_head<span class="token punctuation">,</span> new_tail <span class="token operator">=</span> reverse<span class="token punctuation">(</span>head<span class="token punctuation">,</span> tail<span class="token punctuation">)</span>
-        
-        <span class="token comment" spellcheck="true"># 连接</span>
-        prev_group<span class="token punctuation">.</span>next <span class="token operator">=</span> new_head
-        new_tail<span class="token punctuation">.</span>next <span class="token operator">=</span> next_group
-        
-        prev_group <span class="token operator">=</span> new_tail
-    
-    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
-</code></pre>
 <h3 id="🧠-记忆口诀-5"><a href="#🧠-记忆口诀-5" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“够k就翻，不够就留”</strong></p>
 </blockquote>
 <hr>
 <h2 id="7️⃣-LC-19-删除链表的倒数第-N-个节点-🟡"><a href="#7️⃣-LC-19-删除链表的倒数第-N-个节点-🟡" class="headerlink" title="7️⃣ LC 19. 删除链表的倒数第 N 个节点 🟡"></a>7️⃣ LC 19. 删除链表的倒数第 N 个节点 🟡</h2><h3 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h3><p>删除链表的倒数第 n 个节点。</p>
-<h3 id="🎨-图解思路-6"><a href="#🎨-图解思路-6" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>快慢指针，快指针先走 n 步
+<h3 id="🎨-图解思路-6"><a href="#🎨-图解思路-6" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">快慢指针，快指针先走 n 步</span><br><span class="line"></span><br><span class="line">链表: 1 → 2 → 3 → 4 → 5, n = 2</span><br><span class="line"></span><br><span class="line">Step 1: fast 先走 2 步</span><br><span class="line">        1 → 2 → 3 → 4 → 5</span><br><span class="line">        ↑       ↑</span><br><span class="line">       slow    fast</span><br><span class="line"></span><br><span class="line">Step 2: 同时移动直到 fast 到末尾</span><br><span class="line">        1 → 2 → 3 → 4 → 5 → None</span><br><span class="line">                ↑       ↑</span><br><span class="line">               slow    fast</span><br><span class="line"></span><br><span class="line">Step 3: 删除 slow.next</span><br><span class="line">        1 → 2 → 3 ────→ 5</span><br></pre></td></tr></tbody></table></figure>
 
-链表: 1 → 2 → 3 → 4 → 5, n = 2
+<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">removeNthFromEnd</span>(<span class="params">head: ListNode, n: <span class="built_in">int</span></span>) -&gt; ListNode:</span><br><span class="line">    dummy = ListNode(<span class="number">0</span>, head)</span><br><span class="line">    slow = fast = dummy</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># fast 先走 n+1 步</span></span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n + <span class="number">1</span>):</span><br><span class="line">        fast = fast.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 同时移动</span></span><br><span class="line">    <span class="keyword">while</span> fast:</span><br><span class="line">        slow = slow.<span class="built_in">next</span></span><br><span class="line">        fast = fast.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 删除 slow.next</span></span><br><span class="line">    slow.<span class="built_in">next</span> = slow.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
 
-Step 1: fast 先走 2 步
-        1 → 2 → 3 → 4 → 5
-        ↑       ↑
-       slow    fast
-
-Step 2: 同时移动直到 fast 到末尾
-        1 → 2 → 3 → 4 → 5 → None
-                ↑       ↑
-               slow    fast
-
-Step 3: 删除 slow.next
-        1 → 2 → 3 ────→ 5
-</code></pre>
-<h3 id="💻-代码实现-6"><a href="#💻-代码实现-6" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">removeNthFromEnd</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> n<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> ListNode<span class="token punctuation">:</span>
-    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> head<span class="token punctuation">)</span>
-    slow <span class="token operator">=</span> fast <span class="token operator">=</span> dummy
-    
-    <span class="token comment" spellcheck="true"># fast 先走 n+1 步</span>
-    <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        fast <span class="token operator">=</span> fast<span class="token punctuation">.</span>next
-    
-    <span class="token comment" spellcheck="true"># 同时移动</span>
-    <span class="token keyword">while</span> fast<span class="token punctuation">:</span>
-        slow <span class="token operator">=</span> slow<span class="token punctuation">.</span>next
-        fast <span class="token operator">=</span> fast<span class="token punctuation">.</span>next
-    
-    <span class="token comment" spellcheck="true"># 删除 slow.next</span>
-    slow<span class="token punctuation">.</span>next <span class="token operator">=</span> slow<span class="token punctuation">.</span>next<span class="token punctuation">.</span>next
-    
-    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
-</code></pre>
 <h3 id="🧠-记忆口诀-6"><a href="#🧠-记忆口诀-6" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“快先走n步，同行到末尾”</strong></p>
 </blockquote>
 <hr>
 <h2 id="8️⃣-LC-82-删除排序链表中的重复元素-II-🟡"><a href="#8️⃣-LC-82-删除排序链表中的重复元素-II-🟡" class="headerlink" title="8️⃣ LC 82. 删除排序链表中的重复元素 II 🟡"></a>8️⃣ LC 82. 删除排序链表中的重复元素 II 🟡</h2><h3 id="题目描述-7"><a href="#题目描述-7" class="headerlink" title="题目描述"></a>题目描述</h3><p>删除所有重复的节点，只保留原始链表中没有重复出现的数字。</p>
-<h3 id="🎨-图解思路-7"><a href="#🎨-图解思路-7" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>1 → 2 → 3 → 3 → 4 → 4 → 5
+<h3 id="🎨-图解思路-7"><a href="#🎨-图解思路-7" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1 → 2 → 3 → 3 → 4 → 4 → 5</span><br><span class="line"></span><br><span class="line">检测重复并删除整组：</span><br><span class="line">1 → 2 → [3 → 3] → [4 → 4] → 5</span><br><span class="line">        删除      删除</span><br><span class="line"></span><br><span class="line">结果: 1 → 2 → 5</span><br></pre></td></tr></tbody></table></figure>
 
-检测重复并删除整组：
-1 → 2 → [3 → 3] → [4 → 4] → 5
-        删除      删除
+<h3 id="💻-代码实现-7"><a href="#💻-代码实现-7" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">deleteDuplicates</span>(<span class="params">head: ListNode</span>) -&gt; ListNode:</span><br><span class="line">    dummy = ListNode(<span class="number">0</span>, head)</span><br><span class="line">    prev = dummy</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> prev.<span class="built_in">next</span>:</span><br><span class="line">        curr = prev.<span class="built_in">next</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 检测是否有重复</span></span><br><span class="line">        <span class="keyword">if</span> curr.<span class="built_in">next</span> <span class="keyword">and</span> curr.val == curr.<span class="built_in">next</span>.val:</span><br><span class="line">            <span class="comment"># 跳过所有重复节点</span></span><br><span class="line">            <span class="keyword">while</span> curr.<span class="built_in">next</span> <span class="keyword">and</span> curr.val == curr.<span class="built_in">next</span>.val:</span><br><span class="line">                curr = curr.<span class="built_in">next</span></span><br><span class="line">            prev.<span class="built_in">next</span> = curr.<span class="built_in">next</span>  <span class="comment"># 删除整组</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            prev = prev.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
 
-结果: 1 → 2 → 5
-</code></pre>
-<h3 id="💻-代码实现-7"><a href="#💻-代码实现-7" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">deleteDuplicates</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> ListNode<span class="token punctuation">:</span>
-    dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> head<span class="token punctuation">)</span>
-    prev <span class="token operator">=</span> dummy
-    
-    <span class="token keyword">while</span> prev<span class="token punctuation">.</span>next<span class="token punctuation">:</span>
-        curr <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
-        
-        <span class="token comment" spellcheck="true"># 检测是否有重复</span>
-        <span class="token keyword">if</span> curr<span class="token punctuation">.</span>next <span class="token operator">and</span> curr<span class="token punctuation">.</span>val <span class="token operator">==</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>val<span class="token punctuation">:</span>
-            <span class="token comment" spellcheck="true"># 跳过所有重复节点</span>
-            <span class="token keyword">while</span> curr<span class="token punctuation">.</span>next <span class="token operator">and</span> curr<span class="token punctuation">.</span>val <span class="token operator">==</span> curr<span class="token punctuation">.</span>next<span class="token punctuation">.</span>val<span class="token punctuation">:</span>
-                curr <span class="token operator">=</span> curr<span class="token punctuation">.</span>next
-            prev<span class="token punctuation">.</span>next <span class="token operator">=</span> curr<span class="token punctuation">.</span>next  <span class="token comment" spellcheck="true"># 删除整组</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            prev <span class="token operator">=</span> prev<span class="token punctuation">.</span>next
-    
-    <span class="token keyword">return</span> dummy<span class="token punctuation">.</span>next
-</code></pre>
 <h3 id="🧠-记忆口诀-7"><a href="#🧠-记忆口诀-7" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“见重复全删，不重复才留”</strong></p>
 </blockquote>
 <hr>
 <h2 id="9️⃣-LC-61-旋转链表-🟡"><a href="#9️⃣-LC-61-旋转链表-🟡" class="headerlink" title="9️⃣ LC 61. 旋转链表 🟡"></a>9️⃣ LC 61. 旋转链表 🟡</h2><h3 id="题目描述-8"><a href="#题目描述-8" class="headerlink" title="题目描述"></a>题目描述</h3><p>将链表每个节点向右移动 k 个位置。</p>
-<h3 id="🎨-图解思路-8"><a href="#🎨-图解思路-8" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>1 → 2 → 3 → 4 → 5, k = 2
+<h3 id="🎨-图解思路-8"><a href="#🎨-图解思路-8" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1 → 2 → 3 → 4 → 5, k = 2</span><br><span class="line"></span><br><span class="line">Step 1: 连成环</span><br><span class="line">        1 → 2 → 3 → 4 → 5</span><br><span class="line">        ↑               │</span><br><span class="line">        └───────────────┘</span><br><span class="line"></span><br><span class="line">Step 2: 找到新的断点 (n - k % n)</span><br><span class="line">        新头是第 5-2=3 个节点之后</span><br><span class="line">        </span><br><span class="line">Step 3: 在正确位置断开</span><br><span class="line">        4 → 5 → 1 → 2 → 3</span><br></pre></td></tr></tbody></table></figure>
 
-Step 1: 连成环
-        1 → 2 → 3 → 4 → 5
-        ↑               │
-        └───────────────┘
+<h3 id="💻-代码实现-8"><a href="#💻-代码实现-8" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">rotateRight</span>(<span class="params">head: ListNode, k: <span class="built_in">int</span></span>) -&gt; ListNode:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> head <span class="keyword">or</span> <span class="keyword">not</span> head.<span class="built_in">next</span> <span class="keyword">or</span> k == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> head</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 计算长度并找到尾节点</span></span><br><span class="line">    length = <span class="number">1</span></span><br><span class="line">    tail = head</span><br><span class="line">    <span class="keyword">while</span> tail.<span class="built_in">next</span>:</span><br><span class="line">        tail = tail.<span class="built_in">next</span></span><br><span class="line">        length += <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 实际需要移动的步数</span></span><br><span class="line">    k = k % length</span><br><span class="line">    <span class="keyword">if</span> k == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> head</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 找到新的尾节点（第 length - k 个）</span></span><br><span class="line">    new_tail = head</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(length - k - <span class="number">1</span>):</span><br><span class="line">        new_tail = new_tail.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 重新连接</span></span><br><span class="line">    new_head = new_tail.<span class="built_in">next</span></span><br><span class="line">    new_tail.<span class="built_in">next</span> = <span class="literal">None</span></span><br><span class="line">    tail.<span class="built_in">next</span> = head</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> new_head</span><br></pre></td></tr></tbody></table></figure>
 
-Step 2: 找到新的断点 (n - k % n)
-        新头是第 5-2=3 个节点之后
-        
-Step 3: 在正确位置断开
-        4 → 5 → 1 → 2 → 3
-</code></pre>
-<h3 id="💻-代码实现-8"><a href="#💻-代码实现-8" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">rotateRight</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> k<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> ListNode<span class="token punctuation">:</span>
-    <span class="token keyword">if</span> <span class="token operator">not</span> head <span class="token operator">or</span> <span class="token operator">not</span> head<span class="token punctuation">.</span>next <span class="token operator">or</span> k <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
-        <span class="token keyword">return</span> head
-    
-    <span class="token comment" spellcheck="true"># 计算长度并找到尾节点</span>
-    length <span class="token operator">=</span> <span class="token number">1</span>
-    tail <span class="token operator">=</span> head
-    <span class="token keyword">while</span> tail<span class="token punctuation">.</span>next<span class="token punctuation">:</span>
-        tail <span class="token operator">=</span> tail<span class="token punctuation">.</span>next
-        length <span class="token operator">+=</span> <span class="token number">1</span>
-    
-    <span class="token comment" spellcheck="true"># 实际需要移动的步数</span>
-    k <span class="token operator">=</span> k <span class="token operator">%</span> length
-    <span class="token keyword">if</span> k <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
-        <span class="token keyword">return</span> head
-    
-    <span class="token comment" spellcheck="true"># 找到新的尾节点（第 length - k 个）</span>
-    new_tail <span class="token operator">=</span> head
-    <span class="token keyword">for</span> _ <span class="token keyword">in</span> range<span class="token punctuation">(</span>length <span class="token operator">-</span> k <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        new_tail <span class="token operator">=</span> new_tail<span class="token punctuation">.</span>next
-    
-    <span class="token comment" spellcheck="true"># 重新连接</span>
-    new_head <span class="token operator">=</span> new_tail<span class="token punctuation">.</span>next
-    new_tail<span class="token punctuation">.</span>next <span class="token operator">=</span> None
-    tail<span class="token punctuation">.</span>next <span class="token operator">=</span> head
-    
-    <span class="token keyword">return</span> new_head
-</code></pre>
 <h3 id="🧠-记忆口诀-8"><a href="#🧠-记忆口诀-8" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“先成环，再断开”</strong></p>
 </blockquote>
 <hr>
 <h2 id="🔟-LC-86-分隔链表-🟡"><a href="#🔟-LC-86-分隔链表-🟡" class="headerlink" title="🔟 LC 86. 分隔链表 🟡"></a>🔟 LC 86. 分隔链表 🟡</h2><h3 id="题目描述-9"><a href="#题目描述-9" class="headerlink" title="题目描述"></a>题目描述</h3><p>将链表按值 x 分成两部分：小于 x 的在前，大于等于 x 的在后。</p>
-<h3 id="🎨-图解思路-9"><a href="#🎨-图解思路-9" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>1 → 4 → 3 → 2 → 5 → 2, x = 3
+<h3 id="🎨-图解思路-9"><a href="#🎨-图解思路-9" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1 → 4 → 3 → 2 → 5 → 2, x = 3</span><br><span class="line"></span><br><span class="line">分成两个链表：</span><br><span class="line">小于3: 1 → 2 → 2</span><br><span class="line">≥3:    4 → 3 → 5</span><br><span class="line"></span><br><span class="line">合并: 1 → 2 → 2 → 4 → 3 → 5</span><br></pre></td></tr></tbody></table></figure>
 
-分成两个链表：
-小于3: 1 → 2 → 2
-≥3:    4 → 3 → 5
+<h3 id="💻-代码实现-9"><a href="#💻-代码实现-9" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">partition</span>(<span class="params">head: ListNode, x: <span class="built_in">int</span></span>) -&gt; ListNode:</span><br><span class="line">    <span class="comment"># 两个虚拟头节点</span></span><br><span class="line">    small_dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    large_dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    small = small_dummy</span><br><span class="line">    large = large_dummy</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> head:</span><br><span class="line">        <span class="keyword">if</span> head.val &lt; x:</span><br><span class="line">            small.<span class="built_in">next</span> = head</span><br><span class="line">            small = small.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            large.<span class="built_in">next</span> = head</span><br><span class="line">            large = large.<span class="built_in">next</span></span><br><span class="line">        head = head.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 连接两个链表</span></span><br><span class="line">    large.<span class="built_in">next</span> = <span class="literal">None</span>  <span class="comment"># 防止成环</span></span><br><span class="line">    small.<span class="built_in">next</span> = large_dummy.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> small_dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
 
-合并: 1 → 2 → 2 → 4 → 3 → 5
-</code></pre>
-<h3 id="💻-代码实现-9"><a href="#💻-代码实现-9" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">partition</span><span class="token punctuation">(</span>head<span class="token punctuation">:</span> ListNode<span class="token punctuation">,</span> x<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> ListNode<span class="token punctuation">:</span>
-    <span class="token comment" spellcheck="true"># 两个虚拟头节点</span>
-    small_dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
-    large_dummy <span class="token operator">=</span> ListNode<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
-    small <span class="token operator">=</span> small_dummy
-    large <span class="token operator">=</span> large_dummy
-    
-    <span class="token keyword">while</span> head<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> head<span class="token punctuation">.</span>val <span class="token operator">&lt;</span> x<span class="token punctuation">:</span>
-            small<span class="token punctuation">.</span>next <span class="token operator">=</span> head
-            small <span class="token operator">=</span> small<span class="token punctuation">.</span>next
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            large<span class="token punctuation">.</span>next <span class="token operator">=</span> head
-            large <span class="token operator">=</span> large<span class="token punctuation">.</span>next
-        head <span class="token operator">=</span> head<span class="token punctuation">.</span>next
-    
-    <span class="token comment" spellcheck="true"># 连接两个链表</span>
-    large<span class="token punctuation">.</span>next <span class="token operator">=</span> None  <span class="token comment" spellcheck="true"># 防止成环</span>
-    small<span class="token punctuation">.</span>next <span class="token operator">=</span> large_dummy<span class="token punctuation">.</span>next
-    
-    <span class="token keyword">return</span> small_dummy<span class="token punctuation">.</span>next
-</code></pre>
 <h3 id="🧠-记忆口诀-9"><a href="#🧠-记忆口诀-9" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“分两队，再合并”</strong></p>
 </blockquote>
 <hr>
 <h2 id="1️⃣1️⃣-LC-146-LRU-缓存-🟡"><a href="#1️⃣1️⃣-LC-146-LRU-缓存-🟡" class="headerlink" title="1️⃣1️⃣ LC 146. LRU 缓存 🟡"></a>1️⃣1️⃣ LC 146. LRU 缓存 🟡</h2><h3 id="题目描述-10"><a href="#题目描述-10" class="headerlink" title="题目描述"></a>题目描述</h3><p>实现 LRU (最近最少使用) 缓存机制。</p>
-<h3 id="🎨-图解思路-10"><a href="#🎨-图解思路-10" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>使用双向链表 + 哈希表
+<h3 id="🎨-图解思路-10"><a href="#🎨-图解思路-10" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">使用双向链表 + 哈希表</span><br><span class="line"></span><br><span class="line">双向链表（按使用时间排序）:</span><br><span class="line">head ⇄ [最近用] ⇄ [次近用] ⇄ ... ⇄ [最久未用] ⇄ tail</span><br><span class="line"></span><br><span class="line">哈希表: key → 链表节点</span><br><span class="line"></span><br><span class="line">get/put 操作:</span><br><span class="line">1. 通过哈希表 O(1) 找到节点</span><br><span class="line">2. 移动到链表头部（最近使用）</span><br><span class="line">3. 超容量时删除链表尾部</span><br></pre></td></tr></tbody></table></figure>
 
-双向链表（按使用时间排序）:
-head ⇄ [最近用] ⇄ [次近用] ⇄ ... ⇄ [最久未用] ⇄ tail
+<h3 id="💻-代码实现-10"><a href="#💻-代码实现-10" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DLinkedNode</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, key=<span class="number">0</span>, value=<span class="number">0</span></span>):</span><br><span class="line">        self.key = key</span><br><span class="line">        self.value = value</span><br><span class="line">        self.prev = <span class="literal">None</span></span><br><span class="line">        self.<span class="built_in">next</span> = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LRUCache</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, capacity: <span class="built_in">int</span></span>):</span><br><span class="line">        self.cache = {}  <span class="comment"># key → node</span></span><br><span class="line">        self.capacity = capacity</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 虚拟头尾节点</span></span><br><span class="line">        self.head = DLinkedNode()</span><br><span class="line">        self.tail = DLinkedNode()</span><br><span class="line">        self.head.<span class="built_in">next</span> = self.tail</span><br><span class="line">        self.tail.prev = self.head</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_remove</span>(<span class="params">self, node</span>):</span><br><span class="line">        <span class="string">"""从链表中删除节点"""</span></span><br><span class="line">        node.prev.<span class="built_in">next</span> = node.<span class="built_in">next</span></span><br><span class="line">        node.<span class="built_in">next</span>.prev = node.prev</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_add_to_head</span>(<span class="params">self, node</span>):</span><br><span class="line">        <span class="string">"""添加到链表头部"""</span></span><br><span class="line">        node.prev = self.head</span><br><span class="line">        node.<span class="built_in">next</span> = self.head.<span class="built_in">next</span></span><br><span class="line">        self.head.<span class="built_in">next</span>.prev = node</span><br><span class="line">        self.head.<span class="built_in">next</span> = node</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_move_to_head</span>(<span class="params">self, node</span>):</span><br><span class="line">        <span class="string">"""移动到头部"""</span></span><br><span class="line">        self._remove(node)</span><br><span class="line">        self._add_to_head(node)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_remove_tail</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="string">"""删除尾部节点"""</span></span><br><span class="line">        node = self.tail.prev</span><br><span class="line">        self._remove(node)</span><br><span class="line">        <span class="keyword">return</span> node</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get</span>(<span class="params">self, key: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> self.cache:</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line">        node = self.cache[key]</span><br><span class="line">        self._move_to_head(node)</span><br><span class="line">        <span class="keyword">return</span> node.value</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">put</span>(<span class="params">self, key: <span class="built_in">int</span>, value: <span class="built_in">int</span></span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.cache:</span><br><span class="line">            node = self.cache[key]</span><br><span class="line">            node.value = value</span><br><span class="line">            self._move_to_head(node)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            node = DLinkedNode(key, value)</span><br><span class="line">            self.cache[key] = node</span><br><span class="line">            self._add_to_head(node)</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(self.cache) &gt; self.capacity:</span><br><span class="line">                tail = self._remove_tail()</span><br><span class="line">                <span class="keyword">del</span> self.cache[tail.key]</span><br></pre></td></tr></tbody></table></figure>
 
-哈希表: key → 链表节点
-
-get/put 操作:
-1. 通过哈希表 O(1) 找到节点
-2. 移动到链表头部（最近使用）
-3. 超容量时删除链表尾部
-</code></pre>
-<h3 id="💻-代码实现-10"><a href="#💻-代码实现-10" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">class</span> <span class="token class-name">DLinkedNode</span><span class="token punctuation">:</span>
-    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> key<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span> value<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>key <span class="token operator">=</span> key
-        self<span class="token punctuation">.</span>value <span class="token operator">=</span> value
-        self<span class="token punctuation">.</span>prev <span class="token operator">=</span> None
-        self<span class="token punctuation">.</span>next <span class="token operator">=</span> None
-
-<span class="token keyword">class</span> <span class="token class-name">LRUCache</span><span class="token punctuation">:</span>
-    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> capacity<span class="token punctuation">:</span> int<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        self<span class="token punctuation">.</span>cache <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>  <span class="token comment" spellcheck="true"># key → node</span>
-        self<span class="token punctuation">.</span>capacity <span class="token operator">=</span> capacity
-        
-        <span class="token comment" spellcheck="true"># 虚拟头尾节点</span>
-        self<span class="token punctuation">.</span>head <span class="token operator">=</span> DLinkedNode<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>tail <span class="token operator">=</span> DLinkedNode<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>head<span class="token punctuation">.</span>next <span class="token operator">=</span> self<span class="token punctuation">.</span>tail
-        self<span class="token punctuation">.</span>tail<span class="token punctuation">.</span>prev <span class="token operator">=</span> self<span class="token punctuation">.</span>head
-    
-    <span class="token keyword">def</span> <span class="token function">_remove</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token triple-quoted-string string">"""从链表中删除节点"""</span>
-        node<span class="token punctuation">.</span>prev<span class="token punctuation">.</span>next <span class="token operator">=</span> node<span class="token punctuation">.</span>next
-        node<span class="token punctuation">.</span>next<span class="token punctuation">.</span>prev <span class="token operator">=</span> node<span class="token punctuation">.</span>prev
-    
-    <span class="token keyword">def</span> <span class="token function">_add_to_head</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token triple-quoted-string string">"""添加到链表头部"""</span>
-        node<span class="token punctuation">.</span>prev <span class="token operator">=</span> self<span class="token punctuation">.</span>head
-        node<span class="token punctuation">.</span>next <span class="token operator">=</span> self<span class="token punctuation">.</span>head<span class="token punctuation">.</span>next
-        self<span class="token punctuation">.</span>head<span class="token punctuation">.</span>next<span class="token punctuation">.</span>prev <span class="token operator">=</span> node
-        self<span class="token punctuation">.</span>head<span class="token punctuation">.</span>next <span class="token operator">=</span> node
-    
-    <span class="token keyword">def</span> <span class="token function">_move_to_head</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> node<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token triple-quoted-string string">"""移动到头部"""</span>
-        self<span class="token punctuation">.</span>_remove<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>_add_to_head<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
-    
-    <span class="token keyword">def</span> <span class="token function">_remove_tail</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token triple-quoted-string string">"""删除尾部节点"""</span>
-        node <span class="token operator">=</span> self<span class="token punctuation">.</span>tail<span class="token punctuation">.</span>prev
-        self<span class="token punctuation">.</span>_remove<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
-        <span class="token keyword">return</span> node
-    
-    <span class="token keyword">def</span> <span class="token function">get</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> key<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> key <span class="token operator">not</span> <span class="token keyword">in</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">:</span>
-            <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span>
-        node <span class="token operator">=</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span>
-        self<span class="token punctuation">.</span>_move_to_head<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
-        <span class="token keyword">return</span> node<span class="token punctuation">.</span>value
-    
-    <span class="token keyword">def</span> <span class="token function">put</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> key<span class="token punctuation">:</span> int<span class="token punctuation">,</span> value<span class="token punctuation">:</span> int<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> None<span class="token punctuation">:</span>
-        <span class="token keyword">if</span> key <span class="token keyword">in</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">:</span>
-            node <span class="token operator">=</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span>
-            node<span class="token punctuation">.</span>value <span class="token operator">=</span> value
-            self<span class="token punctuation">.</span>_move_to_head<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            node <span class="token operator">=</span> DLinkedNode<span class="token punctuation">(</span>key<span class="token punctuation">,</span> value<span class="token punctuation">)</span>
-            self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> node
-            self<span class="token punctuation">.</span>_add_to_head<span class="token punctuation">(</span>node<span class="token punctuation">)</span>
-            
-            <span class="token keyword">if</span> len<span class="token punctuation">(</span>self<span class="token punctuation">.</span>cache<span class="token punctuation">)</span> <span class="token operator">></span> self<span class="token punctuation">.</span>capacity<span class="token punctuation">:</span>
-                tail <span class="token operator">=</span> self<span class="token punctuation">.</span>_remove_tail<span class="token punctuation">(</span><span class="token punctuation">)</span>
-                <span class="token keyword">del</span> self<span class="token punctuation">.</span>cache<span class="token punctuation">[</span>tail<span class="token punctuation">.</span>key<span class="token punctuation">]</span>
-</code></pre>
 <h3 id="🧠-记忆口诀-10"><a href="#🧠-记忆口诀-10" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“双链表记顺序，哈希表快查找”</strong></p>
 </blockquote>
@@ -667,21 +243,8 @@ get/put 操作:
 <td>21, 86</td>
 </tr>
 </tbody></table>
-<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><pre><code>环加合复反转组
-删倒删重旋分缓
+<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">环加合复反转组</span><br><span class="line">删倒删重旋分缓</span><br><span class="line"></span><br><span class="line">环 - 环形链表 (141)</span><br><span class="line">加 - 两数相加 (2)</span><br><span class="line">合 - 合并有序链表 (21)</span><br><span class="line">复 - 复制随机链表 (138)</span><br><span class="line">反 - 反转链表 II (92)</span><br><span class="line">组 - K个一组翻转 (25)</span><br><span class="line">删倒 - 删除倒数第N个 (19)</span><br><span class="line">删重 - 删除重复元素 II (82)</span><br><span class="line">旋 - 旋转链表 (61)</span><br><span class="line">分 - 分隔链表 (86)</span><br><span class="line">缓 - LRU缓存 (146)</span><br></pre></td></tr></tbody></table></figure>
 
-环 - 环形链表 (141)
-加 - 两数相加 (2)
-合 - 合并有序链表 (21)
-复 - 复制随机链表 (138)
-反 - 反转链表 II (92)
-组 - K个一组翻转 (25)
-删倒 - 删除倒数第N个 (19)
-删重 - 删除重复元素 II (82)
-旋 - 旋转链表 (61)
-分 - 分隔链表 (86)
-缓 - LRU缓存 (146)
-</code></pre>
 <hr>
 <blockquote>
 <p>📖 <strong>下一篇</strong>：<a href="/2026/01/18/leetcode-150-binary-tree/">二叉树专题</a></p>
@@ -704,7 +267,7 @@ get/put 操作:
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-binary-tree/">🌳 LeetCode 150 - 二叉树专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-heap/">⛰️ LeetCode 150 - 堆/优先队列专题</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-index/">🎯 LeetCode 面试经典 150 题 - 完全攻略</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-sliding-window/">🪟 LeetCode 150 - 滑动窗口专题</a></div></section></div>
 
 
 

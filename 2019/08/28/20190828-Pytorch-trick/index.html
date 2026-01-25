@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -112,18 +112,11 @@
 </ul>
 <h2 id="2-查看模型每层输出详情"><a href="#2-查看模型每层输出详情" class="headerlink" title="2.查看模型每层输出详情"></a>2.查看模型每层输出详情</h2><p>Keras有一个简洁的API来查看模型的每一层输出尺寸，这在调试网络时非常有用。现在在PyTorch中也可以实现这个功能。</p>
 <p>使用很简单，如下用法：  </p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">from</span> torchsummary <span class="token keyword">import</span> summary
-    summary<span class="token punctuation">(</span>your_model<span class="token punctuation">,</span> input_size<span class="token operator">=</span><span class="token punctuation">(</span>channels<span class="token punctuation">,</span> H<span class="token punctuation">,</span> W<span class="token punctuation">)</span><span class="token punctuation">)</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> torchsummary <span class="keyword">import</span> summary</span><br><span class="line">summary(your_model, input_size=(channels, H, W))</span><br></pre></td></tr></tbody></table></figure>
+
 <p>input_size 是根据你自己的网络模型的输入尺寸进行设置。</p>
-<h2 id="3-梯度裁剪（Gradient-Clipping）"><a href="#3-梯度裁剪（Gradient-Clipping）" class="headerlink" title="3.梯度裁剪（Gradient Clipping）"></a>3.梯度裁剪（Gradient Clipping）</h2><pre class=" language-python"><code class="language-python">    <span class="token keyword">import</span> torch<span class="token punctuation">.</span>nn <span class="token keyword">as</span> nn
-    outputs <span class="token operator">=</span> model<span class="token punctuation">(</span>data<span class="token punctuation">)</span>
-    loss<span class="token operator">=</span> loss_fn<span class="token punctuation">(</span>outputs<span class="token punctuation">,</span> target<span class="token punctuation">)</span>
-    optimizer<span class="token punctuation">.</span>zero_grad<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    loss<span class="token punctuation">.</span>backward<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    nn<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>clip_grad_norm_<span class="token punctuation">(</span>model<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> max_norm<span class="token operator">=</span><span class="token number">20</span><span class="token punctuation">,</span> norm_type<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
-    optimizer<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
-</code></pre>
+<h2 id="3-梯度裁剪（Gradient-Clipping）"><a href="#3-梯度裁剪（Gradient-Clipping）" class="headerlink" title="3.梯度裁剪（Gradient Clipping）"></a>3.梯度裁剪（Gradient Clipping）</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line">outputs = model(data)</span><br><span class="line">loss= loss_fn(outputs, target)</span><br><span class="line">optimizer.zero_grad()</span><br><span class="line">loss.backward()</span><br><span class="line">nn.utils.clip_grad_norm_(model.parameters(), max_norm=<span class="number">20</span>, norm_type=<span class="number">2</span>)</span><br><span class="line">optimizer.step()</span><br></pre></td></tr></tbody></table></figure>
+
 <p>nn.utils.clip_grad_norm_ 的参数：</p>
 <ul>
 <li>parameters – 一个基于变量的迭代器，会进行梯度归一化</li>
@@ -131,71 +124,22 @@
 <li>max_norm – 梯度的最大范数<br>知乎用户 不椭的椭圆 提出：梯度裁剪在某些任务上会额外消耗大量的计算时间，可移步评论区查看详情。</li>
 </ul>
 <h2 id="4、扩展单张图片维度"><a href="#4、扩展单张图片维度" class="headerlink" title="4、扩展单张图片维度"></a>4、扩展单张图片维度</h2><p>因为在训练时的数据维度一般都是 (batch_size, c, h, w)，而在测试时只输入一张图片，所以需要扩展维度，扩展维度有多个方法：  </p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">import</span> cv2
-    <span class="token keyword">import</span> torch
-    image <span class="token operator">=</span> cv2<span class="token punctuation">.</span>imread<span class="token punctuation">(</span>img_path<span class="token punctuation">)</span>
-    image <span class="token operator">=</span> torch<span class="token punctuation">.</span>tensor<span class="token punctuation">(</span>image<span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>image<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    img <span class="token operator">=</span> image<span class="token punctuation">.</span>view<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token operator">*</span>image<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>img<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true"># output:</span>
-    <span class="token comment" spellcheck="true"># torch.Size([h, w, c])</span>
-    <span class="token comment" spellcheck="true"># torch.Size([1, h, w, c])</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line">image = cv2.imread(img_path)</span><br><span class="line">image = torch.tensor(image)</span><br><span class="line"><span class="built_in">print</span>(image.size())</span><br><span class="line">img = image.view(<span class="number">1</span>, *image.size())</span><br><span class="line"><span class="built_in">print</span>(img.size())</span><br><span class="line"><span class="comment"># output:</span></span><br><span class="line"><span class="comment"># torch.Size([h, w, c])</span></span><br><span class="line"><span class="comment"># torch.Size([1, h, w, c])</span></span><br></pre></td></tr></tbody></table></figure>
+
 <p>或者  </p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">import</span> cv2
-    <span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
-    image <span class="token operator">=</span> cv2<span class="token punctuation">.</span>imread<span class="token punctuation">(</span>img_path<span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>image<span class="token punctuation">.</span>shape<span class="token punctuation">)</span>
-    img <span class="token operator">=</span> image<span class="token punctuation">[</span>np<span class="token punctuation">.</span>newaxis<span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>img<span class="token punctuation">.</span>shape<span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true"># output:</span>
-    <span class="token comment" spellcheck="true"># (h, w, c)</span>
-    <span class="token comment" spellcheck="true"># (1, h, w, c)</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">image = cv2.imread(img_path)</span><br><span class="line"><span class="built_in">print</span>(image.shape)</span><br><span class="line">img = image[np.newaxis, :, :, :]</span><br><span class="line"><span class="built_in">print</span>(img.shape)</span><br><span class="line"><span class="comment"># output:</span></span><br><span class="line"><span class="comment"># (h, w, c)</span></span><br><span class="line"><span class="comment"># (1, h, w, c)</span></span><br></pre></td></tr></tbody></table></figure>
+
 <p>或者  </p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">import</span> cv2
-    <span class="token keyword">import</span> torch
-    image <span class="token operator">=</span> cv2<span class="token punctuation">.</span>imread<span class="token punctuation">(</span>img_path<span class="token punctuation">)</span>
-    image <span class="token operator">=</span> torch<span class="token punctuation">.</span>tensor<span class="token punctuation">(</span>image<span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>image<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    img <span class="token operator">=</span> image<span class="token punctuation">.</span>unsqueeze<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>img<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    img <span class="token operator">=</span> img<span class="token punctuation">.</span>squeeze<span class="token punctuation">(</span>dim<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>img<span class="token punctuation">.</span>size<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true"># output:</span>
-    <span class="token comment" spellcheck="true"># torch.Size([(h, w, c)])</span>
-    <span class="token comment" spellcheck="true"># torch.Size([1, h, w, c])</span>
-    <span class="token comment" spellcheck="true"># torch.Size([h, w, c])</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line">image = cv2.imread(img_path)</span><br><span class="line">image = torch.tensor(image)</span><br><span class="line"><span class="built_in">print</span>(image.size())</span><br><span class="line">img = image.unsqueeze(dim=<span class="number">0</span>)</span><br><span class="line"><span class="built_in">print</span>(img.size())</span><br><span class="line">img = img.squeeze(dim=<span class="number">0</span>)</span><br><span class="line"><span class="built_in">print</span>(img.size())</span><br><span class="line"><span class="comment"># output:</span></span><br><span class="line"><span class="comment"># torch.Size([(h, w, c)])</span></span><br><span class="line"><span class="comment"># torch.Size([1, h, w, c])</span></span><br><span class="line"><span class="comment"># torch.Size([h, w, c])</span></span><br></pre></td></tr></tbody></table></figure>
+
 <p>tensor.unsqueeze(dim)：扩展维度，dim指定扩展哪个维度。</p>
 <p>tensor.squeeze(dim)：去除dim指定的且size为1的维度，维度大于1时，squeeze()不起作用，不指定dim时，去除所有size为1的维度。</p>
 <h2 id="5-独热编码"><a href="#5-独热编码" class="headerlink" title="5.独热编码"></a>5.独热编码</h2><p>在PyTorch中使用交叉熵损失函数的时候会自动把label转化成onehot，所以不用手动转化，而使用MSE需要手动转化成onehot编码。  </p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">import</span> torch
-    class_num <span class="token operator">=</span> <span class="token number">8</span>
-    batch_size <span class="token operator">=</span> <span class="token number">4</span>
-    <span class="token keyword">def</span> <span class="token function">one_hot</span><span class="token punctuation">(</span>label<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token triple-quoted-string string">"""
-        将一维列表转换为独热编码
-        """</span>
-        label <span class="token operator">=</span> label<span class="token punctuation">.</span>resize_<span class="token punctuation">(</span>batch_size<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
-        m_zeros <span class="token operator">=</span> torch<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>batch_size<span class="token punctuation">,</span> class_num<span class="token punctuation">)</span>
-        <span class="token comment" spellcheck="true"># 从 value 中取值，然后根据 dim 和 index 给相应位置赋值</span>
-        onehot <span class="token operator">=</span> m_zeros<span class="token punctuation">.</span>scatter_<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> label<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># (dim,index,value)</span>
-        <span class="token keyword">return</span> onehot<span class="token punctuation">.</span>numpy<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># Tensor -> Numpy</span>
-    label <span class="token operator">=</span> torch<span class="token punctuation">.</span>LongTensor<span class="token punctuation">(</span>batch_size<span class="token punctuation">)</span><span class="token punctuation">.</span>random_<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">%</span> class_num  <span class="token comment" spellcheck="true"># 对随机数取余</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span>one_hot<span class="token punctuation">(</span>label<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true"># output:</span>
-    <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">1</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
-     <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">1</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
-     <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">1</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
-     <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">1</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span> <span class="token number">0</span><span class="token punctuation">.</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line">class_num = <span class="number">8</span></span><br><span class="line">batch_size = <span class="number">4</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">one_hot</span>(<span class="params">label</span>):</span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    将一维列表转换为独热编码</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    label = label.resize_(batch_size, <span class="number">1</span>)</span><br><span class="line">    m_zeros = torch.zeros(batch_size, class_num)</span><br><span class="line">    <span class="comment"># 从 value 中取值，然后根据 dim 和 index 给相应位置赋值</span></span><br><span class="line">    onehot = m_zeros.scatter_(<span class="number">1</span>, label, <span class="number">1</span>)  <span class="comment"># (dim,index,value)</span></span><br><span class="line">    <span class="keyword">return</span> onehot.numpy()  <span class="comment"># Tensor -&gt; Numpy</span></span><br><span class="line">label = torch.LongTensor(batch_size).random_() % class_num  <span class="comment"># 对随机数取余</span></span><br><span class="line"><span class="built_in">print</span>(one_hot(label))</span><br><span class="line"><span class="comment"># output:</span></span><br><span class="line">[[<span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">1.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span>]</span><br><span class="line"> [<span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">1.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span>]</span><br><span class="line"> [<span class="number">0.</span> <span class="number">0.</span> <span class="number">1.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span>]</span><br><span class="line"> [<span class="number">0.</span> <span class="number">1.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span> <span class="number">0.</span>]]</span><br></pre></td></tr></tbody></table></figure>
+
 <h2 id="6-防止验证模型时爆显存"><a href="#6-防止验证模型时爆显存" class="headerlink" title="6. 防止验证模型时爆显存"></a>6. 防止验证模型时爆显存</h2><p>验证模型时不需要求导，即不需要梯度计算，关闭autograd，可以提高速度，节约内存。如果不关闭可能会爆显存。  </p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">with</span> torch<span class="token punctuation">.</span>no_grad<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 使用model进行预测的代码</span>
-        <span class="token keyword">pass</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> torch.no_grad():</span><br><span class="line">    <span class="comment"># 使用model进行预测的代码</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></tbody></table></figure>
+
 <p>感谢知乎用户zhaz 的提醒，我把 torch.cuda.empty_cache() 的使用原因更新一下。</p>
 <p>这是原回答：</p>
 <p>Pytorch 训练时无用的临时变量可能会越来越多，导致 out of memory ，可以使用下面语句来清理这些不需要的变量。</p>
@@ -204,102 +148,38 @@
 <p>意思就是PyTorch的缓存分配器会事先分配一些固定的显存，即使实际上tensors并没有使用完这些显存，这些显存也不能被其他应用使用。这个分配过程由第一次CUDA内存访问触发的。</p>
 <p>而 torch.cuda.empty_cache() 的作用就是释放缓存分配器当前持有的且未占用的缓存显存，以便这些显存可以被其他GPU应用程序中使用，并且通过 nvidia-smi命令可见。注意使用此命令不会释放tensors占用的显存。</p>
 <p>对于不用的数据变量，Pytorch 可以自动进行回收从而释放相应的显存。</p>
-<h2 id="7-学习率衰减"><a href="#7-学习率衰减" class="headerlink" title="7. 学习率衰减"></a>7. 学习率衰减</h2><pre class=" language-python"><code class="language-python">    <span class="token keyword">import</span> torch<span class="token punctuation">.</span>optim <span class="token keyword">as</span> optim
-    <span class="token keyword">from</span> torch<span class="token punctuation">.</span>optim <span class="token keyword">import</span> lr_scheduler
-    <span class="token comment" spellcheck="true"># 训练前的初始化</span>
-    optimizer <span class="token operator">=</span> optim<span class="token punctuation">.</span>Adam<span class="token punctuation">(</span>net<span class="token punctuation">.</span>parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> lr<span class="token operator">=</span><span class="token number">0.001</span><span class="token punctuation">)</span>
-    scheduler <span class="token operator">=</span> lr_scheduler<span class="token punctuation">.</span>StepLR<span class="token punctuation">(</span>optimizer<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># # 每过10个epoch，学习率乘以0.1</span>
-    <span class="token comment" spellcheck="true"># 训练过程中</span>
-    <span class="token keyword">for</span> n <span class="token keyword">in</span> n_epoch<span class="token punctuation">:</span>
-        scheduler<span class="token punctuation">.</span>step<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-</code></pre>
+<h2 id="7-学习率衰减"><a href="#7-学习率衰减" class="headerlink" title="7. 学习率衰减"></a>7. 学习率衰减</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch.optim <span class="keyword">as</span> optim</span><br><span class="line"><span class="keyword">from</span> torch.optim <span class="keyword">import</span> lr_scheduler</span><br><span class="line"><span class="comment"># 训练前的初始化</span></span><br><span class="line">optimizer = optim.Adam(net.parameters(), lr=<span class="number">0.001</span>)</span><br><span class="line">scheduler = lr_scheduler.StepLR(optimizer, <span class="number">10</span>, <span class="number">0.1</span>)  <span class="comment"># # 每过10个epoch，学习率乘以0.1</span></span><br><span class="line"><span class="comment"># 训练过程中</span></span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> n_epoch:</span><br><span class="line">    scheduler.step()</span><br><span class="line">    ...</span><br></pre></td></tr></tbody></table></figure>
+
 <h2 id="8-冻结某些层的参数"><a href="#8-冻结某些层的参数" class="headerlink" title="8. 冻结某些层的参数"></a>8. 冻结某些层的参数</h2><p>在加载预训练模型的时候，我们有时想冻结前面几层，使其参数在训练过程中不发生变化。</p>
 <p>我们需要先知道每一层的名字，通过如下代码打印：  </p>
-<pre class=" language-python"><code class="language-python">    net <span class="token operator">=</span> Network<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 获取自定义网络结构</span>
-    <span class="token keyword">for</span> name<span class="token punctuation">,</span> value <span class="token keyword">in</span> net<span class="token punctuation">.</span>named_parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'name: {0},	 grad: {1}'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>name<span class="token punctuation">,</span> value<span class="token punctuation">.</span>requires_grad<span class="token punctuation">)</span><span class="token punctuation">)</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">net = Network()  <span class="comment"># 获取自定义网络结构</span></span><br><span class="line"><span class="keyword">for</span> name, value <span class="keyword">in</span> net.named_parameters():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'name: {0},	 grad: {1}'</span>.<span class="built_in">format</span>(name, value.requires_grad))</span><br></pre></td></tr></tbody></table></figure>
+
 <p>假设前几层信息如下：  </p>
-<pre><code>    name: cnn.VGG_16.convolution1_1.weight, grad: True
-    name: cnn.VGG_16.convolution1_1.bias, grad: True
-    name: cnn.VGG_16.convolution1_2.weight, grad: True
-    name: cnn.VGG_16.convolution1_2.bias, grad: True
-    name: cnn.VGG_16.convolution2_1.weight, grad: True
-    name: cnn.VGG_16.convolution2_1.bias, grad: True
-    name: cnn.VGG_16.convolution2_2.weight, grad: True
-    name: cnn.VGG_16.convolution2_2.bias, grad: True
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">name: cnn.VGG_16.convolution1_1.weight, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution1_1.bias, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution1_2.weight, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution1_2.bias, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution2_1.weight, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution2_1.bias, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution2_2.weight, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution2_2.bias, grad: True</span><br></pre></td></tr></tbody></table></figure>
+
 <p>后面的True表示该层的参数可训练，然后我们定义一个要冻结的层的列表：  </p>
-<pre><code>    no_grad = [
-        'cnn.VGG_16.convolution1_1.weight',
-        'cnn.VGG_16.convolution1_1.bias',
-        'cnn.VGG_16.convolution1_2.weight',
-        'cnn.VGG_16.convolution1_2.bias'
-    ]
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">no_grad = [</span><br><span class="line">    'cnn.VGG_16.convolution1_1.weight',</span><br><span class="line">    'cnn.VGG_16.convolution1_1.bias',</span><br><span class="line">    'cnn.VGG_16.convolution1_2.weight',</span><br><span class="line">    'cnn.VGG_16.convolution1_2.bias'</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
 <p>冻结方法如下：  </p>
-<pre><code>    net = Net.CTPN()  # 获取网络结构
-    for name, value in net.named_parameters():
-        if name in no_grad:
-            value.requires_grad = False
-        else:
-            value.requires_grad = True
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">net = Net.CTPN()  # 获取网络结构</span><br><span class="line">for name, value in net.named_parameters():</span><br><span class="line">    if name in no_grad:</span><br><span class="line">        value.requires_grad = False</span><br><span class="line">    else:</span><br><span class="line">        value.requires_grad = True</span><br></pre></td></tr></tbody></table></figure>
+
 <p>冻结后我们再打印每层的信息：  </p>
-<pre><code>    name: cnn.VGG_16.convolution1_1.weight, grad: False
-    name: cnn.VGG_16.convolution1_1.bias, grad: False
-    name: cnn.VGG_16.convolution1_2.weight, grad: False
-    name: cnn.VGG_16.convolution1_2.bias, grad: False
-    name: cnn.VGG_16.convolution2_1.weight, grad: True
-    name: cnn.VGG_16.convolution2_1.bias, grad: True
-    name: cnn.VGG_16.convolution2_2.weight, grad: True
-    name: cnn.VGG_16.convolution2_2.bias, grad: True
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">name: cnn.VGG_16.convolution1_1.weight, grad: False</span><br><span class="line">name: cnn.VGG_16.convolution1_1.bias, grad: False</span><br><span class="line">name: cnn.VGG_16.convolution1_2.weight, grad: False</span><br><span class="line">name: cnn.VGG_16.convolution1_2.bias, grad: False</span><br><span class="line">name: cnn.VGG_16.convolution2_1.weight, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution2_1.bias, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution2_2.weight, grad: True</span><br><span class="line">name: cnn.VGG_16.convolution2_2.bias, grad: True</span><br></pre></td></tr></tbody></table></figure>
+
 <p>可以看到前两层的weight和bias的requires_grad都为False，表示它们不可训练。<br>最后在定义优化器时，只对requires_grad为True的层的参数进行更新。  </p>
-<pre><code>    optimizer = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), lr=0.01)
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">optimizer = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), lr=0.01)</span><br></pre></td></tr></tbody></table></figure>
+
 <h2 id="9-对不同层使用不同学习率"><a href="#9-对不同层使用不同学习率" class="headerlink" title="9. 对不同层使用不同学习率"></a>9. 对不同层使用不同学习率</h2><p>我们对模型的不同层使用不同的学习率。</p>
 <p>还是使用这个模型作为例子：  </p>
-<pre class=" language-python"><code class="language-python">    net <span class="token operator">=</span> Network<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 获取自定义网络结构</span>
-    <span class="token keyword">for</span> name<span class="token punctuation">,</span> value <span class="token keyword">in</span> net<span class="token punctuation">.</span>named_parameters<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'name: {}'</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true"># 输出：</span>
-    <span class="token comment" spellcheck="true"># name: cnn.VGG_16.convolution1_1.weight</span>
-    <span class="token comment" spellcheck="true"># name: cnn.VGG_16.convolution1_1.bias</span>
-    <span class="token comment" spellcheck="true"># name: cnn.VGG_16.convolution1_2.weight</span>
-    <span class="token comment" spellcheck="true"># name: cnn.VGG_16.convolution1_2.bias</span>
-    <span class="token comment" spellcheck="true"># name: cnn.VGG_16.convolution2_1.weight</span>
-    <span class="token comment" spellcheck="true"># name: cnn.VGG_16.convolution2_1.bias</span>
-    <span class="token comment" spellcheck="true"># name: cnn.VGG_16.convolution2_2.weight</span>
-    <span class="token comment" spellcheck="true"># name: cnn.VGG_16.convolution2_2.bias</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">net = Network()  <span class="comment"># 获取自定义网络结构</span></span><br><span class="line"><span class="keyword">for</span> name, value <span class="keyword">in</span> net.named_parameters():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'name: {}'</span>.<span class="built_in">format</span>(name))</span><br><span class="line"><span class="comment"># 输出：</span></span><br><span class="line"><span class="comment"># name: cnn.VGG_16.convolution1_1.weight</span></span><br><span class="line"><span class="comment"># name: cnn.VGG_16.convolution1_1.bias</span></span><br><span class="line"><span class="comment"># name: cnn.VGG_16.convolution1_2.weight</span></span><br><span class="line"><span class="comment"># name: cnn.VGG_16.convolution1_2.bias</span></span><br><span class="line"><span class="comment"># name: cnn.VGG_16.convolution2_1.weight</span></span><br><span class="line"><span class="comment"># name: cnn.VGG_16.convolution2_1.bias</span></span><br><span class="line"><span class="comment"># name: cnn.VGG_16.convolution2_2.weight</span></span><br><span class="line"><span class="comment"># name: cnn.VGG_16.convolution2_2.bias</span></span><br></pre></td></tr></tbody></table></figure>
+
 <p>对 convolution1 和 convolution2 设置不同的学习率，首先将它们分开，即放到不同的列表里：  </p>
-<pre><code>    conv1_params = []
-    conv2_params = []
-    for name, parms in net.named_parameters():
-        if "convolution1" in name:
-            conv1_params += [parms]
-        else:
-            conv2_params += [parms]
-    # 然后在优化器中进行如下操作：
-    optimizer = optim.Adam(
-        [
-            {"params": conv1_params, 'lr': 0.01},
-            {"params": conv2_params, 'lr': 0.001},
-        ],
-        weight_decay=1e-3,
-    )
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">conv1_params = []</span><br><span class="line">conv2_params = []</span><br><span class="line">for name, parms in net.named_parameters():</span><br><span class="line">    if "convolution1" in name:</span><br><span class="line">        conv1_params += [parms]</span><br><span class="line">    else:</span><br><span class="line">        conv2_params += [parms]</span><br><span class="line"># 然后在优化器中进行如下操作：</span><br><span class="line">optimizer = optim.Adam(</span><br><span class="line">    [</span><br><span class="line">        {"params": conv1_params, 'lr': 0.01},</span><br><span class="line">        {"params": conv2_params, 'lr': 0.001},</span><br><span class="line">    ],</span><br><span class="line">    weight_decay=1e-3,</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
 <p>我们将模型划分为两部分，存放到一个列表里，每部分就对应上面的一个字典，在字典里设置不同的学习率。当这两部分有相同的其他参数时，就将该参数放到列表外面作为全局参数，如上面的<code>weight_decay</code>。</p>
 <p>也可以在列表外设置一个全局学习率，当各部分字典里设置了局部学习率时，就使用该学习率，否则就使用列表外的全局学习率。</p>
-<h2 id="显示训练时间"><a href="#显示训练时间" class="headerlink" title="显示训练时间"></a>显示训练时间</h2><pre><code>    for epoch in range(start_epoch, config.epochs):
-                start = time.time()
-                train_loss, lr = train_epoch(model, optimizer, scheduler, train_loader, device, criterion, epoch, all_step,
-                                             writer, logger)
-                logger.info('[{}/{}], train_loss: {:.4f}, time: {:.4f}, lr: {}'.format(
-                    epoch, config.epochs, train_loss, time.time() - start, lr))
-</code></pre>
+<h2 id="显示训练时间"><a href="#显示训练时间" class="headerlink" title="显示训练时间"></a>显示训练时间</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">for epoch in range(start_epoch, config.epochs):</span><br><span class="line">            start = time.time()</span><br><span class="line">            train_loss, lr = train_epoch(model, optimizer, scheduler, train_loader, device, criterion, epoch, all_step,</span><br><span class="line">                                         writer, logger)</span><br><span class="line">            logger.info('[{}/{}], train_loss: {:.4f}, time: {:.4f}, lr: {}'.format(</span><br><span class="line">                epoch, config.epochs, train_loss, time.time() - start, lr))</span><br></pre></td></tr></tbody></table></figure>
+
 <p>参考：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU3NjE4NjQ4MA==&amp;mid=2247485953&amp;idx=2&amp;sn=3ae788b7d643541254ba311f7a7faced&amp;chksm=fd16fb1eca61720870bc58c1a465a346cf2c6a7e8bea39e4b3d582474b595021f3a5b635086d&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;sharer_sharetime=1566885137387&amp;sharer_shareid=285785c5623899db73795495779fe8be#rd">https://mp.weixin.qq.com/s?__biz=MzU3NjE4NjQ4MA==&amp;mid=2247485953&amp;idx=2&amp;sn=3ae788b7d643541254ba311f7a7faced&amp;chksm=fd16fb1eca61720870bc58c1a465a346cf2c6a7e8bea39e4b3d582474b595021f3a5b635086d&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;sharer_sharetime=1566885137387&amp;sharer_shareid=285785c5623899db73795495779fe8be#rd</a></p>
 </article>
 <div class="article-footer slide-up">
@@ -319,7 +199,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-BFS/">广度/宽度优先搜索(BFS)</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/">Pytorch手册</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-PIL%E6%A8%A1%E5%9D%97/">PIL模块</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/20190828-Pytorch%E6%89%8B%E5%86%8C/">Pytorch手册</a></div></section></div>
 
 
 

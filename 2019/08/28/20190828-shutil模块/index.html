@@ -20,12 +20,12 @@
   <title>shutil模块 - Caius的日常博客</title>
 
   
-    <meta name="description" content="shutil.copyfile(&quot;old&quot;,&quot;new&quot;) 　　　　  # 复制文件，都只能是文件     shutil.copytree(&quot;old&quot;,&quot;new&quot;)　　　　 # 复制文件夹，都只能是目录，且new必须不存在     shutil.copy(&quot;old&quot;,&quot;new&quot;)　　　　       # 复制文件&#x2F;文件夹，复制 old 为 new（new是文件，若不存在，即新建），复制 ol">
+    <meta name="description" content="1234shutil.copyfile(&quot;old&quot;,&quot;new&quot;) 　　　　  # 复制文件，都只能是文件shutil.copytree(&quot;old&quot;,&quot;new&quot;)　　　　 # 复制文件夹，都只能是目录，且new必须不存在shutil.copy(&quot;old&quot;,&quot;new&quot;)　　　　       # 复制文件&#x2F;文件夹，复制 old 为 new（new是文件，若不存在，即新建），复制 old 为至 new 文">
 <meta property="og:type" content="article">
 <meta property="og:title" content="shutil模块">
 <meta property="og:url" content="https://caiusy.github.io/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/">
 <meta property="og:site_name" content="Caius的日常博客">
-<meta property="og:description" content="shutil.copyfile(&quot;old&quot;,&quot;new&quot;) 　　　　  # 复制文件，都只能是文件     shutil.copytree(&quot;old&quot;,&quot;new&quot;)　　　　 # 复制文件夹，都只能是目录，且new必须不存在     shutil.copy(&quot;old&quot;,&quot;new&quot;)　　　　       # 复制文件&#x2F;文件夹，复制 old 为 new（new是文件，若不存在，即新建），复制 ol">
+<meta property="og:description" content="1234shutil.copyfile(&quot;old&quot;,&quot;new&quot;) 　　　　  # 复制文件，都只能是文件shutil.copytree(&quot;old&quot;,&quot;new&quot;)　　　　 # 复制文件夹，都只能是目录，且new必须不存在shutil.copy(&quot;old&quot;,&quot;new&quot;)　　　　       # 复制文件&#x2F;文件夹，复制 old 为 new（new是文件，若不存在，即新建），复制 old 为至 new 文">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2019-08-27T16:00:00.000Z">
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -94,11 +94,8 @@
     </div>
     
   </div>
-  </div><article class="md-text content slide-up"><pre><code>    shutil.copyfile("old","new") 　　　　  # 复制文件，都只能是文件
-    shutil.copytree("old","new")　　　　 # 复制文件夹，都只能是目录，且new必须不存在
-    shutil.copy("old","new")　　　　       # 复制文件/文件夹，复制 old 为 new（new是文件，若不存在，即新建），复制 old 为至 new 文件夹（文件夹已存在）
-    shutil.move("old","new")  　　　　    # 移动文件/文件夹至 new 文件夹中
-</code></pre>
+  </div><article class="md-text content slide-up"><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">shutil.copyfile("old","new") 　　　　  # 复制文件，都只能是文件</span><br><span class="line">shutil.copytree("old","new")　　　　 # 复制文件夹，都只能是目录，且new必须不存在</span><br><span class="line">shutil.copy("old","new")　　　　       # 复制文件/文件夹，复制 old 为 new（new是文件，若不存在，即新建），复制 old 为至 new 文件夹（文件夹已存在）</span><br><span class="line">shutil.move("old","new")  　　　　    # 移动文件/文件夹至 new 文件夹中</span><br></pre></td></tr></tbody></table></figure>
+
 </article>
 <div class="article-footer slide-up">
 
@@ -117,7 +114,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-python%E6%89%8B%E5%86%8C/">python手册</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/20190828-skimage%E6%A8%A1%E5%9D%97/">skimage模块</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-skimage%E6%A8%A1%E5%9D%97/">skimage模块</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/20190828-%E4%BB%8E%E4%B8%8A%E5%BE%80%E4%B8%8B%E6%89%93%E5%8D%B0%E4%BA%8C%E5%8F%89%E6%A0%91/">从上往下打印二叉树</a></div></section></div>
 
 
 

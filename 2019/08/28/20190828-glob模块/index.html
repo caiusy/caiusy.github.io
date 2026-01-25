@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -106,24 +106,17 @@
 <h2 id="glob-glob"><a href="#glob-glob" class="headerlink" title="glob.glob()"></a>glob.glob()</h2><p>参数:<br>_(str): 文件路径的正则表达式</p>
 <p>返回值:<br>_(list): 符合正则表达式的文件路径列表</p>
 <p>备注:<br>返回所有匹配的文件路径列表, 它只有一个参数pathname, 定义了文件路径匹配的规则, 这里可以是绝对路径或者相对路径:  </p>
-<pre class=" language-python"><code class="language-python">    <span class="token keyword">import</span> glob
-    pathes_list <span class="token operator">=</span> glob<span class="token punctuation">.</span>glob<span class="token punctuation">(</span><span class="token string">"~/Pictures/*.jpg"</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true"># 获取Pictures下的所有图片</span>
-    relative_pathes_list <span class="token operator">=</span> glob<span class="token punctuation">.</span>glob<span class="token punctuation">(</span><span class="token string">"../*.py"</span><span class="token punctuation">)</span>
-    <span class="token comment" spellcheck="true"># 获取上级目录中的所有.py文件</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> glob</span><br><span class="line">pathes_list = glob.glob(<span class="string">"~/Pictures/*.jpg"</span>)</span><br><span class="line"><span class="comment"># 获取Pictures下的所有图片</span></span><br><span class="line">relative_pathes_list = glob.glob(<span class="string">"../*.py"</span>)</span><br><span class="line"><span class="comment"># 获取上级目录中的所有.py文件</span></span><br></pre></td></tr></tbody></table></figure>
+
 <p>在 linux, osx 系统中, 通配符的匹配是大小写区分的, 也就是需要特别指定大小写:  </p>
-<pre><code>    extensions = ['jpg', 'JPG', 'jpeg', 'JPEG']
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">extensions = ['jpg', 'JPG', 'jpeg', 'JPEG']</span><br></pre></td></tr></tbody></table></figure>
+
 <p>但是在 windows 当中, 通配符的匹配是不区分大小写的, 因此只需要指定大小写中的一个即可, 两个都指定的话, 会出现重复的情况  </p>
-<pre><code>    extensions = ['jpg', 'jpeg']
-</code></pre>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">extensions = ['jpg', 'jpeg']</span><br></pre></td></tr></tbody></table></figure>
+
 <h2 id="glob-iglob"><a href="#glob-iglob" class="headerlink" title="glob.iglob"></a>glob.iglob</h2><p>获取一个可遍历的对象, 使用它可以逐个获取匹配的文件路径名. 与glob.glob()的区别是: glob.glob()会同时获取到所有的匹配路径, 而glob.iglob()一次只获取一个匹配路径.  </p>
-<pre class=" language-python"><code class="language-python">    f <span class="token operator">=</span> glob<span class="token punctuation">.</span>iglob<span class="token punctuation">(</span><span class="token string">"../*.py"</span><span class="token punctuation">)</span>
-    <span class="token keyword">print</span> f <span class="token comment" spellcheck="true"># &lt;generator object iglob at 0x00B9FF80></span>
-    <span class="token keyword">for</span> py <span class="token keyword">in</span> f<span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span>py<span class="token punctuation">)</span>
-</code></pre>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">f = glob.iglob(<span class="string">"../*.py"</span>)</span><br><span class="line"><span class="built_in">print</span> f <span class="comment"># &lt;generator object iglob at 0x00B9FF80&gt;</span></span><br><span class="line"><span class="keyword">for</span> py <span class="keyword">in</span> f:</span><br><span class="line">    <span class="built_in">print</span>(py)</span><br></pre></td></tr></tbody></table></figure>
+
 </article>
 <div class="article-footer slide-up">
 
@@ -142,7 +135,7 @@
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-PIL%E6%A8%A1%E5%9D%97/">PIL模块</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/20190828-numpy%E5%AE%9E%E7%8E%B0%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">numpy实现神经网络</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/20190828-logging%E6%A8%A1%E5%9D%97/">logging模块</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/">opencv模块</a></div></section></div>
 
 
 

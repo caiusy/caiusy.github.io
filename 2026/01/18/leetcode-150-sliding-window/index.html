@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 <body>
 
 <div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
@@ -98,267 +98,46 @@
 <p>🎯 <strong>核心技巧</strong>：右扩左缩、哈希计数、条件收缩</p>
 </blockquote>
 <hr>
-<h2 id="🗺️-滑动窗口核心思想"><a href="#🗺️-滑动窗口核心思想" class="headerlink" title="🗺️ 滑动窗口核心思想"></a>🗺️ 滑动窗口核心思想</h2><pre><code>┌─────────────────────────────────────────────────────────────┐
-│                    滑动窗口工作原理                           │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   Step 1: 右边界扩张                                         │
-│   ┌───┬───┬───┬───┬───┬───┬───┐                            │
-│   │ a │ b │ c │ d │ e │ f │ g │                            │
-│   └───┴───┴───┴───┴───┴───┴───┘                            │
-│     L           R ──────▶                                   │
-│     └─────┬─────┘                                           │
-│         window                                              │
-│                                                             │
-│   Step 2: 满足条件时左边界收缩                                │
-│   ┌───┬───┬───┬───┬───┬───┬───┐                            │
-│   │ a │ b │ c │ d │ e │ f │ g │                            │
-│   └───┴───┴───┴───┴───┴───┴───┘                            │
-│     L ──▶       R                                           │
-│         └───┬───┘                                           │
-│           window (收缩后)                                    │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-</code></pre>
+<h2 id="🗺️-滑动窗口核心思想"><a href="#🗺️-滑动窗口核心思想" class="headerlink" title="🗺️ 滑动窗口核心思想"></a>🗺️ 滑动窗口核心思想</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│                    滑动窗口工作原理                           │</span><br><span class="line">├─────────────────────────────────────────────────────────────┤</span><br><span class="line">│                                                             │</span><br><span class="line">│   Step 1: 右边界扩张                                         │</span><br><span class="line">│   ┌───┬───┬───┬───┬───┬───┬───┐                            │</span><br><span class="line">│   │ a │ b │ c │ d │ e │ f │ g │                            │</span><br><span class="line">│   └───┴───┴───┴───┴───┴───┴───┘                            │</span><br><span class="line">│     L           R ──────▶                                   │</span><br><span class="line">│     └─────┬─────┘                                           │</span><br><span class="line">│         window                                              │</span><br><span class="line">│                                                             │</span><br><span class="line">│   Step 2: 满足条件时左边界收缩                                │</span><br><span class="line">│   ┌───┬───┬───┬───┬───┬───┬───┐                            │</span><br><span class="line">│   │ a │ b │ c │ d │ e │ f │ g │                            │</span><br><span class="line">│   └───┴───┴───┴───┴───┴───┴───┘                            │</span><br><span class="line">│     L ──▶       R                                           │</span><br><span class="line">│         └───┬───┘                                           │</span><br><span class="line">│           window (收缩后)                                    │</span><br><span class="line">│                                                             │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
-<h2 id="🔧-滑动窗口万能模板"><a href="#🔧-滑动窗口万能模板" class="headerlink" title="🔧 滑动窗口万能模板"></a>🔧 滑动窗口万能模板</h2><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">sliding_window</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">from</span> collections <span class="token keyword">import</span> defaultdict
-    
-    window <span class="token operator">=</span> defaultdict<span class="token punctuation">(</span>int<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 窗口内容计数</span>
-    left <span class="token operator">=</span> <span class="token number">0</span>
-    result <span class="token operator">=</span> <span class="token number">0</span>  <span class="token comment" spellcheck="true"># 或者其他结果变量</span>
-    
-    <span class="token keyword">for</span> right <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># ① 右边界扩张：将 s[right] 加入窗口</span>
-        c <span class="token operator">=</span> s<span class="token punctuation">[</span>right<span class="token punctuation">]</span>
-        window<span class="token punctuation">[</span>c<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
-        
-        <span class="token comment" spellcheck="true"># ② 判断是否需要收缩（根据题目条件）</span>
-        <span class="token keyword">while</span> 需要收缩的条件<span class="token punctuation">:</span>
-            <span class="token comment" spellcheck="true"># 将 s[left] 移出窗口</span>
-            d <span class="token operator">=</span> s<span class="token punctuation">[</span>left<span class="token punctuation">]</span>
-            window<span class="token punctuation">[</span>d<span class="token punctuation">]</span> <span class="token operator">-=</span> <span class="token number">1</span>
-            left <span class="token operator">+=</span> <span class="token number">1</span>
-        
-        <span class="token comment" spellcheck="true"># ③ 更新结果（根据题目要求）</span>
-        result <span class="token operator">=</span> max<span class="token punctuation">(</span>result<span class="token punctuation">,</span> right <span class="token operator">-</span> left <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> result
-</code></pre>
+<h2 id="🔧-滑动窗口万能模板"><a href="#🔧-滑动窗口万能模板" class="headerlink" title="🔧 滑动窗口万能模板"></a>🔧 滑动窗口万能模板</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">sliding_window</span>(<span class="params">s</span>):</span><br><span class="line">    <span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line">    </span><br><span class="line">    window = defaultdict(<span class="built_in">int</span>)  <span class="comment"># 窗口内容计数</span></span><br><span class="line">    left = <span class="number">0</span></span><br><span class="line">    result = <span class="number">0</span>  <span class="comment"># 或者其他结果变量</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> right <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(s)):</span><br><span class="line">        <span class="comment"># ① 右边界扩张：将 s[right] 加入窗口</span></span><br><span class="line">        c = s[right]</span><br><span class="line">        window[c] += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># ② 判断是否需要收缩（根据题目条件）</span></span><br><span class="line">        <span class="keyword">while</span> 需要收缩的条件:</span><br><span class="line">            <span class="comment"># 将 s[left] 移出窗口</span></span><br><span class="line">            d = s[left]</span><br><span class="line">            window[d] -= <span class="number">1</span></span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># ③ 更新结果（根据题目要求）</span></span><br><span class="line">        result = <span class="built_in">max</span>(result, right - left + <span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <h2 id="1️⃣-LC-209-长度最小的子数组-🟡"><a href="#1️⃣-LC-209-长度最小的子数组-🟡" class="headerlink" title="1️⃣ LC 209. 长度最小的子数组 🟡"></a>1️⃣ LC 209. 长度最小的子数组 🟡</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>找出和 ≥ target 的最短连续子数组长度。</p>
-<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>nums = [2, 3, 1, 2, 4, 3], target = 7
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">nums = [2, 3, 1, 2, 4, 3], target = 7</span><br><span class="line"></span><br><span class="line">窗口滑动过程：</span><br><span class="line">┌─────────────────────────────────────────┐</span><br><span class="line">│ [2]                  sum=2  &lt; 7  扩张   │</span><br><span class="line">│ [2,3]                sum=5  &lt; 7  扩张   │</span><br><span class="line">│ [2,3,1]              sum=6  &lt; 7  扩张   │</span><br><span class="line">│ [2,3,1,2]            sum=8  ≥ 7  记录4  │</span><br><span class="line">│   [3,1,2]            sum=6  &lt; 7  扩张   │</span><br><span class="line">│   [3,1,2,4]          sum=10 ≥ 7  记录4  │</span><br><span class="line">│     [1,2,4]          sum=7  ≥ 7  记录3  │</span><br><span class="line">│       [2,4]          sum=6  &lt; 7  扩张   │</span><br><span class="line">│       [2,4,3]        sum=9  ≥ 7  记录3  │</span><br><span class="line">│         [4,3]        sum=7  ≥ 7  记录2 ✓│</span><br><span class="line">└─────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line">最小长度 = 2</span><br></pre></td></tr></tbody></table></figure>
 
-窗口滑动过程：
-┌─────────────────────────────────────────┐
-│ [2]                  sum=2  &lt; 7  扩张   │
-│ [2,3]                sum=5  &lt; 7  扩张   │
-│ [2,3,1]              sum=6  &lt; 7  扩张   │
-│ [2,3,1,2]            sum=8  ≥ 7  记录4  │
-│   [3,1,2]            sum=6  &lt; 7  扩张   │
-│   [3,1,2,4]          sum=10 ≥ 7  记录4  │
-│     [1,2,4]          sum=7  ≥ 7  记录3  │
-│       [2,4]          sum=6  &lt; 7  扩张   │
-│       [2,4,3]        sum=9  ≥ 7  记录3  │
-│         [4,3]        sum=7  ≥ 7  记录2 ✓│
-└─────────────────────────────────────────┘
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">minSubArrayLen</span>(<span class="params">target: <span class="built_in">int</span>, nums: <span class="built_in">list</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    left = <span class="number">0</span></span><br><span class="line">    window_sum = <span class="number">0</span></span><br><span class="line">    min_len = <span class="built_in">float</span>(<span class="string">'inf'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> right <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(nums)):</span><br><span class="line">        <span class="comment"># 扩张：加入右边元素</span></span><br><span class="line">        window_sum += nums[right]</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 收缩：满足条件时尝试缩小窗口</span></span><br><span class="line">        <span class="keyword">while</span> window_sum &gt;= target:</span><br><span class="line">            min_len = <span class="built_in">min</span>(min_len, right - left + <span class="number">1</span>)</span><br><span class="line">            window_sum -= nums[left]</span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> min_len <span class="keyword">if</span> min_len != <span class="built_in">float</span>(<span class="string">'inf'</span>) <span class="keyword">else</span> <span class="number">0</span></span><br></pre></td></tr></tbody></table></figure>
 
-最小长度 = 2
-</code></pre>
-<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minSubArrayLen</span><span class="token punctuation">(</span>target<span class="token punctuation">:</span> int<span class="token punctuation">,</span> nums<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    left <span class="token operator">=</span> <span class="token number">0</span>
-    window_sum <span class="token operator">=</span> <span class="token number">0</span>
-    min_len <span class="token operator">=</span> float<span class="token punctuation">(</span><span class="token string">'inf'</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">for</span> right <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>nums<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 扩张：加入右边元素</span>
-        window_sum <span class="token operator">+=</span> nums<span class="token punctuation">[</span>right<span class="token punctuation">]</span>
-        
-        <span class="token comment" spellcheck="true"># 收缩：满足条件时尝试缩小窗口</span>
-        <span class="token keyword">while</span> window_sum <span class="token operator">>=</span> target<span class="token punctuation">:</span>
-            min_len <span class="token operator">=</span> min<span class="token punctuation">(</span>min_len<span class="token punctuation">,</span> right <span class="token operator">-</span> left <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
-            window_sum <span class="token operator">-=</span> nums<span class="token punctuation">[</span>left<span class="token punctuation">]</span>
-            left <span class="token operator">+=</span> <span class="token number">1</span>
-    
-    <span class="token keyword">return</span> min_len <span class="token keyword">if</span> min_len <span class="token operator">!=</span> float<span class="token punctuation">(</span><span class="token string">'inf'</span><span class="token punctuation">)</span> <span class="token keyword">else</span> <span class="token number">0</span>
-</code></pre>
 <h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“够了就缩，不够就扩”</strong></p>
 </blockquote>
 <hr>
 <h2 id="2️⃣-LC-3-无重复字符的最长子串-🟡"><a href="#2️⃣-LC-3-无重复字符的最长子串-🟡" class="headerlink" title="2️⃣ LC 3. 无重复字符的最长子串 🟡"></a>2️⃣ LC 3. 无重复字符的最长子串 🟡</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>找出不含重复字符的最长子串长度。</p>
-<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>s = "abcabcbb"
+<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">s = "abcabcbb"</span><br><span class="line"></span><br><span class="line">窗口滑动过程：</span><br><span class="line">┌─────────────────────────────────────────┐</span><br><span class="line">│ [a]         无重复  len=1               │</span><br><span class="line">│ [a,b]       无重复  len=2               │</span><br><span class="line">│ [a,b,c]     无重复  len=3 ✓             │</span><br><span class="line">│ [a,b,c,a]   有重复! 收缩                │</span><br><span class="line">│   [b,c,a]   无重复  len=3               │</span><br><span class="line">│   [b,c,a,b] 有重复! 收缩                │</span><br><span class="line">│     [c,a,b] 无重复  len=3               │</span><br><span class="line">│     ...                                 │</span><br><span class="line">└─────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line">最长无重复子串长度 = 3</span><br></pre></td></tr></tbody></table></figure>
 
-窗口滑动过程：
-┌─────────────────────────────────────────┐
-│ [a]         无重复  len=1               │
-│ [a,b]       无重复  len=2               │
-│ [a,b,c]     无重复  len=3 ✓             │
-│ [a,b,c,a]   有重复! 收缩                │
-│   [b,c,a]   无重复  len=3               │
-│   [b,c,a,b] 有重复! 收缩                │
-│     [c,a,b] 无重复  len=3               │
-│     ...                                 │
-└─────────────────────────────────────────┘
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">lengthOfLongestSubstring</span>(<span class="params">s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    window = {}  <span class="comment"># 记录字符出现次数</span></span><br><span class="line">    left = <span class="number">0</span></span><br><span class="line">    max_len = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> right <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(s)):</span><br><span class="line">        c = s[right]</span><br><span class="line">        window[c] = window.get(c, <span class="number">0</span>) + <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 有重复字符时收缩</span></span><br><span class="line">        <span class="keyword">while</span> window[c] &gt; <span class="number">1</span>:</span><br><span class="line">            d = s[left]</span><br><span class="line">            window[d] -= <span class="number">1</span></span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        max_len = <span class="built_in">max</span>(max_len, right - left + <span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> max_len</span><br></pre></td></tr></tbody></table></figure>
 
-最长无重复子串长度 = 3
-</code></pre>
-<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lengthOfLongestSubstring</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    window <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>  <span class="token comment" spellcheck="true"># 记录字符出现次数</span>
-    left <span class="token operator">=</span> <span class="token number">0</span>
-    max_len <span class="token operator">=</span> <span class="token number">0</span>
-    
-    <span class="token keyword">for</span> right <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        c <span class="token operator">=</span> s<span class="token punctuation">[</span>right<span class="token punctuation">]</span>
-        window<span class="token punctuation">[</span>c<span class="token punctuation">]</span> <span class="token operator">=</span> window<span class="token punctuation">.</span>get<span class="token punctuation">(</span>c<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span>
-        
-        <span class="token comment" spellcheck="true"># 有重复字符时收缩</span>
-        <span class="token keyword">while</span> window<span class="token punctuation">[</span>c<span class="token punctuation">]</span> <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">:</span>
-            d <span class="token operator">=</span> s<span class="token punctuation">[</span>left<span class="token punctuation">]</span>
-            window<span class="token punctuation">[</span>d<span class="token punctuation">]</span> <span class="token operator">-=</span> <span class="token number">1</span>
-            left <span class="token operator">+=</span> <span class="token number">1</span>
-        
-        max_len <span class="token operator">=</span> max<span class="token punctuation">(</span>max_len<span class="token punctuation">,</span> right <span class="token operator">-</span> left <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> max_len
-</code></pre>
-<h3 id="🔥-优化版本（记录位置）"><a href="#🔥-优化版本（记录位置）" class="headerlink" title="🔥 优化版本（记录位置）"></a>🔥 优化版本（记录位置）</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">lengthOfLongestSubstring</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> int<span class="token punctuation">:</span>
-    char_index <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>  <span class="token comment" spellcheck="true"># 记录字符最后出现的位置</span>
-    left <span class="token operator">=</span> <span class="token number">0</span>
-    max_len <span class="token operator">=</span> <span class="token number">0</span>
-    
-    <span class="token keyword">for</span> right<span class="token punctuation">,</span> c <span class="token keyword">in</span> enumerate<span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 如果字符在窗口内出现过，直接跳到重复位置之后</span>
-        <span class="token keyword">if</span> c <span class="token keyword">in</span> char_index <span class="token operator">and</span> char_index<span class="token punctuation">[</span>c<span class="token punctuation">]</span> <span class="token operator">>=</span> left<span class="token punctuation">:</span>
-            left <span class="token operator">=</span> char_index<span class="token punctuation">[</span>c<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token number">1</span>
-        
-        char_index<span class="token punctuation">[</span>c<span class="token punctuation">]</span> <span class="token operator">=</span> right
-        max_len <span class="token operator">=</span> max<span class="token punctuation">(</span>max_len<span class="token punctuation">,</span> right <span class="token operator">-</span> left <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
-    
-    <span class="token keyword">return</span> max_len
-</code></pre>
+<h3 id="🔥-优化版本（记录位置）"><a href="#🔥-优化版本（记录位置）" class="headerlink" title="🔥 优化版本（记录位置）"></a>🔥 优化版本（记录位置）</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">lengthOfLongestSubstring</span>(<span class="params">s: <span class="built_in">str</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    char_index = {}  <span class="comment"># 记录字符最后出现的位置</span></span><br><span class="line">    left = <span class="number">0</span></span><br><span class="line">    max_len = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> right, c <span class="keyword">in</span> <span class="built_in">enumerate</span>(s):</span><br><span class="line">        <span class="comment"># 如果字符在窗口内出现过，直接跳到重复位置之后</span></span><br><span class="line">        <span class="keyword">if</span> c <span class="keyword">in</span> char_index <span class="keyword">and</span> char_index[c] &gt;= left:</span><br><span class="line">            left = char_index[c] + <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        char_index[c] = right</span><br><span class="line">        max_len = <span class="built_in">max</span>(max_len, right - left + <span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> max_len</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="🧠-记忆口诀-1"><a href="#🧠-记忆口诀-1" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“重复就跳过，记录最长度”</strong></p>
 </blockquote>
 <hr>
 <h2 id="3️⃣-LC-30-串联所有单词的子串-🔴"><a href="#3️⃣-LC-30-串联所有单词的子串-🔴" class="headerlink" title="3️⃣ LC 30. 串联所有单词的子串 🔴"></a>3️⃣ LC 30. 串联所有单词的子串 🔴</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>找出字符串中所有是 <code>words</code> 中所有单词串联结果的起始索引。</p>
-<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>s = "barfoothefoobarman"
-words = ["foo", "bar"]  (每个长度为3)
+<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">s = "barfoothefoobarman"</span><br><span class="line">words = ["foo", "bar"]  (每个长度为3)</span><br><span class="line"></span><br><span class="line">串联结果可能是 "foobar" 或 "barfoo"（长度6）</span><br><span class="line"></span><br><span class="line">检查每个可能的起始位置：</span><br><span class="line">位置0: "barfoo" ✓ (bar + foo)</span><br><span class="line">位置3: "foothe" ✗</span><br><span class="line">位置6: "thefoo" ✗</span><br><span class="line">位置9: "foobar" ✓ (foo + bar)</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">结果: [0, 9]</span><br></pre></td></tr></tbody></table></figure>
 
-串联结果可能是 "foobar" 或 "barfoo"（长度6）
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">findSubstring</span>(<span class="params">s: <span class="built_in">str</span>, words: <span class="built_in">list</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> s <span class="keyword">or</span> <span class="keyword">not</span> words:</span><br><span class="line">        <span class="keyword">return</span> []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line">    </span><br><span class="line">    word_len = <span class="built_in">len</span>(words[<span class="number">0</span>])</span><br><span class="line">    word_count = <span class="built_in">len</span>(words)</span><br><span class="line">    total_len = word_len * word_count</span><br><span class="line">    word_freq = Counter(words)</span><br><span class="line">    result = []</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 只需要检查 word_len 种起始偏移</span></span><br><span class="line">    <span class="keyword">for</span> offset <span class="keyword">in</span> <span class="built_in">range</span>(word_len):</span><br><span class="line">        left = offset</span><br><span class="line">        window = Counter()</span><br><span class="line">        count = <span class="number">0</span>  <span class="comment"># 窗口内有效单词数</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> right <span class="keyword">in</span> <span class="built_in">range</span>(offset, <span class="built_in">len</span>(s) - word_len + <span class="number">1</span>, word_len):</span><br><span class="line">            word = s[right:right + word_len]</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> word <span class="keyword">in</span> word_freq:</span><br><span class="line">                window[word] += <span class="number">1</span></span><br><span class="line">                count += <span class="number">1</span></span><br><span class="line">                </span><br><span class="line">                <span class="comment"># 如果某单词超出需要的数量，收缩左边界</span></span><br><span class="line">                <span class="keyword">while</span> window[word] &gt; word_freq[word]:</span><br><span class="line">                    left_word = s[left:left + word_len]</span><br><span class="line">                    window[left_word] -= <span class="number">1</span></span><br><span class="line">                    count -= <span class="number">1</span></span><br><span class="line">                    left += word_len</span><br><span class="line">                </span><br><span class="line">                <span class="comment"># 找到一个有效的串联</span></span><br><span class="line">                <span class="keyword">if</span> count == word_count:</span><br><span class="line">                    result.append(left)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 遇到不在 words 中的单词，重置窗口</span></span><br><span class="line">                window.clear()</span><br><span class="line">                count = <span class="number">0</span></span><br><span class="line">                left = right + word_len</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
 
-检查每个可能的起始位置：
-位置0: "barfoo" ✓ (bar + foo)
-位置3: "foothe" ✗
-位置6: "thefoo" ✗
-位置9: "foobar" ✓ (foo + bar)
-...
-
-结果: [0, 9]
-</code></pre>
-<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">findSubstring</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">,</span> words<span class="token punctuation">:</span> list<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> list<span class="token punctuation">:</span>
-    <span class="token keyword">if</span> <span class="token operator">not</span> s <span class="token operator">or</span> <span class="token operator">not</span> words<span class="token punctuation">:</span>
-        <span class="token keyword">return</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    <span class="token keyword">from</span> collections <span class="token keyword">import</span> Counter
-    
-    word_len <span class="token operator">=</span> len<span class="token punctuation">(</span>words<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    word_count <span class="token operator">=</span> len<span class="token punctuation">(</span>words<span class="token punctuation">)</span>
-    total_len <span class="token operator">=</span> word_len <span class="token operator">*</span> word_count
-    word_freq <span class="token operator">=</span> Counter<span class="token punctuation">(</span>words<span class="token punctuation">)</span>
-    result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-    
-    <span class="token comment" spellcheck="true"># 只需要检查 word_len 种起始偏移</span>
-    <span class="token keyword">for</span> offset <span class="token keyword">in</span> range<span class="token punctuation">(</span>word_len<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        left <span class="token operator">=</span> offset
-        window <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        count <span class="token operator">=</span> <span class="token number">0</span>  <span class="token comment" spellcheck="true"># 窗口内有效单词数</span>
-        
-        <span class="token keyword">for</span> right <span class="token keyword">in</span> range<span class="token punctuation">(</span>offset<span class="token punctuation">,</span> len<span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">-</span> word_len <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> word_len<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            word <span class="token operator">=</span> s<span class="token punctuation">[</span>right<span class="token punctuation">:</span>right <span class="token operator">+</span> word_len<span class="token punctuation">]</span>
-            
-            <span class="token keyword">if</span> word <span class="token keyword">in</span> word_freq<span class="token punctuation">:</span>
-                window<span class="token punctuation">[</span>word<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
-                count <span class="token operator">+=</span> <span class="token number">1</span>
-                
-                <span class="token comment" spellcheck="true"># 如果某单词超出需要的数量，收缩左边界</span>
-                <span class="token keyword">while</span> window<span class="token punctuation">[</span>word<span class="token punctuation">]</span> <span class="token operator">></span> word_freq<span class="token punctuation">[</span>word<span class="token punctuation">]</span><span class="token punctuation">:</span>
-                    left_word <span class="token operator">=</span> s<span class="token punctuation">[</span>left<span class="token punctuation">:</span>left <span class="token operator">+</span> word_len<span class="token punctuation">]</span>
-                    window<span class="token punctuation">[</span>left_word<span class="token punctuation">]</span> <span class="token operator">-=</span> <span class="token number">1</span>
-                    count <span class="token operator">-=</span> <span class="token number">1</span>
-                    left <span class="token operator">+=</span> word_len
-                
-                <span class="token comment" spellcheck="true"># 找到一个有效的串联</span>
-                <span class="token keyword">if</span> count <span class="token operator">==</span> word_count<span class="token punctuation">:</span>
-                    result<span class="token punctuation">.</span>append<span class="token punctuation">(</span>left<span class="token punctuation">)</span>
-            <span class="token keyword">else</span><span class="token punctuation">:</span>
-                <span class="token comment" spellcheck="true"># 遇到不在 words 中的单词，重置窗口</span>
-                window<span class="token punctuation">.</span>clear<span class="token punctuation">(</span><span class="token punctuation">)</span>
-                count <span class="token operator">=</span> <span class="token number">0</span>
-                left <span class="token operator">=</span> right <span class="token operator">+</span> word_len
-    
-    <span class="token keyword">return</span> result
-</code></pre>
 <h3 id="🧠-记忆口诀-2"><a href="#🧠-记忆口诀-2" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“固定单词长，滑动找串联”</strong></p>
 </blockquote>
 <hr>
 <h2 id="4️⃣-LC-76-最小覆盖子串-🔴"><a href="#4️⃣-LC-76-最小覆盖子串-🔴" class="headerlink" title="4️⃣ LC 76. 最小覆盖子串 🔴"></a>4️⃣ LC 76. 最小覆盖子串 🔴</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><p>找出 s 中包含 t 所有字符的最小子串。</p>
-<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><pre><code>s = "ADOBECODEBANC", t = "ABC"
+<h3 id="🎨-图解思路-3"><a href="#🎨-图解思路-3" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">s = "ADOBECODEBANC", t = "ABC"</span><br><span class="line"></span><br><span class="line">需要: A:1, B:1, C:1</span><br><span class="line"></span><br><span class="line">┌─────────────────────────────────────────────┐</span><br><span class="line">│ 窗口: [A]DOBECODEBANC     缺BC   扩张        │</span><br><span class="line">│ 窗口: [ADOBEC]ODEBANC     满足!  记录6 收缩  │</span><br><span class="line">│ 窗口: [DOBEC]ODEBANC      缺A    扩张        │</span><br><span class="line">│ 窗口: [DOBECODEBA]NC      满足!  记录10 收缩 │</span><br><span class="line">│ 窗口: [CODEBA]NC          满足!  记录6 收缩  │</span><br><span class="line">│ 窗口: [ODEBA]NC           缺C    扩张        │</span><br><span class="line">│ 窗口: [ODEBANC]           满足!  记录7 收缩  │</span><br><span class="line">│ 窗口: [BANC]              满足!  记录4 ✓     │</span><br><span class="line">└─────────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line">最小覆盖子串 = "BANC"</span><br></pre></td></tr></tbody></table></figure>
 
-需要: A:1, B:1, C:1
+<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">minWindow</span>(<span class="params">s: <span class="built_in">str</span>, t: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line">    </span><br><span class="line">    need = Counter(t)       <span class="comment"># 需要的字符及数量</span></span><br><span class="line">    window = Counter()      <span class="comment"># 窗口内的字符</span></span><br><span class="line">    </span><br><span class="line">    have = <span class="number">0</span>                <span class="comment"># 已满足的字符种类数</span></span><br><span class="line">    need_count = <span class="built_in">len</span>(need)  <span class="comment"># 需要满足的字符种类数</span></span><br><span class="line">    </span><br><span class="line">    result = <span class="string">""</span></span><br><span class="line">    min_len = <span class="built_in">float</span>(<span class="string">'inf'</span>)</span><br><span class="line">    left = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> right <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(s)):</span><br><span class="line">        <span class="comment"># 扩张：加入右边字符</span></span><br><span class="line">        c = s[right]</span><br><span class="line">        window[c] += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 如果该字符数量正好满足需求</span></span><br><span class="line">        <span class="keyword">if</span> c <span class="keyword">in</span> need <span class="keyword">and</span> window[c] == need[c]:</span><br><span class="line">            have += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 收缩：当所有字符都满足时</span></span><br><span class="line">        <span class="keyword">while</span> have == need_count:</span><br><span class="line">            <span class="comment"># 更新结果</span></span><br><span class="line">            <span class="keyword">if</span> right - left + <span class="number">1</span> &lt; min_len:</span><br><span class="line">                min_len = right - left + <span class="number">1</span></span><br><span class="line">                result = s[left:right + <span class="number">1</span>]</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 移出左边字符</span></span><br><span class="line">            d = s[left]</span><br><span class="line">            <span class="keyword">if</span> d <span class="keyword">in</span> need <span class="keyword">and</span> window[d] == need[d]:</span><br><span class="line">                have -= <span class="number">1</span></span><br><span class="line">            window[d] -= <span class="number">1</span></span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
 
-┌─────────────────────────────────────────────┐
-│ 窗口: [A]DOBECODEBANC     缺BC   扩张        │
-│ 窗口: [ADOBEC]ODEBANC     满足!  记录6 收缩  │
-│ 窗口: [DOBEC]ODEBANC      缺A    扩张        │
-│ 窗口: [DOBECODEBA]NC      满足!  记录10 收缩 │
-│ 窗口: [CODEBA]NC          满足!  记录6 收缩  │
-│ 窗口: [ODEBA]NC           缺C    扩张        │
-│ 窗口: [ODEBANC]           满足!  记录7 收缩  │
-│ 窗口: [BANC]              满足!  记录4 ✓     │
-└─────────────────────────────────────────────┘
-
-最小覆盖子串 = "BANC"
-</code></pre>
-<h3 id="💻-代码实现-3"><a href="#💻-代码实现-3" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><pre class=" language-python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">minWindow</span><span class="token punctuation">(</span>s<span class="token punctuation">:</span> str<span class="token punctuation">,</span> t<span class="token punctuation">:</span> str<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> str<span class="token punctuation">:</span>
-    <span class="token keyword">from</span> collections <span class="token keyword">import</span> Counter
-    
-    need <span class="token operator">=</span> Counter<span class="token punctuation">(</span>t<span class="token punctuation">)</span>       <span class="token comment" spellcheck="true"># 需要的字符及数量</span>
-    window <span class="token operator">=</span> Counter<span class="token punctuation">(</span><span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># 窗口内的字符</span>
-    
-    have <span class="token operator">=</span> <span class="token number">0</span>                <span class="token comment" spellcheck="true"># 已满足的字符种类数</span>
-    need_count <span class="token operator">=</span> len<span class="token punctuation">(</span>need<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true"># 需要满足的字符种类数</span>
-    
-    result <span class="token operator">=</span> <span class="token string">""</span>
-    min_len <span class="token operator">=</span> float<span class="token punctuation">(</span><span class="token string">'inf'</span><span class="token punctuation">)</span>
-    left <span class="token operator">=</span> <span class="token number">0</span>
-    
-    <span class="token keyword">for</span> right <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 扩张：加入右边字符</span>
-        c <span class="token operator">=</span> s<span class="token punctuation">[</span>right<span class="token punctuation">]</span>
-        window<span class="token punctuation">[</span>c<span class="token punctuation">]</span> <span class="token operator">+=</span> <span class="token number">1</span>
-        
-        <span class="token comment" spellcheck="true"># 如果该字符数量正好满足需求</span>
-        <span class="token keyword">if</span> c <span class="token keyword">in</span> need <span class="token operator">and</span> window<span class="token punctuation">[</span>c<span class="token punctuation">]</span> <span class="token operator">==</span> need<span class="token punctuation">[</span>c<span class="token punctuation">]</span><span class="token punctuation">:</span>
-            have <span class="token operator">+=</span> <span class="token number">1</span>
-        
-        <span class="token comment" spellcheck="true"># 收缩：当所有字符都满足时</span>
-        <span class="token keyword">while</span> have <span class="token operator">==</span> need_count<span class="token punctuation">:</span>
-            <span class="token comment" spellcheck="true"># 更新结果</span>
-            <span class="token keyword">if</span> right <span class="token operator">-</span> left <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">&lt;</span> min_len<span class="token punctuation">:</span>
-                min_len <span class="token operator">=</span> right <span class="token operator">-</span> left <span class="token operator">+</span> <span class="token number">1</span>
-                result <span class="token operator">=</span> s<span class="token punctuation">[</span>left<span class="token punctuation">:</span>right <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span>
-            
-            <span class="token comment" spellcheck="true"># 移出左边字符</span>
-            d <span class="token operator">=</span> s<span class="token punctuation">[</span>left<span class="token punctuation">]</span>
-            <span class="token keyword">if</span> d <span class="token keyword">in</span> need <span class="token operator">and</span> window<span class="token punctuation">[</span>d<span class="token punctuation">]</span> <span class="token operator">==</span> need<span class="token punctuation">[</span>d<span class="token punctuation">]</span><span class="token punctuation">:</span>
-                have <span class="token operator">-=</span> <span class="token number">1</span>
-            window<span class="token punctuation">[</span>d<span class="token punctuation">]</span> <span class="token operator">-=</span> <span class="token number">1</span>
-            left <span class="token operator">+=</span> <span class="token number">1</span>
-    
-    <span class="token keyword">return</span> result
-</code></pre>
 <h3 id="🧠-记忆口诀-3"><a href="#🧠-记忆口诀-3" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
 <p><strong>“扩到满足，缩到不够”</strong></p>
 </blockquote>
@@ -387,29 +166,10 @@ words = ["foo", "bar"]  (每个长度为3)
 <td>30</td>
 </tr>
 </tbody></table>
-<h3 id="滑动窗口思维导图"><a href="#滑动窗口思维导图" class="headerlink" title="滑动窗口思维导图"></a>滑动窗口思维导图</h3><pre><code>        满足条件？
-           │
-     ┌─────┴─────┐
-     ▼           ▼
-    是           否
-     │           │
-     ▼           ▼
-  求最小？     求最大？
-     │           │
-     ▼           ▼
-   收缩        扩张
-  更新答案    继续扩张
-</code></pre>
-<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><pre><code>最无串覆四道题
-滑动窗口巧解析
-右扩左缩是关键
-满足条件再收缩
+<h3 id="滑动窗口思维导图"><a href="#滑动窗口思维导图" class="headerlink" title="滑动窗口思维导图"></a>滑动窗口思维导图</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">      满足条件？</span><br><span class="line">         │</span><br><span class="line">   ┌─────┴─────┐</span><br><span class="line">   ▼           ▼</span><br><span class="line">  是           否</span><br><span class="line">   │           │</span><br><span class="line">   ▼           ▼</span><br><span class="line">求最小？     求最大？</span><br><span class="line">   │           │</span><br><span class="line">   ▼           ▼</span><br><span class="line"> 收缩        扩张</span><br><span class="line">更新答案    继续扩张</span><br></pre></td></tr></tbody></table></figure>
 
-最 - 长度最小的子数组 (209)
-无 - 无重复字符的最长子串 (3)
-串 - 串联所有单词的子串 (30)
-覆 - 最小覆盖子串 (76)
-</code></pre>
+<h3 id="🧠-全章记忆口诀"><a href="#🧠-全章记忆口诀" class="headerlink" title="🧠 全章记忆口诀"></a>🧠 全章记忆口诀</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">最无串覆四道题</span><br><span class="line">滑动窗口巧解析</span><br><span class="line">右扩左缩是关键</span><br><span class="line">满足条件再收缩</span><br><span class="line"></span><br><span class="line">最 - 长度最小的子数组 (209)</span><br><span class="line">无 - 无重复字符的最长子串 (3)</span><br><span class="line">串 - 串联所有单词的子串 (30)</span><br><span class="line">覆 - 最小覆盖子串 (76)</span><br></pre></td></tr></tbody></table></figure>
+
 <hr>
 <blockquote>
 <p>📖 <strong>下一篇</strong>：<a href="/2026/01/18/leetcode-150-linked-list/">链表专题</a></p>
@@ -432,7 +192,7 @@ words = ["foo", "bar"]  (每个长度为3)
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-heap/">⛰️ LeetCode 150 - 堆/优先队列专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-index/">🎯 LeetCode 面试经典 150 题 - 完全攻略</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-linked-list/">🔗 LeetCode 150 - 链表专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-stack/">📦 LeetCode 150 - 栈与队列专题</a></div></section></div>
 
 
 

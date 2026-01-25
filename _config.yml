@@ -1,10 +1,9 @@
-# Hexo Configuration
 ## Docs: https://hexo.io/docs/configuration.html
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
 title: Caius的日常博客
-subtitle: ''
+subtitle: '计算机视觉 | 大模型初学者'
 description: ''
 keywords:
 author: Caius Lu
@@ -14,12 +13,10 @@ timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://caiusy.github.io/
+url: https://caiusy.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
-pretty_urls:
-  trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
-  trailing_html: true # Set to false to remove trailing '.html' from permalinks
+  lang: en
 
 # Directory
 source_dir: source
@@ -41,11 +38,11 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: true
+post_asset_folder: false
 relative_link: false
 future: true
 highlight:
-  enable: false
+  enable: true
   line_number: true
   auto_detect: false
   tab_replace: ''
@@ -81,7 +78,7 @@ meta_generator: true
 ## http://momentjs.com/docs/#/displaying/format/
 date_format: YYYY-MM-DD
 time_format: HH:mm:ss
-## updated_option supports 'mtime', 'date', 'empty'
+## Use post's date for updated date unless set in front-matter
 updated_option: 'mtime'
 
 # Pagination
@@ -101,27 +98,8 @@ ignore:
 theme: stellar
 
 # Deployment
-## Docs: https://hexo.io/docs/one-command-deployment
+## Docs: https://hexo.io/docs/one-command-deployment.html
 deploy:
-  type: 'git'
+  type: git
   repo: https://github.com/caiusy/caiusy.github.io.git
   branch: main
-
-
-prism_plugin:
-  mode: 'preprocess'    # realtime/preprocess
-  theme: 'tomorrow'
-  line_number: false    # default false
-  custom_css:
-
-# Marked 渲染器配置
-marked:
-  prependRoot: true
-  postAsset: true
-# MathJax 数学公式支持
-mathjax:
-  tags: none # 或 'ams' 或 'all'
-  single_dollars: true # 启用单个$符号
-  cjk_width: 0.9 # 中文字符宽度
-  normal_width: 0.6 # 普通字符宽度
-  append_css: true # 添加自定义CSS

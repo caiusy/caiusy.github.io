@@ -6,15 +6,14 @@ tags:
   - Transformer
   - NLP
   - Algorithm
+  - FeynmanTechnique
 categories:
   - Deep Learning
 ---
 
 # 彻底理解 Transformer: Attention Is All You Need
 
-**标签**: #DeepLearning #Transformer #FeynmanTechnique #NLP #Algorithm
-**日期**: 2026-02-02
-**来源**: [[Attention Is All You Need]]
+> **摘要**: 本文利用费曼学习法，通过图解和类比，深入浅出地拆解了 Transformer 架构的核心原理。从 Encoder-Decoder 架构到 Self-Attention 机制，再到 Cross-Attention 和 Masking 的细节，带你彻底搞懂这篇 AI 领域的奠基之作。
 
 ---
 

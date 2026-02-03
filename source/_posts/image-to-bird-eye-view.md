@@ -48,7 +48,7 @@ data
 
 在图像处理中，我们需要理解三种坐标系统的转换关系：
 
-![坐标系统示意图](figures/01_coordinate_systems.png)
+![坐标系统示意图](./image-to-bird-eye-view/figures/01_coordinate_systems.png)
 
 ```infographic
 infographic list-grid-badge-card
@@ -85,7 +85,7 @@ point_world = np.array([3.0, 5.0, 0.0])  # [X, Y, Z]
 
 #### 相机坐标系 (Camera Coordinates)
 
-![Z坐标位置说明](figures/14_where_is_z.png)
+![Z坐标位置说明](./image-to-bird-eye-view/figures/14_where_is_z.png)
 
 **核心规则：**
 - 原点：在相机镜头中心
@@ -120,7 +120,7 @@ pixel = (320, 240)  # (u, v) 像素坐标
 
 ### 1.2 透视投影原理
 
-![小孔成像模型](figures/01_pinhole_camera.png)
+![小孔成像模型](./image-to-bird-eye-view/figures/01_pinhole_camera.png)
 
 **小孔成像模型**是相机的数学抽象：
 
@@ -131,7 +131,7 @@ pixel = (320, 240)  # (u, v) 像素坐标
 
 **投影过程：**
 
-![投影过程示意图](figures/02_projection_process.png)
+![投影过程示意图](./image-to-bird-eye-view/figures/02_projection_process.png)
 
 **数学公式：**
 
@@ -148,7 +148,7 @@ $$
 
 ### 1.3 透视效果
 
-![透视效果](figures/03_perspective_effect.png)
+![透视效果](./image-to-bird-eye-view/figures/03_perspective_effect.png)
 
 **为什么远处的物体看起来小？**
 
@@ -166,7 +166,7 @@ $$
 
 ### 2.1 什么是消失点？
 
-![消失点示意图](figures/02_vanishing_point.png)
+![消失点示意图](./image-to-bird-eye-view/figures/02_vanishing_point.png)
 
 **生活例子**：站在铁轨中间拍照，两条平行的铁轨在远处看起来会"相交"。
 
@@ -214,7 +214,7 @@ def compute_vanishing_point(line1_pts, line2_pts):
 
 ### 2.3 从消失点到相机参数
 
-![消失点到角度的转换](figures/09_vanishing_point_to_angles.png)
+![消失点到角度的转换](./image-to-bird-eye-view/figures/09_vanishing_point_to_angles.png)
 
 **核心思想**：消失点的位置反映了相机的朝向！
 
@@ -265,9 +265,9 @@ def estimate_camera_params(vp, img_shape, cx=None, cy=None):
 
 ### 2.4 几何证明
 
-![几何证明：yaw和pitch](figures/10_geometric_proof_yaw_pitch_fixed.png)
+![几何证明：yaw和pitch](./image-to-bird-eye-view/figures/10_geometric_proof_yaw_pitch_fixed.png)
 
-![Pitch角度证明](figures/12_pitch_proof.png)
+![Pitch角度证明](./image-to-bird-eye-view/figures/12_pitch_proof.png)
 
 **核心公式：**
 
@@ -303,7 +303,7 @@ $$
 
 **单应性变换**就是把第一种视角转换成第二种视角的数学方法！
 
-![单应性对比](figures/03_homography_comparison.png)
+![单应性对比](./image-to-bird-eye-view/figures/03_homography_comparison.png)
 
 ---
 
@@ -426,7 +426,7 @@ def compute_homography_dlt(src_pts, dst_pts):
 
 ### 3.4 优化过程
 
-![优化过程示意图](figures/05_optimization_process.png)
+![优化过程示意图](./image-to-bird-eye-view/figures/05_optimization_process.png)
 
 **步骤解析：**
 
@@ -567,71 +567,58 @@ class InteractiveBirdEyeView:
                 cv2.FONT_HERSHEY_SIMPLEX, 
                 0.8, 
                 (0, 0, 255), 
-                2
+
+```python
             )
-        
         # 绘制连线
         if len(self.points) > 1:
             pts = np.array(self.points, np.int32)
             cv2.polylines(
-                self.display_img, 
-                [pts], 
+                self.display_img,
+                [pts],
                 len(self.points) == 4,
-                (255, 0, 0), 
-                2
+                (255, 0, 0),
             )
-        
         # 显示提示信息
         info = f"已选择 {len(self.points)}/{self.max_points} 个点"
         cv2.putText(
-            self.display_img, 
-            info, 
-            (10, 30), 
-            cv2.FONT_HERSHEY_SIMPLEX, 
-            1, 
-            (255, 255, 0), 
-            2
+            self.display_img,
+            info,
+            (10, 30),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (255, 255, 0),
         )
-        
         cv2.imshow(self.window_name, self.display_img)
-    
     def select_points(self):
         """
         交互式选择点
-        
         返回：
             points: 4×2 numpy数组，或None（如果取消）
         """
         cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
         cv2.setMouseCallback(self.window_name, self.mouse_callback)
-        
         print("\n" + "="*60)
         print("📌 请在图像上依次点击4个点")
         print("   顺序：左下 → 右下 → 右上 → 左上")
         print("   提示：选择路面上的矩形区域")
         print("   按ESC可以取消")
         print("="*60 + "\n")
-        
         self.draw_points()
-        
         while len(self.points) < self.max_points:
             key = cv2.waitKey(1) & 0xFF
             if key == 27:  # ESC
                 print("❌ 已取消")
                 cv2.destroyAllWindows()
                 return None
-        
         return np.array(self.points, dtype=np.float32)
-    
     def compute_bird_view(self, bird_w=400, bird_h=600, margin=50):
         """
         计算并显示鸟瞰图
-        
         参数：
             bird_w: 鸟瞰图宽度（像素）
             bird_h: 鸟瞰图高度（像素）
             margin: 边距（像素）
-        
         返回：
             result: 包含原图和鸟瞰图的字典
         """
@@ -639,9 +626,7 @@ class InteractiveBirdEyeView:
         src_pts = self.select_points()
         if src_pts is None:
             return None
-        
         print("\n🔄 处理中...")
-        
         # 定义目标点（俯视图中的矩形）
         dst_pts = np.array([
             [margin, bird_h - margin],
@@ -649,21 +634,17 @@ class InteractiveBirdEyeView:
             [bird_w - margin, margin],
             [margin, margin]
         ], dtype=np.float32)
-        
         # 计算单应性矩阵
         H = compute_homography_dlt(src_pts, dst_pts)
-        
         print("\n📐 单应性矩阵 H:")
         print(H)
-        
         # 变换图像
         bird_view = cv2.warpPerspective(
-            self.img, 
-            H, 
+            self.img,
+            H,
             (bird_w, bird_h),
             flags=cv2.INTER_LINEAR
         )
-        
         # 在原图上绘制选择的区域
         marked_img = self.img.copy()
         pts = src_pts.astype(np.int32).reshape((-1, 1, 2))
@@ -671,15 +652,13 @@ class InteractiveBirdEyeView:
         for i, pt in enumerate(src_pts):
             cv2.circle(marked_img, tuple(pt.astype(int)), 10, (0, 255, 0), -1)
             cv2.putText(
-                marked_img, 
-                str(i+1), 
-                tuple(pt.astype(int)), 
-                cv2.FONT_HERSHEY_SIMPLEX, 
-                1, 
-                (0, 0, 255), 
-                3
+                marked_img,
+                str(i+1),
+                tuple(pt.astype(int)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 0, 255),
             )
-        
         # 返回结果
         result = {
             'original': self.img,
@@ -689,15 +668,11 @@ class InteractiveBirdEyeView:
             'src_points': src_pts,
             'dst_points': dst_pts
         }
-        
         print("\n✅ 处理完成！")
-        
         return result
-
 def visualize_results(result, save_path=None):
     """
     可视化结果
-    
     参数：
         result: compute_bird_view返回的结果字典
         save_path: 保存路径（可选）
@@ -705,56 +680,44 @@ def visualize_results(result, save_path=None):
     if result is None:
         print("没有结果可显示")
         return
-    
     # 创建对比图
     h1, w1 = result['marked'].shape[:2]
     h2, w2 = result['bird_view'].shape[:2]
-    
     # 调整大小使高度一致
     target_h = 400
     scale1 = target_h / h1
     scale2 = target_h / h2
-    
     img1_resized = cv2.resize(result['marked'], (int(w1*scale1), target_h))
     img2_resized = cv2.resize(result['bird_view'], (int(w2*scale2), target_h))
-    
     # 水平拼接
     combined = np.hstack([img1_resized, img2_resized])
-    
     # 添加标题
     cv2.putText(
-        combined, 
-        'Original (Perspective)', 
-        (10, 30), 
-        cv2.FONT_HERSHEY_SIMPLEX, 
-        1, 
-        (255, 255, 0), 
-        2
+        combined,
+        'Original (Perspective)',
+        (10, 30),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        1,
+        (255, 255, 0),
     )
-    
     cv2.putText(
-        combined, 
-        'Bird Eye View (Top-down)', 
-        (int(w1*scale1) + 10, 30), 
-        cv2.FONT_HERSHEY_SIMPLEX, 
-        1, 
-        (255, 255, 0), 
-        2
+        combined,
+        'Bird Eye View (Top-down)',
+        (int(w1*scale1) + 10, 30),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        1,
+        (255, 255, 0),
     )
-    
     # 显示
     cv2.namedWindow('Result', cv2.WINDOW_NORMAL)
     cv2.imshow('Result', combined)
-    
     # 保存
     if save_path:
         cv2.imwrite(str(save_path), combined)
         print(f"\n💾 结果已保存到: {save_path}")
-    
     print("\n按任意键关闭...")
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
 def main():
     """
     主函数
@@ -762,72 +725,52 @@ def main():
     print("\n" + "="*60)
     print("🚗 从图像到俯视图：完整实现")
     print("="*60)
-    
     # 1. 读取图像
     img_path = input("\n请输入图像路径（或按回车使用默认）: ").strip()
     if not img_path:
         img_path = "input/dashcam.jpg"
-    
     print(f"\n📂 读取图像: {img_path}")
     img = cv2.imread(img_path)
-    
     if img is None:
         print(f"❌ 无法读取图像: {img_path}")
         return
-    
     print(f"✅ 图像大小: {img.shape[1]} × {img.shape[0]}")
-    
     # 2. 创建交互式界面
     bev = InteractiveBirdEyeView(img)
-    
     # 3. 计算鸟瞰图
     result = bev.compute_bird_view(
         bird_w=400,
         bird_h=600,
         margin=50
     )
-    
     if result is None:
         return
-    
     # 4. 显示结果
     visualize_results(result, save_path="output/result.jpg")
-    
     # 5. 保存各个结果
     cv2.imwrite("output/marked.jpg", result['marked'])
     cv2.imwrite("output/bird_view.jpg", result['bird_view'])
-    
     print("\n📁 所有文件已保存到 output/ 目录")
     print("\n✨ 完成！")
-
 if __name__ == "__main__":
     main()
 ```
-
 ---
-
 ### 4.4 运行效果
-
 **运行步骤：**
-
 ```bash
 # 1. 运行程序
 python main.py
-
 # 2. 输入图像路径（或使用默认）
-请输入图像路径（或按回车使用默认）: 
-
+请输入图像路径（或按回车使用默认）:
 # 3. 在弹出的窗口中点击4个点
 📌 请在图像上依次点击4个点
    顺序：左下 → 右下 → 右上 → 左上
-
 # 4. 查看结果
 ✅ 处理完成！
 💾 结果已保存到: output/result.jpg
 ```
-
 **效果展示：**
-
 ```
 输入图像（斜视角）          输出图像（俯视图）
      ╱╲                        ┌──────┐
@@ -836,91 +779,65 @@ python main.py
   ╱______╲                      └──────┘
  梯形效果                        矩形效果
 ```
-
 ---
-
 ## 🐛 第五章：调试与优化
-
 ### 5.1 常见问题
-
 #### 问题1：图像变形严重
-
 **原因**：点选择不合理
-
 **解决方案**：
-
 ```python
 def check_points_distribution(pts):
     """检查点的分布"""
     std_x = np.std(pts[:, 0])
     std_y = np.std(pts[:, 1])
-    
     if std_x < 50 or std_y < 50:
         print("⚠️  警告：点分布过于集中！")
         print(f"   X方向标准差: {std_x:.1f}")
         print(f"   Y方向标准差: {std_y:.1f}")
         print("   建议：选择更分散的点")
         return False
-    
     return True
 ```
-
 ---
-
 #### 问题2：鸟瞰图有黑边
-
 **原因**：输出图像范围设置不当
-
 **解决方案**：
-
 ```python
 def compute_output_size(img, H, src_pts):
     """自动计算输出图像大小"""
     h, w = img.shape[:2]
-    
     # 变换图像的四个角点
     corners = np.array([
         [0, 0], [w, 0], [w, h], [0, h]
     ], dtype=np.float32)
-    
     # 应用H变换
     corners_homo = np.column_stack([corners, np.ones(4)])
     transformed = (H @ corners_homo.T).T
     transformed = transformed[:, :2] / transformed[:, 2:3]
-    
     # 计算边界
     min_x = np.min(transformed[:, 0])
     max_x = np.max(transformed[:, 0])
     min_y = np.min(transformed[:, 1])
     max_y = np.max(transformed[:, 1])
-    
     out_w = int(max_x - min_x)
     out_h = int(max_y - min_y)
-    
     return out_w, out_h
 ```
-
 ---
-
 #### 问题3：运行速度慢
-
 **解决方案**：
-
 ```python
 # 使用更快的插值方法
 result = cv2.warpPerspective(
-    img, 
-    H, 
+    img,
+    H,
     (out_w, out_h),
     flags=cv2.INTER_LINEAR  # 双线性插值（快）
     # flags=cv2.INTER_CUBIC  # 双三次插值（慢但更好）
 )
 ```
-
 ---
-
 ### 5.2 性能优化
-
 ```infographic
 infographic list-grid-badge-card
 data
@@ -939,76 +856,55 @@ data
       desc 避免重复计算
       icon mdi:cached
 ```
-
 ---
-
 ## 🚀 第六章：进阶应用
-
 ### 6.1 视频流处理
-
 ```python
 def process_video(video_path, H):
     """对视频应用鸟瞰变换"""
     cap = cv2.VideoCapture(video_path)
-    
     # 获取视频参数
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    
     # 创建输出视频
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter('output.mp4', fourcc, fps, (400, 600))
-    
     print(f"处理视频：{fps} FPS, {w}x{h}")
-    
     frame_count = 0
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
-        
         # 应用变换
         bird_view = cv2.warpPerspective(frame, H, (400, 600))
-        
         # 写入输出
         out.write(bird_view)
-        
         frame_count += 1
         if frame_count % 30 == 0:
             print(f"已处理 {frame_count} 帧")
-    
     cap.release()
     out.release()
     cv2.destroyAllWindows()
-    
     print(f"✅ 完成！共处理 {frame_count} 帧")
 ```
-
 ---
-
 ### 6.2 实时相机标定
-
 ```python
 def realtime_calibration():
     """实时相机标定和鸟瞰图生成"""
     cap = cv2.VideoCapture(0)
-    
     H = None
     calibrated = False
-    
     print("按 'c' 进入标定模式")
     print("按 'q' 退出")
-    
     while True:
         ret, frame = cap.read()
         if not ret:
             break
-        
         if calibrated and H is not None:
             # 应用变换
             bird_view = cv2.warpPerspective(frame, H, (400, 600))
-            
             # 并排显示
             display = np.hstack([
                 cv2.resize(frame, (400, 300)),
@@ -1017,32 +913,23 @@ def realtime_calibration():
             cv2.imshow('Camera | Bird View', display)
         else:
             cv2.imshow('Camera', frame)
-        
         key = cv2.waitKey(1) & 0xFF
-        
         if key == ord('c'):
             print("\n开始标定...")
             bev = InteractiveBirdEyeView(frame)
             result = bev.compute_bird_view()
-            
             if result is not None:
                 H = result['homography']
                 calibrated = True
                 print("✅ 标定完成！")
-        
         elif key == ord('q'):
             break
-    
     cap.release()
     cv2.destroyAllWindows()
 ```
-
 ---
-
 ## 📊 总结
-
 ### 学习成果
-
 ```infographic
 infographic list-column-done-list
 data
@@ -1059,13 +946,11 @@ data
     - label 完整代码实现
       desc Python+OpenCV
 ```
-
 ---
-
 ### 核心知识点
-
 | 概念 | 公式/方法 | 应用 |
-|------|----------|------|
+```
+
 | 透视投影 | `u = K[R\|t]X` | 3D→2D转换 |
 | 消失点 | 平行线交点 | 估计相机朝向 |
 | 单应性 | `x' = Hx` | 平面变换 |

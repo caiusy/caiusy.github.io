@@ -78,19 +78,8 @@ TF-Slim 是 TensorFlow 中一个用来构建、训练、评估复杂模型的轻
   * 用 slim.arg_scope（）为目标函数设置默认参数.  
 例如如下代码；首先用@slim.add_arg_scope修饰目标函数fun1（），然后利用slim.arg_scope（）为它设置默认参数。
         
-        1  
-        2  
-        3  
-        4  
-        5  
-        6  
-        7  
-        8  
-        9  
-        10  
-        
 
-
+```python
 ```python
 import tensorflow as tf
 slim =tf.contrib.slim
@@ -101,59 +90,44 @@ with slim.arg_scope([fun1],a=10):
 x=fun1(b=30)
 print(x)
 ```
-  
-
-运行结果:40  
-参考链接：  
+运行结果:40
+参考链接：
 <https://blog.csdn.net/u013921430/article/details/80915696>
-
 ### 其他用法见参考链接
-
 <https://blog.csdn.net/wanttifa/article/details/90208398>
-
 ## 查看ckpt中变量的几种方法
-
 查看ckpt中变量的方法有三种：
-
   * 在有model的情况下，使用tf.train.Saver进行restore
   * 使用tf.train.NewCheckpointReader直接读取ckpt文件，这种方法不需要model。
-  * 使用tools里的freeze_graph来读取ckpt  
+  * 使用tools里的freeze_graph来读取ckpt
 Tips:
   * 如果模型保存为.ckpt的文件，则使用该文件就可以查看.ckpt文件里的变量。ckpt路径为 model.ckpt
   * 如果模型保存为.ckpt-xxx-data (图结构)、.ckpt-xxx.index (参数名)、.ckpt-xxx-meta (参数值)文件，则需要同时拥有这三个文件才行。并且ckpt的路径为 model.ckpt-xxx
-
 ### 1.基于model来读取ckpt文件里的变量
-
-1.首先建立起model  
+1.首先建立起model
 2.从ckpt中恢复变量
-        
-        1  
-        2  
-        3  
-        4  
-        5  
-        6  
-        7  
-        8  
-        9  
-        10  
-        
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+        8
+        9
+        10
+        with tf.Graph().as_default() as g:
+          #建立model
+          images, labels = cifar10.inputs(eval_data=eval_data)
+          logits = cifar10.inference(images)
+          top_k_op = tf.nn.in_top_k(logits, labels, 1)
+          #从ckpt中恢复变量
+          sess = tf.Session()
+          saver = tf.train.Saver() #saver = tf.train.Saver(...variables...) # 恢复部分变量时，只需要在Saver里指定要恢复的变量
+          save_path = 'ckpt的路径'
+          saver.restore(sess, save_path) # 从ckpt中恢复变量
+```
 
-| 
-        
-        with tf.Graph().as_default() as g:   
-          #建立model  
-          images, labels = cifar10.inputs(eval_data=eval_data)   
-          logits = cifar10.inference(images)   
-          top_k_op = tf.nn.in_top_k(logits, labels, 1)   
-          #从ckpt中恢复变量  
-          sess = tf.Session()  
-          saver = tf.train.Saver() #saver = tf.train.Saver(...variables...) # 恢复部分变量时，只需要在Saver里指定要恢复的变量  
-          save_path = 'ckpt的路径'  
-          saver.restore(sess, save_path) # 从ckpt中恢复变量  
-          
-  
----|---  
 
 注意：基于model来读取ckpt中变量时，model和ckpt必须匹配。
 

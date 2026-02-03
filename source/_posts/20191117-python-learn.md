@@ -202,7 +202,7 @@ tags: Python
 ```
 
   
-![h1](//caius-lu.github.io/2019/11/17/python-learn/images/20191117_python-learn_h1.png)  
+![h1](/images/20191117_python-learn_h1.png)  
 
     
     
@@ -264,7 +264,7 @@ tags: Python
 ```
 
   
-![h2](//caius-lu.github.io/2019/11/17/python-learn/images/20191117_python-learn_h2.png)
+![h2](/images/20191117_python-learn_h2.png)
 
 ### python 类的构造
     

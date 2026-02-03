@@ -18,7 +18,7 @@ tags: MATLAB
 ```
 
   
-![an1](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an1.png)  
+![an1](/images/20200205_practise-matlab_an1.png)  
 
     
     
@@ -37,7 +37,7 @@ tags: MATLAB
 ```
 
   
-![an2](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an2.png)  
+![an2](/images/20200205_practise-matlab_an2.png)  
 
     
     
@@ -69,7 +69,7 @@ tags: MATLAB
 ```
 
   
-![an3](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an3.png)
+![an3](/images/20200205_practise-matlab_an3.png)
     
     
 
@@ -92,7 +92,7 @@ tags: MATLAB
 ```
 
   
-![an4](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an4.png)
+![an4](/images/20200205_practise-matlab_an4.png)
     
     
 
@@ -125,7 +125,7 @@ tags: MATLAB
 ```
 
   
-![an5](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an5.png)
+![an5](/images/20200205_practise-matlab_an5.png)
     
     
 
@@ -153,7 +153,7 @@ tags: MATLAB
 ```
 
   
-![an6](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an6.png)
+![an6](/images/20200205_practise-matlab_an6.png)
     
     
 
@@ -171,7 +171,7 @@ tags: MATLAB
 ```
 
   
-![an7](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an7.png)  
+![an7](/images/20200205_practise-matlab_an7.png)  
 
     
     
@@ -189,7 +189,7 @@ tags: MATLAB
 ```
 
   
-![an8](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an8.png)
+![an8](/images/20200205_practise-matlab_an8.png)
     
     
 
@@ -217,7 +217,7 @@ tags: MATLAB
 ```
 
   
-![an9](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an9.png)
+![an9](/images/20200205_practise-matlab_an9.png)
     
     
 
@@ -245,7 +245,7 @@ tags: MATLAB
 ```
 
   
-![an10](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an10.png)
+![an10](/images/20200205_practise-matlab_an10.png)
     
     
 
@@ -268,7 +268,7 @@ tags: MATLAB
 ```
 
   
-![an11](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an11.png)
+![an11](/images/20200205_practise-matlab_an11.png)
     
     
 
@@ -294,7 +294,7 @@ tags: MATLAB
 ```
 
   
-![an12](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an12.png)
+![an12](/images/20200205_practise-matlab_an12.png)
     
     
 
@@ -336,7 +336,7 @@ tags: MATLAB
 ```
 
   
-![an13](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an13.png)  
+![an13](/images/20200205_practise-matlab_an13.png)  
 
     
     
@@ -350,7 +350,7 @@ tags: MATLAB
 ```
 
   
-![an14](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an14.png)
+![an14](/images/20200205_practise-matlab_an14.png)
     
     
 
@@ -373,7 +373,7 @@ tags: MATLAB
 ```
 
   
-![an15](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an15.png)
+![an15](/images/20200205_practise-matlab_an15.png)
     
     
 
@@ -392,4 +392,4 @@ tags: MATLAB
 ```
 
   
-![an16](//caius-lu.github.io/2020/02/05/practise-matlab/images/20200205_practise-matlab_an16.png)
+![an16](/images/20200205_practise-matlab_an16.png)

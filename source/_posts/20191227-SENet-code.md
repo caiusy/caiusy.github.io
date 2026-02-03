@@ -13,7 +13,7 @@ tags: 深度学习
 ## 1.SENET中的channel-wise加权的实现
 
 实现代码参考自：[senet.pytorch](https://github.com/moskomule/senet.pytorch)  
-![senet](//caius-lu.github.io/2019/12/27/SENet-code/images/20191227_SENet-code_senet.png)  
+![senet](/images/20191227_SENet-code_senet.png)  
 代码如下：  
 SEnet 模块  
 
@@ -40,7 +40,7 @@ SEnet 模块
 ```
 
   
-![senet2](//caius-lu.github.io/2019/12/27/SENet-code/images/20191227_SENet-code_senet2.png)  
+![senet2](/images/20191227_SENet-code_senet2.png)  
 以上代码设计到的API：
 
   * AdaptiveAvgPool2d: 自适应平均池化，参数为（n,m）则将原来的feature（w,h）通过pooling得到（n,m）的feature，如果是（n）,则将原来的feature从（w,h）通过pooling得到（n,n）
@@ -52,19 +52,8 @@ SEnet 模块
   * x是输入的feature,一般各个通道意义如下：（batch size，channel, width , height）,这里获取了batch(b), channel
   * x通过AdaptiveAvgPool2d(1)以后将得到（batch size, channel, 1, 1）, 然后view（b,c）意思是按照b,c进行展开
         
-        1  
-        2  
-        3  
-        4  
-        5  
-        6  
-        7  
-        8  
-        9  
-        10  
-        
 
-
+```python
 ```python
 In [1]: import torch
 In [2]:  x = torch.zeros((16,256,256,256))
@@ -77,9 +66,7 @@ Out[6]: torch.Size([16, 256])
 In [7]: avg_pool(x).squeeze().shape # squeeze()函数也可以将所有通道个数为1的进行挤压
 Out[7]: torch.Size([16, 256])
 ```
-  
   * 然后形状为【16, 256】的tensor经过fc:
-
   * (1) Linear: from 256(channel) to 256/16
   * (2) ReLu：进行一次激活函数
   * (3) Linear: from 256/16 to 256(channel)
@@ -87,22 +74,16 @@ Out[7]: torch.Size([16, 256])
   * 然后通过view操作转化为【16,256,1,1】形状的tensor
   * 现在y得到的是每一个通道对应的分数（0-1），然后需要将其与通道内容相乘，具体操作使用到了tensor的内置函数expand_as(把一个tensor变成和函数括号内一样形状的tensor，用法与expand类似，相当于expand(tensor.size())
   * x是【16,256,256,256】形状的特征图，y是【16,256,1,1】大小的channel-wise分数，然后需要将其相乘
-  * b.expand_as(a)就是将b进行扩充，扩充到a的维度，需要说明的是a的低维度需要比b大，例如b的shape是3*1，如果a的shape是3*2不会出错，但是是2*2就会报错了。  
+  * b.expand_as(a)就是将b进行扩充，扩充到a的维度，需要说明的是a的低维度需要比b大，例如b的shape是3*1，如果a的shape是3*2不会出错，但是是2*2就会报错了。
 就是必须有一个维度是1，然后用于扩展：
-        
-        1  
-        2  
-        3  
-        
+        1
+        2
+        3
+        In [8]: tensor1 = torch.ones((3,4,1,1))
+        In [9]: tensor1.expand([3,4,5,5]).shape
+        Out[9]: torch.Size([3, 4, 5, 5])
+```
 
-| 
-        
-        In [8]: tensor1 = torch.ones((3,4,1,1))  
-        In [9]: tensor1.expand([3,4,5,5]).shape  
-        Out[9]: torch.Size([3, 4, 5, 5])  
-          
-  
----|---  
 
 这样通过expand_as就能得到【16,256,256,256】大小的tensor，其中256*256都是对应通道的1分数，然后与原先的feature相乘，就能得到channel-wise分数计算后的feature。
 
@@ -194,7 +175,7 @@ channel-attention-module跟以上内容想法有一点像，给每个channel进�
 
   
 API跟上边类似，只添加了卷积，也很简单。需要说明的是貌似Linear和Conv2d中的参数很相似，但是实际上，两者还是很不一样的，Linear接受的是线性的2维数组（batch, 一维特征），Con2d接受的是4维数组（batch, 通道，w, h）。  
-![ch](//caius-lu.github.io/2019/12/27/SENet-code/images/20191227_SENet-code_ch.png)  
+![ch](/images/20191227_SENet-code_ch.png)  
 forward函数：
 
   * 第一行，进行了adaptiveAvgPooling， conv2d, relu, conv2d
@@ -226,7 +207,7 @@ return self.sigmoid(x)
 ```
   
 
-![sa](//caius-lu.github.io/2019/12/27/SENet-code/images/20191227_SENet-code_sa.png)  
+![sa](/images/20191227_SENet-code_sa.png)  
 Spatial attention module中支持kernel_size=3或者7，默认设置为7。  
 以上涉及到的API:
 
@@ -278,7 +259,7 @@ forward函数：
 ```
 
   
-![cbam](//caius-lu.github.io/2019/12/27/SENet-code/images/20191227_SENet-code_cbam.png)  
+![cbam](/images/20191227_SENet-code_cbam.png)  
 resnet50+cbam: 0.902
 
 ## 5.dual pooling的pytorch实现

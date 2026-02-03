@@ -143,6 +143,6 @@ plt.text(5,10, text,
 plt.show()
 ~~~~
 
-![image-20220718002303153](./images/image-20220718002303153.png)
+![image-20220718002303153](/images/image-20220718002303153.png)
 
 

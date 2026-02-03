@@ -189,77 +189,54 @@ nums = [1, 2, 1, 3, 5, 6, 4]
 - 如果 mid 在上坡，峰值在右边
 - 如果 mid 在下坡，峰值在左边
 
-    6
+
+```python
    5 \4
   /
- 3
-  2
  / \
 1   1
-
 mid 处于上坡 → 往右找
 mid 处于下坡 → 往左找（包含mid）
 ```
-
 ### 💻 代码实现
-
 ```python
 def findPeakElement(nums: list) -> int:
     left, right = 0, len(nums) - 1
-    
     while left < right:
         mid = left + (right - left) // 2
-        
         if nums[mid] < nums[mid + 1]:
             # 上坡，峰值在右边
             left = mid + 1
         else:
             # 下坡或峰值，峰值在左边（包含mid）
             right = mid
-    
     return left
 ```
-
 ### 🧠 记忆口诀
 > **"上坡往右，下坡往左"**
-
 ---
-
 ## 4️⃣ LC 33. 搜索旋转排序数组 🟡
-
 ### 题目描述
 在旋转后的有序数组中搜索目标值。
-
 ### 🎨 图解思路
-
 ```
 nums = [4, 5, 6, 7, 0, 1, 2], target = 0
-
 旋转后的数组特点:
-     7
    6  \
   5    0
  4      \
-          1
-           2
-
 二分策略:
 1. 判断 mid 在左半段还是右半段
 2. 判断 target 在 mid 的哪边
 ```
-
 ### 💻 代码实现
-
 ```python
 def search(nums: list, target: int) -> int:
     left, right = 0, len(nums) - 1
-    
     while left <= right:
         mid = left + (right - left) // 2
-        
         if nums[mid] == target:
             return mid
-        
         # 判断 mid 在左半段还是右半段
         if nums[left] <= nums[mid]:
             # mid 在左半段（有序）
@@ -273,35 +250,24 @@ def search(nums: list, target: int) -> int:
                 left = mid + 1
             else:
                 right = mid - 1
-    
     return -1
 ```
-
 ### 🧠 记忆口诀
 > **"先判断哪边有序，再判断目标在哪边"**
-
 ---
-
 ## 5️⃣ LC 34. 查找元素的第一个和最后一个位置 🟡
-
 ### 题目描述
 在排序数组中找到目标值的起始和结束位置。
-
 ### 🎨 图解思路
-
 ```
 nums = [5, 7, 7, 8, 8, 10], target = 8
-
 找第一个 8: 索引 3
 找最后一个 8: 索引 4
-
   5   7   7   8   8   10
               ↑   ↑
             first last
 ```
-
 ### 💻 代码实现
-
 ```python
 def searchRange(nums: list, target: int) -> list:
     def find_first():
@@ -313,7 +279,6 @@ def searchRange(nums: list, target: int) -> list:
             else:
                 left = mid + 1
         return left
-    
     def find_last():
         left, right = 0, len(nums)
         while left < right:
@@ -323,118 +288,85 @@ def searchRange(nums: list, target: int) -> list:
             else:
                 left = mid + 1
         return left - 1
-    
     first = find_first()
     if first == len(nums) or nums[first] != target:
         return [-1, -1]
-    
     last = find_last()
     return [first, last]
 ```
-
 ### 🧠 记忆口诀
 > **"找第一个>=，找第一个>再减1"**
-
 ---
-
 ## 6️⃣ LC 153. 寻找旋转排序数组中的最小值 🟡
-
 ### 题目描述
 在旋转后的有序数组中找到最小值。
-
 ### 🎨 图解思路
-
 ```
 nums = [3, 4, 5, 1, 2]
-
-     5
    4  \
   3    1
         \
-         2
-
 最小值是旋转点
 比较 nums[mid] 和 nums[right]:
 - nums[mid] > nums[right]: 最小值在右边
 - nums[mid] <= nums[right]: 最小值在左边（包含mid）
 ```
-
 ### 💻 代码实现
-
 ```python
 def findMin(nums: list) -> int:
     left, right = 0, len(nums) - 1
-    
     while left < right:
         mid = left + (right - left) // 2
-        
         if nums[mid] > nums[right]:
             # 最小值在右边
             left = mid + 1
         else:
             # 最小值在左边（包含mid）
             right = mid
-    
     return nums[left]
 ```
-
 ### 🧠 记忆口诀
 > **"比右边大就往右，否则往左"**
-
 ---
-
 ## 7️⃣ LC 4. 寻找两个正序数组的中位数 🔴
-
 ### 题目描述
 找到两个正序数组的中位数，要求时间复杂度 O(log(m+n))。
-
 ### 🎨 图解思路
-
 ```
 nums1 = [1, 3], nums2 = [2]
-
 合并后: [1, 2, 3]
 中位数: 2
-
 二分思路:
 在较短的数组上二分，找到一个划分点 i
 使得 nums1[0:i] 和 nums2[0:j] 的总数 = (m+n+1)//2
-
        nums1:  1 | 3
        nums2:  2 |
                ↑
               划分点
-
 左半边最大值 <= 右半边最小值
 ```
-
 ### 💻 代码实现
-
 ```python
 def findMedianSortedArrays(nums1: list, nums2: list) -> float:
     # 确保 nums1 是较短的数组
     if len(nums1) > len(nums2):
         nums1, nums2 = nums2, nums1
-    
     m, n = len(nums1), len(nums2)
     left, right = 0, m
-    
     while left <= right:
         i = (left + right) // 2
         j = (m + n + 1) // 2 - i
-        
         # 边界处理
         nums1_left = float('-inf') if i == 0 else nums1[i - 1]
         nums1_right = float('inf') if i == m else nums1[i]
         nums2_left = float('-inf') if j == 0 else nums2[j - 1]
         nums2_right = float('inf') if j == n else nums2[j]
-        
         if nums1_left <= nums2_right and nums2_left <= nums1_right:
             # 找到正确的划分
             if (m + n) % 2 == 1:
                 return max(nums1_left, nums2_left)
             else:
-                return (max(nums1_left, nums2_left) + 
+                return (max(nums1_left, nums2_left) +
                         min(nums1_right, nums2_right)) / 2
         elif nums1_left > nums2_right:
             # nums1 划分点太靠右
@@ -442,21 +374,16 @@ def findMedianSortedArrays(nums1: list, nums2: list) -> float:
         else:
             # nums1 划分点太靠左
             left = i + 1
-    
     return 0.0
 ```
-
 ### 🧠 记忆口诀
 > **"短数组二分，找正确划分"**
-
 ---
-
 ## 📊 本章总结
-
 ### 二分查找场景
-
 | 场景 | 关键点 | 典型题目 |
-|------|--------|----------|
+```
+
 | 有序数组查找 | 直接二分 | 35, 74 |
 | 旋转数组 | 判断有序段 | 33, 153 |
 | 峰值问题 | 比较相邻元素 | 162 |

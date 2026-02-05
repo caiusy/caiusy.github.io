@@ -22,19 +22,19 @@ cover: /images/bert_guide/bert_complete_visualizations.png
 ## 🖼️ 核心可视化图解
 
 ### BERT 整体架构与核心概念
-![](/images/bert_guide/bert_complete_visualizations.png)
+![](/images/bert_guide/bert_complete_visualizations.png))
 
 ### BERT 架构详解
-![](/images/bert_guide/bert_architecture.png)
+![](/images/bert_guide/bert_architecture.png))
 
 ### Q/K/V 数据流可视化
-![](/images/bert_guide/qkv_dataflow.png)
+![](/images/bert_guide/qkv_dataflow.png))
 
 ### 注意力机制详解
-![](/images/bert_guide/attention_mechanisms.png)
+![](/images/bert_guide/attention_mechanisms.png))
 
 ### Causal vs Bidirectional Attention 对比
-![](/images/bert_guide/causal_vs_bidirectional.png)
+![](/images/bert_guide/causal_vs_bidirectional.png))
 
 ---
 

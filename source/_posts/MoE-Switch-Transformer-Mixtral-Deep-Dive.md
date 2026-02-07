@@ -15,8 +15,8 @@ description: "【费曼式深度解析】从零理解 Mixture of Experts 的核�
 ---
 
 <style>
-mjx-container { font-size: 0.9em !important; }
-.MathJax { font-size: 0.9em !important; }
+mjx-container { font-size: 0.7em !important; }
+.MathJax { font-size: 0.7em !important; }
 code { font-family: 'Fira Code', monospace; }
 h2 { margin-top: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
 .feynman-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0; }

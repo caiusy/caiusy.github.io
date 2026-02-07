@@ -305,9 +305,11 @@ top_k = 1    # Switch Transformer
 
 ### 4.1 完整的 Loss 函数
 
+{% raw %}
 $$
 \mathcal{L}_{\text{total}} = \underbrace{\mathcal{L}_{\text{task}}}_{\text{Task Loss}} + \alpha \cdot \underbrace{\mathcal{L}_{\text{balance}}}_{\text{Load Balance}}
 $$
+{% endraw %}
 
 其中 $\alpha = 0.01$（Switch Transformer 推荐值）
 
@@ -325,6 +327,7 @@ $$
 
 **数学定义**：
 
+{% raw %}
 $$
 f_i = \frac{1}{B \cdot L} \sum_{b,l} \mathbb{1}[\text{Top1}(x_{b,l}) = i]
 $$
@@ -336,6 +339,7 @@ $$
 $$
 \mathcal{L}_{\text{balance}} = N \cdot \sum_{i=1}^{N} f_i \cdot P_i
 $$
+{% endraw %}
 
 **具体计算例子**：
 
@@ -369,9 +373,11 @@ L_balance = N * sum(f[i] * P[i] for i in range(4))
 
 **梯度分析**：
 
+{% raw %}
 $$
 \frac{\partial \mathcal{L}_{\text{balance}}}{\partial P_i} = N \cdot f_i
 $$
+{% endraw %}
 
 - Expert 0: $\nabla P_0 = 4 \times 0.5 = 2.0$ ← 梯度最大，会被惩罚！
 - Expert 1: $\nabla P_1 = 4 \times 0.125 = 0.5$ ← 梯度较小

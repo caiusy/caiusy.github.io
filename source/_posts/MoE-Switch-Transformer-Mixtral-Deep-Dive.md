@@ -306,7 +306,7 @@ top_k = 1    # Switch Transformer
 ### 4.1 完整的 Loss 函数
 
 $$
-\mathcal{L}_{\text{total}} = \underbrace{\mathcal{L}_{\text{task}}}_{\text{主任务}} + \alpha \cdot \underbrace{\mathcal{L}_{\text{balance}}}_{\text{负载均衡}}
+\mathcal{L}_{\text{total}} = \underbrace{\mathcal{L}_{\text{task}}}_{\text{Task Loss}} + \alpha \cdot \underbrace{\mathcal{L}_{\text{balance}}}_{\text{Load Balance}}
 $$
 
 其中 $\alpha = 0.01$（Switch Transformer 推荐值）
@@ -326,11 +326,11 @@ $$
 **数学定义**：
 
 $$
-f_i = \frac{1}{B \cdot L} \sum_{b,l} \mathbb{1}[\text{Top1}(x_{b,l}) = i] \quad \text{(Expert i 被选中的频率)}
+f_i = \frac{1}{B \cdot L} \sum_{b,l} \mathbb{1}[\text{Top1}(x_{b,l}) = i]
 $$
 
 $$
-P_i = \frac{1}{B \cdot L} \sum_{b,l} \text{Router}(x_{b,l})_i \quad \text{(Expert i 的平均概率)}
+P_i = \frac{1}{B \cdot L} \sum_{b,l} \text{Router}(x_{b,l})_i
 $$
 
 $$

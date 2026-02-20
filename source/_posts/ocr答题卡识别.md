@@ -5,10 +5,7 @@ categories:
   - 计算机视觉
 tags:
   - OpenCV
-  - OCR
 ---
-
-
     1  
     2  
     3  

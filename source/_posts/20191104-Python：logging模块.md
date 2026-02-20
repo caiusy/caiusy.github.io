@@ -2,11 +2,10 @@
 title: Python：logging模块
 categories:
   - Python
-tags: Python
+tags:
+  - Python
 date: 2019-11-04 00:00:00
 ---
-
-
 ```python
     In [12]: import logging
         ...:

@@ -3,10 +3,9 @@ title: Matplotlib绘制六种可视化图表
 categories:
   - Python
 date: 2019-08-24 00:00:00
-tags: Python
-  - python
+tags:
+  - Python
 ---
-
 ## 01 折线图
     
     

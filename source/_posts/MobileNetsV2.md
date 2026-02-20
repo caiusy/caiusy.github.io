@@ -5,9 +5,7 @@ categories:
   - 深度学习
 tags:
   - PyTorch
-  - CNN
 ---
-
 论文地址:[MobileNetV2: Inverted Residuals and Linear Bottlenecks ](https://arxiv.org/pdf/1801.04381.pdf)  
 非官方代码:[pytorch](https://github.com/tonylins/pytorch-mobilenet-v2)
 

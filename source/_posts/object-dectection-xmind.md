@@ -6,5 +6,4 @@ categories:
 tags:
   - 目标检测
 ---
-
 ![](/2019/10/31/object-dectection-xmind/images/20191031_object-dectection-xmind_目标检测模型.png)

@@ -4,19 +4,10 @@ date: 2026-01-18
 updated: 2026-01-18
 categories:
   - 算法
+tags:
   - LeetCode
-  - 算法
-  - LeetCode
-tags: LeetCode
-  - LeetCode
-  - leetcode面试150
-  - 栈
-  - 队列
-  - 单调栈
-  - 面试
 description: LeetCode 面试 150 题之栈与队列专题，含单调栈图解、代码模板、记忆口诀
 ---
-
 # 📦 栈与队列专题 (7题)
 
 > 🎯 **核心特性**：栈 LIFO（后进先出），队列 FIFO（先进先出）

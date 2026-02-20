@@ -6,7 +6,6 @@ categories:
 tags:
   - 编程
 ---
-
 ## 查看磁盘空间
 
 df -hl 查看磁盘剩余空间  

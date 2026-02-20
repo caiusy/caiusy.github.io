@@ -6,7 +6,6 @@ categories:
 tags:
   - C++
 ---
-
 ## STL queue
 
   * 队列： FIFO 先进先出

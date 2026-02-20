@@ -6,7 +6,6 @@ categories:
 tags:
   - C++
 ---
-
 ## 顺序容器 STL deque 类
 
   * deque是一个动态数组

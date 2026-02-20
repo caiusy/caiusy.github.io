@@ -2,14 +2,11 @@
 title: 如何使用Hexo写博客
 typora-copy-images-to: 如何使用Hexo写博客
 date: 2026-01-18 20:04:34
-tags: 工具
-  - Hexo
-  - 博客
-  - 教程
+tags:
+  - 工具
 categories:
   - 工具
 ---
-
 ## 简介
 
 这是一篇示例文章，演示如何使用 Hexo 写博客。

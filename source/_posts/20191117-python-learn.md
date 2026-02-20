@@ -3,10 +3,9 @@ title: python_learn
 categories:
   - Python
 date: 2019-11-17 00:00:00
-tags: Python
-  - python
+tags:
+  - Python
 ---
-
 ## 查找图中两个节点的最小的距离  
   
 这里面使用了python的优先队列，这里的队列按照后面的数值大小进行排序，而不是像普通的队列一样先进先出。后面的数值，是节点到出发节点的距离长度。  

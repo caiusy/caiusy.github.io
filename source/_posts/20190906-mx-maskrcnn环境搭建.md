@@ -3,10 +3,9 @@ title: mx-maskrcnn环境搭建
 categories:
   - 工具
 date: 2019-09-06 00:00:00
-tags: 工具
-  - python
+tags:
+  - 工具
 ---
-
 从<https://hub.docker.com/> 选取所需的镜像
 
 下载caffe2 镜像  

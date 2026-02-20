@@ -6,7 +6,6 @@ categories:
 tags:
   - XML
 ---
-
 先创建 root Element, 然后创建 SubElement, 最后将 root 传入 ElementTree(element), 创建 tree, 调用 tree.write() 方法写入文件,创建 XML 类型的数据文件  
 
     

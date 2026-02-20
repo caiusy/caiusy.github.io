@@ -5,9 +5,7 @@ categories:
   - 计算机视觉
 tags:
   - OpenCV
-  - C++
 ---
-
 比opencv的速度要慢很多, 但是使用起来更加简单, 真的对速度要求很高的话, 一般都会C++和opecv使用. 所以一般情况下, 首先看skimage能否实现, 不行的话再转用opencv  
 
     

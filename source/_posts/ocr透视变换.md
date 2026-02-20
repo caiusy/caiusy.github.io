@@ -5,11 +5,7 @@ categories:
   - 计算机视觉
 tags:
   - Python
-  - OpenCV
-  - OCR
 ---
-
-
     1  
     2  
     3  

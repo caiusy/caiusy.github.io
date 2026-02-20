@@ -3,11 +3,9 @@ title: Semantic_segmentation_overview
 categories:
   - 深度学习
 date: 2019-12-24 00:00:00
-tags: 深度学习
-  - Deep Learning
-  - 论文阅读
+tags:
+  - 深度学习
 ---
-
 语义分割是近年来出现的基本问题之一，因此成为计算机视觉和机器学习领域的热门话题。
 
 #### 通用语义分割图像集

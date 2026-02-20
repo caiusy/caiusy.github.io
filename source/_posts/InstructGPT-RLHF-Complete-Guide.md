@@ -8,9 +8,7 @@ categories:
   - 深度学习
 tags:
   - Python
-  - PyTorch
 ---
-
 > 🎯 **面试官视角**：
 > 这篇文章不仅仅是教程，更是你的**面试复习提纲**。
 > 我们不堆砌代码，而是深入到 **原理 (Principles)**、**输入输出流 (I/O Flow)** 和 **数学推导 (Math Derivation)**。

@@ -5,11 +5,7 @@ categories:
   - 计算机视觉
 tags:
   - Python
-  - 目标跟踪
-  - OpenCV
-  - CNN
 ---
-
 ## MOSSE
 
 MOSSE(Minimum Output Sum of Squared Error) 是2010年 的CVPR，它的全名叫做Visual Object Tracking using Adaptive Correlation Filters。 MOSSE 是第一篇将correlation filter(CF) 引入object tracking 的论文，它也是CSK和KCF/DCF等算法的基础。

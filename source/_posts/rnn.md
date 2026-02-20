@@ -5,10 +5,7 @@ categories:
   - 深度学习
 tags:
   - TensorFlow
-  - OpenCV
-  - RNN
 ---
-
 ### RNN及RNN的几个变体  
   
 序列形的数据不太好用原始的神经网络处理，为了建模序列问题，RNN引入了隐状态h（hidden）的概念，h可以对序列形的数据提取特征，接着转换为输出。

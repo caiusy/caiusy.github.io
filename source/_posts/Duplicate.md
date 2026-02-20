@@ -5,9 +5,7 @@ categories:
   - 算法
 tags:
   - Python
-  - 动态规划
 ---
-
 是否存在相同元素，python3用字典的方式解决  
   
       

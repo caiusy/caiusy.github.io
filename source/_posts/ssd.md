@@ -5,11 +5,7 @@ categories:
   - 深度学习
 tags:
   - PyTorch
-  - OpenCV
-  - CNN
-  - 目标检测
 ---
-
 论文地址: [SSD: Single Shot MultiBox Detector ](https://arxiv.org/pdf/1512.02325.pdf)  
 非官方代码: [pytorch](https://github.com/amdegroot/ssd.pytorch)
 

@@ -5,9 +5,7 @@ categories:
   - 深度学习
 tags:
   - PyTorch
-  - CNN
 ---
-
 论文地址: [SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size](https://arxiv.org/pdf/1602.07360.pdf)  
 非官方代码: [pytorch](https://github.com/arvention/SqueezeNet-PyTorch)
 

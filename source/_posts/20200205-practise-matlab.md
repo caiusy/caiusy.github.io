@@ -3,11 +3,9 @@ title: matlab基础
 categories:
   - 其他
 date: 2020-02-05 00:00:00
-tags: MATLAB
-  - matlab
+tags:
+  - MATLAB
 ---
-
-
 ```
     %%
     % 第一题

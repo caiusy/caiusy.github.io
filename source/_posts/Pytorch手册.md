@@ -5,10 +5,7 @@ categories:
   - 深度学习
 tags:
   - Python
-  - PyTorch
-  - OpenCV
 ---
-
 PyTorch 主要提供以下两大特色：
 
   * 支持强力GPU加速的Tensor计算能力

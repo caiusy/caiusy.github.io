@@ -5,9 +5,7 @@ categories:
   - 计算机视觉
 tags:
   - Python
-  - OpenCV
 ---
-
 ## 导入
     
     

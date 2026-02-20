@@ -4,7 +4,8 @@ categories:
   - 算法
 typora-copy-images-to: ./RANSAC算法
 date: 2023-01-22 16:55:53
-tags: 算法
+tags:
+  - 算法
 ---
 ### RANSAC算法
 

@@ -4,20 +4,10 @@ date: 2026-01-18
 updated: 2026-01-18
 categories:
   - 算法
-  - LeetCode
-  - 算法
-  - LeetCode
 tags:
   - LeetCode
-  - 算法
-  - LeetCode
-  - leetcode面试150
-  - 回溯
-  - Backtracking
-  - 面试
 description: LeetCode 面试 150 题之回溯算法专题，含决策树图解、代码模板、记忆口诀
 ---
-
 # 🔄 回溯算法专题 (7题)
 
 > 🎯 **核心思想**：尝试所有可能，走不通就回头

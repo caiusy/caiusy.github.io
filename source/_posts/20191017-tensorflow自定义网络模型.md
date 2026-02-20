@@ -3,11 +3,9 @@ title: tensorflow自定义网络模型
 categories:
   - 深度学习
 date: 2019-10-17 00:00:00
-tags: 深度学习
-  - python
-  - tensorflow
+tags:
+  - 深度学习
 ---
-
 ## Slim  
   
 TF-Slim 模块是 TensorFlow 中最好用的 API 之一。尤其是里面引入的 arg_scope、model_variables、repeat、stack。  

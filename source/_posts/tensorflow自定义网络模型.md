@@ -6,7 +6,6 @@ categories:
 tags:
   - TensorFlow
 ---
-
 ## Slim  
   
 TF-Slim 模块是 TensorFlow 中最好用的 API 之一。尤其是里面引入的 arg_scope、model_variables、repeat、stack。  

@@ -6,5 +6,4 @@ categories:
 tags:
   - Attention
 ---
-
 ![](/2019/10/31/attention-mechanism-xmind/images/20191031_attention-mechanism-xmind_AttentionMechanism.png)

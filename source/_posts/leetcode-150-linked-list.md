@@ -4,17 +4,10 @@ date: 2026-01-18
 updated: 2026-01-18
 categories:
   - 算法
+tags:
   - LeetCode
-  - 算法
-  - LeetCode
-tags: LeetCode
-  - LeetCode
-  - leetcode面试150
-  - 链表
-  - 面试
 description: LeetCode 面试 150 题之链表专题，含图解、代码模板、记忆口诀
 ---
-
 # 🔗 链表专题 (11题)
 
 > 🎯 **核心技巧**：虚拟头节点、快慢指针、链表反转、合并链表

@@ -1,19 +1,13 @@
 ---
 title: BERT 完整解析：从论文到 KV Cache
 date: 2026-02-03 15:30:00
-tags: 
+tags:
   - AI
-  - NLP
-  - BERT
-  - Transformer
-  - Deep Learning
 categories:
-  - 深度学习
   - 深度学习
 top_img: /images/bert_guide/bert_architecture.png
 cover: /images/bert_guide/bert_complete_visualizations.png
 ---
-
 # BERT 完整解析：从论文到 KV Cache
 
 > **学习目标**：深度理解 BERT 论文核心原理、Q/K/V 交互机制、KV Cache 优化技术、Causal Attention，以及完整的训练闭环。

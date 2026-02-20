@@ -3,10 +3,9 @@ title: Pytorch trick
 categories:
   - 深度学习
 date: 2019-08-28 00:00:00
-tags: 深度学习
-  - pytorch
+tags:
+  - 深度学习
 ---
-
 目录：   
   
   1. 指定GPU编号

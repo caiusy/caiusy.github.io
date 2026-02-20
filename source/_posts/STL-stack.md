@@ -6,7 +6,6 @@ categories:
 tags:
   - C++
 ---
-
 ## STL stack
 
   * (堆) 栈： LIFO 后进先出

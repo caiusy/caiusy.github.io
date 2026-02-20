@@ -5,10 +5,7 @@ categories:
   - 深度学习
 tags:
   - Python
-  - GAN
-  - TensorFlow
 ---
-
 ### 对抗生成网络 GAN(Generative Adversarial Nets)
 
 ![图片1](//caius-lu.github.io/2019/11/26/GAN/images/20191126_GAN_图片1.png)

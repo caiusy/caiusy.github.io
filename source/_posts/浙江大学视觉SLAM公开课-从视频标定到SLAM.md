@@ -4,7 +4,8 @@ categories:
   - 技术
 typora-copy-images-to: ./从视频标定到SLAM
 date: 2023-01-22 16:55:53
-tags: 技术
+tags:
+  - 技术
 ---
 ## 浙江大学视觉SLAM公开课-从视频标定到SLAM
 

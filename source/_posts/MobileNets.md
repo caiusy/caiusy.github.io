@@ -5,9 +5,7 @@ categories:
   - 深度学习
 tags:
   - PyTorch
-  - CNN
 ---
-
 论文地址:[MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications ](https://arxiv.org/abs/1704.04861)  
 非官方代码:[pytorch/models](https://github.com/marvis/pytorch-mobilenet)  
   

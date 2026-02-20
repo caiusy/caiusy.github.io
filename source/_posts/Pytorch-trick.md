@@ -5,10 +5,7 @@ categories:
   - 深度学习
 tags:
   - Python
-  - PyTorch
-  - OpenCV
 ---
-
 目录：   
   
   1. 指定GPU编号

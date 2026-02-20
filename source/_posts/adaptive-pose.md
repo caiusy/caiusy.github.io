@@ -4,7 +4,8 @@ categories:
   - 技术
 typora-copy-images-to: adaptive_pose
 date: 2023-01-22 21:15:24
-tags: 技术
+tags:
+  - 技术
 ---
 >[AdaptivePose++](https://arxiv.org/pdf/2210.04014.pdf) : [github](https://github.com/buptxyb666/AdaptivePose)
 

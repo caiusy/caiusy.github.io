@@ -5,9 +5,7 @@ categories:
   - 计算机视觉
 tags:
   - Python
-  - OpenCV
 ---
-
 ## opencv 基础知识  
   
 cv2.imread 读入的图片, 其shape为(h, w, c), 颜色通道顺序为 (b, g, r)

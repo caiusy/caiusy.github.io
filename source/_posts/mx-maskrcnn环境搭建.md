@@ -5,12 +5,7 @@ categories:
   - 深度学习
 tags:
   - Python
-  - OpenCV
-  - Docker
-  - CNN
-  - C++
 ---
-
 从<https://hub.docker.com/> 选取所需的镜像
 
 下载caffe2 镜像  

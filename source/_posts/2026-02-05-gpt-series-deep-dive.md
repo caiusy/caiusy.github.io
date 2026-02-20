@@ -1,12 +1,12 @@
 ---
 title: GPT 系列深度解析：从 GPT-1 到 GPT-3
 date: 2026-02-05 16:30:00
-tags: [Deep Learning, NLP, GPT, Transformer, Paper Reading]
+tags:
+  - Deep Learning
 categories:
   - 深度学习
 mathjax: true
 ---
-
 **摘要**：本文深度解析 OpenAI 的 GPT 系列模型演进之路。从 GPT-1 的预训练+微调范式，到 GPT-2 的零样本尝试，再到 GPT-3 的上下文学习（In-context Learning）与规模法则（Scaling Laws）。文章详细拆解了模型架构、Tensor 维度变化、训练数据流，并配有 13 张可视化图表与通俗易懂的费曼式讲解。
 
 <!-- more -->

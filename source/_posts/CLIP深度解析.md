@@ -1,12 +1,12 @@
 ---
 title: CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用
 date: 2026-02-16 14:58:55
-tags: [深度学习, CLIP, 多模态, 计算机视觉, NLP, 大模型]
+tags:
+  - 深度学习
 categories:
   - 深度学习
 cover: /images/clip/fig1_arch.png
 ---
-
 # CLIP (Contrastive Language-Image Pre-Training) 深度解析
 
 > **一句话本质**：CLIP 是连接文本与图像的"罗塞塔石碑"。它通过对比学习，强行把图像和文本拉到同一个向量空间，让计算机视觉终于"读懂了语言"。

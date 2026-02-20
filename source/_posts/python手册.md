@@ -1,0 +1,2096 @@
+---
+title: python手册
+date: 2019-08-28 00:00:00
+categories:
+  - 算法
+tags:
+  - Python
+---
+
+最近在学习查找资料的过程之中，看到了大佬的博客，觉得写得很好，也是我现在所欠缺的，所以下面先对大佬的博客进行复现。以供自己日后复习，查找，完善成自己的东西。  
+  
+## 字符串固定字数，不足的空格补齐
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    
+
+| 
+    
+    
+    str.ljust(10) # 左对齐 字符串长10位  
+    rjust，ljust和center三个方法来给字符串补全空格  
+    rjust，向右对其，在左边补空格  
+    ljust，向左对其，在右边补空格  
+    center，让字符串居中，在左右补空格  
+      
+  
+---|---  
+  
+## 排序
+
+sorted: 返回一个新的 list  
+list.sort(): 改变 list 自身的值  
+reverse 参数: 默认为 False, 升序, True 时变为降序
+
+## 列表
+
+### 循环删除列表元素
+
+常见错误: 直接删除, 或者正序删除
+
+正确做法:  
+1.使用 pop, 倒序删除  
+
+    
+    
+    1  
+    2  
+    
+
+| 
+    
+    
+    for i in range(len(list)):  
+       	list.pop()  
+      
+  
+---|---  
+      
+    
+    2.使用切片, 遍历拷贝列表, 操作原始列表, 用 remove 删除, remove 会操作首个遇到的匹配元素, 相等元素删除, 删除哪个都一样
+    
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    
+
+| 
+    
+    
+    for x in enumerate(a[::]):  
+       	a.remove(x)  
+      
+    for x in enumerate(a[::-1]):  
+      		 a.remove(x)  
+      
+  
+---|---  
+  
+### 遍历列表:
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    16  
+    17  
+    18  
+    19  
+    20  
+    21  
+    22  
+    23  
+    24  
+    25  
+    26  
+    27  
+    
+
+| 
+    
+    
+    zz_list = ['a', 'b', 'c', 'd']  
+      
+    for index in list:  
+        print(index)  
+        # 0  
+        # 1  
+        # 2  
+        # 3  
+    for index in range(len(list)):  
+        print(index)  
+        # 0  
+        # 1  
+        # 2  
+        # 3  
+    for index, val in enumerate(list):  
+        print(index, val)  
+        # 0 a  
+        # 1 b  
+        # 2 c  
+        # 3 d  
+    # 设置遍历的开始序号, val的输出不变  
+    for i, val in enumerate(list, 2):  
+        print(index, val)  
+        # 2 a  
+        # 3 b  
+        # 4 c  
+        # 5 d  
+      
+  
+---|---  
+  
+### append() 方法
+
+追加单个元素
+
+### extend() 方法
+
+extend()函数用于在列表末尾一次性追加另一个序列中的多个值(用新列表扩展原来的列表).  
+该方法没有返回值, 会直接在已经存在的列表中添加新的列表内容, extend和+=的作用差不多  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    
+
+| 
+    
+    
+    a= [[1,2,3],[4,5,6]]  
+    b= [['a','b','c'],['d','e','f']]  
+    a.extend(b)  
+    print(a)  
+    # [[1, 2, 3], [4, 5, 6], ['a', 'b', 'c'], ['d', 'e', 'f']]  
+      
+  
+---|---  
+  
+### 序列切片(双冒号)
+
+Python序列切片地址可以写为 [开始(包含) : 结束(不包含) : 步长]. 当开始省略的时候, 默认从第0项开始, 当结尾省略的时候, 默认到数组最后, 当步长省略的时候, 默认为1. 步长可以为负数, 代表从右向左取数.  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    
+
+| 
+    
+    
+    a = range(10) # a = [0, 1, 2, 3, 4, 5, 6, 7, 8 ,9]  
+    a[0:9:1] # [0, 1, 2, 3, 4, 5, 6, 7, 8] 包含开始下标, 不包含结束下标  
+    a[1::2] # [1, 3, 5, 7, 9]  
+    a[::3] # [0, 3, 6, 9]  
+    a[::-1] # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]  
+    a[::-2] # [9, 7, 5, 3, 1]  
+      
+  
+---|---  
+  
+## update() 方法
+    
+    
+    1  
+    
+
+| 
+    
+    
+    dict.update(dict2)  
+      
+  
+---|---  
+  
+将 dict2 中的键值更新到 dict 中, 对于存在的则覆盖原值, 对于不存在的则添加新的键值.
+
+### 实例
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    
+
+| 
+    
+    
+    #!/usr/bin/python  
+      
+    dict = {'Name': 'Zara', 'Age': 7}  
+    dict2 = {'Sex': 'female' }  
+      
+    dict.update(dict2)  
+    print "Value : %s" %  dict  
+      
+  
+---|---  
+  
+以上实例输出结果为：  
+
+    
+    
+    1  
+    
+
+| 
+    
+    
+    Value : {'Age': 7, 'Name': 'Zara', 'Sex': 'female'}  
+      
+  
+---|---  
+  
+## 字典
+
+遍历字典:  
+
+    
+    
+    1  
+    
+
+| 
+    
+    
+    zz_dict = {'x': 1, 'y':2, 'z':3}  
+      
+  
+---|---  
+  
+遍历keys:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    
+
+| 
+    
+    
+    # 输出均为: x y z  
+    for key in zz_dict:  
+        print(key)  
+      
+    for key in zz_dict.iterkeys():  
+        print(key)  
+      
+    for key in zz_dict.keys():  
+        print(key)  
+      
+  
+---|---  
+  
+遍历values:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    
+
+| 
+    
+    
+    # 输出均为 1 2 3  
+    for value in zz_dict.itervalues():  
+        print(value)  
+      
+    for value in zz_dict.values():  
+        print(value)  
+      
+  
+---|---  
+  
+遍历keys和values  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    
+
+| 
+    
+    
+    # 输出为: x corresponds to 1 (其余两个也一样)  
+    for key, value in zz_dict.iteritems():  # python3 没有iteritems  
+        print(key, "corresponds to", value)  
+      
+    for key, value in zz_dict.items():  
+        print(key, "corresponds to", value)  
+      
+  
+---|---  
+  
+## 字符串
+
+### 判断字符串是否为字母或者数字
+
+str.isalnum() 字母或数字  
+str.isalpha() 字母  
+str.isdigit() 数字  
+str.isspace() 空白符, \t, \n, \r
+
+isdigit() 和 isnumeric() 的区别  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    16  
+    17  
+    18  
+    19  
+    20  
+    21  
+    22  
+    23  
+    24  
+    
+
+| 
+    
+    
+    num = "1"  #unicode  
+    num.isdigit()   # True  
+    num.isdecimal() # True  
+    num.isnumeric() # True  
+      
+    num = "1" # 全角  
+    num.isdigit()   # True  
+    num.isdecimal() # True  
+    num.isnumeric() # True  
+      
+    num = b"1" # byte  
+    num.isdigit()   # True  
+    num.isdecimal() # AttributeError 'bytes' object has no attribute 'isdecimal'  
+    num.isnumeric() # AttributeError 'bytes' object has no attribute 'isnumeric'  
+      
+    num = "IV" # 罗马数字  
+    num.isdigit()   # True  
+    num.isdecimal() # False  
+    num.isnumeric() # True  
+      
+    num = "四" # 汉字  
+    num.isdigit()   # False  
+    num.isdecimal() # False  
+    num.isnumeric() # True  
+      
+  
+---|---  
+  
+* * *
+
+isdigit()  
+True: Unicode数字，byte数字（单字节），全角数字（双字节），罗马数字  
+False: 汉字数字  
+Error: 无
+
+isdecimal()  
+True: Unicode数字，，全角数字（双字节）  
+False: 罗马数字，汉字数字  
+Error: byte数字（单字节）
+
+isnumeric()  
+True: Unicode数字，全角数字（双字节），罗马数字，汉字数字  
+False: 无  
+Error: byte数字（单字节）
+
+### str.rstrip()
+
+参数:  
+chars: 指定删除的字符(默认为空格或换行符)
+
+返回值:  
+返回删除指定字符后的新字符串
+
+备注:  
+删除字符串末尾的指定字符(默认为空格或换行符)  
+
+    
+    
+    1  
+    
+
+| 
+    
+    
+    str.rstrip([chars])  
+      
+  
+---|---  
+  
+### str.strip()
+
+参数  
+chars — 移除字符串头尾指定的字符序列。  
+返回值  
+返回移除字符串头尾指定的字符生成的新字符串。  
+备注:  
+
+    
+    
+    1  
+    
+
+| 
+    
+    
+    str.strip([chars])  
+      
+  
+---|---  
+  
+### str.split()
+
+参数
+
+  * str — 分隔符，默认为所有的空字符，包括空格、换行(\n)、制表符(\t)等。
+  * num — 分割次数。默认为 -1, 即分隔所有。  
+返回值
+  * 返回分割后的字符串列表。
+        
+        1  
+        
+
+| 
+        
+        str.split(str="", num=string.count(str)).  
+          
+  
+---|---  
+
+## 文件
+
+## reduce() 函数
+
+reduce() 函数会对参数序列中元素进行累积。  
+函数将一个数据集合（链表，元组等）中的所有数据进行下列操作：用传给 reduce 中的函数 function（有两个参数）先对集合中的第 1、2 个元素进行操作，得到的结果再与第三个数据用 function 函数运算，最后得到一个结果。  
+reduce() 函数语法：  
+
+    
+    
+    1  
+    
+
+| 
+    
+    
+    reduce(function, iterable[, initializer])  
+      
+  
+---|---  
+  
+参数
+
+  * function — 函数，有两个参数
+  * iterable — 可迭代对象
+  * initializer — 可选，初始参数  
+返回值
+  * 返回函数计算结果  
+实例
+        
+        1  
+        2  
+        3  
+        4  
+        5  
+        6  
+        7  
+        
+
+| 
+        
+        >>>def add(x, y) :            # 两数相加  
+        ...     return x + y  
+        ...   
+        >>> reduce(add, [1,2,3,4,5])   # 计算列表和：1+2+3+4+5  
+        15  
+        >>> reduce(lambda x, y: x+y, [1,2,3,4,5])  # 使用 lambda 匿名函数  
+        15  
+          
+  
+---|---  
+
+## zip() 函数
+
+zip() 函数用于将可迭代的对象作为参数, 将对象中对应的元素打包成一个个 **元组** ,然后返回有这些元组组成的 对象. ( 相比于python2中返回列表的方式, 这样做的好处是节约了不少的内存 )  
+可以用list()转换或者dict()转换将对象转换成相应的数据类型  
+如果各个迭代器的元素个数不一致, 则返回列表长度与最短的对象相同, 多出来的部分会被舍弃, 利用*号操作符, 可以将元组解压成列表.  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    16  
+    17  
+    18  
+    19  
+    20  
+    21  
+    
+
+| 
+    
+    
+    a = [1,2,3]  
+    b = [4,5,6]  
+    c = ['a','b','c','d','e','f']  
+      
+    zip_ab = zip(a,b)  
+    print(zip_ab) # <zip object at 0x104605348>  
+    print(dict(zip_ab)) # {1: 4, 2: 5, 3: 6}  
+    # !!!注意, 一旦将zip_ab转换成dict以后, zip_ab内部就为空了!! 例如, 再次调用上面的语句:  
+    print(dict(zip_ab)) # {}  
+    # 但是zip_ab对象本身不会消失, 地址仍然不变  
+    print(zip_ab) # <zip object at 0x104605348>  
+      
+    zip_abc = zip(a,b,c) # 注意, 三个元素的zip是不能转换成dict类型的  
+    print(zip_abc) # <zip object at 0x1046054c8>  
+    print(list(zip_abc)) # [(1, 4, 'a'), (2, 5, 'b'), (3, 6, 'c')]  
+      
+    zip_abc = zip(a,b,c)  
+    z_a, z_b, z_c = zip(*zip_abc) # 利用zip(*)可以将zip对象重新解压, 返回类型是元组  
+    print(z_a) # (1,2,3)  
+    print(z_b) # (4,5,6)  
+    print(z_c) # ('a','b','c')  
+      
+  
+---|---  
+  
+## getattr() 函数
+
+getattr()函数用于返回一个对象的属性值, 语法如下  
+
+    
+    
+    1  
+    
+
+| 
+    
+    
+    getattr(object, name[, default])  
+      
+  
+---|---  
+  
+参数：
+
+  * object: 对象
+  * name: 字符串, 对象属性
+  * default: 默认返回值, 如果不提供该参数, 在没有对应属性时, 将触发Attributerror  
+实例
+        
+        1  
+        2  
+        3  
+        4  
+        5  
+        6  
+        7  
+        8  
+        9  
+        10  
+        11  
+        12  
+        13  
+        
+
+| 
+        
+        >>>class A(object):  
+        ...     bar = 1  
+        ...   
+        >>> a = A()  
+        >>> getattr(a, 'bar')        # 获取属性 bar 值  
+        1  
+        >>> getattr(a, 'bar2')       # 属性 bar2 不存在，触发异常  
+        Traceback (most recent call last):  
+          File "<stdin>", line 1, in <module>  
+        AttributeError: 'A' object has no attribute 'bar2'  
+        >>> getattr(a, 'bar2', 3)    # 属性 bar2 不存在，但设置了默认值  
+        3  
+        >>>  
+          
+  
+---|---  
+
+## dir() 函数
+
+可以查看某个类的所有方法和属性  
+
+    
+    
+    1  
+    
+
+| 
+    
+    
+    members = [attr for attr in dir(classA)]  
+      
+  
+---|---  
+  
+  * _var: 在一个模块中以单下划线开头的变量和函数会被默认当做内部函数, 在使用from a_module import * 导入时, 这部分变量和函数不会被导入. 不过如果使用import a_module导入模块时, 仍然可以用a_module._var的形式访问该变量或函数
+  * var_: 有时候, 一个变量的最适合的名称已经被另一个关键字所占用. 在这种情况下, 可以在名称的末尾附加一个下划线来解决冲突.
+  * __var: 双下划线前缀会导致Python解释器重写属性名称, 以避免子类中的命名冲突. 举例来说, 如果在class Test中有一个成员__x, 那么当利用内置函数dir(Test)来查看类的属性时, 会发现__x被解释器重命名为_Test__x. 双下划线的名称修饰同样也适用于方法名称.
+  * __var__: 双下划线开头和结尾的是一些 Python 的特殊对象, 如类成员的 __init__, __del__, __name__, __call__ 等. Python 官方推荐永远不要讲这样的命名方式应用于自己的变量或函数. 有一种说法是说双下划线建议为类的私有成员, 但是 PEP8 当前的官方版本中并没有明说.
+  * _: 有时候我们会用一个独立的下划线作为一个名字, 这通常是用来指示某个变量时临时的或者无关紧要的.
+
+## 类的特殊方法
+
+### call()
+
+在 Python 中, 函数实际上也是一个对象:
+        
+        1  
+        2  
+        3  
+        
+
+| 
+        
+        f = abs  
+        print(f.__name__) # 'abs'  
+        print(f(-123)) # 123  
+          
+  
+---|---  
+
+从上面可以看出, 函数是一个对象, 当它赋给另一个变量时, 该变量也是一个函数对象, 可以起到与原函数相同的效果. 在 Python 中, 一个类实例也可以变成一个可调用对象, 只需要实现一个特殊方法 __call__() 即可. 下面我们举例把 Person 类变成一个可调用对象:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    
+
+| 
+    
+    
+    class Person(object):  
+      
+        def __init__(self, name, gender):  
+            self.name = name  
+            self.gender = gender  
+      
+        def __call__(self, friend):  
+            print("name:", self.name)  
+            print("friend:", friend)  
+      
+  
+---|---  
+  
+接下来我们就可以将 Person 类的实例对象当做一个函数来使用, 如下所示:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    
+
+| 
+    
+    
+    p = Person('Bob', 'male')  
+    p('Tim')  
+    # name: Bob  
+    # friend: Tim  
+      
+  
+---|---  
+  
+### getitem()
+
+凡是在类中定义了 __getitem__() 方法, 那么它的实例对象就是可以通过 [] 操作符来访问指定的成员或进行特定的行为, 大多数情况下会将该方法实现成通过索引来方法元素的形式.  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    
+
+| 
+    
+    
+    class DataBase(object):  
+      
+        def __init__(self):  
+            super(DataBase, self).__init__()  
+            self.vals = [1,2,3,4,5]  
+        def __getitem__(self, key):  
+            return self.vals[key]  
+      
+  
+---|---  
+  
+### setitem()
+
+使得可以通过 A[3] = 4, B[“a”] = 5 等方式来对类中的元素进行赋值
+
+### file()
+
+查看模块的路径
+
+### len()
+
+使得类对象可以使用 Python 的内建方法 len(), 返回你自定义的数值.  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    
+
+| 
+    
+    
+    class DictDemo:  
+        def __init__(self,key,value):  
+            self.dict = {}  
+            self.dict[key] = value  
+        def __getitem__(self,key):  
+            return self.dict[key]  
+        def __setitem__(self,key,value):  
+            self.dict[key] = value  
+        def __len__(self):  
+            return len(self.dict)  
+    dictDemo = DictDemo('key0','value0')  
+    print(dictDemo['key0']) #value0  
+    dictDemo['key1'] = 'value1'  
+    print(dictDemo['key1']) #value1  
+    print(len(dictDemo)) #2  
+      
+  
+---|---  
+  
+### repr()
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    16  
+    17  
+    18  
+    19  
+    20  
+    21  
+    22  
+    23  
+    24  
+    25  
+    26  
+    27  
+    28  
+    29  
+    30  
+    31  
+    32  
+    33  
+    34  
+    35  
+    36  
+    37  
+    38  
+    
+
+| 
+    
+    
+    class Test(object):  
+        def __init__(self, value='hello, world!'):  
+            self.data = value  
+      
+    >>> t = Test()  
+    >>> t  
+    <__main__.Test at 0x7fa91c307190>  
+    >>> print t  
+    <__main__.Test object at 0x7fa91c307190>  
+      
+    # 看到了么？上面打印类对象并不是很友好，显示的是对象的内存地址  
+    # 下面我们重构下该类的__repr__以及__str__，看看它们俩有啥区别  
+      
+    # 重构__repr__  
+    class TestRepr(Test):  
+        def __repr__(self):  
+            return 'TestRepr(%s)' % self.data  
+      
+    >>> tr = TestRepr()  
+    >>> tr  
+    TestRepr(hello, world!)  
+    >>> print tr  
+    TestRepr(hello, world!)  
+      
+    # 重构__repr__方法后，不管直接输出对象还是通过print打印的信息都按我们__repr__方法中定义的格式进行显示了  
+      
+    # 重构__str__  
+    calss TestStr(Test):  
+        def __str__(self):  
+            return '[Value: %s]' % self.data  
+      
+    >>> ts = TestStr()  
+    >>> ts  
+    <__main__.TestStr at 0x7fa91c314e50>  
+    >>> print ts  
+    [Value: hello, world!]  
+      
+    # 你会发现，直接输出对象ts时并没有按我们__str__方法中定义的格式进行输出，而用print输出的信息却改变了  
+      
+  
+---|---  
+  
+### str()
+
+参见 **repr**() 代码示例
+
+## 星号 *
+
+*: 乘法  
+**: 乘幂
+
+### 用于函数参数
+
+单星号: 将所有参数以 元组(tuple) 的形式导入  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    
+
+| 
+    
+    
+    def foo(param1, *param2):  
+        print(param1)  
+        print(param2)  
+    foo(1,2,3,4,5)  
+    # 1  
+    # (2,3,4,5)  
+      
+  
+---|---  
+  
+双星号: 将所有参数以 字典 的形式导入  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    
+
+| 
+    
+    
+    def bar(param1, **param2):  
+        print(param1)  
+        print(param2)  
+    bar(1, a=2, b=3)  
+    # 1  
+    # {'a': 2, 'b': 3}  
+      
+  
+---|---  
+  
+当然这两个用法可以同时出现在一个函数中:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    
+
+| 
+    
+    
+    def fun(a, b=10, *args, **kwargs):  
+        print(a)  
+        print(b)  
+        print(args)  
+        print(kwargs)  
+    fun(1,2,3,4,e=5,f=6)  
+    # 1  
+    # 2  
+    # (3,4)  
+    # {'e': 5, 'f': 6}  
+      
+  
+---|---  
+  
+## globals() 函数
+
+该函数会以字典类型返回当前位置的全部全局变量
+
+## stripe()
+
+## readlines()
+
+## lambda 函数
+
+## 3.6新功能 f string
+
+## 包的导入机制
+
+### 模块和包的定义
+
+模块(module): 用来从逻辑上组织 Python 代码(变量, 函数, 类), 通常是一个.py文件.  
+包(package): 定义了一个由模块和子包组成的 Python 应用程序执行环境, 本质上就是一个有层次的文件目录结果(必须带有一个__init__.py文件)
+
+### import 的搜索路径
+
+  1. 在当前目录下搜索
+  2. 在环境变量PYTHONPATH中指定的路径列表中搜索
+  3. 在 Python 安装路径的lib库中搜索  
+Python 所有加载的模型信息都存放在sys.modules结构中, 当import一个模块时, 会按如下步骤来进行:
+  4. 如果import A, 检查sys.modules中是否已经有A, 如果有则不加载, 如果没有则为A创建module对象, 并加载A;
+  5. 如果是from A import B, 先为A创建module对象, 再解析A(此时会加载并执行A中的所有代码), 从中寻找B并填充到A的__dict__中.  
+在导入模块的时候, 模块所在文件夹会自动生成一个__pycache__/module_name.cpython-35.pyc的文件.
+         
+         1  
+         2  
+         3  
+         4  
+         
+
+| 
+         
+         import module_name的本质是将module_name.py中的全部代码加载到内存中, 并将其赋值给与模块同名的变量, 这个变量的类型是class<module>.  
+         from module_name import name的本质是将指定的变量或者方法导入到当前的文件中  
+         import package_name的本质是执行该包下的__init__.py文件, 在执行文件后, 会在package_name目录下生成一个__pycache__/__init__cpython-35.pyc文件.  
+         from package_name import *的本质是导入__init__.py文件中的__all__列表(eg. __all__ = ['L2Norm', 'MultiBoxLoss']).  
+           
+  
+---|---  
+
+### 相对导入和绝对导入
+
+绝对导入:  
+
+    
+    
+    1  
+    2  
+    
+
+| 
+    
+    
+    import A.B  
+    from A import B  
+      
+  
+---|---  
+  
+相对导入:  
+
+    
+    
+    1  
+    2  
+    
+
+| 
+    
+    
+    from . import B # . 代表当前路径  
+    from ..A import B # .. 代表上层路径, ... 代表上上层路径.  
+      
+  
+---|---  
+  
+在没有明确指定包结构的情况下, Python 是根据__name__来决定一个模块在包中的结构的, 如果是__main__, 则它本身就是顶层模块, 没有包结构, 如果是A.B.C结构, 则A是顶层模块. Python 的导入方式的不同具有不同的规则:
+
+1.如果是绝对导入, 一个模块只能导入自身的子模块或者和它的顶层模块同级别的模块及其子模块.  
+2.如果是相对导入, 一个模块必须有包结构且只能导入它的顶层模块内部的模块.
+
+如果一个模块被直接运行, 则它自己为顶层模块, 不存在层次结构, 所以也找不到上层(..)的相对路径  
+Python2.x 默认为相对路径导入, 而 Python3.x 默认为绝对路径导入, 这样可以避免导入的子包覆盖掉标准库模块. 通常, 在 Python2.x 中, 我们利用下面的语句来使其导入规则遵循 Python3.x  
+
+    
+    
+    1  
+    
+
+| 
+    
+    
+    from __future__ import absolute_import  
+      
+  
+---|---  
+  
+absolute_import的意思并不是将所有的导入都视为绝对导入, 而是指禁用隐式相对导入(implicit relative import), 关于隐式的显示的具体区别, 可以看下面的例子, 假设有如下的包结构:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    
+
+| 
+    
+    
+    thing  
+    └── __init__.py  
+    ├── books  
+    │ ├── __init__.py  
+    │ ├── adventure.py  
+    │ ├── history.py  
+    │ ├── horror.py  
+    │ └── lovestory.py  
+    ├── furniture  
+    │ ├── __init__.py  
+    │ ├── armchair.py  
+    │ ├── bench.py  
+    │ ├── screen.py  
+    │ └── stool.py  
+      
+  
+---|---  
+  
+那么如果想在stool.py中导入bench模块, 则有如下几种方式:  
+
+    
+    
+    1  
+    2  
+    3  
+    
+
+| 
+    
+    
+    import bench # 隐式相对导入  
+    from . import bench # 显式相对导入  
+    from furniture import bench # 绝对导入  
+      
+  
+---|---  
+  
+隐式相对导入没有告诉解释器相对于谁进行导入, 默认相对于当前模块; 而显式相对导入则明确告诉了解释器相对于谁来导入. 以上导入方式的第三种是官方推荐的, 第一种是官方强烈不推荐的, Python3 中第一种导入方式只能用于导入sys.path中的模块.  
+**注意, 还有相对导入的模块不能被直接运行, 会提示如下错误:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    
+
+| 
+    
+    
+    Traceback (most recent call last):  
+      File "test.py", line 8, in <module>  
+        from .ssd import SSD  
+    ModuleNotFoundError: No module named '__main__.ssd'; '__main__' is not a package  
+      
+  
+---|---  
+  
+另外存在一种情况就是: 假如有两个模块a.py和b.py放在同一个目录下, 则可以直接在a.py中使用import b来导入模块b. 这是为什么呢? 我们上面说了在 Python3.x 中不能使用这种隐式相对导入, 但是这里却可以成功导入, 这是因为此时我们是直接运行a.py, 所以a.py和b.py的目录没有被当做一个包来处理, 因此不涉及相对导入和绝对导入的概念. 因此相对导入和绝对导入仅仅是针对于包而言的.
+
+### 综合距离
+
+存在目录结构如下所示:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    
+
+| 
+    
+    
+    dirRoot  
+    └── __init__.py  
+    ├── file1.py  
+    ├── file2.py  
+    ├── dirA  
+    │ ├── __init__.py  
+    │ ├── a1.py  
+    │ └── a2.py  
+    ├── dirB  
+    │ ├── __init__.py  
+    │ ├── b1.py  
+    │ └── b2.py  
+      
+  
+---|---  
+  
+直接运行a1.py, 并希望导入a2模块:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    
+
+| 
+    
+    
+    # a1.py  
+    import a2 # 正确, 此时并未将 dirA 当做包来处理, a1.py 和 a2.py 相当于两个独立的模块  
+    from a2 import func_a2 # 正确  
+    from .a2 import func_a2 # 错误, 当进行相对导入时, 不能直接运行  
+      
+  
+---|---  
+  
+直接运行file1.py, 并希望导入a1模块, 同时a1模块中需要导入a2模块:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    
+
+| 
+    
+    
+    # file1.py  
+    from dirA import a1  
+    a1.func_a1() # a1.py 中的函数  
+    a1.func_a2() # a1.py 中导入了 a2.py 的函数, 可以直接使用  
+      
+    # a1.py  
+    import a2 # 错误, 此时由于 dirA 中有 __init__.py 文件, 因此会将 dirA 当做包来处理,  
+    # 由于 Python3.x 不允许使用隐式的相对导入, 因此该语句非法  
+    from a2 import func_a2 # 错误, 原因同上  
+    from .a2 import func_a2 # 正确, 当进行相对导入时, 需要使用显式的相对导入  
+      
+  
+---|---  
+  
+直接运行file1.py, 并希望导入a1模块, 同时a1模块中需要导入dirB/b1模块(跨文件夹导入):  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    
+
+| 
+    
+    
+    # file1.py  
+    from dirA import a1  
+    a1.func_a1() # a1.py 中的函数  
+    a1.func_a2() # a2.py 中的函数  
+    a1.func_b1() # b1.py 中的函数  
+      
+    # a1.py  
+    from .a2 import func_a2 # 推荐使用绝对导入 from dirA.a1 import func_a2  
+    from dirB import b1 # 由于运行的是 file1.py 文件, 因此顶层目录是 dirRoot  
+    from dirB.b1 import func_b1 # 所以可以直接使用 dirB 包  
+      
+  
+---|---  
+  
+直接运行a1.py, 并希望跨目录的导入dirB/b1模块. 由于这种跨目录的导入超越了顶层路径的限制, 因此必须使用sys.path.append()方法来额外添加搜索路径, 否则无法正常导  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    
+
+| 
+    
+    
+    # a1.py  
+    import sys  
+    sys.path.append("../") # 将 dirA 的上一次目录添加到搜索路径中  
+    from dirB import b1 # 正确, 注意必须先添加 path, 然后再导入  
+    from dirB.b1 import func_b1 # 正确  
+    from .a2 import func_a2 # 这里是错误的, 当直接执行 a1.py 时, a1.py 中不能包含显式相对导入  
+      
+  
+---|---  
+  
+## 获取 python 版本:
+    
+    
+    1  
+    
+
+| 
+    
+    
+    print(sys.version_info)  
+      
+  
+---|---  
+  
+## 获取包的安装位置
+    
+    
+    1  
+    
+
+| 
+    
+    
+    print(cv2)  
+      
+  
+---|---  
+  
+## 解析 xml 文件
+
+导入:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    
+
+| 
+    
+    
+    import sys  
+    if sys.version_info[0] == 2:  
+        import xml.etree.cElementTree as ET  
+    else:  
+        import xml.etree.ElementTree as ET  
+      
+  
+---|---  
+  
+解析:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    
+
+| 
+    
+    
+    xmlfile = ET.parse(xmlfile_path)  
+    root = xmlfile.getroot() # 获取根节点  
+    root.tag # 标签  
+    root.attrib # 属性字典  
+      
+    for child in root: # 迭代访问子节点  
+        print(child.tag, child.attrib)  
+      
+    # 可以通过索引访问嵌套节点的内容  
+    root[0][1].text  
+      
+    Element.findall() #  
+    Element.find() #  
+      
+  
+---|---  
+  
+## python 中 == 和 is 的区别
+
+== 只用于判断值是否相等  
+is 用于判断两个对象是否为同一个实例  
+小整数对象池: Python 为了优化速度，使用了小整数对象池，避免为整数频繁申请和销毁内存空间。而Python 对小整数的定义是 [-5, 257)，只有数字在-5到256之间它们的id才会相等，超过了这个范围就不行了，同样的道理，字符串对象也有一个类似的缓冲池，超过区间范围内自然不会相等了
+
+## 队列 queue
+
+在 Python3 中, 原来的Queue模块被重命名为queue, 该模块包含以下三类数据结构:
+
+  * queue.Queue(maxsize=0): FIFO queue, 先进先出队列, 代表普通队列
+  * queue.LifoQueue(maxsize=0): LIFO queue, 后进先出队列, 类似栈的作用
+  * queue.PriorityQueue(maxsize=0): 优先级队列, 类似堆的作用. 默认为小顶堆, 常用形式为元组:(priority_number, data)  
+上面的 maxsize 表明了队列中最大可以容纳的元素数量, 如果超过, 则无法插入. 当 maxsize <= 0 时, 代表元素数量无限制.  
+公有方法(以上三个通用):
+  * qsize(): 返回 approximate size, qsize() > 0 不保证get()一定 work, 同理, qsize() < maxsize 不保证put()一定 work.
+  * empty(): 如果队列为空, 返回 True. 和qsize()一样, 不提供保证性.
+  * full(): 如果队列满, 返回 True. 不提供保证性
+  * put(item[, block[, timeout]])
+  * put_nowait(item): 等价于put(item, False)
+  * get([block[, timeout]])
+  * get_nowait(): 等价于get(False)
+  * task_done():
+  * join():
+
+## 堆 heapq
+
+heapq 模块只有最小堆的功能, 要实现最大堆, 需要在入堆和出堆的时候取反, 并且 heapq 模块只能作用于数值型类型.  
+最大堆: _heapify_max(), _heappop_max()
+
+给定一组数据, 创建堆, 两种方式(二者等价):  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    
+
+| 
+    
+    
+    import heapq  
+    data = [1,3,6,2,8,5]  
+    heap = []  
+    for d in data:  
+        heapq.heappush(heap, n) # 方法一 逐个构建  
+      
+    heapq.heapify(data) # 方法二 原地构建, 效率更高  
+      
+  
+---|---  
+  
+小顶堆:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    
+
+| 
+    
+    
+    heap = [1,3,6,2,8,5]  
+    heapq.heapify(heap)  
+    heapq.heappop(heap) # 返回并删除堆顶  
+    heapq.heapreplace(heap, 10) # 删除堆顶并添加新值  
+    heapq.heappushpop(heap, 10) # 先将新值加入堆中, 然后立刻弹出堆顶  
+    print(heap[0]) # 查看堆顶  
+      
+  
+---|---  
+  
+大顶堆:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    
+
+| 
+    
+    
+    # 方法一: 取负值  
+    heap = [-1,-3,-6,-2,-8,-5]  
+      
+    # 方法二: 内置方法  
+    heap = [1,3,6,2,8,5]  
+    heapq._heapify_max(heap) # max_heap  
+    print(heap[0]) # 查看堆顶, 8  
+    heapq._heappop_max(heap) # po from maxheap  
+    print(heap[0]) # 6  
+    heapq._heapreplace_max(heap, 10)  
+    print(heap[0]) # 10  
+    # heapq._heappushpop_max(heap, 10) # 注意, 没有 _heappushpop_max 函数  
+      
+  
+---|---  
+  
+## Python 刷题常用
+
+队列:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    
+
+| 
+    
+    
+    import Queue  
+    base_queue = Queue.Queue() # 基本队列, 先进先出  
+    base_queue.put(x)  
+    base_queue.get()  
+      
+    lifo_queue = Queue.LifoQueue() # 先进后出, 类似栈  
+    lifo_queue.put(x)  
+    lifo_queue.get()  
+      
+    prio_queue = Queue.PriorityQueue() # 优先队列, 与C++中priority_queue类似, 可实现堆的功能  
+    prio_queue.put(x)  
+    prio_queue.get()  
+      
+  
+---|---  
+  
+## numpy 中vstack, hstack, concatenate 和 stack 之间的区别和联系
+
+### concatenate
+    
+    
+    1  
+    
+
+| 
+    
+    
+    numpy.concatenate((a1, a2, ...), axis=0, out=None)  
+      
+  
+---|---  
+  
+concatenate 的作用就是将多个数组序列按照axis指定的维度连接起来, 这些数组序列 a1, a2, … 必须保证 除了 axis 指定维度之外的其他维度具有相同的 shape.
+
+注意: 这里的维度指的是a1, a2的维度, 而不是(a1, a2)的维度
+
+从维度角度来更好理解 concatenate 的作用  
+concatenate 执行后的 shape 特定是: axis 指定的维度是多个数组序列对应维度的数值和, 而其他维度保持不变. 也就是说不会增加新的维度, 这是 concatenate 与 stack 之间的一个重要的区别.
+
+如下所示:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    16  
+    17  
+    18  
+    19  
+    20  
+    21  
+    22  
+    
+
+| 
+    
+    
+    import numpy as np  
+    a1 = np.array([[1, 1], [2, 2], [3, 3]]) # shape = 3x2  
+    a2 = np.array([[1, 1], [2, 2]]) # shape = 2 x 2  
+    print(a1.shape, a2.shape)  
+    concat1 = np.concatenate((a1, a2), axis=0)  
+    print(concat1.shape) # shape 为 [5, 2], 在 0 维度上为 3+2, 其他维度保持不变  
+    print(concat1) # a1, a2 维度 0 不同, 一个为 3, 一个为 2, 其他维度相同, 均为 2  
+    #[[1 1]  
+    # [2 2]  
+    # [3 3]  
+    # [1 1]  
+    # [2 2]]  
+    #print(np.concatenate((a1, a2), axis=1)) # 由于维度 0 二者不同, 无法保持不变, 因此报错  
+      
+    a1 = np.array([[1, 2, 3]]) # shape = 1x3  
+    a2 = np.array([[1, 2]]) # shape = 1x2  
+    print(a1.shape, a2.shape)  
+    concat2 = np.concatenate((a1, a2), axis=1)  
+    print(concat2.shape) # shape 为 [1, 5]在 1 维度上为 3 + 2, 0 维度上保持 1 不变  
+    print(concat2)  
+    # [[1 2 3 1 2]]  
+    # print(np.concatenate((a1, a2), axis=0)) # 维度 1 不同, 报错  
+      
+  
+---|---  
+  
+有时候, concatenate的第一个参数只会传送一个一个数组序列, 这时候, 等价于将这个数组序列的第一维的元素看做是多个数组序列作为concatenate的参数进行传递. 如下所示:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    
+
+| 
+    
+    
+    a = [[1, 2, 3], [1, 2, 3]]  
+    print(np.concatenate(a, axis=0)) # 该行与下一行等价  
+    print(np.concatenate((a[0], a[1]), axis=0))  
+      
+    a = [[1, 2, 3], [1, 2]]  
+    print(np.concatenate(a, axis=0)) # 可以看出, 虽然 a 的第一维度为 2, 第二维度为 3 和 2  
+      
+    # 但是, 我们要将其拆分, 拆分后, a[0], a[1] 的第一维度3和2, 其他维度相同, 因此可以在第一维度上进行连接  
+    print(np.concatenate((a[0], a[1]), axis=0))  
+      
+  
+---|---  
+  
+### stack
+    
+    
+    1  
+    2  
+    
+
+| 
+    
+    
+    numpy.stack(arrays, axis=0, out=None)  
+    numpy.stack((a1, a2, ...), axis=0, out=None)  
+      
+  
+---|---  
+  
+stack 的作用就是将多个数组序列按照axis指定的维度 堆叠 起来, 这些数组序列 a1, a2, … 必须保证 所有维度都相同, 注意这里与 concatenate 的区别.
+
+要更好的理解stack, 可以借助 维度 的概念进行理解, 对于 shape 相同的 k 个数组序列来说, stack 的作用相当于新插入一个维度, 维度的大小为 k, 插入的位置为axis指定的位置. 如下所示:  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    
+
+| 
+    
+    
+    a1 = [[1, 1], [2, 2], [3, 3]] # shape = 3x2  
+    a2 = [[4, 4], [5, 5], [6, 6]] # shape = 3x2  
+    a3 = [[7, 7], [8, 8], [9, 9]] # shape = 3x2  
+    a4 = [[0, 0], [0, 0], [0, 0]] # shape = 3x2  
+    stack1 = np.stack((a1, a2, a3, a4), axis=0) # 新插入维度大小为 4, 位置为第 0 维  
+    print(stack1.shape) # shape 为 (4, 3, 2)  
+    print('###\n', stack1) # 先将 shape 画好, 然后进行填充, 在第 0 维上进行堆叠, 因此 stack1[*][*] = a1[0], a1[1], ..., a4[2]  
+      
+    stack2 = np.stack((a1, a2, a3, a4), axis=1) # 新插入维度大小为 4, 位置为第 1 维  
+    print(stack2.shape) # shape 为 (3, 4, 2)  
+    print('###\n', stack2) # 在第 1 维上进行堆叠, 因此 stack2[*][*] = a1[0], a2[0], a3[0], a1[1], ...  
+      
+    stack3 = np.stack((a1, a2, a3, a4), axis=2) # 新插入维度大小为 4, 位置为第 2 维  
+    print(stack3.shape) # shape 为 (3, 2, 4)  
+    print('###\n', stack3) # 在第 2 维上进行堆叠, 因此 stack2[*][*] = [1 4 7 0], [1 4 7 0], [2 5 8 0], ...  
+      
+  
+---|---  
+  
+### hstack 和 vstack
+
+hstack 和 vstack 虽然名字中都带有 stack, 但是实际上, 它们和np.stack的关系并不大, 一个明显的区别就是np.stack要求进行堆叠的多个数组序列需要保证 shape 完全相同, 并且堆叠后会新增加一个由axis指定的维度. 实际上, hstack 和 vstack 可以看做是特殊的 concatenate, 它们在某些情况下可以用 concatenate 来代替
+
+既然 hstack 和 vstack 是特殊的 concatenate, 也就是说, 它们所接受的多个数组序列在axis指定的维度上可以不同, 而在其他维度上必须相同.
+
+vstack: 在垂直方向上将多个数组序列进行堆叠, 相当于在axis=0维度上执行concatenate  
+hstack: 在水平方向上将多个数组序列进行堆叠, 相当于在axis=1维度上执行concatenate  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    16  
+    17  
+    18  
+    19  
+    20  
+    
+
+| 
+    
+    
+    a = [[1, 1], [2, 2], [3, 3]] # shape = 3x2  
+    b = [[4, 4], [5, 5], [6, 6]] # shape = 3x2  
+    c = [[7, 7], [8, 8], [9, 9]] # shape = 3x2  
+    d = [[0, 0], [0, 0], [0, 0]] # shape = 3x2  
+      
+    v = np.vstack((a, b, c, d))  
+    print(v.shape) # (12, 2)  
+    print(v)  
+      
+    x = np.concatenate((a, b, c, d), axis = 0) # 等价于 vstack  
+    print(x.shape) # 12, 2  
+    print(x)  
+      
+    h = np.hstack((a, b, c, d))  
+    print(h.shape) # (3, 8)  
+    print(h)  
+      
+    x = np.concatenate((a, b, c, d), axis = 1) # 等价于 hstack  
+    print(x.shape) # 3, 8  
+    print(x)  
+      
+  
+---|---  
+  
+需要特别注意, 当多个数组序列是一维数组时, 应该先将一维数组转换成二维数组, 然后才能与相应的 concatenate 进行等价. 这是因为, 在数组序列是一维数组时, concatenate 是无法使用axis=1的, 因此此时的 hstack 相当于是在axis=0上进行 concatenate, 而 vstack 则需要先将数组的 shape 从 (N,) 转换成 (1, N) 后才相当于是在axis=1上进行 concatenate
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    16  
+    
+
+| 
+    
+    
+    a = np.array([1, 2, 3, 4, 5]) # 当面对的是一维数组时,  
+    b = np.array([6, 7, 8, 9, 10])  
+      
+    h = np.hstack((a, b))  
+    print(h.shape)  
+    print(h)  
+    con = np.concatenate((a, b), axis=0) # 当 a, b 是一维数组时, hstack 相当于在 axis=0 上进行连接  
+    print(con.shape)  
+    print(con)  
+      
+    v = np.vstack((a, b))  
+    print(v.shape)  
+    print(v)  
+    con = np.concatenate(([a], [b]), axis=0) # 当 a, b 是一维数组时, vstack 相当于将 a, b 先转换成二维 (1, N), 然后在 axis=0 上进行连接  
+    print(con.shape)  
+    print(con)  
+      
+  
+---|---  
+  
+## set 去重
+
+对于二维列表, 由于 list 的元素也是 list, 在内存中存储的是首元素地址, 无法直接使用 set, 因此需要先将内部的元素全部全换成 tuple 后, 才能使用 list 去重. 如下所示  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    
+
+| 
+    
+    
+    a = list()  
+    a.append([1,2,3])  
+    a.append([1,2,3])  
+    a.append([1,2,3])  
+    a.append([4, 5, 6])  
+    # b = set(a) # 报错  
+    b = set(map(tuple, a))  
+    print(b) # {(4, 5, 6), (1, 2, 3)}  
+      
+  
+---|---  
+  
+## os.sep用法
+
+ython是跨平台的。在Windows上，文件的路径分隔符是’\’，在Linux上是’/‘。
+
+为了让代码在不同的平台上都能运行，那么路径应该写’\’还是’/‘呢？
+
+使用os.sep的话，就不用考虑这个了，os.sep根据你所处的平台，自动采用相应的分隔符号。
+
+举例
+
+Linux下一个路径，/usr/share/python,那么上面的os.sep就是‘/’  
+windows下一个路径，C：\Users\Public\Desktop,那么上面的os.sep就是‘\’.  
+
+    
+    
+    1  
+    
+
+| 
+    
+    
+    data_dir = os.sep.join(['hello', 'world'])  
+      
+  
+---|---  
+  
+## Python3 元组
+
+Python元组包含了以下内置函数
+
+  * len(tuple) 计算元组元素个数。
+        
+        1  
+        2  
+        3  
+        4  
+        
+
+| 
+        
+        >>> tuple1 = ('Google', 'Runoob', 'Taobao')  
+        >>> len(tuple1)  
+        3  
+        >>>  
+          
+  
+---|---  
+  * max(tuple) 返回元组中元素最大值。
+        
+        1  
+        2  
+        3  
+        4  
+        
+
+| 
+        
+        >>> tuple2 = ('5', '4', '8')  
+        >>> max(tuple2)  
+        '8'  
+        >>>  
+          
+  
+---|---  
+  * min(tuple) 返回元组中元素最小值。
+        
+        1  
+        2  
+        3  
+        4  
+        
+
+| 
+        
+        >>> tuple2 = ('5', '4', '8')  
+        >>> min(tuple2)  
+        '4'  
+        >>>  
+          
+  
+---|---  
+  * tuple(seq) 将列表转换为元组。
+        
+        1  
+        2  
+        3  
+        4  
+        
+
+| 
+        
+        >>> list1= ['Google', 'Taobao', 'Runoob', 'Baidu']  
+        >>> tuple1=tuple(list1)  
+        >>> tuple1  
+        ('Google', 'Taobao', 'Runoob', 'Baidu')  
+          
+  
+---|---  
+
+## 序列化Python对象
+
+你需要将一个Python对象序列化为一个字节流，以便将它保存到一个文件、存储到数据库或者通过网络传输它。  
+对于序列化最普遍的做法就是使用 pickle 模块。为了将一个对象保存到一个文件中，可以这样做
+
+pickle 对于大型的数据结构比如使用 array 或 numpy 模块创建的二进制数组效率并不是一个高效的编码方式。 如果你需要移动大量的数组数据，你最好是先在一个文件中将其保存为数组数据块或使用更高级的标准编码方式如HDF5 (需要第三方库的支持)。  
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    16  
+    17  
+    18  
+    19  
+    
+
+| 
+    
+    
+    In [1]: import pickle                                                             
+      
+    In [2]: obj = 123,"abcdef", ["ac", 123], {"key": "value", "key1": "value1"}       
+      
+    In [3]: print(obj)                                                                
+    (123, 'abcdef', ['ac', 123], {'key': 'value', 'key1': 'value1'})  
+      
+    In [4]: # 序列化到文件                                                            
+      
+    In [5]: with open(r'./a.pickle','wb') as f:   
+       ...:     pickle.dump(obj,f)   
+       ...:                                                                           
+      
+    In [6]: with open(r'./a.pickle','rb') as f:   
+       ...:     aa= pickle.load(f)   
+       ...: print(aa)   
+       ...:    
+       ...:                                                                           
+    (123, 'abcdef', ['ac', 123], {'key': 'value', 'key1': 'value1'})  
+      
+  
+---|---  
+  
+参考链接：  
+<https://hellozhaozheng.github.io>  
+<https://www.runoob.com/python/python-tutorial.html>

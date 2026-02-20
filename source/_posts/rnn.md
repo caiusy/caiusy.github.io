@@ -1,0 +1,225 @@
+---
+title: rnn
+date: 2019-11-17 00:00:00
+categories:
+  - 深度学习
+tags:
+  - TensorFlow
+  - OpenCV
+  - RNN
+---
+
+### RNN及RNN的几个变体  
+  
+序列形的数据不太好用原始的神经网络处理，为了建模序列问题，RNN引入了隐状态h（hidden）的概念，h可以对序列形的数据提取特征，接着转换为输出。
+
+![h1](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h1.jpg)
+
+  * 圆圈或方块表示的是向量
+
+  * 一个箭头就表示对该向量做一次变换。如上图中h0和x1分别有一个箭头连接，就表示对h0和x1各做了一次变换
+
+**Tips：U、W、b都是一样的，每个步骤的参数都是共享的，这是RNN的重要特点。**
+
+![h2](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h2.jpg)  
+依次计算剩下来的（使用相同的参数U、W、b）：  
+![h3](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h3.jpg)  
+输出值的方法就是直接通过h进行计算：  
+![h4](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h4.jpg)  
+**一个箭头就表示对对应的向量做一次类似于f(Wx+b)的变换，这里的这个箭头就表示对h1进行一次变换，得到输出y1**  
+![h5](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h5.jpg)  
+输入是x1, x2, …..xn，输出为y1, y2, …yn，也就是说，**输入和输出序列必须要是等长的。**  
+一些问题适合用经典的RNN结构建模，如：
+
+  * 计算视频中每一帧的分类标签。因为要对每一帧进行计算，因此输入和输出序列等长。
+  * 输入为字符，输出为下一个字符的概率。这就是著名的Char RNN（详细介绍请参考：The Unreasonable Effectiveness of Recurrent Neural Networks）。
+
+### N vs 1 多输入单输出
+
+![h6](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h6.jpg)  
+这种结构通常用来处理序列分类问题。如输入一段文字判别它所属的类别，输入一个句子判断其情感倾向，输入一段视频并判断它的类别等等。
+
+### 1 VS N 单输入多输出
+
+输入不是序列而输出为序列的情况怎么处理？我们可以只在序列开始进行输入计算：  
+![h7](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h7.jpg)  
+还有一种结构是把输入x作为每个阶段的输入：  
+![h8](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h8.jpg)  
+这种结构处理的问题：
+
+  * 从图像生成文字（image caption），此时输入的X就是图像的特征，而输出的y序列就是一段句子
+  * 从类别生成语音或音乐等
+
+### N vs M
+
+RNN最重要的一个变种：N vs M。这种结构又叫Encoder-Decoder模型，也可以称之为Seq2Seq模型。  
+为此，Encoder-Decoder结构先将输入数据编码成一个上下文向量c：  
+![h9](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h9.jpg)  
+c有多种方式，最简单的方法就是把Encoder的最后一个隐状态赋值给c，还可以对最后的隐状态做一个变换得到c，也可以对所有的隐状态做变换。
+
+拿到c之后，就用另一个RNN网络对其进行解码，这部分RNN网络被称为Decoder。具体做法就是将c当做之前的初始状态h0输入到Decoder中：  
+![h10](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h10.jpg)  
+还有一种做法是将c当做每一步的输入：  
+![h11](//caius-lu.github.io/2019/11/17/rnn/h11.jpg)  
+Encoder-Decoder结构不限制输入和输出的序列长度，因此应用的范围非常广泛，比如：
+
+  * 机器翻译。Encoder-Decoder的最经典应用，事实上这一结构就是在机器翻译领域最先提出的
+  * 文本摘要。输入是一段文本序列，输出是这段文本序列的摘要序列
+  * 阅读理解。将输入的文章和问题分别编码，再对其进行解码得到问题的答案。
+  * 语音识别。输入是语音信号序列，输出是文字序列。
+  * ………
+
+## tensorflow 实现RNN
+
+### RNNCell
+
+RNNCell 是TensorFlow中实现RNN的基本单元，每个RNNCell都有一个call方法，使用方式是：(output, next_state) = call(input, state)  
+借助图片来说可能更容易理解。假设我们有一个初始状态h0，还有输入x1，调用call(x1, h0)后就可以得到(output1, h1)：  
+![h12](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h12.jpg)  
+再调用一次call(x2, h1)就可以得到(output2, h2)：  
+![h13](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h13.jpg)  
+也就是说，每调用一次RNNCell的call方法，就相当于在时间上“推进了一步”，这就是RNNCell的基本功能。  
+RNNCell只是一个抽象类，其他的RNNcell都会继承该方法，然后具体实现其中的call()函数。主要有state_size和output_size两个属性，分别代表了隐藏层和输出层的维度。然后就是zero_state()和call()两个函数，分别用于初始化初始状态h0为全零向量和定义实际的RNNCell的操作（比如RNN就是一个激活，GRU的两个门，LSTM的三个门控等，不同的RNN的区别主要体现在这个函数）。
+
+#### BasicRNNCell
+
+把state_size和output_size定义成相同，而且ht和output也是相同的  
+最普通的RNN定义方式。也就是说output = new_state = f(W _input + U_ state + B)
+
+#### GRU
+
+相比BasicRNNCell只改变了call函数部分，增加了重置门和更新门两部分，分别由r和u表示。然后c表示要更新的状态值。其对应的公式如如下所示：
+
+r = f(W1 _input + U1_ state + B1)r=f(W1∗input+U1∗state+B1)  
+u = f(W2 _input + U2_ state + B2)u=f(W2∗input+U2∗state+B2)  
+c = f(W3 _input + U3_ r _state + B3)c=f(W3∗input+U3∗r∗state+B3)  
+h_new = u _ h + (1 - u) * chn​ew=u∗h+(1−u)∗c
+
+#### BasicLSTMCell
+
+相比GRU，LSTM又多了一个输出门，而且又新增添了一个C表示其内部状态，然后将h和c以tuple的形式返回作为LSTM内部的状态变量。
+
+我们用的时候都是用的它的两个子类BasicRNNCell和BasicLSTMCell。顾名思义，前者是RNN的基础类，后者是LSTM的基础类。看下RNNCell、BasicRNNCell、BasicLSTMCell这三个类的注释部分，应该就可以理解它们的功能了。  
+除了call方法外，对于RNNCell，还有两个类属性比较重要：
+
+  * state_size
+  * output_size  
+前者是隐层的大小，后者是输出的大小。比如我们通常是将一个batch送入模型计算，设输入数据的形状为(batch_size, input_size)，那么计算时得到的隐层状态就是(batch_size, state_size)，输出就是(batch_size, output_size)。  
+![h14](//caius-lu.github.io/2019/11/17/rnn/images/20191117_rnn_h14.jpg)
+
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    14  
+    15  
+    16  
+    17  
+    18  
+    19  
+    20  
+    21  
+    22  
+    23  
+    24  
+    25  
+    26  
+    27  
+    28  
+    29  
+    30  
+    31  
+    32  
+    
+
+| 
+    
+    
+    In [2]: import numpy as np                                                                                                                                          
+      
+    In [3]: cell = tf.nn.rnn_cell.BasicRNNCell(num_units=128) # state_size = 128                                                                                        
+      
+    In [4]: print(cell.state_size) # 128                                                                                                                                
+    128  
+      
+    In [5]: inputs = tf.placeholder(np.float32, shape=(32, 100)) # 32 是 batch_size                                                                                     
+      
+    In [6]: h0 = cell.zero_state(32, np.float32) # 通过zero_state得到一个全0的初始状态，形状为(batch_size, state_size)                                                  
+      
+    In [7]: output, h1 = cell.call(inputs, h0) #调用call函数                                                                                                            
+    ---------------------------------------------------------------------------  
+    AttributeError                            Traceback (most recent call last)  
+    <ipython-input-7-378fe3b1c400> in <module>  
+    ----> 1 output, h1 = cell.call(inputs, h0) #调用call函数  
+      
+    ~/anaconda3/envs/tensorflow/lib/python3.6/site-packages/tensorflow/python/ops/rnn_cell_impl.py in call(self, inputs, state)  
+        349   
+        350     gate_inputs = math_ops.matmul(  
+    --> 351         array_ops.concat([inputs, state], 1), self._kernel)  
+        352     gate_inputs = nn_ops.bias_add(gate_inputs, self._bias)  
+        353     output = self._activation(gate_inputs)  
+      
+    AttributeError: 'BasicRNNCell' object has no attribute '_kernel'  
+      
+    In [8]: output, h1 = cell.__call__(inputs, h0) #调用call函数                                                                                                        
+      
+    In [9]: print(h1.shape) # (32, 128)                                                                                                                                 
+    (32, 128)  
+      
+    In [10]:  
+      
+  
+---|---  
+  
+BasicLSTMCell
+    
+    
+    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    8  
+    9  
+    10  
+    11  
+    12  
+    13  
+    
+
+| 
+    
+    
+    In [10]: lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(num_units=128)                                             
+      
+    In [11]: inputs = tf.placeholder(np.float32, shape=(32, 100)) # 32 是 batch_size                             
+      
+    In [12]: h0 = lstm_cell.zero_state(32, np.float32) # 通过zero_state得到一个全0的初始状态                     
+      
+    In [13]: output, h1 = lstm_cell.__call__(inputs, h0)                                                         
+      
+    In [14]: print(h1.h)  # shape=(32, 128)                                                                      
+    Tensor("basic_lstm_cell/Mul_2:0", shape=(32, 128), dtype=float32)  
+      
+    In [15]: print(h1.c)  # shape=(32, 128)                                                                      
+    Tensor("basic_lstm_cell/Add_1:0", shape=(32, 128), dtype=float32)  
+      
+  
+---|---  
+  
+参考链接：  
+<https://zhuanlan.zhihu.com/p/28054589>  
+<https://zhuanlan.zhihu.com/p/28196873>

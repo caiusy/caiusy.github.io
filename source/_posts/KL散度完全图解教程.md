@@ -1,17 +1,12 @@
 ---
 title: KL散度完全图解教程：从零到精通
 date: 2026-02-08
-tags:
-  - AI
-  - 信息论
-  - 深度学习
-  - KL散度
-  - 机器学习
-categories:
-  - AI与大模型
-  - 信息论
 mathjax: true
 toc: true
+categories:
+  - AI理论
+tags:
+  - Python
 ---
 
 > 🎯 **学习目标**  

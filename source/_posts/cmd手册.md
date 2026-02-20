@@ -1,0 +1,69 @@
+---
+title: Terminal 手册
+date: 2019-09-05 00:00:00
+categories:
+  - 其他
+tags:
+  - 编程
+---
+
+## 查看磁盘空间
+
+df -hl 查看磁盘剩余空间  
+df -h 查看每个根路径的分区大小
+
+## 查看文件/文件夹大小
+
+查看指定文件/文件夹大小：du -hs <文件名或文件夹名>  
+查看当前文件夹下所有文件大小（包括子文件夹）：du -sh
+
+## 查看文件数量
+
+统计当前目录下文件的个数（不包括目录）  
+ls -l | grep “^-“ | wc -l
+
+## ls 命令
+
+ls -a 显示全部的文件及文件夹，包括隐藏的文件或文件夹  
+ls -l 显示较全的文件信息，包括权限、用户、用户组等。  
+ls —color 显示文件及文件夹，并标有不同的颜色。
+
+## tab键
+
+tab command 用于当你的命令记不全时，输入一部再按一下进行补全，如果有多个前面部分相同命令，则按两次tab键
+
+## cmp
+
+cmp /bin/ls /bin/dir 用于比较两个文件是否是完全相同的。
+
+## cp
+
+cp /bin/ls /bin/a 用于复制文件的命令。这时就复制了一个命令文件，就可以运行a命令，与ls用法相同  
+cp命令与操作文件一样是用来复制的，带r表示将其子目录一起复制。
+
+## mv
+
+格式：mv /home/user1/桌面/ruijie/xrgsu /usr/share/local/bin/xrgsu
+
+## chmod
+
+用于改为用户对于文件的操作权限。chmod 0+r 添加读的权限。sudo chmod 0-r filename取消读的权限。
+
+## cat
+
+  * cat 命令就是用于查看ubuntu中文本文件的内容的命令。
+  * cat /proc/cpuinfo 用于查看计算机的cpu信息。
+  * cat /proc/meminfo 用于查看计算机的内在信息。
+  * cat /etc/issue 查看ubuntu的版本信息。
+  * 查看cuda 版本 cat /usr/local/cuda/version.txt
+  * 查看cudnn 版本 cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
+
+## touch
+
+格式：touch test1 test2 test3  
+touch命令用于创建文件，可以同一时间创建多个文件。
+
+## pwd
+
+pwd命令是用来指出当前所在的路径。是print working directory的缩写
+

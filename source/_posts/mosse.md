@@ -2,7 +2,7 @@
 title: mosse
 date: 2019-09-14 00:00:00
 categories:
-  - 计算机视觉
+  - 深度学习
 tags:
   - Python
   - 目标跟踪

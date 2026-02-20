@@ -9,7 +9,7 @@ tags:
   - Mixtral
   - 大模型架构
 categories:
-  - AI原理深究
+  - 深度学习
 mathjax: true
 description: "【费曼式深度解析】从零理解 Mixture of Experts 的核心机制。详解 Router 路由、Load Balance Loss 推导、梯度流动分析，含完整 Tensor 维度变化图解与生产级代码实现。"
 ---

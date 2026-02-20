@@ -2,7 +2,7 @@
 title: xml生成
 date: 2019-09-07 00:00:00
 categories:
-  - 工具
+  - 其他
 tags:
   - XML
 ---

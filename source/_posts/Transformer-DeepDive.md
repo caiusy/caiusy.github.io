@@ -8,7 +8,7 @@ tags:
   - Algorithm
   - FeynmanTechnique
 categories:
-  - Deep Learning
+  - 深度学习
 ---
 
 # 彻底理解 Transformer: Attention Is All You Need

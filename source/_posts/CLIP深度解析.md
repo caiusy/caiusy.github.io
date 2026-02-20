@@ -53,17 +53,23 @@ CLIP 是典型的**双塔架构 (Two-Tower Architecture)**。
 
 1.  **Image Branch (左侧)**:
     *   Input: `[4, 3, 224, 224]` (图片)
-    *   Patch Embedding: 切成 7x7=49 个 patch $ightarrow$ `[4, 49, 768]`
-    *   Transformer: 加上 `[CLS]` token $ightarrow$ `[4, 50, 768]`
-    *   **Output**: 取 `[CLS]` token，投影到 512 维 $ightarrow$ **`I_e [4, 512]`**
+    *   Patch Embedding: 切成 7x7=49 个 patch $
+ightarrow$ `[4, 49, 768]`
+    *   Transformer: 加上 `[CLS]` token $
+ightarrow$ `[4, 50, 768]`
+    *   **Output**: 取 `[CLS]` token，投影到 512 维 $
+ightarrow$ **`I_e [4, 512]`**
 
 2.  **Text Branch (右侧)**:
     *   Input: `[4, 77]` (文本 Token ID)
-    *   Transformer: 经过 12 层处理 $ightarrow$ `[4, 77, 512]`
-    *   **Output**: 取 `[EOS]` token，投影到 512 维 $ightarrow$ **`T_e [4, 512]`**
+    *   Transformer: 经过 12 层处理 $
+ightarrow$ `[4, 77, 512]`
+    *   **Output**: 取 `[EOS]` token，投影到 512 维 $
+ightarrow$ **`T_e [4, 512]`**
 
 3.  **Interaction (交互)**:
-    *   **矩阵乘法**: `Logits = I_e @ T_e.T` $ightarrow$ **`[4, 4]`**
+    *   **矩阵乘法**: `Logits = I_e @ T_e.T` $
+ightarrow$ **`[4, 4]`**
     *   这就得到了一个相似度矩阵！
 
 ---

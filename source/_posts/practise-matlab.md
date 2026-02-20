@@ -2,7 +2,7 @@
 title: matlab基础
 date: 2020-02-05 00:00:00
 categories:
-  - 工具
+  - 计算机视觉
 tags:
   - OpenCV
 ---

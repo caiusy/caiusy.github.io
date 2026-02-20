@@ -2,7 +2,7 @@
 title: python_learn
 date: 2019-11-17 00:00:00
 categories:
-  - AI理论
+  - 算法
 tags:
   - Python
   - BFS

@@ -4,7 +4,7 @@ date: 2026-02-08
 mathjax: true
 toc: true
 categories:
-  - AI理论
+  - 深度学习
 tags:
   - Python
 ---

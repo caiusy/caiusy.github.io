@@ -8,7 +8,7 @@ tags:
   - Transformer
   - Deep Learning
 categories: 
-  - AI Learning
+  - 深度学习
 top_img: /images/bert_guide/bert_architecture.png
 cover: /images/bert_guide/bert_complete_visualizations.png
 ---

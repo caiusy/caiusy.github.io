@@ -2,7 +2,7 @@
 title: SpatialSense
 date: 2019-12-27 00:00:00
 categories:
-  - 计算机视觉
+  - 其他
 tags:
   - OpenCV
 ---

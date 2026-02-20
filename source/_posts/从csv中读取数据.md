@@ -2,7 +2,7 @@
 title: 从csv中读取数据
 date: 2019-09-08 00:00:00
 categories:
-  - Python
+  - 其他
 tags:
   - Python
 ---

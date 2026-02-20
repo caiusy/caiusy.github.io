@@ -2,7 +2,7 @@
 title: LNMS
 date: 2019-08-16 00:00:00
 categories:
-  - 计算机视觉
+  - 深度学习
 tags:
   - OpenCV
 ---

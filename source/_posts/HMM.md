@@ -2,7 +2,7 @@
 title: 隐马尔可夫HMM
 date: 2019-11-28 00:00:00
 categories:
-  - 算法
+  - 其他
 tags:
   - 编程
 ---

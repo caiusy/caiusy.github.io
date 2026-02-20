@@ -2,7 +2,7 @@
 title: shutil模块
 date: 2019-08-28 00:00:00
 categories:
-  - 其他
+  - Python
 tags:
   - 编程
 ---

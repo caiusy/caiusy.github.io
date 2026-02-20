@@ -2,7 +2,7 @@
 title: kmeans算法
 date: 2019-09-07 00:00:00
 categories:
-  - 机器学习
+  - 深度学习
 tags:
   - Python
   - KMeans

@@ -2,7 +2,7 @@
 title: python_learn
 date: 2019-11-17 00:00:00
 categories:
-  - 算法
+  - 深度学习
 tags:
   - Python
   - BFS

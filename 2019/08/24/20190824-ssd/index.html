@@ -1,0 +1,967 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>SSD源码解析 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="论文地址: SSD: Single Shot MultiBox Detector 非官方代码: pytorch 介绍SSD，全称Single Shot MultiBox Detector，是一种One-Stage的方法，它由Wei Liu在ECCV 2016上提出，SSD具有如下主要特点：  从YOLO中继承了将detection转化为regression的思路，同时一次即可完成网络训练 基于Fa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSD源码解析">
+<meta property="og:url" content="https://caiusy.github.io/2019/08/24/20190824-ssd/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="论文地址: SSD: Single Shot MultiBox Detector 非官方代码: pytorch 介绍SSD，全称Single Shot MultiBox Detector，是一种One-Stage的方法，它由Wei Liu在ECCV 2016上提出，SSD具有如下主要特点：  从YOLO中继承了将detection转化为regression的思路，同时一次即可完成网络训练 基于Fa">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2019-08-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-20T06:58:57.399Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="目标检测 - Deep Learning - 论文阅读 - pytorch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="目标检测 - Deep Learning - 论文阅读 - pytorch">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2019-08-24T00:00:00+08:00","dateModified":"2026-02-20T14:58:57+08:00","datePublished":"2019-08-24T00:00:00+08:00","description":"","headline":"SSD源码解析","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2019/08/24/20190824-ssd/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2019/08/24/20190824-ssd/","keywords":"目标检测 - Deep Learning - 论文阅读 - pytorch","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2019-08-23T16:00:00.000Z">2019-08-24</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-20T06:58:57.399Z">2026-02-20</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>SSD源码解析</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><p>论文地址: <a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1512.02325.pdf">SSD: Single Shot MultiBox Detector </a><br>非官方代码: <a target="_blank" rel="noopener" href="https://github.com/amdegroot/ssd.pytorch">pytorch</a></p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>SSD，全称Single Shot MultiBox Detector，是一种One-Stage的方法，它由Wei Liu在ECCV 2016上提出，SSD具有如下主要特点：</p>
+<ul>
+<li>从YOLO中继承了将detection转化为regression的思路，同时一次即可完成网络训练</li>
+<li>基于Faster RCNN中的anchor，提出了相似的prior box</li>
+<li>加入基于特征金字塔（Pyramidal Feature Hierarchy）的检测方式，相当于半个FPN思路</li>
+</ul>
+<h2 id="SSD的-网络结构"><a href="#SSD的-网络结构" class="headerlink" title="SSD的 网络结构"></a>SSD的 网络结构</h2><p><img src="/images/20190824_ssd_ssdarchitecture.png"></p>
+<p>由上图可以看出，SSD的基础网络结构由基础网络VGG16组成，在VGG16基础网络之后接了一个3x3的卷积和一个1x1的卷积做特征融合，然后增加了一个Extra Feature Layers 层，这个层由八个卷积层构成。SSD在前面的基础网络去conv_4_3之后的relu层输出，以及倒数第二层的conv_7_1的relu再加上Extra Feature Layers层的第1,3,5,7层 共有6个 featuremap层，在此基础上对box进行预测。但感觉要提升效果的话可以对基础网络进行更改，增加特征融合等等。</p>
+<h3 id="空洞卷积-Dilation-Conv"><a href="#空洞卷积-Dilation-Conv" class="headerlink" title="空洞卷积(Dilation Conv)"></a>空洞卷积(Dilation Conv)</h3><p>ssd网络里还使用了空洞卷积(Dilation Conv),采用VGG16做基础模型，首先VGG16是在ILSVRC CLS-LOC数据集预训练。然后借鉴了DeepLab-LargeFOV，分别将VGG16的全连接层fc6和fc7转换成 3×3卷积层 conv6和 1×1 卷积层conv7，同时将池化层 pool5 由原来的 stride=2 的 2×2 变成 stride=1 的(猜想是不想reduce特征图大小)，为了配合这种变化，采用了一种 Atrous Algorithm，其实就是conv6采用扩展卷积或带孔卷积（Dilation Conv），其在不增加参数与模型复杂度的条件下指数级扩大卷积的视野，其使用扩张率(dilation rate)参数，来表示扩张的大小，如下图所示，(a)是普通的 3×3 卷积，其视野就是 3×3 ，(b)是扩张率为 1，此时视野变成 7×7 ，(c)扩张率为3时，视野扩大为 15×15 ，但是视野的特征更稀疏了。Conv6采用 3×3 大小但dilation rate=6的扩展卷积。</p>
+<h2 id="Prior-Box"><a href="#Prior-Box" class="headerlink" title="Prior Box"></a>Prior Box</h2><p>SSD中有着类似anchor机制的Prior Box机制，用于来生成先验框，后面将这些先验框与真实的gt进行匹配，然后与预测的进行回归。从而得到物体真实的 位置。<br>SSD的prior Box 按照如下规则生成：</p>
+<ul>
+<li><p>以feature map上每个点的中点为中心（offset=0.5），生成一些列同心的prior box（然后中心点的坐标会乘以step，相当于从feature map位置映射回原图位置）</p>
+</li>
+<li><p>正方形prior box最小边长为’’’pash $min_size$’’’，最大边长为：\sqrt{min_size*max_size}<br>E=mc^2</p>
+</li>
+<li><p>根据相应的aspect ratio，会生成不同个数的长方形 ，长宽为：$ \sqrt{aspect_ratio}<em>min_size$ 和 $1/ \sqrt{aspect_ratio}</em> min_size$ $f(x)=ax+b$</p>
+</li>
+<li><p>最终网络生成固定数量的Prior Box</p>
+</li>
+<li><p>每个feature map 对应prior box的min_size 和max_size 由以下的公式决定，公式中的m是使用feature map的数量(m=6)第一层feature map对应的min_size=S1，max_size=S2；第二层min_size=S2，max_size=S3；其他类推。在原文中，Smin=0.2，Smax=0.9<img src="/images/20190824_ssd_priorbox.png"></p>
+</li>
+</ul>
+<p>| min_size | max_size | def.boxes num<br>—|—|—|—<br>conv4_3 | 30 | 60 | 4<br>fc7 | 60 | 111 | 6<br>conv6_2 | 111 | 162 | 6<br>fc7 | 162 | 213 | 6<br>conv4_3 | 213 | 264 | 4<br>fc7 | 264 | 315 | 4  </p>
+<h2 id="训练策略"><a href="#训练策略" class="headerlink" title="训练策略"></a>训练策略</h2><h3 id="正负样本"><a href="#正负样本" class="headerlink" title="正负样本"></a>正负样本</h3><p>给定输入图像以及每个物体的Ground Truth,首先找到每个Ground True box对应的default box中IOU最大的最为正样本。然后,在剩下的default box中寻找与Ground Truth 的IOU大于0.5的default box作为正样本。一个Ground Truth可能对应多个正样本default box.其他的default box作为负样本。,为了保证样本尽量平衡,SSD采用了hard nagative mining,即对负样本进行抽样,抽样时按照置信度误差(预测背景的置信度越小,误差越大)进行奖序排列,选取误差较大的top-k作为训练的负样本,保证正负样本比例接近1:3。</p>
+<h3 id="目标函数"><a href="#目标函数" class="headerlink" title="目标函数"></a>目标函数</h3><p>目标函数为训练过程中的优化标准,目标函数也称损失函数,主要包括位置误差(localization loss,loc) 与置信度误差(confidence loss,conf,分类损失)的加权和,定义为：</p>
+<h1 id="代码解析"><a href="#代码解析" class="headerlink" title="代码解析"></a>代码解析</h1><h2 id="基础模型定义"><a href="#基础模型定义" class="headerlink" title="基础模型定义"></a>基础模型定义</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># vgg([64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'C', 512, 512, 512, 'M',</span></span><br><span class="line"><span class="comment">#             512, 512, 512], 3)</span></span><br><span class="line"><span class="comment"># This function is derived from torchvision VGG make_layers()</span></span><br><span class="line"><span class="comment"># https://github.com/pytorch/vision/blob/master/torchvision/models/vgg.py</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">vgg</span>(<span class="params">cfg, i, batch_norm=<span class="literal">False</span></span>):</span><br><span class="line">    layers = []</span><br><span class="line">    in_channels = i</span><br><span class="line">    <span class="keyword">for</span> v <span class="keyword">in</span> cfg:</span><br><span class="line">        <span class="keyword">if</span> v == <span class="string">'M'</span>:</span><br><span class="line">            layers += [nn.MaxPool2d(kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>)]</span><br><span class="line">        <span class="keyword">elif</span> v == <span class="string">'C'</span>:</span><br><span class="line">            layers += [nn.MaxPool2d(kernel_size=<span class="number">2</span>, stride=<span class="number">2</span>, ceil_mode=<span class="literal">True</span>)]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            conv2d = nn.Conv2d(in_channels, v, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">if</span> batch_norm:</span><br><span class="line">                layers += [conv2d, nn.BatchNorm2d(v), nn.ReLU(inplace=<span class="literal">True</span>)]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                layers += [conv2d, nn.ReLU(inplace=<span class="literal">True</span>)]</span><br><span class="line">            in_channels = v</span><br><span class="line">    pool5 = nn.MaxPool2d(kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>)</span><br><span class="line">    conv6 = nn.Conv2d(<span class="number">512</span>, <span class="number">1024</span>, kernel_size=<span class="number">3</span>, padding=<span class="number">6</span>, dilation=<span class="number">6</span>)</span><br><span class="line">    conv7 = nn.Conv2d(<span class="number">1024</span>, <span class="number">1024</span>, kernel_size=<span class="number">1</span>)</span><br><span class="line">    layers += [pool5, conv6,</span><br><span class="line">               nn.ReLU(inplace=<span class="literal">True</span>), conv7, nn.ReLU(inplace=<span class="literal">True</span>)]</span><br><span class="line">    <span class="keyword">return</span> layers</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">base = {</span><br><span class="line">    <span class="string">'300'</span>: [<span class="number">64</span>, <span class="number">64</span>, <span class="string">'M'</span>, <span class="number">128</span>, <span class="number">128</span>, <span class="string">'M'</span>, <span class="number">256</span>, <span class="number">256</span>, <span class="number">256</span>, <span class="string">'C'</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="number">512</span>, <span class="string">'M'</span>,</span><br><span class="line">            <span class="number">512</span>, <span class="number">512</span>, <span class="number">512</span>],</span><br><span class="line">    <span class="string">'512'</span>: [],</span><br><span class="line">}</span><br><span class="line">extras = {</span><br><span class="line">    <span class="string">'300'</span>: [<span class="number">256</span>, <span class="string">'S'</span>, <span class="number">512</span>, <span class="number">128</span>, <span class="string">'S'</span>, <span class="number">256</span>, <span class="number">128</span>, <span class="number">256</span>, <span class="number">128</span>, <span class="number">256</span>],</span><br><span class="line">    <span class="string">'512'</span>: [],</span><br><span class="line">}</span><br><span class="line">mbox = {</span><br><span class="line">    <span class="string">'300'</span>: [<span class="number">4</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">4</span>, <span class="number">4</span>],  <span class="comment"># number of boxes per feature map location</span></span><br><span class="line">    <span class="string">'512'</span>: [],</span><br><span class="line">}</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add_extras</span>(<span class="params">cfg, i, batch_norm=<span class="literal">False</span></span>):</span><br><span class="line">    <span class="comment"># Extra layers added to VGG for feature scaling</span></span><br><span class="line">    layers =[]</span><br><span class="line">    in_channel = i</span><br><span class="line">    flag = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">for</span> k,v <span class="keyword">in</span> <span class="built_in">enumerate</span>(cfg):</span><br><span class="line">        <span class="keyword">if</span> in_channel !=<span class="string">"S"</span>:</span><br><span class="line">            <span class="keyword">if</span> v == <span class="string">"S"</span>:</span><br><span class="line">                layers += [nn.Conv2d(in_channel,cfg[k+<span class="number">1</span>],</span><br><span class="line">                                     kernel_size=(<span class="number">1</span>,<span class="number">3</span>)[flag], stride=<span class="number">2</span>,padding=<span class="number">1</span>)]   <span class="comment"># flag 来控制卷积核是1 还是3</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                layers += [nn.Conv2d(in_channel, v, kernel_size=(<span class="number">1</span>,<span class="number">3</span>)[flag])]</span><br><span class="line">            flag = <span class="keyword">not</span> flag</span><br><span class="line">        in_channel = v</span><br><span class="line">    <span class="keyword">return</span> layers</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="模型Head部分的生成"><a href="#模型Head部分的生成" class="headerlink" title="模型Head部分的生成"></a>模型Head部分的生成</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cfg  [4, 6, 6, 6, 4, 4],  # number of boxes per feature map location</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">multibox</span>(<span class="params">vgg, extra_layers, cfg, num_classes</span>):</span><br><span class="line">    loc_layers = []</span><br><span class="line">    conf_layers = []</span><br><span class="line">    vgg_source = [<span class="number">21</span>, -<span class="number">2</span>]</span><br><span class="line">    <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">enumerate</span>(vgg_source):</span><br><span class="line">        loc_layers += [nn.Conv2d(vgg[v].out_channels,</span><br><span class="line">                                 cfg[k] * <span class="number">4</span>, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)]</span><br><span class="line">        conf_layers += [nn.Conv2d(vgg[v].out_channels,</span><br><span class="line">                        cfg[k] * num_classes, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)]</span><br><span class="line">    <span class="comment"># 对extra_layers中的（Conv2d-2_1、Conv2d-4_1、Conv2d-6_1、Conv2d-8_1）层通过卷积提取特征</span></span><br><span class="line">    <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">enumerate</span>(extra_layers[<span class="number">1</span>::<span class="number">2</span>], <span class="number">2</span>):</span><br><span class="line">        loc_layers += [nn.Conv2d(v.out_channels, cfg[k]</span><br><span class="line">                                 * <span class="number">4</span>, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)]</span><br><span class="line">        conf_layers += [nn.Conv2d(v.out_channels, cfg[k]</span><br><span class="line">                                  * num_classes, kernel_size=<span class="number">3</span>, padding=<span class="number">1</span>)]</span><br><span class="line">    <span class="keyword">return</span> vgg, extra_layers, (loc_layers, conf_layers)</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="模型先验框的生成"><a href="#模型先验框的生成" class="headerlink" title="模型先验框的生成"></a>模型先验框的生成</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">PriorBox</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="string">"""Compute priorbox coordinates in center-offset form for each source</span></span><br><span class="line"><span class="string">    feature map.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, cfg</span>):</span><br><span class="line">        <span class="built_in">super</span>(PriorBox, self).__init__()</span><br><span class="line">        self.image_size = cfg[<span class="string">'min_dim'</span>]</span><br><span class="line">        <span class="comment"># number of priors for feature map location (either 4 or 6)</span></span><br><span class="line">        self.num_priors = <span class="built_in">len</span>(cfg[<span class="string">'aspect_ratios'</span>])</span><br><span class="line">        self.variance = cfg[<span class="string">'variance'</span>] <span class="keyword">or</span> [<span class="number">0.1</span>]</span><br><span class="line">        self.feature_maps = cfg[<span class="string">'feature_maps'</span>]</span><br><span class="line">        self.min_sizes = cfg[<span class="string">'min_sizes'</span>]</span><br><span class="line">        self.max_sizes = cfg[<span class="string">'max_sizes'</span>]</span><br><span class="line">        self.steps = cfg[<span class="string">'steps'</span>]</span><br><span class="line">        self.aspect_ratios = cfg[<span class="string">'aspect_ratios'</span>]</span><br><span class="line">        self.clip = cfg[<span class="string">'clip'</span>]</span><br><span class="line">        self.version = cfg[<span class="string">'name'</span>]</span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> self.variance:</span><br><span class="line">            <span class="keyword">if</span> v &lt;= <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">raise</span> ValueError(<span class="string">'Variances must be greater than 0'</span>)</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self</span>):</span><br><span class="line">        mean = []</span><br><span class="line">        <span class="comment">#   'steps': [8, 16, 32, 64, 100, 300],</span></span><br><span class="line">        <span class="comment"># 'feature_maps': [38, 19, 10, 5, 3, 1],</span></span><br><span class="line">        <span class="comment">#  'min_sizes': [21, 45, 99, 153, 207, 261],</span></span><br><span class="line">        <span class="comment"># 'max_sizes': [45, 99, 153, 207, 261, 315],</span></span><br><span class="line">        <span class="keyword">for</span> k, f <span class="keyword">in</span> <span class="built_in">enumerate</span>(self.feature_maps):</span><br><span class="line">            <span class="keyword">for</span> i, j <span class="keyword">in</span> product(<span class="built_in">range</span>(f), repeat=<span class="number">2</span>):</span><br><span class="line">                f_k = self.image_size / self.steps[k]</span><br><span class="line">                <span class="comment"># unit center x,y</span></span><br><span class="line">                cx = (j + <span class="number">0.5</span>) / f_k</span><br><span class="line">                cy = (i + <span class="number">0.5</span>) / f_k</span><br><span class="line">                <span class="comment"># aspect_ratio: 1</span></span><br><span class="line">                <span class="comment"># rel size: min_size</span></span><br><span class="line">                s_k = self.min_sizes[k]/self.image_size</span><br><span class="line">                mean += [cx, cy, s_k, s_k]</span><br><span class="line">                <span class="comment"># aspect_ratio: 1</span></span><br><span class="line">                <span class="comment"># rel size: sqrt(s_k * s_(k+1))</span></span><br><span class="line">                s_k_prime = sqrt(s_k * (self.max_sizes[k]/self.image_size))</span><br><span class="line">                mean += [cx, cy, s_k_prime, s_k_prime]</span><br><span class="line">                <span class="comment"># rest of aspect ratios</span></span><br><span class="line">                <span class="keyword">for</span> ar <span class="keyword">in</span> self.aspect_ratios[k]:</span><br><span class="line">                    mean += [cx, cy, s_k*sqrt(ar), s_k/sqrt(ar)]</span><br><span class="line">                    mean += [cx, cy, s_k/sqrt(ar), s_k*sqrt(ar)]</span><br><span class="line">        <span class="comment"># back to torch land</span></span><br><span class="line">        output = torch.Tensor(mean).view(-<span class="number">1</span>, <span class="number">4</span>)</span><br><span class="line">        <span class="keyword">if</span> self.clip:</span><br><span class="line">            output.clamp_(<span class="built_in">max</span>=<span class="number">1</span>, <span class="built_in">min</span>=<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> output</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="MultiBox-损失函数"><a href="#MultiBox-损失函数" class="headerlink" title="MultiBox 损失函数"></a>MultiBox 损失函数</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MultiBoxLoss</span>(nn.Module):</span><br><span class="line">    <span class="string">"""SSD Weighted Loss Function</span></span><br><span class="line"><span class="string">    Compute Targets:</span></span><br><span class="line"><span class="string">        1) Produce Confidence Target Indices by matching  ground truth boxes</span></span><br><span class="line"><span class="string">           with (default) 'priorboxes' that have jaccard index &gt; threshold parameter</span></span><br><span class="line"><span class="string">           (default threshold: 0.5).</span></span><br><span class="line"><span class="string">        2) Produce localization target by 'encoding' variance into offsets of ground</span></span><br><span class="line"><span class="string">           truth boxes and their matched  'priorboxes'.</span></span><br><span class="line"><span class="string">        3) Hard negative mining to filter the excessive number of negative examples</span></span><br><span class="line"><span class="string">           that comes with using a large number of default bounding boxes.</span></span><br><span class="line"><span class="string">           (default negative:positive ratio 3:1)</span></span><br><span class="line"><span class="string">    Objective Loss:</span></span><br><span class="line"><span class="string">        L(x,c,l,g) = (Lconf(x, c) + αLloc(x,l,g)) / N</span></span><br><span class="line"><span class="string">        Where, Lconf is the CrossEntropy Loss and Lloc is the SmoothL1 Loss</span></span><br><span class="line"><span class="string">        weighted by α which is set to 1 by cross val.</span></span><br><span class="line"><span class="string">        Args:</span></span><br><span class="line"><span class="string">            c: class confidences,</span></span><br><span class="line"><span class="string">            l: predicted boxes,</span></span><br><span class="line"><span class="string">            g: ground truth boxes</span></span><br><span class="line"><span class="string">            N: number of matched default boxes</span></span><br><span class="line"><span class="string">        See: https://arxiv.org/pdf/1512.02325.pdf for more details.</span></span><br><span class="line"><span class="string">        # 计算目标:</span></span><br><span class="line"><span class="string">        # 输出那些与真实框的iou大于一定阈值的框的下标.</span></span><br><span class="line"><span class="string">        # 根据与真实框的偏移量输出localization目标</span></span><br><span class="line"><span class="string">        # 用难样例挖掘算法去除大量负样本(默认正负样本比例为1:3)</span></span><br><span class="line"><span class="string">        # 目标损失:</span></span><br><span class="line"><span class="string">        # L(x,c,l,g) = (Lconf(x,c) + αLloc(x,l,g)) / N</span></span><br><span class="line"><span class="string">        # 参数:</span></span><br><span class="line"><span class="string">        # c: 类别置信度(class confidences)</span></span><br><span class="line"><span class="string">        # l: 预测的框(predicted boxes)</span></span><br><span class="line"><span class="string">        # g: 真实框(ground truth boxes)</span></span><br><span class="line"><span class="string">        # N: 匹配到的框的数量(number of matched default boxes)</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"><span class="comment">#  MultiBoxLoss(cfg['num_classes'], 0.5, True, 0, True, 3, 0.5, False, args.cuda)</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, num_classes, overlap_thresh, prior_for_matching,</span></span><br><span class="line"><span class="params">                 bkg_label, neg_mining, neg_pos, neg_overlap, encode_target,</span></span><br><span class="line"><span class="params">                 use_gpu=<span class="literal">True</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(MultiBoxLoss, self).__init__()</span><br><span class="line">        self.use_gpu = use_gpu</span><br><span class="line">        self.num_classes = num_classes  <span class="comment"># 列表数  21</span></span><br><span class="line">        self.threshold = overlap_thresh <span class="comment"># 交并比阈值, 0.5</span></span><br><span class="line">        self.background_label = bkg_label <span class="comment"># 背景标签, 0</span></span><br><span class="line">        self.encode_target = encode_target  <span class="comment"># True 没卵用</span></span><br><span class="line">        self.use_prior_for_matching = prior_for_matching  <span class="comment"># True, 没卵用</span></span><br><span class="line">        self.do_neg_mining = neg_mining  <span class="comment"># 负样本和正样本的比例, 3:1</span></span><br><span class="line">        self.negpos_ratio = neg_pos <span class="comment"># 0.5 判定负样本的阈值.</span></span><br><span class="line">        self.neg_overlap = neg_overlap  <span class="comment"># False 没卵用</span></span><br><span class="line">        self.variance = cfg[<span class="string">'variance'</span>]</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, predictions, targets</span>):</span><br><span class="line">        <span class="string">"""Multibox Loss</span></span><br><span class="line"><span class="string">        Args:</span></span><br><span class="line"><span class="string">            predictions (tuple): A tuple containing loc preds, conf preds,</span></span><br><span class="line"><span class="string">            and prior boxes from SSD net.</span></span><br><span class="line"><span class="string">                conf shape: torch.size(batch_size,num_priors,num_classes)</span></span><br><span class="line"><span class="string">                loc shape: torch.size(batch_size,num_priors,4)</span></span><br><span class="line"><span class="string">                priors shape: torch.size(num_priors,4)</span></span><br><span class="line"><span class="string">            targets (tensor): Ground truth boxes and labels for a batch,</span></span><br><span class="line"><span class="string">                shape: [batch_size,num_objs,5] (last idx is the label).</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        loc_data, conf_data, priors = predictions</span><br><span class="line">        <span class="comment"># loc_data: [batch_size, 8732, 4]</span></span><br><span class="line">        <span class="comment"># conf_data: [batch_size, 8732, 21]</span></span><br><span class="line">        <span class="comment"># priors: [8732, 4]  default box 对于任意的图片, 都是相同的, 因此无需带有 batch 维度</span></span><br><span class="line">        num = loc_data.size(<span class="number">0</span>) <span class="comment"># num = batch_size</span></span><br><span class="line">        priors = priors[:loc_data.size(<span class="number">1</span>), :] <span class="comment"># loc_data.size(1) = 8732, 因此 priors 维持不变</span></span><br><span class="line">        num_priors = (priors.size(<span class="number">0</span>)) <span class="comment"># num_priors = 8732</span></span><br><span class="line">        num_classes = self.num_classes <span class="comment"># num_classes = 21 (默认为voc数据集)</span></span><br><span class="line">        <span class="comment"># match priors (default boxes) and ground truth boxes</span></span><br><span class="line">        <span class="comment"># 将priors(default boxes)和ground truth boxes匹配</span></span><br><span class="line">        loc_t = torch.Tensor(num, num_priors, <span class="number">4</span>) <span class="comment"># shape:[batch_size, 8732, 4]</span></span><br><span class="line">        conf_t = torch.LongTensor(num, num_priors)  <span class="comment"># shape:[batch_size, 8732]</span></span><br><span class="line">        <span class="keyword">for</span> idx <span class="keyword">in</span> <span class="built_in">range</span>(num):</span><br><span class="line">            <span class="comment"># targets是列表, 列表的长度为batch_size, 列表中每个元素为一个 tensor,</span></span><br><span class="line">            <span class="comment"># 其 shape 为 [num_objs, 5], 其中 num_objs 为当前图片中物体的数量, 第二维前4个元素为边框坐标, 最后一个元素为类别编号(1~20)</span></span><br><span class="line">            truths = targets[idx][:, :-<span class="number">1</span>].data <span class="comment"># [num_objs, 4]</span></span><br><span class="line">            labels = targets[idx][:, -<span class="number">1</span>].data  <span class="comment"># [num_objs] 使用的是 -1, 而不是 -1:, 因此, 返回的维度变少了</span></span><br><span class="line">            defaults = priors.data <span class="comment"># [8732, 4]</span></span><br><span class="line">            <span class="comment"># from ..box_utils import match</span></span><br><span class="line">            <span class="comment"># 关键函数, 实现候选框与真实框之间的匹配, 注意是候选框而不是预测结果框! 这个函数实现较为复杂, 会在后面着重讲解</span></span><br><span class="line">            <span class="keyword">match</span>(self.threshold, truths, defaults, self.variance, labels,</span><br><span class="line">                  loc_t, conf_t,  )</span><br><span class="line">        <span class="keyword">if</span> self.use_gpu:</span><br><span class="line">            loc_t = loc_t.cuda()</span><br><span class="line">            conf_t = conf_t.cuda()</span><br><span class="line">        <span class="comment"># wrap targets</span></span><br><span class="line">        <span class="comment"># 用Variable封装loc_t, 新版本的 PyTorch 无需这么做, 只需要将 requires_grad 属性设置为 True 就行了</span></span><br><span class="line">        loc_t = Variable(loc_t, requires_grad=<span class="literal">False</span>)</span><br><span class="line">        conf_t = Variable(conf_t, requires_grad=<span class="literal">False</span>)</span><br><span class="line">        pos = conf_t &gt; <span class="number">0</span> <span class="comment"># 筛选出 &gt;0 的box下标(大部分都是=0的)</span></span><br><span class="line">        num_pos = pos.<span class="built_in">sum</span>(dim=<span class="number">1</span>, keepdim=<span class="literal">True</span>) <span class="comment"># 求和, 取得满足条件的box的数量, [batch_size, num_gt_threshold]</span></span><br><span class="line">        <span class="comment"># Localization Loss (Smooth L1)</span></span><br><span class="line">        <span class="comment"># Shape: [batch,num_priors,4]</span></span><br><span class="line">        <span class="comment"># 位置(localization)损失函数, 使用 Smooth L1 函数求损失</span></span><br><span class="line">        <span class="comment"># loc_data:[batch, num_priors, 4]</span></span><br><span class="line">        <span class="comment"># pos: [batch, num_priors]</span></span><br><span class="line">        <span class="comment"># pos_idx: [batch, num_priors, 4], 复制下标成坐标格式, 以便获取坐标值</span></span><br><span class="line">        pos_idx = pos.unsqueeze(pos.dim()).expand_as(loc_data)</span><br><span class="line">        loc_p = loc_data[pos_idx].view(-<span class="number">1</span>, <span class="number">4</span>) <span class="comment"># 获取预测结果值</span></span><br><span class="line">        loc_t = loc_t[pos_idx].view(-<span class="number">1</span>, <span class="number">4</span>)    <span class="comment"># 获取gt值</span></span><br><span class="line">        loss_l = F.smooth_l1_loss(loc_p, loc_t, size_average=<span class="literal">False</span>) <span class="comment"># 计算损失</span></span><br><span class="line">        <span class="comment"># Compute max conf across batch for hard negative mining</span></span><br><span class="line">        <span class="comment"># 计算最大的置信度, 以进行难负样本挖掘</span></span><br><span class="line">        <span class="comment"># conf_data: [batch, num_priors, num_classes]</span></span><br><span class="line">        <span class="comment"># batch_conf: [batch, num_priors, num_classes]</span></span><br><span class="line">        batch_conf = conf_data.view(-<span class="number">1</span>, self.num_classes)</span><br><span class="line">        <span class="comment"># conf_t: [batch, num_priors]</span></span><br><span class="line">        <span class="comment"># loss_c: [batch*num_priors, 1], 计算每个priorbox预测后的损失</span></span><br><span class="line">        loss_c = log_sum_exp(batch_conf) - batch_conf.gather(<span class="number">1</span>, conf_t.view(-<span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">        <span class="comment"># 难负样本挖掘, 按照loss进行排序, 取loss最大的负样本参与更新</span></span><br><span class="line">        <span class="comment"># Hard Negative Mining</span></span><br><span class="line">        loss_c[pos] = <span class="number">0</span>  <span class="comment"># filter out pos boxes for now # 将所有的pos下标的box的loss置为0(pos指示的是正样本的下标)</span></span><br><span class="line">        <span class="comment"># 将 loss_c 的shape 从 [batch*num_priors, 1] 转换成 [batch, num_priors]</span></span><br><span class="line">        loss_c = loss_c.view(num, -<span class="number">1</span>)  <span class="comment"># reshape</span></span><br><span class="line">        <span class="comment"># 进行降序排序, 并获取到排序的下标</span></span><br><span class="line">        _, loss_idx = loss_c.sort(<span class="number">1</span>, descending=<span class="literal">True</span>)</span><br><span class="line">        <span class="comment"># 将下标进行升序排序, 并获取到下标的下标</span></span><br><span class="line">        _, idx_rank = loss_idx.sort(<span class="number">1</span>)</span><br><span class="line">        <span class="comment"># num_pos: [batch, 1], 统计每个样本中的obj个数</span></span><br><span class="line">        num_pos = pos.long().<span class="built_in">sum</span>(<span class="number">1</span>, keepdim=<span class="literal">True</span>)</span><br><span class="line">        <span class="comment"># 根据obj的个数, 确定负样本的个数(正样本的3倍)</span></span><br><span class="line">        num_neg = torch.clamp(self.negpos_ratio*num_pos, <span class="built_in">max</span>=pos.size(<span class="number">1</span>)-<span class="number">1</span>)</span><br><span class="line">        <span class="comment"># 获取到负样本的下标</span></span><br><span class="line">        neg = idx_rank &lt; num_neg.expand_as(idx_rank)</span><br><span class="line">        <span class="comment"># 计算包括正样本和负样本的置信度损失</span></span><br><span class="line">        <span class="comment"># pos: [batch, num_priors]</span></span><br><span class="line">        <span class="comment"># pos_idx: [batch, num_priors, num_classes]</span></span><br><span class="line">        pos_idx = pos.unsqueeze(<span class="number">2</span>).expand_as(conf_data)</span><br><span class="line">        <span class="comment"># neg: [batch, num_priors]</span></span><br><span class="line">        <span class="comment"># neg_idx: [batch, num_priors, num_classes]</span></span><br><span class="line">        neg_idx = neg.unsqueeze(<span class="number">2</span>).expand_as(conf_data)</span><br><span class="line">        <span class="comment"># 按照pos_idx和neg_idx指示的下标筛选参与计算损失的预测数据</span></span><br><span class="line">        conf_p = conf_data[(pos_idx+neg_idx).gt(<span class="number">0</span>)].view(-<span class="number">1</span>, self.num_classes)</span><br><span class="line">        <span class="comment"># 按照pos_idx和neg_idx筛选目标数据</span></span><br><span class="line">        targets_weighted = conf_t[(pos+neg).gt(<span class="number">0</span>)]</span><br><span class="line">        <span class="comment"># 计算二者的交叉熵</span></span><br><span class="line">        loss_c = F.cross_entropy(conf_p, targets_weighted, size_average=<span class="literal">False</span>)</span><br><span class="line">        <span class="comment"># Sum of losses: L(x,c,l,g) = (Lconf(x, c) + αLloc(x,l,g)) / N</span></span><br><span class="line">        <span class="comment"># 将损失函数归一化后返回</span></span><br><span class="line">        N = num_pos.data.<span class="built_in">sum</span>()</span><br><span class="line">        loss_l /= N</span><br><span class="line">        loss_c /= N</span><br><span class="line">        <span class="keyword">return</span> loss_l, loss_c</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="match函数的解析"><a href="#match函数的解析" class="headerlink" title="match函数的解析"></a>match函数的解析</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">match</span>(<span class="params">threshold, truths, priors, variances, labels, loc_t, conf_t, idx</span>):</span><br><span class="line">    <span class="comment"># threshold: (float) 确定是否匹配的交并比阈值</span></span><br><span class="line">    <span class="comment"># truths: (tensor: [num_obj, 4]) 存储真实 box 的边框坐标</span></span><br><span class="line">    <span class="comment"># priors: (tensor: [num_priors, 4], 即[8732, 4]), 存储推荐框的坐标, 注意, 此时的框是 default box, 而不是 SSD 网络预测出来的框的坐标, 预测的结果存储在 loc_data中, 其 shape 为[num_obj, 8732, 4].</span></span><br><span class="line">    <span class="comment"># variances: cfg['variance'], [0.1, 0.2], 用于将坐标转换成方便训练的形式(参考RCNN系列对边框坐标的处理)</span></span><br><span class="line">    <span class="comment"># labels: (tensor: [num_obj]), 代表了每个真实 box 对应的类别的编号</span></span><br><span class="line">    <span class="comment"># loc_t: (tensor: [batches, 8732, 4]),</span></span><br><span class="line">    <span class="comment"># conf_t: (tensor: [batches, 8732]),</span></span><br><span class="line">    <span class="comment"># idx: batches 中图片的序号, 标识当前正在处理的 image 在 batches 中的序号</span></span><br><span class="line">    <span class="comment"># jaccard index</span></span><br><span class="line">    overlaps = jaccard(    <span class="comment"># [A, B], 返回任意两个box之间的交并比, overlaps[i][j] 代表box_a中的第i个box与box_b中的第j个box之间的交并比.</span></span><br><span class="line">        truths,</span><br><span class="line">        point_form(priors)</span><br><span class="line">    )</span><br><span class="line">    <span class="comment"># 二部图匹配(Bipartite Matching)</span></span><br><span class="line">    <span class="comment"># [num_objs,1], 得到对于每个 gt box 来说的匹配度最高的 prior box, 前者存储交并比, 后者存储prior box在num_priors中的位置</span></span><br><span class="line">    best_prior_overlap, best_prior_idx = overlaps.<span class="built_in">max</span>(<span class="number">1</span>, keepdim=<span class="literal">True</span>)  <span class="comment"># keepdim=True, 因此shape为[num_objs,1]</span></span><br><span class="line">    <span class="comment"># [1,num_priors] best ground truth for each prior</span></span><br><span class="line">    <span class="comment"># [1, num_priors], 即[1,8732], 同理, 得到对于每个 prior box 来说的匹配度最高的 gt box</span></span><br><span class="line">    best_truth_overlap, best_truth_idx = overlaps.<span class="built_in">max</span>(<span class="number">0</span>, keepdim=<span class="literal">True</span>)</span><br><span class="line">    best_truth_idx.squeeze_(<span class="number">0</span>) <span class="comment"># 上面特意保留了维度(keepdim=True), 这里又都把维度 squeeze/reduce 了, 实际上只需用默认的 keepdim=False 就可以自动 squeeze/reduce 维度.</span></span><br><span class="line">    best_truth_overlap.squeeze_(<span class="number">0</span>)</span><br><span class="line">    best_prior_idx.squeeze_(<span class="number">1</span>)</span><br><span class="line">    best_prior_overlap.squeeze_(<span class="number">1</span>)</span><br><span class="line">    best_truth_overlap.index_fill_(<span class="number">0</span>, best_prior_idx, <span class="number">2</span>)  <span class="comment"># ensure best prior</span></span><br><span class="line">    <span class="comment"># 维度压缩后变为[num_priors], best_prior_idx 维度为[num_objs],</span></span><br><span class="line">    <span class="comment"># 该语句会将与gt box匹配度最好的prior box 的交并比置为 2, 确保其最大, 以免防止某些 gtbox 没有匹配的 priorbox.</span></span><br><span class="line">    <span class="comment"># 假想一种极端情况, 所有的priorbox与某个gtbox(标记为G)的交并比为1, 而其他gtbox分别有一个交并比</span></span><br><span class="line">    <span class="comment"># 最高的priorbox, 但是肯定小于1(因为其他的gtbox与G的交并比肯定小于1), 这样一来, 就会使得所有</span></span><br><span class="line">    <span class="comment"># 的priorbox都与G匹配, 为了防止这种情况, 我们将那些对gtbox来说, 具有最高交并比的priorbox,</span></span><br><span class="line">    <span class="comment"># 强制进行互相匹配, 即令best_truth_idx[best_prior_idx[j]] = j, 详细见下面的for循环</span></span><br><span class="line">    <span class="comment"># TODO refactor: index  best_prior_idx with long tensor</span></span><br><span class="line">    <span class="comment"># ensure every gt matches with its prior of max overlap</span></span><br><span class="line">    <span class="comment"># 注意!!: 因为 gt box 的数量要远远少于 prior box 的数量, 因此, 同一个 gt box 会与多个 prior box 匹配.</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(best_prior_idx.size(<span class="number">0</span>)):</span><br><span class="line">        best_truth_idx[best_prior_idx[j]] = j</span><br><span class="line">        <span class="comment"># best_prior_idx[j] 代表与box_a的第j个box交并比最高的 prior box 的下标, 将与该 gtbox</span></span><br><span class="line">        <span class="comment"># 匹配度最好的 prior box 的下标改为j, 由此,完成了该 gtbox 与第j个 prior box 的匹配.</span></span><br><span class="line">        <span class="comment"># 这里的循环只会进行num_obj次, 剩余的匹配为 best_truth_idx 中原本的值.</span></span><br><span class="line">        <span class="comment"># 这里处理的情况是, priorbox中第i个box与gtbox中第k个box的交并比最高,</span></span><br><span class="line">        <span class="comment"># 即 best_truth_idx[i]= k</span></span><br><span class="line">        <span class="comment"># 但是对于best_prior_idx[k]来说, 它却与priorbox的第l个box有着最高的交并比,</span></span><br><span class="line">        <span class="comment"># 即best_prior_idx[k]=l</span></span><br><span class="line">        <span class="comment"># 而对于gtbox的另一个边框gtbox[j]来说, 它与priorbox[i]的交并比最大,</span></span><br><span class="line">        <span class="comment"># 即但是对于best_prior_idx[j] = i.</span></span><br><span class="line">        <span class="comment"># 那么, 此时, 我们就应该将best_truth_idx[i]= k 修改成 best_truth_idx[i]= j.</span></span><br><span class="line">        <span class="comment"># 即令 priorbox[i] 与 gtbox[j]对应.</span></span><br><span class="line">        <span class="comment"># 这样做的原因: 防止某个gtbox没有匹配的 prior box.</span></span><br><span class="line">    matches = truths[best_truth_idx]          <span class="comment"># Shape: [num_priors,4]</span></span><br><span class="line">    <span class="comment"># truths 的shape 为[num_objs, 4], 而best_truth_idx是一个指示下标的列表, 列表长度为 8732,</span></span><br><span class="line">    <span class="comment"># 列表中的下标范围为0~num_objs-1, 代表的是与每个priorbox匹配的gtbox的下标</span></span><br><span class="line">    <span class="comment"># 上面的表达式会返回一个shape为 [num_priors, 4], 即 [8732, 4] 的tensor, 代表的就是与每个priorbox匹配的gtbox的坐标值.</span></span><br><span class="line">    conf = labels[best_truth_idx] + <span class="number">1</span>        <span class="comment"># 与上面的语句道理差不多, 这里得到的是每个prior box匹配的类别编号, shape 为[8732]</span></span><br><span class="line">    conf[best_truth_overlap &lt; threshold] = <span class="number">0</span> <span class="comment"># 将与gtbox的交并比小于阈值的置为0 , 即认为是非物体框</span></span><br><span class="line">    loc = encode(matches, priors, variances) <span class="comment"># 返回编码后的中心坐标和宽高.</span></span><br><span class="line">    loc_t[idx] = loc    <span class="comment"># [num_priors,4] encoded offsets to learn # 设置第idx张图片的gt编码坐标信息</span></span><br><span class="line">    conf_t[idx] = conf  <span class="comment"># [num_priors] top class label for each prior  设置第idx张图片的编号信息.(大于0即为物体编号, 认为有物体, 小于0认为是背景)</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/happyday_d/article/details/86021993">https://blog.csdn.net/happyday_d/article/details/86021993</a><br><a target="_blank" rel="noopener" href="https://hellozhaozheng.github.io/z_post/PyTorch-SSD">https://hellozhaozheng.github.io/z_post/PyTorch-SSD</a></p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2019/08/24/20190824-ssd/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2019/08/24/20190824-ssd/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/24/20190824-pythonplot/">Matplotlib绘制六种可视化图表</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/24/pythonplot/">Matplotlib绘制六种可视化图表</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-text">介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SSD%E7%9A%84-%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">SSD的 网络结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF-Dilation-Conv"><span class="toc-text">空洞卷积(Dilation Conv)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prior-Box"><span class="toc-text">Prior Box</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E7%AD%96%E7%95%A5"><span class="toc-text">训练策略</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A3%E8%B4%9F%E6%A0%B7%E6%9C%AC"><span class="toc-text">正负样本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0"><span class="toc-text">目标函数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="toc-text">代码解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E6%A8%A1%E5%9E%8B%E5%AE%9A%E4%B9%89"><span class="toc-text">基础模型定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8BHead%E9%83%A8%E5%88%86%E7%9A%84%E7%94%9F%E6%88%90"><span class="toc-text">模型Head部分的生成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E5%85%88%E9%AA%8C%E6%A1%86%E7%9A%84%E7%94%9F%E6%88%90"><span class="toc-text">模型先验框的生成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MultiBox-%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="toc-text">MultiBox 损失函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#match%E5%87%BD%E6%95%B0%E7%9A%84%E8%A7%A3%E6%9E%90"><span class="toc-text">match函数的解析</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2019/08/24/20190824-ssd/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

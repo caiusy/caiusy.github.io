@@ -1,0 +1,1757 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>KL散度完全图解教程：从零到精通 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="🎯 学习目标假设你完全不懂信息论，本教程将带你从零开始，用最通俗的语言、最生动的例子、最直观的图示，彻底理解 KL 散度的本质。   📊 配套资源    5张高清可视化图表（Jensen不等式、KL非负性证明、前向vs反向KL对比等） Python可视化代码 练习题及参考答案">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KL散度完全图解教程：从零到精通">
+<meta property="og:url" content="https://caiusy.github.io/2026/02/08/KL%E6%95%A3%E5%BA%A6%E5%AE%8C%E5%85%A8%E5%9B%BE%E8%A7%A3%E6%95%99%E7%A8%8B/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="🎯 学习目标假设你完全不懂信息论，本教程将带你从零开始，用最通俗的语言、最生动的例子、最直观的图示，彻底理解 KL 散度的本质。   📊 配套资源    5张高清可视化图表（Jensen不等式、KL非负性证明、前向vs反向KL对比等） Python可视化代码 练习题及参考答案">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-02-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-20T06:58:57.408Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="Python">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-02-08T00:00:00+08:00","dateModified":"2026-02-20T14:58:57+08:00","datePublished":"2026-02-08T00:00:00+08:00","description":"\n🎯 学习目标假设你完全不懂信息论，本教程将带你从零开始，用最通俗的语言、最生动的例子、最直观的图示，彻底理解 KL 散度的本质。\n\n\n📊 配套资源  \n\n5张高清可视化图表（Jensen不等式、KL非负性证明、前向vs反向KL对比等）\nPython可视化代码\n练习题及参考答案\n\n","headline":"KL散度完全图解教程：从零到精通","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/02/08/KL%E6%95%A3%E5%BA%A6%E5%AE%8C%E5%85%A8%E5%9B%BE%E8%A7%A3%E6%95%99%E7%A8%8B/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/02/08/KL%E6%95%A3%E5%BA%A6%E5%AE%8C%E5%85%A8%E5%9B%BE%E8%A7%A3%E6%95%99%E7%A8%8B/","keywords":"Python","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-02-07T16:00:00.000Z">2026-02-08</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-20T06:58:57.408Z">2026-02-20</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>KL散度完全图解教程：从零到精通</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><blockquote>
+<p>🎯 <strong>学习目标</strong><br>假设你完全不懂信息论，本教程将带你从零开始，用最通俗的语言、最生动的例子、最直观的图示，彻底理解 KL 散度的本质。</p>
+</blockquote>
+<blockquote>
+<p>📊 <strong>配套资源</strong>  </p>
+<ul>
+<li>5张高清可视化图表（Jensen不等式、KL非负性证明、前向vs反向KL对比等）</li>
+<li>Python可视化代码</li>
+<li>练习题及参考答案</li>
+</ul>
+</blockquote>
+<span id="more"></span>
+
+<hr>
+<h2 id="📑-目录"><a href="#📑-目录" class="headerlink" title="📑 目录"></a>📑 目录</h2><ol>
+<li><a href="#%E7%AC%AC%E4%B8%80%E7%AB%A0%E4%BF%A1%E6%81%AF%E7%9A%84%E4%BB%B7%E5%80%BC">第一章：信息的价值 - 为什么需要信息论？</a></li>
+<li><a href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0%E4%BF%A1%E6%81%AF%E9%87%8F">第二章：信息量 - 惊讶度的数学</a></li>
+<li><a href="#%E7%AC%AC%E4%B8%89%E7%AB%A0%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83">第三章：概率分布 - 世界的规律</a></li>
+<li><a href="#%E7%AC%AC%E5%9B%9B%E7%AB%A0%E7%86%B5">第四章：熵 - 平均惊讶程度</a></li>
+<li><a href="#%E7%AC%AC%E4%BA%94%E7%AB%A0%E4%BA%A4%E5%8F%89%E7%86%B5">第五章：交叉熵 - 用错编码的代价</a></li>
+<li><a href="#%E7%AC%AC%E5%85%AD%E7%AB%A0kl%E6%95%A3%E5%BA%A6">第六章：KL散度 - 测量分布的差异</a><ul>
+<li>6.4.1 Jensen 不等式科普</li>
+<li>6.4.2 KL 散度非负性的详细证明</li>
+<li>6.4.3 前向 KL vs 反向 KL：深度解析</li>
+</ul>
+</li>
+<li><a href="#%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8">第七章：实战应用 - 从 RLHF 到 VAE</a></li>
+<li><a href="#%E7%AC%AC%E5%85%AB%E7%AB%A0%E6%80%BB%E7%BB%93">第八章：总结与记忆技巧</a></li>
+</ol>
+<hr>
+<h2 id="第一章：信息的价值"><a href="#第一章：信息的价值" class="headerlink" title="第一章：信息的价值"></a>第一章：信息的价值</h2><h3 id="1-1-没有信息的世界"><a href="#1-1-没有信息的世界" class="headerlink" title="1.1 没有信息的世界"></a>1.1 没有信息的世界</h3><p>想象一下，你生活在一个完全没有信息的世界：</p>
+<ul>
+<li>明天会下雨吗？🤷 <strong>不知道</strong></li>
+<li>股票会涨吗？🤷 <strong>不知道</strong>  </li>
+<li>考试会考什么？🤷 <strong>不知道</strong></li>
+</ul>
+<p>这是一个充满<strong>不确定性</strong>的世界。你无法做任何有效的决策，因为你对未来一无所知。</p>
+<p><img src="/images/01_why_information.png" alt="信息的价值"></p>
+<h3 id="1-2-信息的本质"><a href="#1-2-信息的本质" class="headerlink" title="1.2 信息的本质"></a>1.2 信息的本质</h3><p><strong>信息 = 消除不确定性的工具</strong></p>
+<p>当你知道：</p>
+<ul>
+<li>明天 90% 会下雨 → 你带伞</li>
+<li>股票 60% 会涨 → 你考虑投资</li>
+<li>考试第3章占 70% → 你重点复习</li>
+</ul>
+<p><strong>核心理解：</strong> 信息让世界从”不知道”变成”知道”，从”混乱”变成”有序”。</p>
+<hr>
+<h2 id="第二章：信息量"><a href="#第二章：信息量" class="headerlink" title="第二章：信息量"></a>第二章：信息量</h2><h3 id="2-1-直觉：什么事情信息量大？"><a href="#2-1-直觉：什么事情信息量大？" class="headerlink" title="2.1 直觉：什么事情信息量大？"></a>2.1 直觉：什么事情信息量大？</h3><p>请看下面三个事件：</p>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th>发生概率</th>
+<th>你的反应</th>
+<th>信息量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>太阳从东边升起</td>
+<td>99.99%</td>
+<td>😐 理所当然</td>
+<td><strong>≈ 0</strong></td>
+</tr>
+<tr>
+<td>今天是周一到周日</td>
+<td>14.3%</td>
+<td>🙂 正常</td>
+<td><strong>中等</strong></td>
+</tr>
+<tr>
+<td>中了彩票头奖</td>
+<td>0.0001%</td>
+<td>😱 惊呆了！</td>
+<td><strong>巨大！</strong></td>
+</tr>
+</tbody></table>
+<p><img src="/images/02_surprise.png" alt="惊讶度"></p>
+<p><strong>发现规律了吗？</strong></p>
+<p>$$<br>\boxed{\text{概率越低} \rightarrow \text{越惊讶} \rightarrow \text{信息量越大}}<br>$$</p>
+<h3 id="2-2-信息量的公式"><a href="#2-2-信息量的公式" class="headerlink" title="2.2 信息量的公式"></a>2.2 信息量的公式</h3><p>我们需要一个公式来量化”惊讶程度”。这个公式必须满足：</p>
+<ol>
+<li><p><strong>概率高 → 信息量低</strong><br>例如：$P = 100%$ 时，$I = 0$（完全不惊讶）</p>
+</li>
+<li><p><strong>概率低 → 信息量高</strong><br>例如：$P = 1%$ 时，$I$ 很大（非常惊讶）</p>
+</li>
+<li><p><strong>独立事件信息量可以相加</strong><br>例如：$I(A \text{且} B) = I(A) + I(B)$</p>
+</li>
+</ol>
+<p><img src="/images/03_formula_birth.png" alt="公式诞生"></p>
+<p><strong>唯一满足这些要求的函数就是对数：</strong></p>
+<p>$$<br>\boxed{I(x) = -\log_2 P(x)}<br>$$</p>
+<h3 id="2-3-变量详解"><a href="#2-3-变量详解" class="headerlink" title="2.3 变量详解"></a>2.3 变量详解</h3><p>让我们逐个击破每个符号：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>读作</th>
+<th>含义</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$x$</td>
+<td>“某个事件”</td>
+<td>一个具体的结果</td>
+<td>“下雨”、”掷骰子得到6”</td>
+</tr>
+<tr>
+<td>$P(x)$</td>
+<td>“x 的概率”</td>
+<td>这个事件发生的可能性</td>
+<td>$P(\text{下雨}) = 0.3$</td>
+</tr>
+<tr>
+<td>$I(x)$</td>
+<td>“x 的信息量”</td>
+<td>知道这件事后获得的信息</td>
+<td>$I(\text{下雨}) = -\log_2(0.3) = 1.74$ bits</td>
+</tr>
+<tr>
+<td>$\log_2$</td>
+<td>“以2为底的对数”</td>
+<td>用二进制表示需要多少位</td>
+<td>$\log_2(8) = 3$（8需要3个二进制位）</td>
+</tr>
+</tbody></table>
+<p><strong>为什么用对数？</strong></p>
+<ol>
+<li><p><strong>把乘法变加法</strong><br>$\log(A \times B) = \log(A) + \log(B)$</p>
+</li>
+<li><p><strong>把小数变大数</strong><br>概率是 0 到 1 之间的小数，对数把它变成正数<br>例如：$\log_2(0.01) = -6.64$，加个负号变成 $6.64$ bits</p>
+</li>
+</ol>
+<p><strong>实际计算例子：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line"><span class="comment"># 事件：太阳从东边升起</span></span><br><span class="line">P_sun = <span class="number">0.9999</span></span><br><span class="line">I_sun = -math.log2(P_sun)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f"信息量：<span class="subst">{I_sun:<span class="number">.4</span>f}</span> bits"</span>)  <span class="comment"># ≈ 0.0001 bits（几乎没有信息）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 事件：中彩票</span></span><br><span class="line">P_lottery = <span class="number">0.000001</span></span><br><span class="line">I_lottery = -math.log2(P_lottery)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f"信息量：<span class="subst">{I_lottery:<span class="number">.2</span>f}</span> bits"</span>)  <span class="comment"># ≈ 19.93 bits（信息量巨大！）</span></span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="第三章：概率分布"><a href="#第三章：概率分布" class="headerlink" title="第三章：概率分布"></a>第三章：概率分布</h2><h3 id="3-1-什么是分布？"><a href="#3-1-什么是分布？" class="headerlink" title="3.1 什么是分布？"></a>3.1 什么是分布？</h3><p><strong>分布 = 所有可能结果的概率清单</strong></p>
+<p>想象掷骰子：</p>
+<table>
+<thead>
+<tr>
+<th>结果</th>
+<th>概率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1点</td>
+<td>1/6</td>
+</tr>
+<tr>
+<td>2点</td>
+<td>1/6</td>
+</tr>
+<tr>
+<td>3点</td>
+<td>1/6</td>
+</tr>
+<tr>
+<td>4点</td>
+<td>1/6</td>
+</tr>
+<tr>
+<td>5点</td>
+<td>1/6</td>
+</tr>
+<tr>
+<td>6点</td>
+<td>1/6</td>
+</tr>
+</tbody></table>
+<p>这就是一个<strong>均匀分布</strong>（每个结果概率相同）。</p>
+<p><img src="/images/04_distribution.png" alt="分布"></p>
+<h3 id="3-2-真实世界-vs-我的猜测"><a href="#3-2-真实世界-vs-我的猜测" class="headerlink" title="3.2 真实世界 vs 我的猜测"></a>3.2 真实世界 vs 我的猜测</h3><p>在机器学习中，我们关心两个分布：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>名称</th>
+<th>含义</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$P(x)$</td>
+<td><strong>真实分布</strong></td>
+<td>世界的真相</td>
+<td>老师出题的真实规律</td>
+</tr>
+<tr>
+<td>$Q(x)$</td>
+<td><strong>预测分布</strong></td>
+<td>我的模型</td>
+<td>我猜测的重点章节</td>
+</tr>
+</tbody></table>
+<p><img src="/images/05_two_distributions.png" alt="两个分布"></p>
+<p><strong>问题来了：</strong><br>如何衡量 $Q$（我的猜测）和 $P$（真相）有多不一样？</p>
+<p>👉 <strong>这就是 KL 散度要解决的问题！</strong></p>
+<hr>
+<h2 id="第四章：熵"><a href="#第四章：熵" class="headerlink" title="第四章：熵"></a>第四章：熵</h2><h3 id="4-1-熵的直觉"><a href="#4-1-熵的直觉" class="headerlink" title="4.1 熵的直觉"></a>4.1 熵的直觉</h3><p><strong>熵 = 平均惊讶程度 = 平均信息量</strong></p>
+<p>看两个地区的天气：</p>
+<p><strong>沙漠地区（低熵）：</strong></p>
+<ul>
+<li>晴天：90%</li>
+<li>雨天：8%</li>
+<li>雪天：2%</li>
+</ul>
+<p>→ 你几乎确定是晴天，很少惊讶 → <strong>熵低</strong></p>
+<p><strong>山区（高熵）：</strong></p>
+<ul>
+<li>晴天：35%</li>
+<li>雨天：33%</li>
+<li>雪天：32%</li>
+</ul>
+<p>→ 你完全不知道会怎样，经常惊讶 → <strong>熵高</strong></p>
+<p><img src="/images/06_entropy.png" alt="熵"></p>
+<h3 id="4-2-熵的公式"><a href="#4-2-熵的公式" class="headerlink" title="4.2 熵的公式"></a>4.2 熵的公式</h3><p>$$<br>\boxed{H(P) = -\sum_{x} P(x) \log_2 P(x)}<br>$$</p>
+<p><strong>逐项解读：</strong></p>
+<table>
+<thead>
+<tr>
+<th>部分</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$P(x)$</td>
+<td>事件 $x$ 的真实概率</td>
+</tr>
+<tr>
+<td>$\log_2 P(x)$</td>
+<td>事件 $x$ 的信息量（的负值）</td>
+</tr>
+<tr>
+<td>$P(x) \cdot \log_2 P(x)$</td>
+<td>用概率加权</td>
+</tr>
+<tr>
+<td>$\sum$</td>
+<td>对所有可能的 $x$ 求和</td>
+</tr>
+<tr>
+<td>$-$</td>
+<td>加个负号让结果为正</td>
+</tr>
+</tbody></table>
+<p><strong>计算例子（沙漠天气）：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">P = [<span class="number">0.9</span>, <span class="number">0.08</span>, <span class="number">0.02</span>]  <span class="comment"># 晴、雨、雪</span></span><br><span class="line"></span><br><span class="line">H = -<span class="built_in">sum</span>([p * np.log2(p) <span class="keyword">if</span> p &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span> <span class="keyword">for</span> p <span class="keyword">in</span> P])</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f"熵 = <span class="subst">{H:<span class="number">.2</span>f}</span> bits"</span>)  <span class="comment"># ≈ 0.64 bits（低熵）</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>计算例子（山区天气）：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">P = [<span class="number">0.35</span>, <span class="number">0.33</span>, <span class="number">0.32</span>]</span><br><span class="line"></span><br><span class="line">H = -<span class="built_in">sum</span>([p * np.log2(p) <span class="keyword">if</span> p &gt; <span class="number">0</span> <span class="keyword">else</span> <span class="number">0</span> <span class="keyword">for</span> p <span class="keyword">in</span> P])</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f"熵 = <span class="subst">{H:<span class="number">.2</span>f}</span> bits"</span>)  <span class="comment"># ≈ 1.58 bits（高熵）</span></span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="第五章：交叉熵"><a href="#第五章：交叉熵" class="headerlink" title="第五章：交叉熵"></a>第五章：交叉熵</h2><h3 id="5-1-摩斯密码的故事"><a href="#5-1-摩斯密码的故事" class="headerlink" title="5.1 摩斯密码的故事"></a>5.1 摩斯密码的故事</h3><p>想象你要用摩斯密码发电报。为了省电，你要设计一套编码：</p>
+<ul>
+<li><strong>高频字母（如 E, T）</strong> → 用短代码（•, ━）</li>
+<li><strong>低频字母（如 Z, Q）</strong> → 用长代码（•━•━）</li>
+</ul>
+<p><strong>场景A：编码完美匹配</strong><br>如果你的编码完全符合英文字母的真实频率 $P$，你的电报最短。</p>
+<p><strong>场景B：编码错误</strong><br>如果你拿着中文的编码本 $Q$ 去发英文电报 $P$，会发生什么？</p>
+<p>你可能给 “E”（英文最常见）分配了超长代码，因为中文里没有 “E” 这个音。</p>
+<p><strong>结果：</strong> 每条消息都比理论最优长度多出一大截！</p>
+<p><img src="/images/07_cross_entropy.png" alt="交叉熵"></p>
+<h3 id="5-2-交叉熵公式"><a href="#5-2-交叉熵公式" class="headerlink" title="5.2 交叉熵公式"></a>5.2 交叉熵公式</h3><p>$$<br>\boxed{H(P, Q) = -\sum_{x} P(x) \log_2 Q(x)}<br>$$</p>
+<p><strong>关键区别：</strong></p>
+<table>
+<thead>
+<tr>
+<th>公式</th>
+<th>概率来源</th>
+<th>信息量来源</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$H(P)$</td>
+<td>$P(x)$</td>
+<td>$\log P(x)$</td>
+<td>用 $P$ 的编码传输 $P$ 的信息</td>
+</tr>
+<tr>
+<td>$H(P,Q)$</td>
+<td>$P(x)$</td>
+<td>$\log Q(x)$</td>
+<td>用 $Q$ 的编码传输 $P$ 的信息</td>
+</tr>
+</tbody></table>
+<p><strong>直观理解：</strong></p>
+<ul>
+<li>真实世界按照 $P$ 分布产生数据</li>
+<li>但你用 $Q$ 的编码本来编码</li>
+<li>$H(P,Q)$ = 平均每条消息需要多少 bits</li>
+</ul>
+<p><strong>重要性质：</strong></p>
+<p>$$<br>H(P, Q) \geq H(P)<br>$$</p>
+<p>交叉熵永远 ≥ 熵！（用错误编码一定更浪费）</p>
+<hr>
+<h2 id="第六章：KL散度"><a href="#第六章：KL散度" class="headerlink" title="第六章：KL散度"></a>第六章：KL散度</h2><h3 id="6-1-KL散度的定义"><a href="#6-1-KL散度的定义" class="headerlink" title="6.1 KL散度的定义"></a>6.1 KL散度的定义</h3><p>KL散度 = 交叉熵 - 熵 = <strong>额外浪费的信息量</strong></p>
+<p>$$<br>\boxed{D_{KL}(P | Q) = H(P, Q) - H(P)}<br>$$</p>
+<p>展开后：</p>
+<p>$$<br>\boxed{D_{KL}(P | Q) = \sum_{x} P(x) \log \frac{P(x)}{Q(x)}}<br>$$</p>
+<p><img src="/images/08_kl_formula.png" alt="KL公式"></p>
+<h3 id="6-2-公式深度解析"><a href="#6-2-公式深度解析" class="headerlink" title="6.2 公式深度解析"></a>6.2 公式深度解析</h3><p>让我们把公式拆成最小的零件：</p>
+<p>$$<br>D_{KL}(P | Q) = \sum_{x} P(x) \cdot \log \frac{P(x)}{Q(x)}<br>$$</p>
+<p><strong>第1部分：$x$</strong></p>
+<ul>
+<li>含义：所有可能的事件/结果</li>
+<li>例子：天气里的”晴”、”雨”、”雪”</li>
+</ul>
+<p><strong>第2部分：$P(x)$</strong></p>
+<ul>
+<li>含义：真实世界中 $x$ 发生的概率</li>
+<li>例子：$P(\text{晴}) = 0.6$（真实情况60%是晴天）</li>
+</ul>
+<p><strong>第3部分：$Q(x)$</strong></p>
+<ul>
+<li>含义：你的模型认为 $x$ 发生的概率</li>
+<li>例子：$Q(\text{晴}) = 0.2$（你却认为只有20%是晴天）</li>
+</ul>
+<p><strong>第4部分：$\frac{P(x)}{Q(x)}$</strong></p>
+<ul>
+<li>含义：真实 vs 预测的比值</li>
+<li>当 $P$ 大但 $Q$ 小时，这个比值<strong>爆炸性增长</strong>！</li>
+<li>例子：$\frac{0.6}{0.2} = 3$（你低估了3倍）</li>
+</ul>
+<p><strong>第5部分：$\log \frac{P(x)}{Q(x)}$</strong></p>
+<ul>
+<li>含义：把比值转成信息量（bits）</li>
+<li>例子：$\log_2(3) = 1.58$ bits</li>
+</ul>
+<p><strong>第6部分：$P(x) \cdot \log \frac{P(x)}{Q(x)}$</strong></p>
+<ul>
+<li>含义：用真实概率加权（重要！）</li>
+<li><strong>只有在真相经常发生的地方犯错，才会被严重惩罚</strong></li>
+<li>例子：$0.6 \times 1.58 = 0.95$</li>
+</ul>
+<p><strong>第7部分：$\sum$</strong></p>
+<ul>
+<li>含义：对所有可能的 $x$ 求和，得到平均浪费</li>
+</ul>
+<h3 id="6-3-完整计算实例"><a href="#6-3-完整计算实例" class="headerlink" title="6.3 完整计算实例"></a>6.3 完整计算实例</h3><p><strong>场景：天气预报</strong></p>
+<table>
+<thead>
+<tr>
+<th>天气</th>
+<th>$P$ (真实)</th>
+<th>$Q$ (预测)</th>
+<th>$P/Q$</th>
+<th>$\log_2(P/Q)$</th>
+<th>$P \cdot \log(P/Q)$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>☀️晴</td>
+<td>0.6</td>
+<td>0.2</td>
+<td>3.00</td>
+<td>1.58</td>
+<td><strong>0.950</strong></td>
+</tr>
+<tr>
+<td>🌧️雨</td>
+<td>0.3</td>
+<td>0.5</td>
+<td>0.60</td>
+<td>-0.74</td>
+<td>-0.222</td>
+</tr>
+<tr>
+<td>☁️阴</td>
+<td>0.1</td>
+<td>0.3</td>
+<td>0.33</td>
+<td>-1.58</td>
+<td>-0.158</td>
+</tr>
+<tr>
+<td><strong>总和</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>0.570 bits</strong></td>
+</tr>
+</tbody></table>
+<p><img src="/images/09_kl_calculation.png" alt="KL计算"></p>
+<p><strong>结果解读：</strong></p>
+<ol>
+<li><p><strong>KL散度 = 0.570 bits</strong><br>意味着：用你的预测 $Q$ 代替真实 $P$，平均每次多浪费 0.57 bits</p>
+</li>
+<li><p><strong>最大贡献来自”晴天”</strong><br>真实60%但你只预测20%，差距太大！</p>
+</li>
+<li><p><strong>“雨天”贡献是负的</strong><br>你高估了雨天（预测50%实际30%），在这个方向上反而”赚了”信息<br>但总体还是亏的（因为晴天亏太多）</p>
+</li>
+</ol>
+<h3 id="6-4-KL散度的性质"><a href="#6-4-KL散度的性质" class="headerlink" title="6.4 KL散度的性质"></a>6.4 KL散度的性质</h3><p><strong>性质1：非负性</strong></p>
+<p>$$<br>D_{KL}(P | Q) \geq 0<br>$$</p>
+<p>永远 ≥ 0，当且仅当 $P = Q$ 时等于 0。</p>
+<h4 id="6-4-1-Jensen-不等式科普"><a href="#6-4-1-Jensen-不等式科普" class="headerlink" title="6.4.1 Jensen 不等式科普"></a>6.4.1 Jensen 不等式科普</h4><p>要证明 KL 散度非负，我们需要先理解 <strong>Jensen 不等式</strong>。</p>
+<p><strong>什么是凹函数和凸函数？</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">凹函数（如 log x）：                  凸函数（如 x²）：</span><br><span class="line">        ___                                    /\</span><br><span class="line">      /     \                                 /  \</span><br><span class="line">     /       \                               /    \</span><br><span class="line">    /         \                             /      \</span><br><span class="line">   /           \                          _/        \_</span><br><span class="line">  </span><br><span class="line">  弦在曲线下方                            弦在曲线上方</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>判断方法</strong>：在曲线上任取两点，连一条线（弦）</p>
+<ul>
+<li>弦在曲线<strong>下方</strong> → 凹函数</li>
+<li>弦在曲线<strong>上方</strong> → 凸函数</li>
+</ul>
+<p><strong>Jensen 不等式的内容</strong></p>
+<p>对于<strong>凹函数</strong> $f$（比如 $\log$）：</p>
+<p>$$<br>f\left(\sum_i p_i x_i\right) \geq \sum_i p_i f(x_i)<br>$$</p>
+<p>其中 $p_i \geq 0$ 且 $\sum_i p_i = 1$（概率权重）</p>
+<p><strong>通俗解释</strong>：</p>
+<blockquote>
+<p>“先平均再变换” ≥ “先变换再平均”</p>
+</blockquote>
+<p><img src="/images/jensen_inequality.png" alt="Jensen不等式几何解释"></p>
+<p><strong>用图来理解</strong></p>
+<p>假设只有两个点 $x_1$ 和 $x_2$，权重各 0.5：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">y</span><br><span class="line">│</span><br><span class="line">│      A ●───────────────● B      ← f(x₁) 和 f(x₂)</span><br><span class="line">│       ╲ ．．．．．．．．╱</span><br><span class="line">│        ╲    ● M'       ╱         ← 弦的中点（先变换再平均）</span><br><span class="line">│         ╲    ↓        ╱</span><br><span class="line">│          ╲   ↓       ╱</span><br><span class="line">│           ╲  ● M    ╱            ← 曲线上的点（先平均再变换）</span><br><span class="line">│            ╲       ╱</span><br><span class="line">│             ╲_____╱   ← 凹函数曲线</span><br><span class="line">│</span><br><span class="line">└──────────────────────────── x</span><br><span class="line">          x₁    中点    x₂</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><strong>M</strong> = $f\left(\frac{x_1+x_2}{2}\right)$（先平均再变换）</li>
+<li><strong>M’</strong> = $\frac{f(x_1)+f(x_2)}{2}$（先变换再平均）</li>
+</ul>
+<p>因为曲线是凹的，所以 <strong>M 在 M’ 上方</strong>，即 $f(\text{平均}) \geq \text{平均}(f)$</p>
+<h4 id="6-4-2-KL-散度非负性的详细证明"><a href="#6-4-2-KL-散度非负性的详细证明" class="headerlink" title="6.4.2 KL 散度非负性的详细证明"></a>6.4.2 KL 散度非负性的详细证明</h4><p><img src="/images/kl_nonnegative_proof.png" alt="KL散度非负性证明"></p>
+<p><strong>目标：证明 $D_{KL}(P|Q) \geq 0$</strong></p>
+<p><strong>第一步：写出定义</strong></p>
+<p>$$<br>D_{KL}(P|Q) = \sum_x P(x) \log \frac{P(x)}{Q(x)}<br>$$</p>
+<p><strong>第二步：变形</strong></p>
+<p>$$<br>= -\sum_x P(x) \log \frac{Q(x)}{P(x)}<br>$$</p>
+<p>令 $r(x) = \frac{Q(x)}{P(x)}$，则：</p>
+<p>$$<br>D_{KL}(P|Q) = -\sum_x P(x) \log r(x) = -\mathbb{E}_P[\log r(x)]<br>$$</p>
+<p><strong>第三步：应用 Jensen 不等式</strong></p>
+<p>因为 $\log$ 是<strong>凹函数</strong>，根据 Jensen 不等式：</p>
+<p>$$<br>\sum_x P(x) \log r(x) \leq \log \left(\sum_x P(x) \cdot r(x)\right)<br>$$</p>
+<blockquote>
+<p>注意：凹函数的 Jensen 不等式是 $\leq$</p>
+</blockquote>
+<p><strong>第四步：计算右边</strong></p>
+<p>$$<br>\sum_x P(x) \cdot r(x) = \sum_x P(x) \cdot \frac{Q(x)}{P(x)} = \sum_x Q(x) = 1<br>$$</p>
+<p>所以：</p>
+<p>$$<br>\sum_x P(x) \log r(x) \leq \log(1) = 0<br>$$</p>
+<p><strong>第五步：得出结论</strong></p>
+<p>$$<br>D_{KL}(P|Q) = -\sum_x P(x) \log r(x) \geq -0 = 0<br>$$</p>
+<p><strong>证毕！</strong> ✓</p>
+<p><strong>等号什么时候成立？</strong></p>
+<p>当 $r(x) = \frac{Q(x)}{P(x)} = \text{常数}$ 对所有 $x$ 成立时。</p>
+<p>又因为 $\sum P(x) = \sum Q(x) = 1$，所以这个常数只能是 1。</p>
+<p>即：**$P(x) = Q(x)$ 对所有 $x$ 成立时，$D_{KL} = 0$**</p>
+<hr>
+<p><strong>性质2：不对称性（超级重要！）</strong></p>
+<p>$$<br>D_{KL}(P | Q) \neq D_{KL}(Q | P)<br>$$</p>
+<p>KL散度<strong>不是距离</strong>！方向很重要！</p>
+<p><img src="/images/10_asymmetry.png" alt="不对称性"></p>
+<h4 id="6-4-3-前向-KL-vs-反向-KL：深度解析"><a href="#6-4-3-前向-KL-vs-反向-KL：深度解析" class="headerlink" title="6.4.3 前向 KL vs 反向 KL：深度解析"></a>6.4.3 前向 KL vs 反向 KL：深度解析</h4><p><img src="/images/forward_vs_reverse_kl.png" alt="前向vs反向KL对比"></p>
+<p>KL 散度的不对称性是其最重要的特性之一。理解前向和反向 KL 的区别，对于深度学习中的应用至关重要。</p>
+<p><strong>核心区别：谁在做主？</strong></p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th><strong>前向 KL</strong> $D_{KL}(P|Q)$</th>
+<th><strong>反向 KL</strong> $D_{KL}(Q|P)$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>公式</strong></td>
+<td>$\sum P(x) \log \frac{P(x)}{Q(x)}$</td>
+<td>$\sum Q(x) \log \frac{Q(x)}{P(x)}$</td>
+</tr>
+<tr>
+<td><strong>视角</strong></td>
+<td>站在真相 $P$ 的角度</td>
+<td>站在模型 $Q$ 的角度</td>
+</tr>
+<tr>
+<td><strong>核心权重</strong></td>
+<td>$P(x)$（真相决定一切）</td>
+<td>$Q(x)$（模型自己决定）</td>
+</tr>
+<tr>
+<td><strong>惩罚条件</strong></td>
+<td>$P&gt;0$ 但 $Q≈0$ 时爆炸</td>
+<td>$Q&gt;0$ 但 $P≈0$ 时爆炸</td>
+</tr>
+<tr>
+<td><strong>行为模式</strong></td>
+<td>Zero-Avoiding（避免遗漏）</td>
+<td>Zero-Forcing（强制精准）</td>
+</tr>
+<tr>
+<td><strong>结果</strong></td>
+<td>模糊但全面</td>
+<td>尖锐但保守</td>
+</tr>
+<tr>
+<td><strong>别名</strong></td>
+<td>Mean-seeking（寻找平均）</td>
+<td>Mode-seeking（寻找模态）</td>
+</tr>
+</tbody></table>
+<p><strong>为什么”权重”决定了命运？</strong></p>
+<p>公式里只是交换了 $P$ 和 $Q$ 的位置，为什么行为差异这么大？**因为前面的权重项充当了”开关”**。</p>
+<p><strong>详细例子：双峰分布问题</strong></p>
+<p>假设<strong>真实分布 $P$</strong> 是一个双峰分布（比如身高分布：男性峰 + 女性峰）：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">真实分布 P（双峰）:</span><br><span class="line">        ████                    ████</span><br><span class="line">       ██████                  ██████</span><br><span class="line">      ████████                ████████</span><br><span class="line">     ██████████              ██████████</span><br><span class="line">    ████████████            ████████████</span><br><span class="line">-------------------------------------------</span><br><span class="line">       峰1                      峰2</span><br></pre></td></tr></tbody></table></figure>
+
+<p>但我们的<strong>模型 $Q$</strong> 只能是单峰分布（比如只能用一个高斯分布）。</p>
+<p>问题：$Q$ 应该怎么放？</p>
+<p><strong>情况1：前向 KL（$D_{KL}(P|Q)$）— Zero Avoiding</strong></p>
+<p><strong>惩罚机制</strong>：在 $P(x) &gt; 0$ 的地方，如果 $Q(x) \approx 0$，则 $\log \frac{P(x)}{Q(x)} \to +\infty$</p>
+<p><strong>后果</strong>：$Q$ <strong>必须覆盖</strong> $P$ 有概率的所有地方，否则会被严重惩罚！</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">前向 KL 的结果 — Q 变得"模糊但全面":</span><br><span class="line"></span><br><span class="line">        ████                    ████       ← P（真实）</span><br><span class="line">       ██████                  ██████</span><br><span class="line">    ┌─────────────────────────────────┐</span><br><span class="line">    │  █████████████████████████████  │    ← Q（模型）</span><br><span class="line">    │ ███████████████████████████████ │       覆盖了两个峰</span><br><span class="line">    └─────────────────────────────────┘         但中间也有概率</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>特点</strong>：宁可在中间”瞎猜”，也不能漏掉任何一个峰 → <strong>Mean-seeking（均值寻找）</strong></p>
+<hr>
+<p><strong>情况2：反向 KL（$D_{KL}(Q|P)$）— Zero Forcing</strong></p>
+<p><strong>惩罚机制</strong>：在 $Q(x) &gt; 0$ 的地方，如果 $P(x) \approx 0$，则 $\log \frac{Q(x)}{P(x)} \to +\infty$</p>
+<p><strong>后果</strong>：$Q$ <strong>只能在</strong> $P$ 有概率的地方出现，否则会被严重惩罚！</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">反向 KL 的结果 — Q 变得"尖锐但保守":</span><br><span class="line"></span><br><span class="line">        ████                    ████       ← P（真实）</span><br><span class="line">       ██████                  ██████</span><br><span class="line"></span><br><span class="line">        ████                               ← Q（模型）</span><br><span class="line">       ██████                                 只选择一个峰</span><br><span class="line">      ████████                                精准但不全面</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>特点</strong>：宁可放弃一个峰，也不能在 $P=0$ 的地方有概率 → <strong>Mode-seeking（模式寻找）</strong></p>
+<hr>
+<p><strong>形象比喻总结</strong></p>
+<p><strong>前向KL：严厉的老师（Teacher Forcing）</strong></p>
+<ul>
+<li><strong>心态</strong>：老师拿着标准答案 $P$ 巡视</li>
+<li><strong>规则</strong>：”我考纲（$P$）里有的知识点，你（$Q$）必须都要会！如果你交白卷（$Q \approx 0$），我就给你挂科！”</li>
+<li><strong>结果</strong>：为了不挂科，你被迫把所有可能考的东西都写上去。哪怕有些地方你不懂，你也得硬凑。</li>
+</ul>
+<p><strong>反向KL：保守的学生（Student’s Choice）</strong></p>
+<ul>
+<li><strong>心态</strong>：你自己拿着手电筒 $Q$ 在雷区 $P$ 探路</li>
+<li><strong>规则</strong>：”只要我踩到了雷（$P \approx 0$），我就死定了（Loss 无穷大）。但我没踩到的地方，雷再大也炸不到我。”</li>
+<li><strong>结果</strong>：为了保命，你发现最好的策略是<strong>缩在一个绝对安全的地方不动</strong>。你放弃了探索其他区域，只死守一个山头。</li>
+</ul>
+<p><img src="/images/kl_penalty_curves.png" alt="KL惩罚曲线"></p>
+<hr>
+<h2 id="第七章：实战应用"><a href="#第七章：实战应用" class="headerlink" title="第七章：实战应用"></a>第七章：实战应用</h2><h3 id="7-1-RLHF中的KL惩罚"><a href="#7-1-RLHF中的KL惩罚" class="headerlink" title="7.1 RLHF中的KL惩罚"></a>7.1 RLHF中的KL惩罚</h3><p>在训练大模型（如 ChatGPT）时，有个步骤叫 <strong>RLHF</strong>（基于人类反馈的强化学习）。</p>
+<p><strong>问题：</strong><br>如果只优化人类打分（Reward），模型可能会：</p>
+<ul>
+<li>疯狂说彩虹屁拿高分</li>
+<li>忘记正常的语言规则</li>
+<li>最终崩溃成胡言乱语</li>
+</ul>
+<p><strong>解决方案：加KL惩罚</strong></p>
+<p>$$<br>\max ; \mathbb{E}[\text{Reward}] - \beta \cdot D_{KL}(\pi_{\text{new}} | \pi_{\text{old}})<br>$$</p>
+<p><img src="/images/11_rlhf.png" alt="RLHF"></p>
+<p><strong>各部分含义：</strong></p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\pi_{\text{new}}$</td>
+<td>新模型（正在训练的）</td>
+</tr>
+<tr>
+<td>$\pi_{\text{old}}$</td>
+<td>旧模型（基座模型）</td>
+</tr>
+<tr>
+<td>$\text{Reward}$</td>
+<td>人类打分（越高越好）</td>
+</tr>
+<tr>
+<td>$D_{KL}$</td>
+<td>KL惩罚（防止离旧模型太远）</td>
+</tr>
+<tr>
+<td>$\beta$</td>
+<td>调节强度（$\beta$ 越大越保守）</td>
+</tr>
+</tbody></table>
+<p><strong>形象比喻：</strong></p>
+<p>KL惩罚 = 风筝线</p>
+<ul>
+<li>让你飞高（追求高分）</li>
+<li>但拉住你别飞丢（保持语言能力）</li>
+</ul>
+<h3 id="7-2-其他应用"><a href="#7-2-其他应用" class="headerlink" title="7.2 其他应用"></a>7.2 其他应用</h3><table>
+<thead>
+<tr>
+<th>领域</th>
+<th>应用</th>
+<th>KL散度的作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>VAE</strong></td>
+<td>变分自编码器</td>
+<td>ELBO损失函数的核心</td>
+</tr>
+<tr>
+<td><strong>知识蒸馏</strong></td>
+<td>大模型→小模型</td>
+<td>让小模型模仿大模型的输出分布</td>
+</tr>
+<tr>
+<td><strong>GAN</strong></td>
+<td>生成对抗网络</td>
+<td>衡量生成分布和真实分布的差距</td>
+</tr>
+<tr>
+<td><strong>DPO</strong></td>
+<td>直接偏好优化</td>
+<td>新一代RLHF，直接优化KL约束下的偏好</td>
+</tr>
+<tr>
+<td><strong>信息检索</strong></td>
+<td>搜索引擎</td>
+<td>计算文档相似度</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="第八章：总结"><a href="#第八章：总结" class="headerlink" title="第八章：总结"></a>第八章：总结</h2><h3 id="8-1-知识地图"><a href="#8-1-知识地图" class="headerlink" title="8.1 知识地图"></a>8.1 知识地图</h3><p><img src="/images/12_summary.png" alt="总结"></p>
+<p><strong>从信息论到KL散度的完整路径：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">信息量 I(x) = -log P(x)</span><br><span class="line">    ↓</span><br><span class="line">熵 H(P) = 期望[I(x)] = -Σ P(x)log P(x)</span><br><span class="line">    ↓</span><br><span class="line">交叉熵 H(P,Q) = -Σ P(x)log Q(x)</span><br><span class="line">    ↓</span><br><span class="line">KL散度 = H(P,Q) - H(P) = Σ P(x)log[P(x)/Q(x)]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="8-2-记忆口诀"><a href="#8-2-记忆口诀" class="headerlink" title="8.2 记忆口诀"></a>8.2 记忆口诀</h3><p><strong>6句话记住KL散度：</strong></p>
+<p>1️⃣ <strong>KL散度不是距离，是”信息浪费”</strong><br>   用 $Q$ 编码 $P$ 比用 $P$ 编码 $P$ 多浪费的 bits</p>
+<p>2️⃣ <strong>永远 ≥ 0，= 0 当且仅当 P = Q</strong><br>   完美匹配时无浪费</p>
+<p>3️⃣ <strong>不对称！$D_{KL}(P|Q) \neq D_{KL}(Q|P)$</strong><br>   前向关注覆盖，反向关注精确</p>
+<p>4️⃣ <strong>前向KL让模型”不遗漏”（Zero Avoiding）</strong><br>   $P$ 有的地方 $Q$ 必须有</p>
+<p>5️⃣ <strong>反向KL让模型”不出错”（Zero Forcing）</strong><br>   $Q$ 有的地方必须符合 $P$</p>
+<p>6️⃣ <strong>在深度学习中常作正则项防止”忘本”</strong><br>   RLHF、VAE、蒸馏都用它</p>
+<h3 id="8-3-公式速查"><a href="#8-3-公式速查" class="headerlink" title="8.3 公式速查"></a>8.3 公式速查</h3><p><strong>完整公式：</strong></p>
+<p>$$<br>D_{KL}(P | Q) = \sum_{x} P(x) \log \frac{P(x)}{Q(x)}<br>$$</p>
+<p><strong>等价形式：</strong></p>
+<p>$$<br>\begin{aligned}<br>D_{KL}(P | Q) &amp;= H(P, Q) - H(P) \<br>&amp;= \sum_{x} P(x) \log P(x) - \sum_{x} P(x) \log Q(x) \<br>&amp;= \mathbb{E}_{x \sim P} \left[ \log \frac{P(x)}{Q(x)} \right]<br>\end{aligned}<br>$$</p>
+<p><strong>连续情况：</strong></p>
+<p>$$<br>D_{KL}(P | Q) = \int P(x) \log \frac{P(x)}{Q(x)} dx<br>$$</p>
+<h3 id="8-4-常见误区"><a href="#8-4-常见误区" class="headerlink" title="8.4 常见误区"></a>8.4 常见误区</h3><table>
+<thead>
+<tr>
+<th>误区</th>
+<th>真相</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>KL散度是距离</td>
+<td>❌ 它不满足对称性和三角不等式</td>
+</tr>
+<tr>
+<td>KL散度可以为负</td>
+<td>❌ 永远 ≥ 0</td>
+</tr>
+<tr>
+<td>$D_{KL}(P|Q)$ 和 $D_{KL}(Q|P)$ 相等</td>
+<td>❌ 完全不同！方向很重要</td>
+</tr>
+<tr>
+<td>KL散度越大越好</td>
+<td>❌ 越小越好，0 = 完美</td>
+</tr>
+<tr>
+<td>只有深度学习用KL散度</td>
+<td>❌ 信息论、统计学、物理学都用</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="📚-延伸阅读"><a href="#📚-延伸阅读" class="headerlink" title="📚 延伸阅读"></a>📚 延伸阅读</h2><h3 id="推荐资源"><a href="#推荐资源" class="headerlink" title="推荐资源"></a>推荐资源</h3><ol>
+<li><p><strong>经典教材</strong></p>
+<ul>
+<li>《信息论基础》（Elements of Information Theory）</li>
+<li>《深度学习》（Deep Learning Book）第3章</li>
+</ul>
+</li>
+<li><p><strong>在线资源</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://distill.pub/">Distill.pub - KL Divergence可视化</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/c/3blue1brown">3Blue1Brown - 信息论视频</a></li>
+</ul>
+</li>
+<li><p><strong>相关概念</strong></p>
+<ul>
+<li>JS散度（Jensen-Shannon Divergence）</li>
+<li>Wasserstein距离</li>
+<li>f-散度（f-Divergence）</li>
+</ul>
+</li>
+</ol>
+<h3 id="练习题"><a href="#练习题" class="headerlink" title="练习题"></a>练习题</h3><p><strong>初级：</strong></p>
+<ol>
+<li>计算均匀分布 $P=[0.25, 0.25, 0.25, 0.25]$ 的熵</li>
+<li>证明：为什么 $D_{KL}(P | Q) \geq 0$？</li>
+</ol>
+<p><strong>中级：</strong><br>3. 推导：为什么交叉熵可以作为分类任务的损失函数？<br>4. 对比前向KL和反向KL在变分推断中的应用</p>
+<p><strong>高级：</strong><br>5. 实现一个VAE，观察ELBO中KL项的作用<br>6. 分析PPO算法中KL约束的超参数 $\beta$ 如何影响训练稳定性</p>
+<hr>
+<h3 id="练习题参考答案"><a href="#练习题参考答案" class="headerlink" title="练习题参考答案"></a>练习题参考答案</h3><p><strong>初级题答案</strong></p>
+<ol>
+<li><strong>均匀分布的熵</strong></li>
+</ol>
+<p>$$<br>H(P) = -\sum_{i=1}^{4} 0.25 \times \log_2(0.25) = -4 \times 0.25 \times (-2) = 2 \text{ bits}<br>$$</p>
+<p>均匀分布的熵最大，因为不确定性最高。</p>
+<ol start="2">
+<li><strong>KL 散度非负性证明</strong>（见 6.4.2 节的详细证明）</li>
+</ol>
+<p><strong>中级题答案</strong></p>
+<ol start="3">
+<li><strong>交叉熵作为分类损失函数</strong></li>
+</ol>
+<p>在分类任务中：</p>
+<ul>
+<li>$P$ = 真实标签的 one-hot 编码（如 $[0, 1, 0, 0]$）</li>
+<li>$Q$ = 模型预测的概率分布（如 $[0.1, 0.7, 0.1, 0.1]$）</li>
+</ul>
+<p>损失函数：<br>$$<br>\text{Loss} = H(P, Q) = -\sum_i P_i \log Q_i<br>$$</p>
+<p>因为 $P$ 中只有一个位置为 1，其余为 0，所以：<br>$$<br>\text{Loss} = -\log Q_{\text{true}}<br>$$</p>
+<p>这就是<strong>负对数似然（Negative Log-Likelihood）</strong>，最小化它等价于最大化正确类别的预测概率。</p>
+<ol start="4">
+<li><strong>前向 vs 反向 KL 在变分推断中的应用</strong></li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>方面</th>
+<th>前向 KL (ELBO)</th>
+<th>反向 KL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>公式</td>
+<td>$D_{KL}(Q|P)$</td>
+<td>$D_{KL}(P|Q)$</td>
+</tr>
+<tr>
+<td>可计算性</td>
+<td>✅ 可以优化</td>
+<td>❌ 需要归一化常数</td>
+</tr>
+<tr>
+<td>行为</td>
+<td>Mode-seeking</td>
+<td>Mean-seeking</td>
+</tr>
+<tr>
+<td>应用</td>
+<td>VAE 标准做法</td>
+<td>期望传播（EP）</td>
+</tr>
+</tbody></table>
+<p>VAE 使用反向 KL 是因为它不需要知道 $P$ 的归一化常数。</p>
+<hr>
+<h3 id="8-5-数值计算实例"><a href="#8-5-数值计算实例" class="headerlink" title="8.5 数值计算实例"></a>8.5 数值计算实例</h3><p><img src="/images/kl_numerical_example.png" alt="KL散度数值计算"></p>
+<p><strong>完整示例：离散分布的 KL 散度计算</strong></p>
+<p>设有离散分布 P 和 Q，取值为 {A, B, C}：</p>
+<table>
+<thead>
+<tr>
+<th>取值</th>
+<th>P (真实)</th>
+<th>Q (模型)</th>
+<th>P/Q</th>
+<th>log(P/Q)</th>
+<th>P·log(P/Q)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>0.5</td>
+<td>0.4</td>
+<td>1.25</td>
+<td>0.32</td>
+<td><strong>0.16</strong></td>
+</tr>
+<tr>
+<td>B</td>
+<td>0.3</td>
+<td>0.4</td>
+<td>0.75</td>
+<td>-0.42</td>
+<td>-0.13</td>
+</tr>
+<tr>
+<td>C</td>
+<td>0.2</td>
+<td>0.2</td>
+<td>1.00</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>合计</strong></td>
+<td>1.0</td>
+<td>1.0</td>
+<td>—</td>
+<td>—</td>
+<td><strong>≈ 0.03 bits</strong></td>
+</tr>
+</tbody></table>
+<p><strong>计算步骤：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line">P = np.array([<span class="number">0.5</span>, <span class="number">0.3</span>, <span class="number">0.2</span>])</span><br><span class="line">Q = np.array([<span class="number">0.4</span>, <span class="number">0.4</span>, <span class="number">0.2</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算 KL 散度</span></span><br><span class="line">D_KL = np.<span class="built_in">sum</span>(P * np.log(P / Q))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f"D_KL(P||Q) = <span class="subst">{D_KL:<span class="number">.4</span>f}</span> bits"</span>)</span><br><span class="line"><span class="comment"># 输出: D_KL(P||Q) = 0.0361 bits</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>结果解读：</strong></p>
+<ul>
+<li>KL 散度 = 0.036 bits：用 Q 编码 P 的信息，平均每个符号多浪费 0.036 bits</li>
+<li>主要误差来源：A 点被低估（P=0.5, Q=0.4）</li>
+<li>当 P = Q 时，D_KL = 0（完美匹配）</li>
+</ul>
+<hr>
+<h2 id="🎉-结语"><a href="#🎉-结语" class="headerlink" title="🎉 结语"></a>🎉 结语</h2><p>恭喜你！如果你读到这里，你已经从零开始，完全理解了KL散度的本质：</p>
+<ul>
+<li>✅ 从信息论出发，理解了信息量、熵、交叉熵</li>
+<li>✅ 掌握了KL散度的公式和每个变量的含义</li>
+<li>✅ 通过图示和例子建立了直觉</li>
+<li>✅ 了解了在深度学习中的实际应用</li>
+</ul>
+<p><strong>最后的建议：</strong></p>
+<p>KL散度不是用来背的，而是用来<strong>理解</strong>的。每次在论文或代码中看到它，问自己三个问题：</p>
+<ol>
+<li>这里的 $P$ 是什么？（真实分布）</li>
+<li>这里的 $Q$ 是什么？（模型分布）</li>
+<li>为什么要用KL散度？（防止过拟合？约束输出？）</li>
+</ol>
+<p>带着这些问题，你会发现KL散度无处不在，而你已经完全理解它了。</p>
+<hr>
+<blockquote>
+<p>📝 <strong>更新日志</strong>  </p>
+<ul>
+<li>2026-02-08：首次发布，包含完整的数学证明、前向/反向KL深度解析和5张可视化图表</li>
+</ul>
+</blockquote>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/02/08/KL%E6%95%A3%E5%BA%A6%E5%AE%8C%E5%85%A8%E5%9B%BE%E8%A7%A3%E6%95%99%E7%A8%8B/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/02/08/KL%E6%95%A3%E5%BA%A6%E5%AE%8C%E5%85%A8%E5%9B%BE%E8%A7%A3%E6%95%99%E7%A8%8B/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/02/08/MoE-Switch-Transformer-Mixtral-Deep-Dive/">MoE 深度解析：Switch Transformer 与 Mixtral 的稀疏之道</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/02/07/InstructGPT-RLHF-Complete-Guide/">InstructGPT 与 RLHF 深度解析：费曼视角下的原理与实现</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%91-%E7%9B%AE%E5%BD%95"><span class="toc-text">📑 目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9A%E4%BF%A1%E6%81%AF%E7%9A%84%E4%BB%B7%E5%80%BC"><span class="toc-text">第一章：信息的价值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E6%B2%A1%E6%9C%89%E4%BF%A1%E6%81%AF%E7%9A%84%E4%B8%96%E7%95%8C"><span class="toc-text">1.1 没有信息的世界</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E4%BF%A1%E6%81%AF%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-text">1.2 信息的本质</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9A%E4%BF%A1%E6%81%AF%E9%87%8F"><span class="toc-text">第二章：信息量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%9B%B4%E8%A7%89%EF%BC%9A%E4%BB%80%E4%B9%88%E4%BA%8B%E6%83%85%E4%BF%A1%E6%81%AF%E9%87%8F%E5%A4%A7%EF%BC%9F"><span class="toc-text">2.1 直觉：什么事情信息量大？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E4%BF%A1%E6%81%AF%E9%87%8F%E7%9A%84%E5%85%AC%E5%BC%8F"><span class="toc-text">2.2 信息量的公式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E5%8F%98%E9%87%8F%E8%AF%A6%E8%A7%A3"><span class="toc-text">2.3 变量详解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9A%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83"><span class="toc-text">第三章：概率分布</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E4%BB%80%E4%B9%88%E6%98%AF%E5%88%86%E5%B8%83%EF%BC%9F"><span class="toc-text">3.1 什么是分布？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E7%9C%9F%E5%AE%9E%E4%B8%96%E7%95%8C-vs-%E6%88%91%E7%9A%84%E7%8C%9C%E6%B5%8B"><span class="toc-text">3.2 真实世界 vs 我的猜测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E7%AB%A0%EF%BC%9A%E7%86%B5"><span class="toc-text">第四章：熵</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E7%86%B5%E7%9A%84%E7%9B%B4%E8%A7%89"><span class="toc-text">4.1 熵的直觉</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E7%86%B5%E7%9A%84%E5%85%AC%E5%BC%8F"><span class="toc-text">4.2 熵的公式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9A%E4%BA%A4%E5%8F%89%E7%86%B5"><span class="toc-text">第五章：交叉熵</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E6%91%A9%E6%96%AF%E5%AF%86%E7%A0%81%E7%9A%84%E6%95%85%E4%BA%8B"><span class="toc-text">5.1 摩斯密码的故事</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E4%BA%A4%E5%8F%89%E7%86%B5%E5%85%AC%E5%BC%8F"><span class="toc-text">5.2 交叉熵公式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%85%AD%E7%AB%A0%EF%BC%9AKL%E6%95%A3%E5%BA%A6"><span class="toc-text">第六章：KL散度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-KL%E6%95%A3%E5%BA%A6%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-text">6.1 KL散度的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%85%AC%E5%BC%8F%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90"><span class="toc-text">6.2 公式深度解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E5%AE%8C%E6%95%B4%E8%AE%A1%E7%AE%97%E5%AE%9E%E4%BE%8B"><span class="toc-text">6.3 完整计算实例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-KL%E6%95%A3%E5%BA%A6%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="toc-text">6.4 KL散度的性质</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#6-4-1-Jensen-%E4%B8%8D%E7%AD%89%E5%BC%8F%E7%A7%91%E6%99%AE"><span class="toc-text">6.4.1 Jensen 不等式科普</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-4-2-KL-%E6%95%A3%E5%BA%A6%E9%9D%9E%E8%B4%9F%E6%80%A7%E7%9A%84%E8%AF%A6%E7%BB%86%E8%AF%81%E6%98%8E"><span class="toc-text">6.4.2 KL 散度非负性的详细证明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-4-3-%E5%89%8D%E5%90%91-KL-vs-%E5%8F%8D%E5%90%91-KL%EF%BC%9A%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90"><span class="toc-text">6.4.3 前向 KL vs 反向 KL：深度解析</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%83%E7%AB%A0%EF%BC%9A%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8"><span class="toc-text">第七章：实战应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-RLHF%E4%B8%AD%E7%9A%84KL%E6%83%A9%E7%BD%9A"><span class="toc-text">7.1 RLHF中的KL惩罚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-%E5%85%B6%E4%BB%96%E5%BA%94%E7%94%A8"><span class="toc-text">7.2 其他应用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%85%AB%E7%AB%A0%EF%BC%9A%E6%80%BB%E7%BB%93"><span class="toc-text">第八章：总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE"><span class="toc-text">8.1 知识地图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80"><span class="toc-text">8.2 记忆口诀</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-%E5%85%AC%E5%BC%8F%E9%80%9F%E6%9F%A5"><span class="toc-text">8.3 公式速查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-4-%E5%B8%B8%E8%A7%81%E8%AF%AF%E5%8C%BA"><span class="toc-text">8.4 常见误区</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%9A-%E5%BB%B6%E4%BC%B8%E9%98%85%E8%AF%BB"><span class="toc-text">📚 延伸阅读</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E8%8D%90%E8%B5%84%E6%BA%90"><span class="toc-text">推荐资源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98"><span class="toc-text">练习题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E9%A2%98%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="toc-text">练习题参考答案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-5-%E6%95%B0%E5%80%BC%E8%AE%A1%E7%AE%97%E5%AE%9E%E4%BE%8B"><span class="toc-text">8.5 数值计算实例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%89-%E7%BB%93%E8%AF%AD"><span class="toc-text">🎉 结语</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/02/08/KL%E6%95%A3%E5%BA%A6%E5%AE%8C%E5%85%A8%E5%9B%BE%E8%A7%A3%E6%95%99%E7%A8%8B/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

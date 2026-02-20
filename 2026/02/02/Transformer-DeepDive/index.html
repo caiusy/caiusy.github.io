@@ -1,0 +1,1029 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>彻底理解 Transformer：Attention Is All You Need - Caius的日常博客</title>
+
+  
+    <meta name="description" content="彻底理解 Transformer: Attention Is All You Need 摘要: 本文利用费曼学习法，通过图解和类比，深入浅出地拆解了 Transformer 架构的核心原理。从 Encoder-Decoder 架构到 Self-Attention 机制，再到 Cross-Attention 和 Masking 的细节，带你彻底搞懂这篇 AI 领域的奠基之作。   1. 核心大白话：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="彻底理解 Transformer：Attention Is All You Need">
+<meta property="og:url" content="https://caiusy.github.io/2026/02/02/Transformer-DeepDive/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="彻底理解 Transformer: Attention Is All You Need 摘要: 本文利用费曼学习法，通过图解和类比，深入浅出地拆解了 Transformer 架构的核心原理。从 Encoder-Decoder 架构到 Self-Attention 机制，再到 Cross-Attention 和 Masking 的细节，带你彻底搞懂这篇 AI 领域的奠基之作。   1. 核心大白话：">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-02-02T06:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-20T06:58:57.395Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="NLP">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="DeepLearning">
+<meta property="article:tag" content="Algorithm">
+<meta property="article:tag" content="FeynmanTechnique">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="NLP,Transformer,DeepLearning,Algorithm,FeynmanTechnique">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-02-02T14:00:00+08:00","dateModified":"2026-02-20T14:58:57+08:00","datePublished":"2026-02-02T14:00:00+08:00","description":"","headline":"彻底理解 Transformer：Attention Is All You Need","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/02/02/Transformer-DeepDive/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/02/02/Transformer-DeepDive/","keywords":"NLP, Transformer, DeepLearning, Algorithm, FeynmanTechnique","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-02-02T06:00:00.000Z">2026-02-02</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-20T06:58:57.395Z">2026-02-20</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>彻底理解 Transformer：Attention Is All You Need</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h1 id="彻底理解-Transformer-Attention-Is-All-You-Need"><a href="#彻底理解-Transformer-Attention-Is-All-You-Need" class="headerlink" title="彻底理解 Transformer: Attention Is All You Need"></a>彻底理解 Transformer: Attention Is All You Need</h1><blockquote>
+<p><strong>摘要</strong>: 本文利用费曼学习法，通过图解和类比，深入浅出地拆解了 Transformer 架构的核心原理。从 Encoder-Decoder 架构到 Self-Attention 机制，再到 Cross-Attention 和 Masking 的细节，带你彻底搞懂这篇 AI 领域的奠基之作。</p>
+</blockquote>
+<hr>
+<h2 id="1-核心大白话：为什么要搞这一套？"><a href="#1-核心大白话：为什么要搞这一套？" class="headerlink" title="1. 核心大白话：为什么要搞这一套？"></a>1. 核心大白话：为什么要搞这一套？</h2><p><strong>传统模型的痛点</strong>：<br>以前的 AI (RNN/LSTM) 像是一个<strong>接力赛跑</strong>选手。</p>
+<ul>
+<li>必须先读第一个字，传棒给第二个字，再传给第三个…</li>
+<li><strong>缺点</strong>：如果句子太长，跑到最后早就忘了第一棒是谁了（长距离遗忘）；而且必须按顺序跑，不能所有人一起跑（无法并行，慢）。</li>
+</ul>
+<p><strong>Transformer 的革命</strong>：<br>不搞接力赛了，搞<strong>足球赛</strong>。</p>
+<ul>
+<li><strong>并行</strong>：所有单词（球员）同时在场上。</li>
+<li><strong>注意力</strong>：每个球员（单词）都能时刻观察场上所有其他球员的位置，不管那个人在球场哪一头（解决了长距离依赖）。</li>
+</ul>
+<hr>
+<h2 id="2-核心概念：Self-Attention-自注意力"><a href="#2-核心概念：Self-Attention-自注意力" class="headerlink" title="2. 核心概念：Self-Attention (自注意力)"></a>2. 核心概念：Self-Attention (自注意力)</h2><p>这是 Transformer 的心脏。它解决了“每个词该关注谁”的问题。</p>
+<h3 id="2-1-Q-K-V-的图书检索类比"><a href="#2-1-Q-K-V-的图书检索类比" class="headerlink" title="2.1 Q, K, V 的图书检索类比"></a>2.1 Q, K, V 的图书检索类比</h3><p>为什么每个词要有 Query (Q), Key (K), Value (V) 三个向量？<br>这源于<strong>数据库检索</strong>的思想。</p>
+<p><img src="/images/Transformer_DeepDive/transformer_qkv.png" alt="通过图书检索系统理解 Q, K, V 的分离"><br><em>(图注：通过图书检索系统理解 Q, K, V 的分离)</em></p>
+<h3 id="2-2-主动与被动：Q-与-K-的聚光灯效应"><a href="#2-2-主动与被动：Q-与-K-的聚光灯效应" class="headerlink" title="2.2 主动与被动：Q 与 K 的聚光灯效应"></a>2.2 主动与被动：Q 与 K 的聚光灯效应</h3><p>为什么数学公式一样，Q 却是“主动”的？</p>
+<p><img src="/images/Transformer_DeepDive/active_passive_demo.png" alt="Q 像手电筒一样主动扫描所有 K"><br><em>(图注：Q 像手电筒一样主动扫描所有 K)</em></p>
+<ul>
+<li><strong>Q (Query)<strong>：手握 100% 的“注意力预算”，它必须决定把光打在谁身上。在训练中，Loss 逼迫它学会</strong>“去寻找对我有用的信息”</strong>。</li>
+<li><strong>K (Key)<strong>：像墙上的靶子，无法移动。在训练中，Loss 逼迫它学会</strong>“标明自己的身份”</strong>，以便被正确的 Q 找到。</li>
+</ul>
+<h3 id="2-3-矩阵维度的秘密：为什么维度必须一样？"><a href="#2-3-矩阵维度的秘密：为什么维度必须一样？" class="headerlink" title="2.3 矩阵维度的秘密：为什么维度必须一样？"></a>2.3 矩阵维度的秘密：为什么维度必须一样？</h3><p>很多初学者在这里卡住：为什么 $Q$ 和 $K$ 的维度必须一致？<br>因为数学上的<strong>点积 (Dot Product)</strong> 就像拉拉链，齿数必须对得上。</p>
+<p><img src="/images/Transformer_DeepDive/transformer_dims.png" alt="矩阵乘法就像“拉链”咬合，中间的维度必须对齐"><br><em>(图注：矩阵乘法就像“拉链”咬合，中间的维度必须对齐)</em></p>
+<hr>
+<h2 id="3-完整实战：德语到英语翻译训练全过程"><a href="#3-完整实战：德语到英语翻译训练全过程" class="headerlink" title="3. 完整实战：德语到英语翻译训练全过程"></a>3. 完整实战：德语到英语翻译训练全过程</h2><p>我们通过一个具体的任务：<code>"Ich liebe dich"</code> (德) -&gt; <code>"I love you"</code> (英)，来彻底搞懂编码器和解码器到底在干什么。</p>
+<h3 id="3-1-架构全景：数据是如何流动的？"><a href="#3-1-架构全景：数据是如何流动的？" class="headerlink" title="3.1 架构全景：数据是如何流动的？"></a>3.1 架构全景：数据是如何流动的？</h3><p>首先，看一眼上帝视角的架构图。注意红色的<strong>梯度回传</strong>线，这解释了为什么 Encoder 即使没有 Label 也能学会正确编码。</p>
+<p><img src="/images/Transformer_DeepDive/viz_arch_overview.png" alt="Encoder-Decoder 完整架构与梯度回传路径"><br><em>(图注：Encoder-Decoder 完整架构与梯度回传路径)</em></p>
+<h3 id="3-2-步骤一：Encoder-读懂德语"><a href="#3-2-步骤一：Encoder-读懂德语" class="headerlink" title="3.2 步骤一：Encoder (读懂德语)"></a>3.2 步骤一：Encoder (读懂德语)</h3><p>Encoder 的任务是把德语变成一组高质量的“记忆向量”。</p>
+<ul>
+<li><strong>操作</strong>: Self-Attention。</li>
+<li><strong>结果</strong>: 每个词都融合了上下文信息，形成了记忆库 $M$ (Memory)。</li>
+<li><strong>维度不变性</strong>: 输入是 <code>[Batch, 3, 512]</code>，输出 $M$ 依然是 <code>[Batch, 3, 512]</code>。这就是<strong>残差流</strong> (Residual Stream) 的设计。</li>
+</ul>
+<h3 id="3-3-步骤二：Decoder-的核心-Cross-Attention"><a href="#3-3-步骤二：Decoder-的核心-Cross-Attention" class="headerlink" title="3.3 步骤二：Decoder 的核心 (Cross-Attention)"></a>3.3 步骤二：Decoder 的核心 (Cross-Attention)</h3><p>这是模型最精彩的部分。Decoder 拿着英语去查德语。</p>
+<p><img src="/images/Transformer_DeepDive/viz_cross_attn.png" alt="Cross-Attention 细节"><br><em>(图注：Cross-Attention 细节。英语的 “I” (Q) 精准找到了德语的 “liebe” (K2))</em></p>
+<ul>
+<li><strong>Query (Q)</strong>: 来自 <strong>Decoder</strong> 中间状态 $X_{mid}$。<ul>
+<li><em>形状</em>: <code>[Batch, 2, 512]</code> (英语长度)</li>
+</ul>
+</li>
+<li><strong>Key (K)</strong>: 来自 <strong>Encoder</strong> 记忆库 $M$。<ul>
+<li><em>形状</em>: <code>[Batch, 3, 512]</code> (德语长度)</li>
+</ul>
+</li>
+<li><strong>Value (V)</strong>: 来自 <strong>Encoder</strong> 记忆库 $M$。</li>
+</ul>
+<p><strong>QKV 矩阵的作用</strong>:<br>Decoder 的 $W_Q^{cross}$ 和 Encoder 侧的 $W_K^{cross}$ 就像<strong>同声传译员</strong>，把英语状态和德语记忆映射到同一个“中间语义空间”，这样它们才能进行点积匹配。</p>
+<h3 id="3-4-步骤三：Mask-机制-不许偷看"><a href="#3-4-步骤三：Mask-机制-不许偷看" class="headerlink" title="3.4 步骤三：Mask 机制 (不许偷看)"></a>3.4 步骤三：Mask 机制 (不许偷看)</h3><p>在 Decoder 内部，为了防止模型在预测 “love” 时偷看后面的 “you”，我们使用了 Mask。</p>
+<p><img src="/images/Transformer_DeepDive/viz_masking.png" alt="Mask 矩阵"><br><em>(图注：Mask 矩阵。深蓝色代表可见，白色代表被遮挡 (-∞))</em></p>
+<h3 id="3-5-步骤四：并行计算与-Loss"><a href="#3-5-步骤四：并行计算与-Loss" class="headerlink" title="3.5 步骤四：并行计算与 Loss"></a>3.5 步骤四：并行计算与 Loss</h3><p>虽然逻辑上是“预测完 I 再预测 love”，但在训练时，这都在<strong>一次矩阵运算</strong>中完成了。</p>
+<p><img src="/images/Transformer_DeepDive/viz_training_parallel.png" alt="一次性处理 4 个时刻的预测与 Loss 计算"><br><em>(图注：一次性处理 4 个时刻的预测与 Loss 计算)</em></p>
+<hr>
+<h2 id="4-极简代码实现-Python-x2F-PyTorch"><a href="#4-极简代码实现-Python-x2F-PyTorch" class="headerlink" title="4. 极简代码实现 (Python/PyTorch)"></a>4. 极简代码实现 (Python/PyTorch)</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SelfAttention</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, d_model, head_size</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.head_size = head_size</span><br><span class="line">        <span class="comment"># 1. 定义三个线性层：用来生成 Q, K, V</span></span><br><span class="line">        self.key = nn.Linear(d_model, head_size, bias=<span class="literal">False</span>)</span><br><span class="line">        self.query = nn.Linear(d_model, head_size, bias=<span class="literal">False</span>)</span><br><span class="line">        self.value = nn.Linear(d_model, head_size, bias=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># x 的形状: [Batch, Time(词数), Dimension(维度)]</span></span><br><span class="line">        B, T, C = x.shape</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 2. 生成 Q, K, V</span></span><br><span class="line">        k = self.key(x)   <span class="comment"># (B, T, H)</span></span><br><span class="line">        q = self.query(x) <span class="comment"># (B, T, H)</span></span><br><span class="line">        v = self.value(x) <span class="comment"># (B, T, H)</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 3. 计算关注度 (Attention Scores)</span></span><br><span class="line">        wei = q @ k.transpose(-<span class="number">2</span>, -<span class="number">1</span>) * (<span class="number">1.0</span> / math.sqrt(self.head_size))</span><br><span class="line">        wei = F.softmax(wei, dim=-<span class="number">1</span>)</span><br><span class="line">        out = wei @ v </span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="5-核心数学公式与维度-The-Math-amp-Dimensions"><a href="#5-核心数学公式与维度-The-Math-amp-Dimensions" class="headerlink" title="5. 核心数学公式与维度 (The Math &amp; Dimensions)"></a>5. 核心数学公式与维度 (The Math &amp; Dimensions)</h2><h3 id="5-1-Self-Attention-单头"><a href="#5-1-Self-Attention-单头" class="headerlink" title="5.1 Self-Attention (单头)"></a>5.1 Self-Attention (单头)</h3><p>$$ Attention(Q, K, V) = \text{Softmax}(\frac{QK^T}{\sqrt{d_k}})V $$</p>
+<p><strong>维度推演</strong> (以 $d_{model}=512, d_k=64$ 为例)：</p>
+<ol>
+<li><strong>输入 $X$</strong>: <code>[L, 512]</code></li>
+<li><strong>生成 Q, K, V</strong>:<ul>
+<li>$Q = X W_Q \rightarrow [L, 64]$</li>
+<li>$K = X W_K \rightarrow [L, 64]$</li>
+<li>$V = X W_V \rightarrow [L, 64]$</li>
+</ul>
+</li>
+<li><strong>矩阵乘法 $Q \cdot K^T$</strong>:<ul>
+<li><code>[L, 64]</code> @ <code>[64, L]</code> $\rightarrow$ <code>[L, L]</code> (分数矩阵)</li>
+</ul>
+</li>
+<li><strong>输出</strong>:<ul>
+<li><code>[L, L]</code> @ <code>[L, 64]</code> $\rightarrow$ <code>[L, 64]</code></li>
+</ul>
+</li>
+</ol>
+<h3 id="5-2-Cross-Attention-混合双打"><a href="#5-2-Cross-Attention-混合双打" class="headerlink" title="5.2 Cross-Attention (混合双打)"></a>5.2 Cross-Attention (混合双打)</h3><p>$$ \text{CrossAttn}(X_{dec}, M) = \text{Softmax}(\frac{(X_{dec}W_Q)(M W_K)^T}{\sqrt{d_k}}) (M W_V) $$</p>
+<ul>
+<li><strong>$X_{dec}$</strong>: 英语中间状态 <code>[L_tgt, 512]</code></li>
+<li><strong>$M$</strong>: 德语记忆库 <code>[L_src, 512]</code></li>
+<li><strong>$W_Q$</strong>: <code>[512, 64]</code> (负责转译英语)</li>
+<li><strong>$W_K$</strong>: <code>[512, 64]</code> (负责转译德语)</li>
+<li><strong>Attention Map</strong>: <code>[L_tgt, L_src]</code> (例如 2行3列，表示每个英语词关注哪些德语词)</li>
+</ul>
+<h3 id="5-3-最终输出-Word-Prediction"><a href="#5-3-最终输出-Word-Prediction" class="headerlink" title="5.3 最终输出 (Word Prediction)"></a>5.3 最终输出 (Word Prediction)</h3><p>$$ P(\text{word}) = \text{Softmax}(h \cdot W_{vocab} + b) $$</p>
+<ul>
+<li><strong>$h$</strong>: Decoder 最终输出 <code>[Batch, Seq, 512]</code></li>
+<li><strong>$W_{vocab}$</strong>: 投影矩阵 <code>[512, Vocab_Size]</code> (例如 30000)</li>
+<li><strong>结果</strong>: <code>[Batch, Seq, 30000]</code></li>
+</ul>
+<hr>
+<h2 id="6-费曼自测-Self-Check"><a href="#6-费曼自测-Self-Check" class="headerlink" title="6. 费曼自测 (Self-Check)"></a>6. 费曼自测 (Self-Check)</h2><ol>
+<li><strong>Encoder 没有 Label，它是怎么学会正确的 Attention 的？</strong><br><em>(答：通过端到端的梯度反向传播。Decoder 的翻译错误会转化为 Loss，梯度顺着 Cross-Attention 流回 Encoder，告诉它“你提供的 Memory 质量太差，改！”)</em></li>
+<li><strong>Cross-Attention 的 QKV 矩阵是随机的吗？</strong><br><em>(答：初始是随机的，但它们起到了“适配器”的作用，负责把英语状态和德语记忆映射到同一个语义空间，以便进行匹配。)</em></li>
+<li><strong>为什么 Encoder 输入输出维度必须一致？</strong><br><em>(答：为了支持残差连接 (Residual Connection)，公式 $x + SubLayer(x)$ 要求两者形状必须完全相同。)</em></li>
+</ol>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/02/02/Transformer-DeepDive/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/02/02/Transformer-DeepDive/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/02/03/bert-comprehensive-guide/">BERT 完整解析：从论文到 KV Cache</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/25/qlora-deep-dive/">彻底搞懂 QLoRA：如何用 4-bit 量化技术单卡微调千亿模型？</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BD%BB%E5%BA%95%E7%90%86%E8%A7%A3-Transformer-Attention-Is-All-You-Need"><span class="toc-text">彻底理解 Transformer: Attention Is All You Need</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%A0%B8%E5%BF%83%E5%A4%A7%E7%99%BD%E8%AF%9D%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%90%9E%E8%BF%99%E4%B8%80%E5%A5%97%EF%BC%9F"><span class="toc-text">1. 核心大白话：为什么要搞这一套？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5%EF%BC%9ASelf-Attention-%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B"><span class="toc-text">2. 核心概念：Self-Attention (自注意力)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Q-K-V-%E7%9A%84%E5%9B%BE%E4%B9%A6%E6%A3%80%E7%B4%A2%E7%B1%BB%E6%AF%94"><span class="toc-text">2.1 Q, K, V 的图书检索类比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E4%B8%BB%E5%8A%A8%E4%B8%8E%E8%A2%AB%E5%8A%A8%EF%BC%9AQ-%E4%B8%8E-K-%E7%9A%84%E8%81%9A%E5%85%89%E7%81%AF%E6%95%88%E5%BA%94"><span class="toc-text">2.2 主动与被动：Q 与 K 的聚光灯效应</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E7%9F%A9%E9%98%B5%E7%BB%B4%E5%BA%A6%E7%9A%84%E7%A7%98%E5%AF%86%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E7%BB%B4%E5%BA%A6%E5%BF%85%E9%A1%BB%E4%B8%80%E6%A0%B7%EF%BC%9F"><span class="toc-text">2.3 矩阵维度的秘密：为什么维度必须一样？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%AE%8C%E6%95%B4%E5%AE%9E%E6%88%98%EF%BC%9A%E5%BE%B7%E8%AF%AD%E5%88%B0%E8%8B%B1%E8%AF%AD%E7%BF%BB%E8%AF%91%E8%AE%AD%E7%BB%83%E5%85%A8%E8%BF%87%E7%A8%8B"><span class="toc-text">3. 完整实战：德语到英语翻译训练全过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E6%9E%B6%E6%9E%84%E5%85%A8%E6%99%AF%EF%BC%9A%E6%95%B0%E6%8D%AE%E6%98%AF%E5%A6%82%E4%BD%95%E6%B5%81%E5%8A%A8%E7%9A%84%EF%BC%9F"><span class="toc-text">3.1 架构全景：数据是如何流动的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E6%AD%A5%E9%AA%A4%E4%B8%80%EF%BC%9AEncoder-%E8%AF%BB%E6%87%82%E5%BE%B7%E8%AF%AD"><span class="toc-text">3.2 步骤一：Encoder (读懂德语)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E6%AD%A5%E9%AA%A4%E4%BA%8C%EF%BC%9ADecoder-%E7%9A%84%E6%A0%B8%E5%BF%83-Cross-Attention"><span class="toc-text">3.3 步骤二：Decoder 的核心 (Cross-Attention)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E6%AD%A5%E9%AA%A4%E4%B8%89%EF%BC%9AMask-%E6%9C%BA%E5%88%B6-%E4%B8%8D%E8%AE%B8%E5%81%B7%E7%9C%8B"><span class="toc-text">3.4 步骤三：Mask 机制 (不许偷看)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-%E6%AD%A5%E9%AA%A4%E5%9B%9B%EF%BC%9A%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97%E4%B8%8E-Loss"><span class="toc-text">3.5 步骤四：并行计算与 Loss</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%9E%81%E7%AE%80%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-Python-x2F-PyTorch"><span class="toc-text">4. 极简代码实现 (Python&#x2F;PyTorch)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%A0%B8%E5%BF%83%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E4%B8%8E%E7%BB%B4%E5%BA%A6-The-Math-amp-Dimensions"><span class="toc-text">5. 核心数学公式与维度 (The Math &amp; Dimensions)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-Self-Attention-%E5%8D%95%E5%A4%B4"><span class="toc-text">5.1 Self-Attention (单头)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-Cross-Attention-%E6%B7%B7%E5%90%88%E5%8F%8C%E6%89%93"><span class="toc-text">5.2 Cross-Attention (混合双打)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E6%9C%80%E7%BB%88%E8%BE%93%E5%87%BA-Word-Prediction"><span class="toc-text">5.3 最终输出 (Word Prediction)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E8%B4%B9%E6%9B%BC%E8%87%AA%E6%B5%8B-Self-Check"><span class="toc-text">6. 费曼自测 (Self-Check)</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/02/02/Transformer-DeepDive/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

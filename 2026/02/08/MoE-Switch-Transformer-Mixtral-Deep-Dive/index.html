@@ -1,0 +1,1314 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>MoE 深度解析：Switch Transformer 与 Mixtral 的稀疏之道 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="【费曼式深度解析】从零理解 Mixture of Experts 的核心机制。详解 Router 路由、Load Balance Loss 推导、梯度流动分析，含完整 Tensor 维度变化图解与生产级代码实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MoE 深度解析：Switch Transformer 与 Mixtral 的稀疏之道">
+<meta property="og:url" content="https://caiusy.github.io/2026/02/08/MoE-Switch-Transformer-Mixtral-Deep-Dive/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="【费曼式深度解析】从零理解 Mixture of Experts 的核心机制。详解 Router 路由、Load Balance Loss 推导、梯度流动分析，含完整 Tensor 维度变化图解与生产级代码实现。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-02-08T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-08T02:00:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="MoE">
+<meta property="article:tag" content="Switch Transformer">
+<meta property="article:tag" content="Mixtral">
+<meta property="article:tag" content="大模型架构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="深度学习,MoE,Switch Transformer,Mixtral,大模型架构">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-02-08T10:00:00+08:00","dateModified":"2026-02-08T10:00:00+08:00","datePublished":"2026-02-08T10:00:00+08:00","description":"","headline":"MoE 深度解析：Switch Transformer 与 Mixtral 的稀疏之道","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/02/08/MoE-Switch-Transformer-Mixtral-Deep-Dive/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/02/08/MoE-Switch-Transformer-Mixtral-Deep-Dive/","keywords":"深度学习, MoE, Switch Transformer, Mixtral, 大模型架构","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-02-08T02:00:00.000Z">2026-02-08</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-08T02:00:00.000Z">2026-02-08</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>MoE 深度解析：Switch Transformer 与 Mixtral 的稀疏之道</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h1 id="MoE-深度解析：Switch-Transformer-与-Mixtral-的稀疏之道"><a href="#MoE-深度解析：Switch-Transformer-与-Mixtral-的稀疏之道" class="headerlink" title="MoE 深度解析：Switch Transformer 与 Mixtral 的稀疏之道"></a>MoE 深度解析：Switch Transformer 与 Mixtral 的稀疏之道</h1><blockquote>
+<p>📅 <strong>创建时间</strong>：2026-02-08<br>🏷️ <strong>标签</strong>：#MoE #SwitchTransformer #Mixtral #稀疏计算 #大模型<br>📚 <strong>学习方法</strong>：费曼式讲解 + 数学推导 + 代码实现<br>📖 <strong>前置知识</strong>：Transformer FFN 层, Softmax, PyTorch 基础</p>
+</blockquote>
+<hr>
+<h2 id="🎯-一句话理解-MoE"><a href="#🎯-一句话理解-MoE" class="headerlink" title="🎯 一句话理解 MoE"></a>🎯 一句话理解 MoE</h2><div class="feynman-box">
+<h4>🧠 费曼式理解</h4>
+<p><strong>MoE 就像一家拥有 128 个专科医生的医院。</strong></p>
+<p>普通医院：所有病人都找同一个全科医生（稠密 FFN）→ 医生累死，效率低下。</p>
+<p>MoE 医院：前台护士（Router）快速判断病情，把心脏病人分给心脏专家，骨折病人分给骨科专家。每个病人只见 1-2 个专家，但医院总共有 128 个专家随时待命。</p>
+<p><strong>结果</strong>：医院容量提升 128 倍，但每个病人的等待时间几乎不变！</p>
+</div>
+
+<hr>
+<h2 id="📋-目录"><a href="#📋-目录" class="headerlink" title="📋 目录"></a>📋 目录</h2><ol>
+<li><a href="#why-moe">为什么需要 MoE？</a></li>
+<li><a href="#mechanism">核心机制：Router + Expert</a></li>
+<li><a href="#tensor-flow">Tensor 维度变化全图解</a></li>
+<li><a href="#training">Training Loop：梯度如何流动？</a></li>
+<li><a href="#comparison">Switch vs Mixtral：关键差异</a></li>
+<li><a href="#code">完整代码实现</a></li>
+<li><a href="#quiz">费曼自测题</a></li>
+</ol>
+<hr>
+<p><a id="why-moe"></a></p>
+<h2 id="1-为什么需要-MoE？"><a href="#1-为什么需要-MoE？" class="headerlink" title="1. 为什么需要 MoE？"></a>1. 为什么需要 MoE？</h2><h3 id="1-1-稠密模型的困境"><a href="#1-1-稠密模型的困境" class="headerlink" title="1.1 稠密模型的困境"></a>1.1 稠密模型的困境</h3><p>传统 Transformer 的 FFN 层占据了 <strong>2/3 的参数量</strong>：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DenseFFN</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, d_model=<span class="number">1024</span>, d_ff=<span class="number">4096</span></span>):</span><br><span class="line">        self.W1 = nn.Linear(d_model, d_ff)   <span class="comment"># [1024, 4096] = 4.2M 参数</span></span><br><span class="line">        self.W2 = nn.Linear(d_ff, d_model)   <span class="comment"># [4096, 1024] = 4.2M 参数</span></span><br><span class="line">        <span class="comment"># 总计 8.4M 参数，每个 token 都要过一遍</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>问题</strong>：</p>
+<ul>
+<li>GPT-3 (175B) 每次推理都激活 <strong>100% 参数</strong></li>
+<li>推理成本 ∝ 参数量 → 参数越多，推理越慢</li>
+<li><strong>扩展悖论</strong>：想要更聪明，就必须更慢？</li>
+</ul>
+<h3 id="1-2-MoE-的核心洞察"><a href="#1-2-MoE-的核心洞察" class="headerlink" title="1.2 MoE 的核心洞察"></a>1.2 MoE 的核心洞察</h3><div class="insight-box">
+<strong>💡 关键洞察</strong>：不同的 token 需要不同的"知识"来处理。
+<ul>
+<li>"The capital of France is" → 需要<strong>地理知识</strong></li>
+<li>"def quicksort(arr):" → 需要<strong>编程知识</strong></li>
+<li>"I feel so happy" → 需要<strong>情感理解</strong></li>
+</ul>
+<p>为什么要让同一个 FFN 处理所有这些？让专家各司其职！</p>
+</div>
+
+<p><strong>MoE 的解决方案</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>稠密 FFN</th>
+<th>MoE (128 Experts)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>总参数量</td>
+<td>8.4M</td>
+<td>8.4M × 128 = <strong>1.075B</strong></td>
+</tr>
+<tr>
+<td>每次激活参数</td>
+<td>8.4M (100%)</td>
+<td>8.4M (<strong>0.78%</strong>)</td>
+</tr>
+<tr>
+<td>模型容量</td>
+<td>1×</td>
+<td><strong>128×</strong></td>
+</tr>
+<tr>
+<td>推理成本</td>
+<td>1×</td>
+<td><strong>≈ 1×</strong></td>
+</tr>
+</tbody></table>
+<p><strong>这就是 MoE 的魔法</strong>：参数量暴涨 128 倍，推理成本几乎不变！</p>
+<hr>
+<p><a id="mechanism"></a></p>
+<h2 id="2-核心机制：Router-Expert"><a href="#2-核心机制：Router-Expert" class="headerlink" title="2. 核心机制：Router + Expert"></a>2. 核心机制：Router + Expert</h2><h3 id="2-1-架构总览"><a href="#2-1-架构总览" class="headerlink" title="2.1 架构总览"></a>2.1 架构总览</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">输入 Token [B, L, D]</span><br><span class="line">       ↓</span><br><span class="line">   ┌─────────┐</span><br><span class="line">   │ Router  │  ← 一个简单的 Linear 层</span><br><span class="line">   └────┬────┘</span><br><span class="line">        ↓ Softmax + Top-K</span><br><span class="line">   ┌────┴────┐</span><br><span class="line">   ↓    ↓    ↓</span><br><span class="line">┌───┐ ┌───┐ ┌───┐</span><br><span class="line">│E_0│ │E_1│ │...│ │E_127│  ← 128 个并行的 FFN</span><br><span class="line">└─┬─┘ └─┬─┘ └───┘</span><br><span class="line">  │     │</span><br><span class="line">  └──┬──┘</span><br><span class="line">     ↓ 加权求和</span><br><span class="line">输出 [B, L, D]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="2-2-Router：交通调度员"><a href="#2-2-Router：交通调度员" class="headerlink" title="2.2 Router：交通调度员"></a>2.2 Router：交通调度员</h3><p>Router 就是一个 <strong>Linear 层</strong>，把每个 token 映射到 N 个 Expert 的概率分布：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Router 的全部代码</span></span><br><span class="line">self.router = nn.Linear(d_model, num_experts, bias=<span class="literal">False</span>)  <span class="comment"># [1024, 128]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 前向传播</span></span><br><span class="line">router_logits = self.router(x)           <span class="comment"># [B, L, 128]</span></span><br><span class="line">router_probs = F.softmax(router_logits, dim=-<span class="number">1</span>)  <span class="comment"># 概率分布</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>具体例子</strong>：</p>
+<p>假设一个 token 的 embedding 是 <code>x = [0.1, 0.2, ..., 0.5]</code>（1024 维）</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Router 计算</span></span><br><span class="line">router_logits = W_router @ x  <span class="comment"># [128]</span></span><br><span class="line"><span class="comment"># 假设结果是 [2.1, 0.5, 3.2, 0.1, ..., 0.8]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Softmax 归一化</span></span><br><span class="line">router_probs = softmax(router_logits)</span><br><span class="line"><span class="comment"># [0.15, 0.03, 0.45, 0.01, ..., 0.02]</span></span><br><span class="line"><span class="comment">#   ↑                ↑</span></span><br><span class="line"><span class="comment"># Expert 0: 15%   Expert 2: 45% ← 选这个！</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="2-3-Top-K-选择"><a href="#2-3-Top-K-选择" class="headerlink" title="2.3 Top-K 选择"></a>2.3 Top-K 选择</h3><p>**Switch Transformer (Top-1)**：每个 token 只选 <strong>1 个</strong> Expert</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">topk_probs, topk_indices = torch.topk(router_probs, k=<span class="number">1</span>)</span><br><span class="line"><span class="comment"># topk_indices = [2]  ← 选择 Expert 2</span></span><br><span class="line"><span class="comment"># topk_probs = [0.45] ← 权重 0.45</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>**Mixtral (Top-2)**：每个 token 选 <strong>2 个</strong> Expert</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">topk_probs, topk_indices = torch.topk(router_probs, k=<span class="number">2</span>)</span><br><span class="line"><span class="comment"># topk_indices = [2, 0]  ← 选择 Expert 2 和 Expert 0</span></span><br><span class="line"><span class="comment"># topk_probs = [0.45, 0.15] → 归一化 → [0.75, 0.25]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="2-4-稀疏计算的实现"><a href="#2-4-稀疏计算的实现" class="headerlink" title="2.4 稀疏计算的实现"></a>2.4 稀疏计算的实现</h3><div class="warning-box">
+<strong>⚠️ 关键问题</strong>：128 个 Expert，每个 token 只用 1 个，怎么高效计算？
+</div>
+
+<p><strong>朴素实现</strong>（低效）：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> expert_id <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">128</span>):</span><br><span class="line">    mask = (topk_indices == expert_id)</span><br><span class="line">    <span class="keyword">if</span> mask.<span class="built_in">any</span>():</span><br><span class="line">        output[mask] = experts[expert_id](x[mask])</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>优化实现</strong>（实际使用）：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 按 Expert ID 重排所有 token</span></span><br><span class="line">sorted_indices = topk_indices.argsort()</span><br><span class="line">sorted_x = x[sorted_indices]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 批量处理每个 Expert 的 token</span></span><br><span class="line">expert_outputs = []</span><br><span class="line"><span class="keyword">for</span> expert_id, expert <span class="keyword">in</span> <span class="built_in">enumerate</span>(experts):</span><br><span class="line">    start, end = expert_boundaries[expert_id]</span><br><span class="line">    <span class="keyword">if</span> start &lt; end:</span><br><span class="line">        expert_outputs.append(expert(sorted_x[start:end]))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 还原到原始顺序</span></span><br><span class="line">output = torch.cat(expert_outputs)[inverse_indices]</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<p><a id="tensor-flow"></a></p>
+<h2 id="3-Tensor-维度变化全图解"><a href="#3-Tensor-维度变化全图解" class="headerlink" title="3. Tensor 维度变化全图解"></a>3. Tensor 维度变化全图解</h2><div class="feynman-box">
+<h4>🎨 可视化是建立直觉的最快方式</h4>
+<p>让我们跟踪一个具体的例子，看 Tensor 如何流动。</p>
+</div>
+
+<h3 id="3-1-配置参数"><a href="#3-1-配置参数" class="headerlink" title="3.1 配置参数"></a>3.1 配置参数</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">batch_size = <span class="number">8</span></span><br><span class="line">seq_len = <span class="number">512</span></span><br><span class="line">d_model = <span class="number">1024</span></span><br><span class="line">num_experts = <span class="number">128</span></span><br><span class="line">d_ff = <span class="number">4096</span>  <span class="comment"># 每个 Expert 的 FFN 隐藏层</span></span><br><span class="line">top_k = <span class="number">1</span>    <span class="comment"># Switch Transformer</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="3-2-完整数据流"><a href="#3-2-完整数据流" class="headerlink" title="3.2 完整数据流"></a>3.2 完整数据流</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│ Step 0: Input                                               │</span><br><span class="line">│ x: [8, 512, 1024]                                          │</span><br><span class="line">│ 含义: 8 个样本，每个 512 个 token，每个 token 1024 维        │</span><br><span class="line">└───────────────────────────┬─────────────────────────────────┘</span><br><span class="line">                            ↓</span><br><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│ Step 1: Router Logits                                       │</span><br><span class="line">│ router_logits = W_r @ x                                     │</span><br><span class="line">│ W_r: [1024, 128]                                           │</span><br><span class="line">│ router_logits: [8, 512, 128]                               │</span><br><span class="line">│ 含义: 每个 token 对 128 个 Expert 的"打分"                  │</span><br><span class="line">└───────────────────────────┬─────────────────────────────────┘</span><br><span class="line">                            ↓ Softmax</span><br><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│ Step 2: Router Probabilities                                │</span><br><span class="line">│ router_probs = softmax(router_logits, dim=-1)              │</span><br><span class="line">│ router_probs: [8, 512, 128]                                │</span><br><span class="line">│ 含义: 每个 token 选择各 Expert 的概率                        │</span><br><span class="line">│ 每行和 = 1.0                                                │</span><br><span class="line">└───────────────────────────┬─────────────────────────────────┘</span><br><span class="line">                            ↓ Top-1</span><br><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│ Step 3: Top-K Selection                                     │</span><br><span class="line">│ topk_probs: [8, 512, 1]   ← 最大概率值                      │</span><br><span class="line">│ topk_indices: [8, 512, 1] ← Expert ID (0-127)              │</span><br><span class="line">│                                                             │</span><br><span class="line">│ 例: Token[0,0] → Expert 42, 权重 0.67                       │</span><br><span class="line">│     Token[0,1] → Expert 7,  权重 0.81                       │</span><br><span class="line">│     Token[0,2] → Expert 42, 权重 0.55  ← 同一个 Expert!     │</span><br><span class="line">└───────────────────────────┬─────────────────────────────────┘</span><br><span class="line">                            ↓ Dispatch</span><br><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│ Step 4: Expert Processing (稀疏!)                           │</span><br><span class="line">│                                                             │</span><br><span class="line">│ Expert 7:  收到 32 个 token  → [32, 1024]                   │</span><br><span class="line">│ Expert 42: 收到 48 个 token  → [48, 1024]  ← 负载不均!      │</span><br><span class="line">│ Expert 99: 收到 0 个 token   → 空闲                         │</span><br><span class="line">│ ...                                                         │</span><br><span class="line">│                                                             │</span><br><span class="line">│ 每个 Expert 内部:                                            │</span><br><span class="line">│ [N_i, 1024] → W1 → [N_i, 4096] → GELU → W2 → [N_i, 1024]   │</span><br><span class="line">└───────────────────────────┬─────────────────────────────────┘</span><br><span class="line">                            ↓ Weighted Combine</span><br><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│ Step 5: Output                                              │</span><br><span class="line">│ output[i] = topk_probs[i] × expert_output[i]               │</span><br><span class="line">│ output: [8, 512, 1024]                                     │</span><br><span class="line">│ 维度与输入完全一致!                                          │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="3-3-可视化：Router-决策热力图"><a href="#3-3-可视化：Router-决策热力图" class="headerlink" title="3.3 可视化：Router 决策热力图"></a>3.3 可视化：Router 决策热力图</h3><p><img src="/images/moe/01_router_decision_load.png" alt="Router 决策与负载分布"><br><em>图 3.1: Router 决策热力图 (左)、Top-1 分配 (中)、负载分布 (右)</em></p>
+<p><strong>解读</strong>：</p>
+<ul>
+<li><strong>左图</strong>：每列是一个 token 对 16 个 Expert 的概率（颜色越深 = 概率越高）</li>
+<li><strong>中图</strong>：每个 token 最终选择的 Expert（绿色 = 被选中）</li>
+<li><strong>右图</strong>：Expert 负载分布<ul>
+<li>🔴 红色柱子 = 过载（如 Expert 2 处理 12 个 token）</li>
+<li>🟠 橙色柱子 = 空闲（如 Expert 13 只处理 1 个）</li>
+<li>🟢 绿色虚线 = 理想均衡值</li>
+</ul>
+</li>
+</ul>
+<p><strong>这就是负载不均衡问题的根源！</strong></p>
+<hr>
+<p><a id="training"></a></p>
+<h2 id="4-Training-Loop：梯度如何流动？"><a href="#4-Training-Loop：梯度如何流动？" class="headerlink" title="4. Training Loop：梯度如何流动？"></a>4. Training Loop：梯度如何流动？</h2><h3 id="4-1-完整的-Loss-函数"><a href="#4-1-完整的-Loss-函数" class="headerlink" title="4.1 完整的 Loss 函数"></a>4.1 完整的 Loss 函数</h3>
+$$
+\mathcal{L}_{\text{total}} = \underbrace{\mathcal{L}_{\text{task}}}_{\text{Task Loss}} + \alpha \cdot \underbrace{\mathcal{L}_{\text{balance}}}_{\text{Load Balance}}
+$$
+
+
+<p>其中 $\alpha = 0.01$（Switch Transformer 推荐值）</p>
+<h3 id="4-2-Load-Balance-Loss-推导"><a href="#4-2-Load-Balance-Loss-推导" class="headerlink" title="4.2 Load Balance Loss 推导"></a>4.2 Load Balance Loss 推导</h3><div class="feynman-box">
+<h4>🧠 费曼式理解 Load Balance Loss</h4>
+<p>想象你是医院管理者，要让 128 个专家的工作量均衡：</p>
+<ul>
+<li><strong>f_i</strong> = Expert i 实际接诊的病人比例（频率）</li>
+<li><strong>P_i</strong> = 护士给 Expert i 的平均推荐概率</li>
+</ul>
+<p>如果某个专家既<strong>实际接诊多</strong>（f 大），又<strong>被推荐概率高</strong>（P 大），说明系统在"偏袒"这个专家。惩罚它！</p>
+</div>
+
+<p><strong>数学定义</strong>：</p>
+
+$$
+f_i = \frac{1}{B \cdot L} \sum_{b,l} \mathbb{1}[\text{Top1}(x_{b,l}) = i]
+$$
+
+$$
+P_i = \frac{1}{B \cdot L} \sum_{b,l} \text{Router}(x_{b,l})_i
+$$
+
+$$
+\mathcal{L}_{\text{balance}} = N \cdot \sum_{i=1}^{N} f_i \cdot P_i
+$$
+
+
+<p><strong>具体计算例子</strong>：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 假设 4 个 Expert，8 个 token</span></span><br><span class="line">router_probs = torch.tensor([</span><br><span class="line">    [<span class="number">0.7</span>, <span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.1</span>],  <span class="comment"># Token 0 → Expert 0 (p=0.7)</span></span><br><span class="line">    [<span class="number">0.6</span>, <span class="number">0.2</span>, <span class="number">0.1</span>, <span class="number">0.1</span>],  <span class="comment"># Token 1 → Expert 0 (p=0.6)</span></span><br><span class="line">    [<span class="number">0.5</span>, <span class="number">0.3</span>, <span class="number">0.1</span>, <span class="number">0.1</span>],  <span class="comment"># Token 2 → Expert 0 (p=0.5)</span></span><br><span class="line">    [<span class="number">0.4</span>, <span class="number">0.4</span>, <span class="number">0.1</span>, <span class="number">0.1</span>],  <span class="comment"># Token 3 → Expert 0 (p=0.4)</span></span><br><span class="line">    [<span class="number">0.1</span>, <span class="number">0.6</span>, <span class="number">0.2</span>, <span class="number">0.1</span>],  <span class="comment"># Token 4 → Expert 1</span></span><br><span class="line">    [<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.7</span>, <span class="number">0.1</span>],  <span class="comment"># Token 5 → Expert 2</span></span><br><span class="line">    [<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.7</span>],  <span class="comment"># Token 6 → Expert 3</span></span><br><span class="line">    [<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.7</span>],  <span class="comment"># Token 7 → Expert 3</span></span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Top-1 选择结果: [0, 0, 0, 0, 1, 2, 3, 3]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算 f (频率)</span></span><br><span class="line">f = [<span class="number">4</span>/<span class="number">8</span>, <span class="number">1</span>/<span class="number">8</span>, <span class="number">1</span>/<span class="number">8</span>, <span class="number">2</span>/<span class="number">8</span>]  <span class="comment"># = [0.5, 0.125, 0.125, 0.25]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 计算 P (平均概率)</span></span><br><span class="line">P = router_probs.mean(dim=<span class="number">0</span>)  <span class="comment"># = [0.325, 0.2375, 0.1625, 0.2375]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Load Balance Loss</span></span><br><span class="line">N = <span class="number">4</span></span><br><span class="line">L_balance = N * <span class="built_in">sum</span>(f[i] * P[i] <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">4</span>))</span><br><span class="line"><span class="comment"># = 4 * (0.5×0.325 + 0.125×0.2375 + 0.125×0.1625 + 0.25×0.2375)</span></span><br><span class="line"><span class="comment"># = 4 * 0.2719 = 1.0876</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>梯度分析</strong>：</p>
+
+$$
+\frac{\partial \mathcal{L}_{\text{balance}}}{\partial P_i} = N \cdot f_i
+$$
+
+
+<ul>
+<li>Expert 0: $\nabla P_0 = 4 \times 0.5 = 2.0$ ← 梯度最大，会被惩罚！</li>
+<li>Expert 1: $\nabla P_1 = 4 \times 0.125 = 0.5$ ← 梯度较小</li>
+</ul>
+<p>→ 训练会<strong>降低 Expert 0 的概率，提升其他 Expert 的概率</strong></p>
+<h3 id="4-3-梯度流动图解"><a href="#4-3-梯度流动图解" class="headerlink" title="4.3 梯度流动图解"></a>4.3 梯度流动图解</h3><p><img src="/images/moe/03_gradient_flow.png" alt="梯度流动路径"><br><em>图 4.1: MoE 反向传播的完整梯度流动路径</em></p>
+<p><strong>关键点</strong>：</p>
+<ol>
+<li><p><strong>Expert 参数的梯度</strong>：</p>
+<ul>
+<li>✅ 被选中的 Expert 收到梯度</li>
+<li>❌ 未被选中的 Expert 梯度为 0</li>
+</ul>
+</li>
+<li><p><strong>Router 参数收到两种梯度</strong>：</p>
+<ul>
+<li>🔵 来自主任务 Loss（通过 Gating Weight）</li>
+<li>🟠 来自 Load Balance Loss（直接作用于 softmax）</li>
+</ul>
+</li>
+<li><p><strong>梯度冲突</strong>：</p>
+<ul>
+<li>主任务想让 Router <strong>选择最好的 Expert</strong></li>
+<li>LB Loss 想让 Router <strong>均匀分配</strong></li>
+<li>$\alpha = 0.01$ 平衡这两个目标</li>
+</ul>
+</li>
+</ol>
+<h3 id="4-4-训练稳定性技巧"><a href="#4-4-训练稳定性技巧" class="headerlink" title="4.4 训练稳定性技巧"></a>4.4 训练稳定性技巧</h3><table>
+<thead>
+<tr>
+<th>技巧</th>
+<th>原因</th>
+<th>代码</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>小初始化</strong></td>
+<td>防止 Router 一开始就偏向某些 Expert</td>
+<td><code>nn.init.normal_(router.weight, std=0.01)</code></td>
+</tr>
+<tr>
+<td><strong>Capacity Factor</strong></td>
+<td>限制每个 Expert 最多处理的 token 数</td>
+<td><code>capacity = (B*L/N) * 1.25</code></td>
+</tr>
+<tr>
+<td><strong>BF16 训练</strong></td>
+<td>防止 softmax 上溢/下溢</td>
+<td><code>model.to(torch.bfloat16)</code></td>
+</tr>
+<tr>
+<td><strong>梯度裁剪</strong></td>
+<td>防止梯度爆炸</td>
+<td><code>clip_grad_norm_(params, 1.0)</code></td>
+</tr>
+</tbody></table>
+<hr>
+<p><a id="comparison"></a></p>
+<h2 id="5-Switch-vs-Mixtral：关键差异"><a href="#5-Switch-vs-Mixtral：关键差异" class="headerlink" title="5. Switch vs Mixtral：关键差异"></a>5. Switch vs Mixtral：关键差异</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Switch Transformer (2021)</th>
+<th>Mixtral 8x7B (2023)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Top-K</strong></td>
+<td>Top-1（极致稀疏）</td>
+<td>Top-2（平衡性能）</td>
+</tr>
+<tr>
+<td><strong>Expert 数量</strong></td>
+<td>2048（极端多）</td>
+<td>8（适合单机）</td>
+</tr>
+<tr>
+<td><strong>每 token 计算量</strong></td>
+<td>1 个 Expert</td>
+<td>2 个 Expert</td>
+</tr>
+<tr>
+<td><strong>负载均衡</strong></td>
+<td>Auxiliary Loss</td>
+<td>Token Choice + Expert Choice</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>预训练超大模型</td>
+<td>指令微调 + 推理部署</td>
+</tr>
+</tbody></table>
+<p><img src="/images/moe/05_switch_vs_mixtral.png" alt="Switch vs Mixtral 架构对比"><br><em>图 5.1: Switch Transformer (Top-1) vs Mixtral (Top-2) 架构对比</em></p>
+<h3 id="5-1-Mixtral-的-Top-2-优势"><a href="#5-1-Mixtral-的-Top-2-优势" class="headerlink" title="5.1 Mixtral 的 Top-2 优势"></a>5.1 Mixtral 的 Top-2 优势</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Top-2 路由</span></span><br><span class="line">topk_probs, topk_indices = torch.topk(router_probs, k=<span class="number">2</span>)</span><br><span class="line"><span class="comment"># 归一化</span></span><br><span class="line">topk_probs = topk_probs / topk_probs.<span class="built_in">sum</span>(dim=-<span class="number">1</span>, keepdim=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出 = w1 * Expert1(x) + w2 * Expert2(x)</span></span><br><span class="line">output = topk_probs[:, <span class="number">0</span>] * expert1_out + topk_probs[:, <span class="number">1</span>] * expert2_out</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>优势</strong>：</p>
+<ul>
+<li>更好的<strong>容错性</strong>（如果 Top-1 过载，Top-2 补充）</li>
+<li>负载<strong>自然更均衡</strong></li>
+<li>训练<strong>更稳定</strong></li>
+</ul>
+<p><strong>代价</strong>：</p>
+<ul>
+<li>推理成本 ×2（但仍远低于稠密模型：8 个 Expert 只激活 2 个 = 25%）</li>
+</ul>
+<hr>
+<p><a id="code"></a></p>
+<h2 id="6-完整代码实现"><a href="#6-完整代码实现" class="headerlink" title="6. 完整代码实现"></a>6. 完整代码实现</h2><h3 id="6-1-Switch-MoE-Layer"><a href="#6-1-Switch-MoE-Layer" class="headerlink" title="6.1 Switch MoE Layer"></a>6.1 Switch MoE Layer</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SwitchMoELayer</span>(nn.Module):</span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Switch Transformer 的 MoE Layer 实现</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    参数:</span></span><br><span class="line"><span class="string">        d_model: 输入/输出维度</span></span><br><span class="line"><span class="string">        num_experts: Expert 数量</span></span><br><span class="line"><span class="string">        d_ff: FFN 隐藏层维度</span></span><br><span class="line"><span class="string">        capacity_factor: 容量因子（默认 1.25）</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, d_model=<span class="number">1024</span>, num_experts=<span class="number">128</span>, d_ff=<span class="number">4096</span>, </span></span><br><span class="line"><span class="params">                 capacity_factor=<span class="number">1.25</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.num_experts = num_experts</span><br><span class="line">        self.capacity_factor = capacity_factor</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># Router: 简单的 Linear 层</span></span><br><span class="line">        self.router = nn.Linear(d_model, num_experts, bias=<span class="literal">False</span>)</span><br><span class="line">        nn.init.normal_(self.router.weight, std=<span class="number">0.01</span>)  <span class="comment"># 关键：小初始化</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># Experts: N 个独立的 FFN</span></span><br><span class="line">        self.experts = nn.ModuleList([</span><br><span class="line">            nn.Sequential(</span><br><span class="line">                nn.Linear(d_model, d_ff),</span><br><span class="line">                nn.GELU(),</span><br><span class="line">                nn.Linear(d_ff, d_model)</span><br><span class="line">            ) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(num_experts)</span><br><span class="line">        ])</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        B, L, D = x.shape</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># Step 1: Router 计算</span></span><br><span class="line">        router_logits = self.router(x)  <span class="comment"># [B, L, N]</span></span><br><span class="line">        router_probs = F.softmax(router_logits, dim=-<span class="number">1</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># Step 2: Top-1 选择</span></span><br><span class="line">        topk_probs, topk_indices = torch.topk(router_probs, k=<span class="number">1</span>, dim=-<span class="number">1</span>)</span><br><span class="line">        topk_probs = topk_probs.squeeze(-<span class="number">1</span>)      <span class="comment"># [B, L]</span></span><br><span class="line">        topk_indices = topk_indices.squeeze(-<span class="number">1</span>)  <span class="comment"># [B, L]</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># Step 3: 容量限制</span></span><br><span class="line">        capacity = <span class="built_in">int</span>((B * L / self.num_experts) * self.capacity_factor)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># Step 4: Expert 计算</span></span><br><span class="line">        output = torch.zeros_like(x)</span><br><span class="line">        expert_counts = torch.zeros(self.num_experts, device=x.device)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> expert_id <span class="keyword">in</span> <span class="built_in">range</span>(self.num_experts):</span><br><span class="line">            mask = (topk_indices == expert_id)</span><br><span class="line">            num_tokens = mask.<span class="built_in">sum</span>().item()</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> num_tokens == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 容量限制：只选概率最高的 token</span></span><br><span class="line">            <span class="keyword">if</span> num_tokens &gt; capacity:</span><br><span class="line">                masked_probs = torch.where(</span><br><span class="line">                    mask, topk_probs, </span><br><span class="line">                    torch.tensor(-<span class="number">1e9</span>, device=x.device)</span><br><span class="line">                )</span><br><span class="line">                _, top_indices = torch.topk(masked_probs.flatten(), k=capacity)</span><br><span class="line">                new_mask = torch.zeros_like(mask.flatten(), dtype=torch.<span class="built_in">bool</span>)</span><br><span class="line">                new_mask[top_indices] = <span class="literal">True</span></span><br><span class="line">                mask = new_mask.view(B, L)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># Expert 前向传播</span></span><br><span class="line">            selected_x = x[mask]</span><br><span class="line">            expert_out = self.experts[expert_id](selected_x)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 加权输出</span></span><br><span class="line">            weights = topk_probs[mask].unsqueeze(-<span class="number">1</span>)</span><br><span class="line">            output[mask] = expert_out * weights</span><br><span class="line">            expert_counts[expert_id] = mask.<span class="built_in">sum</span>().item()</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># Step 5: 计算 Load Balance Loss</span></span><br><span class="line">        f = expert_counts / (B * L)</span><br><span class="line">        P = router_probs.mean(dim=[<span class="number">0</span>, <span class="number">1</span>])</span><br><span class="line">        load_balance_loss = self.num_experts * (f * P).<span class="built_in">sum</span>()</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> output, load_balance_loss</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ===== 测试代码 =====</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    moe = SwitchMoELayer(d_model=<span class="number">512</span>, num_experts=<span class="number">8</span>, d_ff=<span class="number">2048</span>)</span><br><span class="line">    x = torch.randn(<span class="number">2</span>, <span class="number">16</span>, <span class="number">512</span>)</span><br><span class="line">    </span><br><span class="line">    output, lb_loss = moe(x)</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f"Input:  <span class="subst">{x.shape}</span>"</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f"Output: <span class="subst">{output.shape}</span>"</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f"LB Loss: <span class="subst">{lb_loss.item():<span class="number">.4</span>f}</span>"</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 反向传播测试</span></span><br><span class="line">    total_loss = output.<span class="built_in">sum</span>() + <span class="number">0.01</span> * lb_loss</span><br><span class="line">    total_loss.backward()</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f"Router grad norm: <span class="subst">{moe.router.weight.grad.norm():<span class="number">.4</span>f}</span>"</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="6-2-完整训练循环"><a href="#6-2-完整训练循环" class="headerlink" title="6.2 完整训练循环"></a>6.2 完整训练循环</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch.optim <span class="keyword">as</span> optim</span><br><span class="line"></span><br><span class="line">model = SwitchMoELayer(d_model=<span class="number">512</span>, num_experts=<span class="number">16</span>, d_ff=<span class="number">2048</span>)</span><br><span class="line">optimizer = optim.AdamW(model.parameters(), lr=<span class="number">1e-4</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    x = torch.randn(<span class="number">8</span>, <span class="number">64</span>, <span class="number">512</span>)</span><br><span class="line">    target = torch.randn(<span class="number">8</span>, <span class="number">64</span>, <span class="number">512</span>)</span><br><span class="line">    </span><br><span class="line">    output, lb_loss = model(x)</span><br><span class="line">    main_loss = F.mse_loss(output, target)</span><br><span class="line">    total_loss = main_loss + <span class="number">0.01</span> * lb_loss</span><br><span class="line">    </span><br><span class="line">    optimizer.zero_grad()</span><br><span class="line">    total_loss.backward()</span><br><span class="line">    torch.nn.utils.clip_grad_norm_(model.parameters(), <span class="number">1.0</span>)</span><br><span class="line">    optimizer.step()</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f"Epoch <span class="subst">{epoch}</span>: Main=<span class="subst">{main_loss:<span class="number">.4</span>f}</span>, LB=<span class="subst">{lb_loss:<span class="number">.4</span>f}</span>"</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>输出示例</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Epoch 0: Main=1.0234, LB=1.4521</span><br><span class="line">Epoch 1: Main=0.9876, LB=1.3214</span><br><span class="line">...</span><br><span class="line">Epoch 9: Main=0.7821, LB=1.0234  ← LB Loss 下降，负载更均衡！</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<p><a id="quiz"></a></p>
+<h2 id="7-费曼自测题"><a href="#7-费曼自测题" class="headerlink" title="7. 费曼自测题"></a>7. 费曼自测题</h2><div class="quiz-box">
+<h4>🧪 检验你是否真正理解了 MoE</h4>
+
+<p><strong>Q1</strong>: 如果 MoE 有 128 个 Expert，每个 Expert 的 FFN 隐藏层是 4096，那么：</p>
+<ul>
+<li>总参数量是多少？</li>
+<li>每次推理激活多少参数？（Top-1）</li>
+</ul>
+<details>
+<summary>点击查看答案</summary>
+
+<ul>
+<li>总参数：$2 \times 1024 \times 4096 \times 128 = 1.07B$</li>
+<li>激活参数：$2 \times 1024 \times 4096 = 8.4M$（仅 0.78%）</li>
+</ul>
+</details>
+
+<hr>
+<p><strong>Q2</strong>: Load Balance Loss 中，$f_i \cdot P_i$ 乘积的直觉含义是什么？</p>
+<details>
+<summary>点击查看答案</summary>
+
+<ul>
+<li>$f_i$ 是 Expert i 实际被选中的频率</li>
+<li>$P_i$ 是 Router 给 Expert i 的平均概率</li>
+<li><strong>乘积大</strong>说明这个 Expert 既被选中多，又被推荐概率高 → 系统在”偏袒”它</li>
+<li>Loss 惩罚这种情况，迫使 Router 更均匀地分配</li>
+</ul>
+</details>
+
+<hr>
+<p><strong>Q3</strong>: 为什么 Mixtral 选择 Top-2 而不是 Top-1？</p>
+<details>
+<summary>点击查看答案</summary>
+
+<ol>
+<li><strong>容错性</strong>：如果 Top-1 Expert 过载，Top-2 补充</li>
+<li><strong>训练稳定性</strong>：负载自然更均衡</li>
+<li><strong>性能</strong>：两个 Expert 的知识互补</li>
+</ol>
+<p>代价：推理成本 ×2，但仍远低于稠密模型</p>
+</details>
+
+<hr>
+<p><strong>Q4</strong>: 如果不使用 Load Balance Loss，会发生什么？</p>
+<details>
+<summary>点击查看答案</summary>
+
+<ul>
+<li>部分 Expert 会被大量选择（马太效应）</li>
+<li>部分 Expert 几乎不被使用 → 参数浪费</li>
+<li>梯度更新不均 → 某些 Expert 过度训练，某些几乎不更新</li>
+<li>极端情况：模型退化为只用 1-2 个 Expert 的”伪 MoE”</li>
+</ul>
+</details>
+</div>
+
+<hr>
+<h2 id="🔗-延伸阅读"><a href="#🔗-延伸阅读" class="headerlink" title="🔗 延伸阅读"></a>🔗 延伸阅读</h2><ol>
+<li><p><strong>论文原文</strong>：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2101.03961">Switch Transformers (2021)</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2401.04088">Mixtral of Experts (2023)</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2006.16668">GShard (2020)</a> - 分布式 MoE</li>
+</ul>
+</li>
+<li><p><strong>开源实现</strong>：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/huggingface/transformers">Hugging Face Transformers</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/facebookresearch/fairseq">Fairseq MoE</a></li>
+</ul>
+</li>
+<li><p><strong>进阶话题</strong>：</p>
+<ul>
+<li>Expert Parallelism vs Tensor Parallelism</li>
+<li>MoE + LoRA 稀疏微调</li>
+<li>Dynamic Expert Selection</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="📊-总结"><a href="#📊-总结" class="headerlink" title="📊 总结"></a>📊 总结</h2><div class="feynman-box">
+<h4>🎯 一图总结 MoE</h4>
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">                 ┌─────────────────────────────────────┐</span><br><span class="line">                 │           MoE 核心公式              │</span><br><span class="line">                 │                                     │</span><br><span class="line">                 │  y = Σ Router(x)_i × Expert_i(x)   │</span><br><span class="line">                 │      i∈Top-K                       │</span><br><span class="line">                 └─────────────────────────────────────┘</span><br><span class="line">                                  ↓</span><br><span class="line">     ┌────────────────────────────┼────────────────────────────┐</span><br><span class="line">     │                            │                            │</span><br><span class="line">┌────┴────┐                 ┌─────┴─────┐                ┌─────┴─────┐</span><br><span class="line">│ Router  │                 │  Experts  │                │   Loss    │</span><br><span class="line">│ (调度)  │                 │  (执行)   │                │  (均衡)   │</span><br><span class="line">└────┬────┘                 └─────┬─────┘                └─────┬─────┘</span><br><span class="line">     │                            │                            │</span><br><span class="line">Softmax+TopK               并行 FFN 层                   f·P 惩罚项</span><br><span class="line">选择 K 个专家              稀疏激活                      防止偏袒</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>记住三个数字</strong>：</p>
+<ul>
+<li><strong>128×</strong> 参数量提升</li>
+<li><strong>1%</strong> 激活率（Top-1 with 128 Experts）</li>
+<li><strong>0.01</strong> Load Balance Loss 权重</li>
+</ul>
+</div>
+
+<hr>
+<p><em>Created: 2026-02-08 by Caius</em><br><em>Tags: #MoE #SwitchTransformer #Mixtral #DeepLearning #LLM</em></p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/02/08/MoE-Switch-Transformer-Mixtral-Deep-Dive/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/02/08/MoE-Switch-Transformer-Mixtral-Deep-Dive/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/02/08/KL%E6%95%A3%E5%BA%A6%E5%AE%8C%E5%85%A8%E5%9B%BE%E8%A7%A3%E6%95%99%E7%A8%8B/">KL散度完全图解教程：从零到精通</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MoE-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%EF%BC%9ASwitch-Transformer-%E4%B8%8E-Mixtral-%E7%9A%84%E7%A8%80%E7%96%8F%E4%B9%8B%E9%81%93"><span class="toc-text">MoE 深度解析：Switch Transformer 与 Mixtral 的稀疏之道</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%AF-%E4%B8%80%E5%8F%A5%E8%AF%9D%E7%90%86%E8%A7%A3-MoE"><span class="toc-text">🎯 一句话理解 MoE</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-text">🧠 费曼式理解</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8B-%E7%9B%AE%E5%BD%95"><span class="toc-text">📋 目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-MoE%EF%BC%9F"><span class="toc-text">1. 为什么需要 MoE？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E7%A8%A0%E5%AF%86%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%9B%B0%E5%A2%83"><span class="toc-text">1.1 稠密模型的困境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-MoE-%E7%9A%84%E6%A0%B8%E5%BF%83%E6%B4%9E%E5%AF%9F"><span class="toc-text">1.2 MoE 的核心洞察</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%A0%B8%E5%BF%83%E6%9C%BA%E5%88%B6%EF%BC%9ARouter-Expert"><span class="toc-text">2. 核心机制：Router + Expert</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E6%9E%B6%E6%9E%84%E6%80%BB%E8%A7%88"><span class="toc-text">2.1 架构总览</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Router%EF%BC%9A%E4%BA%A4%E9%80%9A%E8%B0%83%E5%BA%A6%E5%91%98"><span class="toc-text">2.2 Router：交通调度员</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-Top-K-%E9%80%89%E6%8B%A9"><span class="toc-text">2.3 Top-K 选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E7%A8%80%E7%96%8F%E8%AE%A1%E7%AE%97%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">2.4 稀疏计算的实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Tensor-%E7%BB%B4%E5%BA%A6%E5%8F%98%E5%8C%96%E5%85%A8%E5%9B%BE%E8%A7%A3"><span class="toc-text">3. Tensor 维度变化全图解</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-text">🎨 可视化是建立直觉的最快方式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0"><span class="toc-text">3.1 配置参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%AE%8C%E6%95%B4%E6%95%B0%E6%8D%AE%E6%B5%81"><span class="toc-text">3.2 完整数据流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E5%8F%AF%E8%A7%86%E5%8C%96%EF%BC%9ARouter-%E5%86%B3%E7%AD%96%E7%83%AD%E5%8A%9B%E5%9B%BE"><span class="toc-text">3.3 可视化：Router 决策热力图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Training-Loop%EF%BC%9A%E6%A2%AF%E5%BA%A6%E5%A6%82%E4%BD%95%E6%B5%81%E5%8A%A8%EF%BC%9F"><span class="toc-text">4. Training Loop：梯度如何流动？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E5%AE%8C%E6%95%B4%E7%9A%84-Loss-%E5%87%BD%E6%95%B0"><span class="toc-text">4.1 完整的 Loss 函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-Load-Balance-Loss-%E6%8E%A8%E5%AF%BC"><span class="toc-text">4.2 Load Balance Loss 推导</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-text">🧠 费曼式理解 Load Balance Loss</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E6%A2%AF%E5%BA%A6%E6%B5%81%E5%8A%A8%E5%9B%BE%E8%A7%A3"><span class="toc-text">4.3 梯度流动图解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E8%AE%AD%E7%BB%83%E7%A8%B3%E5%AE%9A%E6%80%A7%E6%8A%80%E5%B7%A7"><span class="toc-text">4.4 训练稳定性技巧</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Switch-vs-Mixtral%EF%BC%9A%E5%85%B3%E9%94%AE%E5%B7%AE%E5%BC%82"><span class="toc-text">5. Switch vs Mixtral：关键差异</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-Mixtral-%E7%9A%84-Top-2-%E4%BC%98%E5%8A%BF"><span class="toc-text">5.1 Mixtral 的 Top-2 优势</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-text">6. 完整代码实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-Switch-MoE-Layer"><span class="toc-text">6.1 Switch MoE Layer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%AE%8C%E6%95%B4%E8%AE%AD%E7%BB%83%E5%BE%AA%E7%8E%AF"><span class="toc-text">6.2 完整训练循环</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E8%B4%B9%E6%9B%BC%E8%87%AA%E6%B5%8B%E9%A2%98"><span class="toc-text">7. 费曼自测题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-text">🧪 检验你是否真正理解了 MoE</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%97-%E5%BB%B6%E4%BC%B8%E9%98%85%E8%AF%BB"><span class="toc-text">🔗 延伸阅读</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8A-%E6%80%BB%E7%BB%93"><span class="toc-text">📊 总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link"><span class="toc-text">🎯 一图总结 MoE</span></a></li></ol></li></ol></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/02/08/MoE-Switch-Transformer-Mixtral-Deep-Dive/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

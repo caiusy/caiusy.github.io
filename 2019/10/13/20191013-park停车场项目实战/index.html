@@ -1,0 +1,935 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>park停车场项目实战 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="park 类对象123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100">
+<meta property="og:type" content="article">
+<meta property="og:title" content="park停车场项目实战">
+<meta property="og:url" content="https://caiusy.github.io/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="park 类对象123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2019-10-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-20T06:58:57.419Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="计算机视觉 - python - opencv">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="计算机视觉 - python - opencv">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2019-10-13T00:00:00+08:00","dateModified":"2026-02-20T14:58:57+08:00","datePublished":"2019-10-13T00:00:00+08:00","description":"","headline":"park停车场项目实战","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/","keywords":"计算机视觉 - python - opencv","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2019-10-12T16:00:00.000Z">2019-10-13</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-20T06:58:57.419Z">2026-02-20</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>park停车场项目实战</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h2 id="park-类对象"><a href="#park-类对象" class="headerlink" title="park 类对象"></a>park 类对象</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding=utf-8</span></span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> os, glob</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Parking</span>:</span><br><span class="line">    <span class="comment"># 显示图片</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show_images</span>(<span class="params">self, images, cmap=<span class="literal">None</span></span>):</span><br><span class="line">        cols = <span class="number">2</span></span><br><span class="line">        rows = (<span class="built_in">len</span>(images)+<span class="number">1</span>)//cols</span><br><span class="line">        plt.figure(figsize=(<span class="number">15</span>,<span class="number">12</span>))</span><br><span class="line">        <span class="keyword">for</span> i, image <span class="keyword">in</span> <span class="built_in">enumerate</span>(images):</span><br><span class="line">            plt.subplot(rows, cols, i+<span class="number">1</span>)</span><br><span class="line">            cmap = <span class="string">'gray'</span> <span class="keyword">if</span>  <span class="built_in">len</span>(image.shape)==<span class="number">2</span> <span class="keyword">else</span> cmap</span><br><span class="line">            plt.imshow(image, cmap=cmap)</span><br><span class="line">            plt.xticks([])</span><br><span class="line">            plt.yticks([])</span><br><span class="line">        plt.tight_layout(pad=<span class="number">0</span>, h_pad=<span class="number">0</span>, w_pad=<span class="number">0</span>)</span><br><span class="line">        plt.show()</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">cv_show</span>(<span class="params">self, name, img</span>):</span><br><span class="line">        cv2.imshow(name,img)</span><br><span class="line">        cv2.waitKey(<span class="number">0</span>)</span><br><span class="line">        cv2.destroyAllWindows()</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">select_rgb_white_yello</span>(<span class="params">self, image</span>):</span><br><span class="line">        <span class="comment"># 过滤掉背景</span></span><br><span class="line">        lower = np.uint8([<span class="number">120</span>,<span class="number">120</span>,<span class="number">120</span>])</span><br><span class="line">        upper = np.uint8([<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>])</span><br><span class="line">        <span class="comment"># lower_red和高于upper_red的部分分别变成0，lower_red～upper_red之间的值变成255,相当于过滤背景</span></span><br><span class="line">        white_mask =  cv2.inRange(image,lower, upper)</span><br><span class="line">        self.cv_show(<span class="string">'white_mask'</span>, white_mask)</span><br><span class="line">        masked = cv2.bitwise_and(image, image, mask = white_mask)</span><br><span class="line">        self.cv_show(<span class="string">'masked'</span>, masked)</span><br><span class="line">        <span class="keyword">return</span> masked</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">convert_gray_sacle</span>(<span class="params">self,image</span>):</span><br><span class="line">        <span class="keyword">return</span> cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)</span><br><span class="line">    <span class="comment"># 检测边缘</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">detect_edges</span>(<span class="params">self, image, low_threshold=<span class="number">50</span>, high_threshold=<span class="number">200</span></span>):</span><br><span class="line">        <span class="keyword">return</span> cv2.Canny(image, low_threshold, high_threshold)</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">filter_region</span>(<span class="params">self, image, vertices</span>):</span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">           剔除不需要的地方</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        mask = np.zeros_like(image)</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(mask.shape) == <span class="number">2</span>:</span><br><span class="line">            cv2.fillPoly(mask, vertices, <span class="number">255</span>)</span><br><span class="line">            self.cv_show(<span class="string">'mask'</span>, mask)</span><br><span class="line">        <span class="keyword">return</span> cv2.bitwise_and(image, mask)</span><br><span class="line">    <span class="comment"># 手动选择区域</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">select_region</span>(<span class="params">self,image</span>):</span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">                手动选择区域</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="comment"># first, define the polygon by vertices</span></span><br><span class="line">        rows, cols = image.shape[:<span class="number">2</span>]</span><br><span class="line">        pt_1  = [cols*<span class="number">0.05</span>, rows*<span class="number">0.90</span>]</span><br><span class="line">        pt_2 = [cols*<span class="number">0.05</span>, rows*<span class="number">0.70</span>]</span><br><span class="line">        pt_3 = [cols*<span class="number">0.30</span>, rows*<span class="number">0.55</span>]</span><br><span class="line">        pt_4 = [cols*<span class="number">0.6</span>, rows*<span class="number">0.15</span>]</span><br><span class="line">        pt_5 = [cols*<span class="number">0.90</span>, rows*<span class="number">0.15</span>]</span><br><span class="line">        pt_6 = [cols*<span class="number">0.90</span>, rows*<span class="number">0.90</span>]</span><br><span class="line">        vertices = np.array([[pt_1, pt_2, pt_3, pt_4, pt_5, pt_6]], dtype=np.int32)</span><br><span class="line">        point_img = image.copy()</span><br><span class="line">        point_img = cv2.cvtColor(point_img, cv2.COLOR_GRAY2RGB)</span><br><span class="line">        <span class="keyword">for</span> point <span class="keyword">in</span> vertices[<span class="number">0</span>]:</span><br><span class="line">            cv2.circle(point_img, (point[<span class="number">0</span>],point[<span class="number">1</span>]), <span class="number">10</span>, (<span class="number">0</span>,<span class="number">0</span>,<span class="number">255</span>), <span class="number">4</span>)</span><br><span class="line">        self.cv_show(<span class="string">'point_img'</span>,point_img)</span><br><span class="line">        <span class="keyword">return</span> self.filter_region(image, vertices)</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">hough_line</span>(<span class="params">self, image</span>):</span><br><span class="line">        <span class="comment"># 输入的图像需要是边缘检测后的结果</span></span><br><span class="line">        <span class="comment"># minLineLengh(线的最短长度，比这个短的都被忽略)和MaxLineCap（两条直线之间的最大间隔，小于此值，认为是一条直线）</span></span><br><span class="line">        <span class="comment"># rho距离精度,theta角度精度,threshod超过设定阈值才被检测出线段</span></span><br><span class="line">        <span class="keyword">return</span> cv2.HoughLinesP(image, rho=<span class="number">0.1</span>, theta=np.pi/<span class="number">10</span>, threshold=<span class="number">15</span>, minLineLength=<span class="number">9</span>, maxLineGap=<span class="number">4</span>)</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw_lines</span>(<span class="params">self, image, lines, color=[<span class="number">255</span>,<span class="number">0</span>,<span class="number">0</span>], thickness=<span class="number">2</span>, make_copy=<span class="literal">True</span></span>):</span><br><span class="line">        <span class="comment"># 过滤霍夫变换检测得到直线</span></span><br><span class="line">        <span class="keyword">if</span> make_copy:</span><br><span class="line">            image = np.copy(image)</span><br><span class="line">        cleaned = []</span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">            <span class="keyword">for</span> x1, y1, x2, y2 <span class="keyword">in</span> line:</span><br><span class="line">                <span class="keyword">if</span> <span class="built_in">abs</span>(y2-y1) &lt;=<span class="number">1</span> <span class="keyword">and</span> <span class="built_in">abs</span>(x2-x1) &gt;=<span class="number">25</span> <span class="keyword">and</span> <span class="built_in">abs</span>(x2-x1) &lt;= <span class="number">55</span>:</span><br><span class="line">                    cleaned.append((x1,y1,x2,y2))</span><br><span class="line">                    cv2.line(image, (x1, y1), (x2, y2), color, thickness)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">'No lines detected: '</span>, <span class="built_in">len</span>(cleaned))</span><br><span class="line">        <span class="keyword">return</span> image</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">identify_blocks</span>(<span class="params">self, image, lines, make_copy=<span class="literal">True</span></span>):</span><br><span class="line">        <span class="keyword">if</span> make_copy:</span><br><span class="line">            new_image = np.copy(image)</span><br><span class="line">        <span class="comment"># step 1: 过滤部分直线</span></span><br><span class="line">        cleaned = []</span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> lines:</span><br><span class="line">            <span class="keyword">for</span> x1,y1,x2,y2 <span class="keyword">in</span> line:</span><br><span class="line">                <span class="keyword">if</span> <span class="built_in">abs</span>(y2-y1) &lt;=<span class="number">1</span> <span class="keyword">and</span> <span class="built_in">abs</span>(x2-x1) &gt;=<span class="number">25</span> <span class="keyword">and</span> <span class="built_in">abs</span>(x2-x1) &lt;= <span class="number">55</span>:</span><br><span class="line">                    cleaned.append((x1,y1,x2,y2))</span><br><span class="line">        <span class="comment"># step 2: 对直线按照x1进行排序</span></span><br><span class="line">        <span class="keyword">import</span> operator</span><br><span class="line">        list1 = <span class="built_in">sorted</span>(cleaned, key=operator.itemgetter(<span class="number">0</span>,<span class="number">1</span>))</span><br><span class="line">        <span class="comment"># &gt;&gt;&gt; b=operator.itemgetter(1,0)   //定义函数b，获取对象的第1个域和第0个的值</span></span><br><span class="line">        <span class="comment"># &gt;&gt;&gt; b(a)</span></span><br><span class="line">        <span class="comment"># (2, 1)</span></span><br><span class="line">        <span class="comment"># step 3: 找到多个列，相当于每列是一排车</span></span><br><span class="line">        clusters = {}</span><br><span class="line">        dIndex = <span class="number">0</span></span><br><span class="line">        clus_dist = <span class="number">10</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(list1)-<span class="number">1</span>):</span><br><span class="line">            distance = <span class="built_in">abs</span>(list1[i+<span class="number">1</span>][<span class="number">0</span>] - list1[i][<span class="number">0</span>])</span><br><span class="line">            <span class="keyword">if</span> distance &lt;= clus_dist:</span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">not</span> dIndex <span class="keyword">in</span> clusters.keys(): clusters[dIndex] = []</span><br><span class="line">                clusters[dIndex].append(list1[i])</span><br><span class="line">                clusters[dIndex].append(list1[i + <span class="number">1</span>])</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                dIndex += <span class="number">1</span></span><br><span class="line">        <span class="comment"># step 4: 得到坐标</span></span><br><span class="line">        rects = {}</span><br><span class="line">        i = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> key <span class="keyword">in</span> clusters:</span><br><span class="line">            all_list = clusters[key]</span><br><span class="line">            cleaned = <span class="built_in">list</span>(<span class="built_in">set</span>(all_list))</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(cleaned) &gt; <span class="number">5</span>:</span><br><span class="line">                cleaned = <span class="built_in">sorted</span>(cleaned, key=<span class="keyword">lambda</span> tup: tup[<span class="number">1</span>])</span><br><span class="line">                avg_y1 = cleaned[<span class="number">0</span>][<span class="number">1</span>]</span><br><span class="line">                avg_y2 = cleaned[-<span class="number">1</span>][<span class="number">1</span>]</span><br><span class="line">                avg_x1 = <span class="number">0</span></span><br><span class="line">                avg_x2 = <span class="number">0</span></span><br><span class="line">                <span class="keyword">for</span> tup <span class="keyword">in</span> cleaned:</span><br><span class="line">                    avg_x1 += tup[<span class="number">0</span>]</span><br><span class="line">                    avg_x2 += tup[<span class="number">2</span>]</span><br><span class="line">                avg_x1 = avg_x1/<span class="built_in">len</span>(cleaned)</span><br><span class="line">                avg_x2 = avg_x2/<span class="built_in">len</span>(cleaned)</span><br><span class="line">                rects[i] = (avg_x1, avg_y1, avg_x2, avg_y2)</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"Num Parking Lanes: "</span>, <span class="built_in">len</span>(rects))</span><br><span class="line">        <span class="comment"># step 5: 把矩形画出来</span></span><br><span class="line">        buff = <span class="number">7</span></span><br><span class="line">        <span class="keyword">for</span> key <span class="keyword">in</span> rects:</span><br><span class="line">            tup_topLeft = (<span class="built_in">int</span>(rects[key][<span class="number">0</span>] - buff), <span class="built_in">int</span>(rects[key][<span class="number">1</span>]))</span><br><span class="line">            tup_botRight = (<span class="built_in">int</span>(rects[key][<span class="number">2</span>] + buff), <span class="built_in">int</span>(rects[key][<span class="number">3</span>]))</span><br><span class="line">            cv2.rectangle(new_image, tup_topLeft,tup_botRight,(<span class="number">0</span>,<span class="number">255</span>,<span class="number">0</span>),<span class="number">3</span>)</span><br><span class="line">        <span class="keyword">return</span> new_image, rects</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">draw_parking</span>(<span class="params">self, image, rects, make_copy=<span class="literal">True</span>, color=[<span class="number">255</span>,<span class="number">0</span>,<span class="number">0</span>],thickness=<span class="number">2</span>, save=<span class="literal">True</span></span>):</span><br><span class="line">        <span class="keyword">if</span> make_copy:</span><br><span class="line">            new_image = np.copy(image)</span><br><span class="line">        gap = <span class="number">15.5</span></span><br><span class="line">        spot_dict = {} <span class="comment"># 字典：一个车位对应一个位置</span></span><br><span class="line">        tot_spots = <span class="number">0</span></span><br><span class="line">        <span class="comment">#微调</span></span><br><span class="line">        adj_y1 = {<span class="number">0</span>: <span class="number">20</span>, <span class="number">1</span>:-<span class="number">10</span>, <span class="number">2</span>:<span class="number">0</span>, <span class="number">3</span>:-<span class="number">11</span>, <span class="number">4</span>:<span class="number">28</span>, <span class="number">5</span>:<span class="number">5</span>, <span class="number">6</span>:-<span class="number">15</span>, <span class="number">7</span>:-<span class="number">15</span>, <span class="number">8</span>:-<span class="number">10</span>, <span class="number">9</span>:-<span class="number">30</span>, <span class="number">10</span>:<span class="number">9</span>, <span class="number">11</span>:-<span class="number">32</span>}</span><br><span class="line">        adj_y2 = {<span class="number">0</span>: <span class="number">30</span>, <span class="number">1</span>: <span class="number">50</span>, <span class="number">2</span>:<span class="number">15</span>, <span class="number">3</span>:<span class="number">10</span>, <span class="number">4</span>:-<span class="number">15</span>, <span class="number">5</span>:<span class="number">15</span>, <span class="number">6</span>:<span class="number">15</span>, <span class="number">7</span>:-<span class="number">20</span>, <span class="number">8</span>:<span class="number">15</span>, <span class="number">9</span>:<span class="number">15</span>, <span class="number">10</span>:<span class="number">0</span>, <span class="number">11</span>:<span class="number">30</span>}</span><br><span class="line">        adj_x1 = {<span class="number">0</span>: -<span class="number">8</span>, <span class="number">1</span>:-<span class="number">15</span>, <span class="number">2</span>:-<span class="number">15</span>, <span class="number">3</span>:-<span class="number">15</span>, <span class="number">4</span>:-<span class="number">15</span>, <span class="number">5</span>:-<span class="number">15</span>, <span class="number">6</span>:-<span class="number">15</span>, <span class="number">7</span>:-<span class="number">15</span>, <span class="number">8</span>:-<span class="number">10</span>, <span class="number">9</span>:-<span class="number">10</span>, <span class="number">10</span>:-<span class="number">10</span>, <span class="number">11</span>:<span class="number">0</span>}</span><br><span class="line">        adj_x2 = {<span class="number">0</span>: <span class="number">0</span>, <span class="number">1</span>: <span class="number">15</span>, <span class="number">2</span>:<span class="number">15</span>, <span class="number">3</span>:<span class="number">15</span>, <span class="number">4</span>:<span class="number">15</span>, <span class="number">5</span>:<span class="number">15</span>, <span class="number">6</span>:<span class="number">15</span>, <span class="number">7</span>:<span class="number">15</span>, <span class="number">8</span>:<span class="number">10</span>, <span class="number">9</span>:<span class="number">10</span>, <span class="number">10</span>:<span class="number">10</span>, <span class="number">11</span>:<span class="number">0</span>}</span><br><span class="line">        <span class="keyword">for</span> key <span class="keyword">in</span> rects:</span><br><span class="line">            tup = rects[key]</span><br><span class="line">            x1 = <span class="built_in">int</span>(tup[<span class="number">0</span>]+ adj_x1[key])</span><br><span class="line">            x2 = <span class="built_in">int</span>(tup[<span class="number">2</span>]+ adj_x2[key])</span><br><span class="line">            y1 = <span class="built_in">int</span>(tup[<span class="number">1</span>] + adj_y1[key])</span><br><span class="line">            y2 = <span class="built_in">int</span>(tup[<span class="number">3</span>] + adj_y2[key])</span><br><span class="line">            cv2.rectangle(new_image, (x1, y1),(x2,y2),(<span class="number">0</span>,<span class="number">255</span>,<span class="number">0</span>),<span class="number">2</span>)</span><br><span class="line">            num_splits = <span class="built_in">int</span>(<span class="built_in">abs</span>(y2-y1)//gap)</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, num_splits+<span class="number">1</span>):</span><br><span class="line">                y = <span class="built_in">int</span>(y1 + i*gap)</span><br><span class="line">                cv2.line(new_image, (x1, y), (x2, y), color, thickness)</span><br><span class="line">            <span class="keyword">if</span> key &gt; <span class="number">0</span> <span class="keyword">and</span> key &lt; <span class="built_in">len</span>(rects) -<span class="number">1</span> :</span><br><span class="line">                <span class="comment">#竖直线</span></span><br><span class="line">                x = <span class="built_in">int</span>((x1 + x2)/<span class="number">2</span>)</span><br><span class="line">                cv2.line(new_image, (x, y1), (x, y2), color, thickness)</span><br><span class="line">            <span class="comment"># 计算数量</span></span><br><span class="line">            <span class="keyword">if</span> key == <span class="number">0</span> <span class="keyword">or</span> key == (<span class="built_in">len</span>(rects) -<span class="number">1</span>):</span><br><span class="line">                tot_spots += num_splits +<span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                tot_spots += <span class="number">2</span>*(num_splits +<span class="number">1</span>)</span><br><span class="line">            <span class="comment"># 字典对应好</span></span><br><span class="line">            <span class="keyword">if</span> key == <span class="number">0</span> <span class="keyword">or</span> key == (<span class="built_in">len</span>(rects) -<span class="number">1</span>):</span><br><span class="line">                <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, num_splits+<span class="number">1</span>):</span><br><span class="line">                    cur_len = <span class="built_in">len</span>(spot_dict)</span><br><span class="line">                    y = <span class="built_in">int</span>(y1 + i*gap)</span><br><span class="line">                    spot_dict[(x1, y, x2, y+gap)] = cur_len +<span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, num_splits+<span class="number">1</span>):</span><br><span class="line">                    cur_len = <span class="built_in">len</span>(spot_dict)</span><br><span class="line">                    y = <span class="built_in">int</span>(y1 + i*gap)</span><br><span class="line">                    x = <span class="built_in">int</span>((x1 + x2)/<span class="number">2</span>)</span><br><span class="line">                    spot_dict[(x1, y, x, y+gap)] = cur_len +<span class="number">1</span></span><br><span class="line">                    spot_dict[(x, y, x2, y+gap)] = cur_len +<span class="number">2</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"total parking spaces: "</span>, tot_spots, cur_len)</span><br><span class="line">        <span class="keyword">if</span> save:</span><br><span class="line">            filename = <span class="string">'with_parking.jpg'</span></span><br><span class="line">            cv2.imwrite(filename, new_image)</span><br><span class="line">        <span class="keyword">return</span> new_image, spot_dict</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">assign_spots_map</span>(<span class="params">self,image, spot_dict, make_copy = <span class="literal">True</span>, color=[<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>], thickness=<span class="number">2</span></span>):</span><br><span class="line">        <span class="keyword">if</span> make_copy:</span><br><span class="line">            new_image = np.copy(image)</span><br><span class="line">        <span class="keyword">for</span> spot <span class="keyword">in</span> spot_dict.keys():</span><br><span class="line">            (x1, y1, x2, y2) = spot</span><br><span class="line">            cv2.rectangle(new_image, (<span class="built_in">int</span>(x1),<span class="built_in">int</span>(y1)), (<span class="built_in">int</span>(x2),<span class="built_in">int</span>(y2)), color, thickness)</span><br><span class="line">        <span class="keyword">return</span> new_image</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">save_images_for_cnn</span>(<span class="params">self,image, spot_dict, folder_name =<span class="string">'cnn_data'</span></span>):</span><br><span class="line">        <span class="keyword">for</span> spot <span class="keyword">in</span> spot_dict.keys():</span><br><span class="line">            (x1, y1, x2, y2) = spot</span><br><span class="line">            (x1, y1, x2, y2) = (<span class="built_in">int</span>(x1), <span class="built_in">int</span>(y1), <span class="built_in">int</span>(x2), <span class="built_in">int</span>(y2))</span><br><span class="line">            <span class="comment">#裁剪图像</span></span><br><span class="line">            spot_img = image[y1:y2, x1:x2]</span><br><span class="line">            spot_img = cv2.resize(spot_img, (<span class="number">0</span>,<span class="number">0</span>), fx=<span class="number">2.0</span>, fy=<span class="number">2.0</span>)</span><br><span class="line">            spot_id = spot_dict[spot]</span><br><span class="line">            filename = <span class="string">'spot'</span> + <span class="built_in">str</span>(spot_id) +<span class="string">'.jpg'</span></span><br><span class="line">            <span class="built_in">print</span>(spot_img.shape, filename, (x1,x2,y1,y2))</span><br><span class="line">            cv2.imwrite(os.path.join(folder_name, filename), spot_img)</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">make_prediction</span>(<span class="params">self,image, model, class_dictionary</span>):</span><br><span class="line">        <span class="comment"># 预处理</span></span><br><span class="line">        img = image/<span class="number">255.</span></span><br><span class="line">        <span class="comment"># 转换成4D tensor</span></span><br><span class="line">        image = np.expand_dims(img,axis=<span class="number">0</span>)</span><br><span class="line">        <span class="comment"># 用训练好的模型进行训练</span></span><br><span class="line">        class_predicted = model.predict(image)</span><br><span class="line">        inID = np.argmax(class_predicted[<span class="number">0</span>])</span><br><span class="line">        label = class_dictionary[inID]</span><br><span class="line">        <span class="keyword">return</span> label</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">predict_on_image</span>(<span class="params">self, image, spot_dict, model, class_dictionary, make_copy=<span class="literal">True</span>, color = [<span class="number">0</span>,<span class="number">255</span>,<span class="number">0</span>], alpha=<span class="number">0.5</span></span>):</span><br><span class="line">        <span class="keyword">if</span> make_copy:</span><br><span class="line">            new_image = np.copy(image)</span><br><span class="line">            overlay = np.copy(image)</span><br><span class="line">        self.cv_show(<span class="string">'new_image'</span>,new_image)</span><br><span class="line">        cnt_empty = <span class="number">0</span></span><br><span class="line">        all_spots = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> spot <span class="keyword">in</span> spot_dict.key():</span><br><span class="line">            all_spots += <span class="number">1</span></span><br><span class="line">            (x1, y1, x2, y2) = spot</span><br><span class="line">            (x1, y1, x2, y2) = (<span class="built_in">int</span>(x1), <span class="built_in">int</span>(y1), <span class="built_in">int</span>(x2), <span class="built_in">int</span>(y2))</span><br><span class="line">            spot_img = image[y1:y2, x1:x2]</span><br><span class="line">            spot_img = cv2.resize(spot_img, (<span class="number">48</span>, <span class="number">48</span>))</span><br><span class="line">            label = self.make_prediction(spot_img,model,class_dictionary)</span><br><span class="line">            <span class="keyword">if</span> label == <span class="string">'empty'</span>:</span><br><span class="line">                cv2.rectangle(overlay, (<span class="built_in">int</span>(x1),<span class="built_in">int</span>(y1)), (<span class="built_in">int</span>(x2),<span class="built_in">int</span>(y2)), color, -<span class="number">1</span>)</span><br><span class="line">                cnt_empty += <span class="number">1</span></span><br><span class="line">        cv2.addWeighted(overlay, alpha, new_image, <span class="number">1</span> - alpha, <span class="number">0</span>, new_image) <span class="comment"># 图像融合</span></span><br><span class="line">        cv2.putText(new_image, <span class="string">"Available: %d spots"</span> %cnt_empty, (<span class="number">30</span>, <span class="number">95</span>),</span><br><span class="line">        cv2.FONT_HERSHEY_SIMPLEX,</span><br><span class="line">        <span class="number">0.7</span>, (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>), <span class="number">2</span>)</span><br><span class="line">        cv2.putText(new_image, <span class="string">"Total: %d spots"</span> %all_spots, (<span class="number">30</span>, <span class="number">125</span>),</span><br><span class="line">        cv2.FONT_HERSHEY_SIMPLEX,</span><br><span class="line">        <span class="number">0.7</span>, (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>), <span class="number">2</span>)</span><br><span class="line">                save = <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> save:</span><br><span class="line">            filename = <span class="string">'with_marking.jpg'</span></span><br><span class="line">            cv2.imwrite(filename, new_image)</span><br><span class="line">        self.cv_show(<span class="string">'new_image'</span>,new_image)</span><br><span class="line">        <span class="keyword">return</span> new_image</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">predict_on_video</span>(<span class="params">self,video_name,final_spot_dict, model,class_dictionary,ret=<span class="literal">True</span></span>):</span><br><span class="line">        cap = cv2.VideoCapture(video_name)</span><br><span class="line">        count = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> ret:</span><br><span class="line">            ret, image = cap.read()</span><br><span class="line">            count += <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> count == <span class="number">5</span>:</span><br><span class="line">                count = <span class="number">0</span></span><br><span class="line">                new_image = np.copy(image)</span><br><span class="line">                overlay = np.copy(image)</span><br><span class="line">                cnt_empty = <span class="number">0</span></span><br><span class="line">                all_spots = <span class="number">0</span></span><br><span class="line">                color = [<span class="number">0</span>, <span class="number">255</span>, <span class="number">0</span>]</span><br><span class="line">                alpha=<span class="number">0.5</span></span><br><span class="line">                <span class="keyword">for</span> spot <span class="keyword">in</span> final_spot_dict.keys():</span><br><span class="line">                    all_spots += <span class="number">1</span></span><br><span class="line">                    (x1, y1, x2, y2) = spot</span><br><span class="line">                    (x1, y1, x2, y2) = (<span class="built_in">int</span>(x1), <span class="built_in">int</span>(y1), <span class="built_in">int</span>(x2), <span class="built_in">int</span>(y2))</span><br><span class="line">                    spot_img = image[y1:y2, x1:x2]</span><br><span class="line">                    spot_img = cv2.resize(spot_img, (<span class="number">48</span>,<span class="number">48</span>))</span><br><span class="line">                    label = self.make_prediction(spot_img,model,class_dictionary)</span><br><span class="line">                    <span class="keyword">if</span> label == <span class="string">'empty'</span>:</span><br><span class="line">                        cv2.rectangle(overlay, (<span class="built_in">int</span>(x1),<span class="built_in">int</span>(y1)), (<span class="built_in">int</span>(x2),<span class="built_in">int</span>(y2)), color, -<span class="number">1</span>)</span><br><span class="line">                        cnt_empty += <span class="number">1</span></span><br><span class="line">                cv2.addWeighted(overlay, alpha, new_image, <span class="number">1</span> - alpha, <span class="number">0</span>, new_image)</span><br><span class="line">                cv2.putText(new_image, <span class="string">"Available: %d spots"</span> %cnt_empty, (<span class="number">30</span>, <span class="number">95</span>),</span><br><span class="line">                cv2.FONT_HERSHEY_SIMPLEX,</span><br><span class="line">                <span class="number">0.7</span>, (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>), <span class="number">2</span>)</span><br><span class="line">                cv2.putText(new_image, <span class="string">"Total: %d spots"</span> %all_spots, (<span class="number">30</span>, <span class="number">125</span>),</span><br><span class="line">                cv2.FONT_HERSHEY_SIMPLEX,</span><br><span class="line">                <span class="number">0.7</span>, (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>), <span class="number">2</span>)</span><br><span class="line">                cv2.imshow(<span class="string">'frame'</span>, new_image)</span><br><span class="line">                <span class="keyword">if</span> cv2.waitKey(<span class="number">10</span>) &amp; <span class="number">0xFF</span> == <span class="built_in">ord</span>(<span class="string">'q'</span>):</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">        cv2.destroyAllWindows()</span><br><span class="line">        cap.release()</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="test模块"><a href="#test模块" class="headerlink" title="test模块"></a>test模块</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> division</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> os, glob</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="keyword">from</span> keras.applications.imagenet_utils <span class="keyword">import</span> preprocess_input</span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> load_model</span><br><span class="line"><span class="keyword">from</span> keras.preprocessing <span class="keyword">import</span> image</span><br><span class="line"><span class="keyword">from</span> Parking <span class="keyword">import</span> Parking</span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line">cwd = os.getcwd()</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">img_process</span>(<span class="params">test_images,park</span>):</span><br><span class="line">    white_yellow_images = <span class="built_in">list</span>(<span class="built_in">map</span>(park.select_rgb_white_yellow, test_images))</span><br><span class="line">    park.show_images(white_yellow_images)</span><br><span class="line">    gray_images = <span class="built_in">list</span>(<span class="built_in">map</span>(park.convert_gray_scale, white_yellow_images))</span><br><span class="line">    park.show_images(gray_images)</span><br><span class="line">    edge_images = <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> image: park.detect_edges(image), gray_images))</span><br><span class="line">    park.show_images(edge_images)</span><br><span class="line">    roi_images = <span class="built_in">list</span>(<span class="built_in">map</span>(park.select_region, edge_images))</span><br><span class="line">    park.show_images(roi_images)</span><br><span class="line">    list_of_lines = <span class="built_in">list</span>(<span class="built_in">map</span>(park.hough_lines, roi_images))</span><br><span class="line">    line_images = []</span><br><span class="line">    <span class="keyword">for</span> image, lines <span class="keyword">in</span> <span class="built_in">zip</span>(test_images, list_of_lines):</span><br><span class="line">        line_images.append(park.draw_lines(image, lines))</span><br><span class="line">    park.show_images(line_images)</span><br><span class="line">    rect_images = []</span><br><span class="line">    rect_coords = []</span><br><span class="line">    <span class="keyword">for</span> image, lines <span class="keyword">in</span> <span class="built_in">zip</span>(test_images, list_of_lines):</span><br><span class="line">        new_image, rects = park.identify_blocks(image, lines)</span><br><span class="line">        rect_images.append(new_image)</span><br><span class="line">        rect_coords.append(rects)</span><br><span class="line">    park.show_images(rect_images)</span><br><span class="line">    delineated = []</span><br><span class="line">    spot_pos = []</span><br><span class="line">    <span class="keyword">for</span> image, rects <span class="keyword">in</span> <span class="built_in">zip</span>(test_images, rect_coords):</span><br><span class="line">        new_image, spot_dict = park.draw_parking(image, rects)</span><br><span class="line">        delineated.append(new_image)</span><br><span class="line">        spot_pos.append(spot_dict)</span><br><span class="line">    park.show_images(delineated)</span><br><span class="line">    final_spot_dict = spot_pos[<span class="number">1</span>]</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">len</span>(final_spot_dict))</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">'spot_dict.pickle'</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> handle:</span><br><span class="line">        pickle.dump(final_spot_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)</span><br><span class="line">    park.save_images_for_cnn(test_images[<span class="number">0</span>],final_spot_dict)</span><br><span class="line">    <span class="keyword">return</span> final_spot_dict</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">keras_model</span>(<span class="params">weights_path</span>):</span><br><span class="line">    model = load_model(weights_path)</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">img_test</span>(<span class="params">test_images,final_spot_dict,model,class_dictionary</span>):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span> (<span class="built_in">len</span>(test_images)):</span><br><span class="line">        predicted_images = park.predict_on_image(test_images[i],final_spot_dict,model,class_dictionary)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">video_test</span>(<span class="params">video_name,final_spot_dict,model,class_dictionary</span>):</span><br><span class="line">    name = video_name</span><br><span class="line">    cap = cv2.VideoCapture(name)</span><br><span class="line">    park.predict_on_video(name,final_spot_dict,model,class_dictionary,ret=<span class="literal">True</span>)</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test_images = [plt.imread(path) <span class="keyword">for</span> path <span class="keyword">in</span> glob.glob(<span class="string">'test_images/*.jpg'</span>)]</span><br><span class="line">    weights_path = <span class="string">'car1.h5'</span></span><br><span class="line">    video_name = <span class="string">'parking_video.mp4'</span></span><br><span class="line">    class_dictionary = {}</span><br><span class="line">    class_dictionary[<span class="number">0</span>] = <span class="string">'empty'</span></span><br><span class="line">    class_dictionary[<span class="number">1</span>] = <span class="string">'occupied'</span></span><br><span class="line">    park = Parking()</span><br><span class="line">    park.show_images(test_images)</span><br><span class="line">    final_spot_dict = img_process(test_images,park)</span><br><span class="line">    model = keras_model(weights_path)</span><br><span class="line">    img_test(test_images,final_spot_dict,model,class_dictionary)</span><br><span class="line">    video_test(video_name,final_spot_dict,model,class_dictionary)</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="利用cnn训练出一个二分类网络"><a href="#利用cnn训练出一个二分类网络" class="headerlink" title="利用cnn训练出一个二分类网络"></a>利用cnn训练出一个二分类网络</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> keras <span class="keyword">import</span> applications</span><br><span class="line"><span class="keyword">from</span> keras.preprocessing.image <span class="keyword">import</span> ImageDataGenerator</span><br><span class="line"><span class="keyword">from</span> keras <span class="keyword">import</span> optimizers</span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Sequential, Model</span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Dropout, Flatten, Dense, GlobalAveragePooling2D</span><br><span class="line"><span class="keyword">from</span> keras <span class="keyword">import</span> backend <span class="keyword">as</span> k</span><br><span class="line"><span class="keyword">from</span> keras.callbacks <span class="keyword">import</span> ModelCheckpoint, LearningRateScheduler, TensorBoard, EarlyStopping</span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">from</span> keras.layers.normalization <span class="keyword">import</span> BatchNormalization</span><br><span class="line"><span class="keyword">from</span> keras.layers.convolutional <span class="keyword">import</span> Conv2D</span><br><span class="line"><span class="keyword">from</span> keras.layers.convolutional <span class="keyword">import</span> MaxPooling2D</span><br><span class="line"><span class="keyword">from</span> keras.initializers <span class="keyword">import</span> TruncatedNormal</span><br><span class="line"><span class="keyword">from</span> keras.layers.core <span class="keyword">import</span> Activation</span><br><span class="line"><span class="keyword">from</span> keras.layers.core <span class="keyword">import</span> Flatten</span><br><span class="line"><span class="keyword">from</span> keras.layers.core <span class="keyword">import</span> Dropout</span><br><span class="line"><span class="keyword">from</span> keras.layers.core <span class="keyword">import</span> Dense</span><br><span class="line">files_train = <span class="number">0</span></span><br><span class="line">files_validation = <span class="number">0</span></span><br><span class="line">cwd = os.getcwd()</span><br><span class="line">folder = <span class="string">'train_data/train'</span></span><br><span class="line"><span class="keyword">for</span> sub_folder <span class="keyword">in</span> os.listdir(folder):</span><br><span class="line">    path, dirs, files = <span class="built_in">next</span>(os.walk(os.path.join(folder,sub_folder)))</span><br><span class="line">    files_train += <span class="built_in">len</span>(files)</span><br><span class="line">folder = <span class="string">'train_data/test'</span></span><br><span class="line"><span class="keyword">for</span> sub_folder <span class="keyword">in</span> os.listdir(folder):</span><br><span class="line">    path, dirs, files = <span class="built_in">next</span>(os.walk(os.path.join(folder,sub_folder)))</span><br><span class="line">    files_validation += <span class="built_in">len</span>(files)</span><br><span class="line"><span class="built_in">print</span>(files_train,files_validation)</span><br><span class="line">img_width, img_height = <span class="number">48</span>, <span class="number">48</span></span><br><span class="line">train_data_dir = <span class="string">"train_data/train"</span></span><br><span class="line">validation_data_dir = <span class="string">"train_data/test"</span></span><br><span class="line">nb_train_samples = files_train</span><br><span class="line">nb_validation_samples = files_validation</span><br><span class="line">batch_size = <span class="number">32</span></span><br><span class="line">epochs = <span class="number">15</span></span><br><span class="line">num_classes = <span class="number">2</span></span><br><span class="line">model = applications.VGG16(weights=<span class="string">'imagenet'</span>, include_top=<span class="literal">False</span>, input_shape = (img_width, img_height, <span class="number">3</span>))</span><br><span class="line"><span class="keyword">for</span> layer <span class="keyword">in</span> model.layers[:<span class="number">10</span>]:</span><br><span class="line">    layer.trainable = <span class="literal">False</span></span><br><span class="line">x = model.output</span><br><span class="line">x = Flatten()(x)</span><br><span class="line">predictions = Dense(num_classes, activation=<span class="string">"softmax"</span>)(x)</span><br><span class="line">model_final = Model(<span class="built_in">input</span> = model.<span class="built_in">input</span>, output = predictions)</span><br><span class="line">model_final.<span class="built_in">compile</span>(loss = <span class="string">"categorical_crossentropy"</span>,</span><br><span class="line">                    optimizer = optimizers.SGD(lr=<span class="number">0.0001</span>, momentum=<span class="number">0.9</span>),</span><br><span class="line">                    metrics=[<span class="string">"accuracy"</span>])</span><br><span class="line">train_datagen = ImageDataGenerator(</span><br><span class="line">rescale = <span class="number">1.</span>/<span class="number">255</span>,</span><br><span class="line">horizontal_flip = <span class="literal">True</span>,</span><br><span class="line">fill_mode = <span class="string">"nearest"</span>,</span><br><span class="line">zoom_range = <span class="number">0.1</span>,</span><br><span class="line">width_shift_range = <span class="number">0.1</span>,</span><br><span class="line">height_shift_range=<span class="number">0.1</span>,</span><br><span class="line">rotation_range=<span class="number">5</span>)</span><br><span class="line">test_datagen = ImageDataGenerator(</span><br><span class="line">rescale = <span class="number">1.</span>/<span class="number">255</span>,</span><br><span class="line">horizontal_flip = <span class="literal">True</span>,</span><br><span class="line">fill_mode = <span class="string">"nearest"</span>,</span><br><span class="line">zoom_range = <span class="number">0.1</span>,</span><br><span class="line">width_shift_range = <span class="number">0.1</span>,</span><br><span class="line">height_shift_range=<span class="number">0.1</span>,</span><br><span class="line">rotation_range=<span class="number">5</span>)</span><br><span class="line">train_generator = train_datagen.flow_from_directory(</span><br><span class="line">train_data_dir,</span><br><span class="line">target_size = (img_height, img_width),</span><br><span class="line">batch_size = batch_size,</span><br><span class="line">class_mode = <span class="string">"categorical"</span>)</span><br><span class="line">validation_generator = test_datagen.flow_from_directory(</span><br><span class="line">validation_data_dir,</span><br><span class="line">target_size = (img_height, img_width),</span><br><span class="line">class_mode = <span class="string">"categorical"</span>)</span><br><span class="line">checkpoint = ModelCheckpoint(<span class="string">"car1.h5"</span>, monitor=<span class="string">'val_acc'</span>, verbose=<span class="number">1</span>, save_best_only=<span class="literal">True</span>, save_weights_only=<span class="literal">False</span>, mode=<span class="string">'auto'</span>, period=<span class="number">1</span>)</span><br><span class="line">early = EarlyStopping(monitor=<span class="string">'val_acc'</span>, min_delta=<span class="number">0</span>, patience=<span class="number">10</span>, verbose=<span class="number">1</span>, mode=<span class="string">'auto'</span>)</span><br><span class="line">history_object = model_final.fit_generator(</span><br><span class="line">train_generator,</span><br><span class="line">samples_per_epoch = nb_train_samples,</span><br><span class="line">epochs = epochs,</span><br><span class="line">validation_data = validation_generator,</span><br><span class="line">nb_val_samples = nb_validation_samples,</span><br><span class="line">callbacks = [checkpoint, early])</span><br></pre></td></tr></tbody></table></figure>
+
+<p>参考资料： 唐宇迪 OpenCV计算机视觉实战(Python版)</p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/10/13/20191013-ocr%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/">ocr透视变换</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/10/13/20191013-ocr%E7%AD%94%E9%A2%98%E5%8D%A1%E8%AF%86%E5%88%AB/">ocr答题卡识别</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#park-%E7%B1%BB%E5%AF%B9%E8%B1%A1"><span class="toc-text">park 类对象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#test%E6%A8%A1%E5%9D%97"><span class="toc-text">test模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8cnn%E8%AE%AD%E7%BB%83%E5%87%BA%E4%B8%80%E4%B8%AA%E4%BA%8C%E5%88%86%E7%B1%BB%E7%BD%91%E7%BB%9C"><span class="toc-text">利用cnn训练出一个二分类网络</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

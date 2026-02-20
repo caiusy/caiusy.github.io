@@ -1,0 +1,1056 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="CLIP (Contrastive Language-Image Pre-Training) 深度解析 一句话本质：CLIP 是连接文本与图像的”罗塞塔石碑”。它通过对比学习，强行把图像和文本拉到同一个向量空间，让计算机视觉终于”读懂了语言”。   一、STAR 框架：CLIP 的诞生与革命1. Situation (背景与痛点)在 CLIP (2021) 之前，计算机视觉（CV）和自然语言处理（">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用">
+<meta property="og:url" content="https://caiusy.github.io/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="CLIP (Contrastive Language-Image Pre-Training) 深度解析 一句话本质：CLIP 是连接文本与图像的”罗塞塔石碑”。它通过对比学习，强行把图像和文本拉到同一个向量空间，让计算机视觉终于”读懂了语言”。   一、STAR 框架：CLIP 的诞生与革命1. Situation (背景与痛点)在 CLIP (2021) 之前，计算机视觉（CV）和自然语言处理（">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-02-16T06:58:55.000Z">
+<meta property="article:modified_time" content="2026-02-20T06:58:57.417Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="NLP">
+<meta property="article:tag" content="CLIP">
+<meta property="article:tag" content="多模态">
+<meta property="article:tag" content="大模型">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="计算机视觉,深度学习,NLP,CLIP,多模态,大模型">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-02-16T14:58:55+08:00","dateModified":"2026-02-20T14:58:57+08:00","datePublished":"2026-02-16T14:58:55+08:00","description":"","headline":"CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/","keywords":"计算机视觉, 深度学习, NLP, CLIP, 多模态, 大模型","thumbnailUrl":"/images/clip/fig1_arch.png","image":1}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-02-16T06:58:55.000Z">2026-02-16</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-20T06:58:57.417Z">2026-02-20</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h1 id="CLIP-Contrastive-Language-Image-Pre-Training-深度解析"><a href="#CLIP-Contrastive-Language-Image-Pre-Training-深度解析" class="headerlink" title="CLIP (Contrastive Language-Image Pre-Training) 深度解析"></a>CLIP (Contrastive Language-Image Pre-Training) 深度解析</h1><blockquote>
+<p><strong>一句话本质</strong>：CLIP 是连接文本与图像的”罗塞塔石碑”。它通过对比学习，强行把图像和文本拉到同一个向量空间，让计算机视觉终于”读懂了语言”。</p>
+</blockquote>
+<hr>
+<h2 id="一、STAR-框架：CLIP-的诞生与革命"><a href="#一、STAR-框架：CLIP-的诞生与革命" class="headerlink" title="一、STAR 框架：CLIP 的诞生与革命"></a>一、STAR 框架：CLIP 的诞生与革命</h2><h3 id="1-Situation-背景与痛点"><a href="#1-Situation-背景与痛点" class="headerlink" title="1. Situation (背景与痛点)"></a>1. Situation (背景与痛点)</h3><p>在 CLIP (2021) 之前，计算机视觉（CV）和自然语言处理（NLP）是两个平行的世界：</p>
+<ul>
+<li><strong>CV 的困境</strong>：严重依赖人工标注（ImageNet 的 1000 个类），模型只能识别训练过的类别（Closed-Set），换个场景就要重新训练。</li>
+<li><strong>NLP 的突破</strong>：GPT 系列证明了”从海量无标注文本中自监督学习”是通往通用的钥匙。</li>
+</ul>
+<p><strong>核心痛点</strong>：如何让 CV 模型像 GPT 一样，从互联网海量数据中学习，不再需要人工打标签？</p>
+<h3 id="2-Task-任务目标"><a href="#2-Task-任务目标" class="headerlink" title="2. Task (任务目标)"></a>2. Task (任务目标)</h3><p>OpenAI 的目标很明确：</p>
+<blockquote>
+<p><strong>训练一个能直接通过”自然语言”指挥的视觉模型，实现 Zero-Shot（零样本）迁移。</strong></p>
+</blockquote>
+<p>即：不用微调，直接告诉模型”找一张猫的照片”，它就能从图库里找出猫。</p>
+<h3 id="3-Action-核心方法"><a href="#3-Action-核心方法" class="headerlink" title="3. Action (核心方法)"></a>3. Action (核心方法)</h3><p>CLIP 摒弃了传统的”分类”范式，采用了 **对比学习 (Contrastive Learning)**：</p>
+<ul>
+<li><strong>数据</strong>：收集了 4 亿对 (图片, 文本) 数据 (WebImageText)。</li>
+<li><strong>机制</strong>：训练一个图像编码器和一个文本编码器，让配对的图文向量<strong>相似度最大化</strong>，不配对的<strong>最小化</strong>。</li>
+<li><strong>规模</strong>：使用了超大的 Batch Size (32,768)，这是成功的关键之一。</li>
+</ul>
+<h3 id="4-Result-结果与影响"><a href="#4-Result-结果与影响" class="headerlink" title="4. Result (结果与影响)"></a>4. Result (结果与影响)</h3><ul>
+<li><strong>性能</strong>：在 ImageNet 上，Zero-Shot 的 CLIP 达到了 ResNet-50 的水平（76.2%），但鲁棒性远超后者。</li>
+<li><strong>影响</strong>：它成为了 AI 绘画（Stable Diffusion）、多模态大模型（LLaVA、GPT-4V）的基石。没有 CLIP，就没有现在的 AIGC 热潮。</li>
+</ul>
+<hr>
+<h2 id="二、深度原理：从-Tensor-流向到梯度回传"><a href="#二、深度原理：从-Tensor-流向到梯度回传" class="headerlink" title="二、深度原理：从 Tensor 流向到梯度回传"></a>二、深度原理：从 Tensor 流向到梯度回传</h2><h3 id="2-1-架构与数据流-The-Flow"><a href="#2-1-架构与数据流-The-Flow" class="headerlink" title="2.1 架构与数据流 (The Flow)"></a>2.1 架构与数据流 (The Flow)</h3><p>CLIP 是典型的**双塔架构 (Two-Tower Architecture)**。</p>
+<p><img src="/images/clip/fig1_arch.png" alt="CLIP Architecture"><br><em>(图1：CLIP 完整架构与 Tensor 维度变化图)</em></p>
+<h4 id="数据流拆解-以-ViT-B-x2F-32-为例"><a href="#数据流拆解-以-ViT-B-x2F-32-为例" class="headerlink" title="数据流拆解 (以 ViT-B/32 为例)"></a><strong>数据流拆解 (以 ViT-B/32 为例)</strong></h4><p>假设 Batch Size $N=4$：</p>
+<ol>
+<li><p><strong>Image Branch (左侧)</strong>:</p>
+<ul>
+<li>Input: <code>[4, 3, 224, 224]</code> (图片)</li>
+<li>Patch Embedding: 切成 7x7=49 个 patch $<br>ightarrow$ <code>[4, 49, 768]</code></li>
+<li>Transformer: 加上 <code>[CLS]</code> token $<br>ightarrow$ <code>[4, 50, 768]</code></li>
+<li><strong>Output</strong>: 取 <code>[CLS]</code> token，投影到 512 维 $<br>ightarrow$ <strong><code>I_e [4, 512]</code></strong></li>
+</ul>
+</li>
+<li><p><strong>Text Branch (右侧)</strong>:</p>
+<ul>
+<li>Input: <code>[4, 77]</code> (文本 Token ID)</li>
+<li>Transformer: 经过 12 层处理 $<br>ightarrow$ <code>[4, 77, 512]</code></li>
+<li><strong>Output</strong>: 取 <code>[EOS]</code> token，投影到 512 维 $<br>ightarrow$ <strong><code>T_e [4, 512]</code></strong></li>
+</ul>
+</li>
+<li><p><strong>Interaction (交互)</strong>:</p>
+<ul>
+<li><strong>矩阵乘法</strong>: <code>Logits = I_e @ T_e.T</code> $<br>ightarrow$ <strong><code>[4, 4]</code></strong></li>
+<li>这就得到了一个相似度矩阵！</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="2-2-核心机制：对比学习与-InfoNCE-Loss"><a href="#2-2-核心机制：对比学习与-InfoNCE-Loss" class="headerlink" title="2.2 核心机制：对比学习与 InfoNCE Loss"></a>2.2 核心机制：对比学习与 InfoNCE Loss</h3><p>CLIP 不做生成（不画图），也不做分类（不预测 Label），它只做<strong>判断题</strong>：</p>
+<blockquote>
+<p>“这张图和这段字，是不是一对？”</p>
+</blockquote>
+<p><img src="/images/clip/fig2_loss.png" alt="Contrastive Loss"><br><em>(图2：对比损失矩阵计算与梯度回传)</em></p>
+<h4 id="InfoNCE-Loss-详解"><a href="#InfoNCE-Loss-详解" class="headerlink" title="InfoNCE Loss 详解"></a><strong>InfoNCE Loss 详解</strong></h4><p>对于 Batch 中的第 $i$ 张图，它与第 $i$ 段文本是正样本，与其他所有文本是负样本。</p>
+<p>$$ L_i = -\log rac{xp(	ext{sim}(I_i, T_i)/	au)}{\sum_{j=1}^N xp(	ext{sim}(I_i, T_j)/	au)} $$</p>
+<ul>
+<li><strong>分子</strong>：正样本的相似度（我们要最大化它）。</li>
+<li><strong>分母</strong>：所有样本的相似度总和（我们要通过最大化分子，间接压低分母中其他负样本的比重）。</li>
+<li>**$	au$ (Temperature)**：温度系数。$	au$ 越小，分布越尖锐，模型越关注最难区分的负样本。CLIP 中 $	au$ 是可学习的。</li>
+</ul>
+<h4 id="费曼直觉：为什么要用对比学习？"><a href="#费曼直觉：为什么要用对比学习？" class="headerlink" title="费曼直觉：为什么要用对比学习？"></a><strong>费曼直觉：为什么要用对比学习？</strong></h4><p>想象你在教小孩认动物：</p>
+<ul>
+<li>**生成式 (Generative)**：让小孩画一只猫。（太难了，还要学画画）</li>
+<li>**分类式 (Classification)**：给小孩看图，让他背这是”类别ID 283”。（死记硬背，不懂含义）</li>
+<li><strong>对比式 (Contrastive)<strong>：给小孩看一张猫图和”猫”字卡片，再看一张狗图和”车”字卡片，让他</strong>配对</strong>。（简单、高效，懂语义）</li>
+</ul>
+<hr>
+<h2 id="三、Zero-Shot-机制：如何”听懂人话”？"><a href="#三、Zero-Shot-机制：如何”听懂人话”？" class="headerlink" title="三、Zero-Shot 机制：如何”听懂人话”？"></a>三、Zero-Shot 机制：如何”听懂人话”？</h2><p>这是 CLIP 最骚的操作。它把<strong>分类问题</strong>变成了<strong>检索问题</strong>。</p>
+<p><img src="/images/clip/fig3_zeroshot.png" alt="Zero-Shot Mechanism"><br><em>(图3：Zero-Shot 推理与动态权重生成)</em></p>
+<h3 id="3-1-动态分类器-Dynamic-Classifier"><a href="#3-1-动态分类器-Dynamic-Classifier" class="headerlink" title="3.1 动态分类器 (Dynamic Classifier)"></a>3.1 动态分类器 (Dynamic Classifier)</h3><p>传统的分类器，最后一层权重 $W$ 是固定的（比如 ImageNet 的 1000 类）。<br>CLIP 的权重是<strong>动态生成</strong>的：</p>
+<ol>
+<li>你给它一组类别词：<code>["dog", "cat", "plane"]</code>。</li>
+<li>它把这些词变成向量：<code>[v_dog, v_cat, v_plane]</code>。</li>
+<li>这三个向量，就构成了临时的分类器权重 $W’$！</li>
+<li>图片向量 $I$ 与 $W’$ 做点积，谁大就是谁。</li>
+</ol>
+<h3 id="3-2-Prompt-Engineering-的起源"><a href="#3-2-Prompt-Engineering-的起源" class="headerlink" title="3.2 Prompt Engineering 的起源"></a>3.2 Prompt Engineering 的起源</h3><p>论文发现，直接用单词 <code>"dog"</code> 效果一般。如果改成 <code>"a photo of a dog"</code>，效果提升 1.3%。<br>如果用 <strong>Ensemble（集成）</strong>：</p>
+<ul>
+<li><code>"a photo of a big {label}"</code></li>
+<li><code>"a drawing of a {label}"</code></li>
+<li><code>"it is a {label}"</code><br>把 80 种句子的向量取平均，效果提升 3.5%！</li>
+</ul>
+<p>这告诉我们：<strong>多角度描述一个事物，特征更稳。</strong></p>
+<hr>
+<h2 id="四、大模型应用：CLIP-是-AI-的”视觉接口”"><a href="#四、大模型应用：CLIP-是-AI-的”视觉接口”" class="headerlink" title="四、大模型应用：CLIP 是 AI 的”视觉接口”"></a>四、大模型应用：CLIP 是 AI 的”视觉接口”</h2><p>CLIP 最大的贡献不是它自己，而是它<strong>成全了</strong>别人。</p>
+<p><img src="/images/clip/fig4_apps.png" alt="Applications"><br><em>(图4：CLIP 在 Stable Diffusion 和 LLaVA 中的核心地位)</em></p>
+<h3 id="4-1-Stable-Diffusion-AI-绘画"><a href="#4-1-Stable-Diffusion-AI-绘画" class="headerlink" title="4.1 Stable Diffusion (AI 绘画)"></a>4.1 Stable Diffusion (AI 绘画)</h3><ul>
+<li><strong>角色</strong>：CLIP Text Encoder 是 SD 的”理解中枢”。</li>
+<li><strong>流程</strong>：<ol>
+<li>用户输入：”一只赛博朋克风格的猫”。</li>
+<li><strong>CLIP Text Encoder</strong> 把这句话变成向量。</li>
+<li>U-Net 根据这个向量，从噪声中”雕刻”出图像。</li>
+</ol>
+</li>
+<li><strong>本质</strong>：SD 画得好，是因为 CLIP <strong>懂</strong>文本对应的视觉特征长什么样。</li>
+</ul>
+<h3 id="4-2-LLaVA-x2F-GPT-4V-多模态大模型"><a href="#4-2-LLaVA-x2F-GPT-4V-多模态大模型" class="headerlink" title="4.2 LLaVA / GPT-4V (多模态大模型)"></a>4.2 LLaVA / GPT-4V (多模态大模型)</h3><ul>
+<li><strong>角色</strong>：CLIP Vision Encoder 是大模型的”眼睛”。</li>
+<li><strong>流程</strong>：<ol>
+<li>输入一张图。</li>
+<li><strong>CLIP Image Encoder</strong> 提取图像特征。</li>
+<li>通过一个投影层 (Projection)，把图像特征伪装成”词向量”。</li>
+<li>LLM (如 Vicuna/Llama) 以为自己看到了文字，实际上是看到了图像特征。</li>
+</ol>
+</li>
+<li><strong>本质</strong>：CLIP 把像素变成了 LLM 能读懂的语义。</li>
+</ul>
+<hr>
+<h2 id="五、核心代码实现-PyTorch"><a href="#五、核心代码实现-PyTorch" class="headerlink" title="五、核心代码实现 (PyTorch)"></a>五、核心代码实现 (PyTorch)</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CLIP</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, embed_dim=<span class="number">512</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.visual = VisionTransformer() <span class="comment"># Image Encoder</span></span><br><span class="line">        self.text = TextTransformer()     <span class="comment"># Text Encoder</span></span><br><span class="line">        self.logit_scale = nn.Parameter(torch.ones([]) * np.log(<span class="number">1</span> / <span class="number">0.07</span>))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, image, text</span>):</span><br><span class="line">        <span class="comment"># 1. 提取特征</span></span><br><span class="line">        I_e = self.visual(image)  <span class="comment"># [N, 512]</span></span><br><span class="line">        T_e = self.text(text)     <span class="comment"># [N, 512]</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 2. 归一化 (关键！否则点积无上界)</span></span><br><span class="line">        I_e = I_e / I_e.norm(dim=-<span class="number">1</span>, keepdim=<span class="literal">True</span>)</span><br><span class="line">        T_e = T_e / T_e.norm(dim=-<span class="number">1</span>, keepdim=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 3. 计算相似度矩阵</span></span><br><span class="line">        <span class="comment"># exp(t) * (I @ T.T)</span></span><br><span class="line">        logit_scale = self.logit_scale.exp()</span><br><span class="line">        logits_per_image = logit_scale * I_e @ T_e.t()</span><br><span class="line">        logits_per_text = logits_per_image.t()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 4. 构造标签 (对角线是正样本)</span></span><br><span class="line">        labels = torch.arange(<span class="built_in">len</span>(image)).to(image.device)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 5. 计算双向 Loss</span></span><br><span class="line">        loss_i = nn.CrossEntropyLoss()(logits_per_image, labels)</span><br><span class="line">        loss_t = nn.CrossEntropyLoss()(logits_per_text, labels)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> (loss_i + loss_t) / <span class="number">2</span></span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="六、局限性与思考"><a href="#六、局限性与思考" class="headerlink" title="六、局限性与思考"></a>六、局限性与思考</h2><p>虽然 CLIP 很强，但它不是万能的：</p>
+<ol>
+<li><strong>不擅长细粒度任务</strong>：它很难区分”波音747”和”波音777”，或者数清图里有几只鸟。因为对比学习更关注整体语义匹配。</li>
+<li><strong>OCR 能力弱</strong>：它能认出”Apple”这个Logo，但如果你手写一个”Sony”贴在苹果上，它可能会困惑。</li>
+<li><strong>非生成式</strong>：CLIP 自己不能生成图像，它只能<strong>评价</strong>图像。它需要配合 GAN 或 Diffusion 才能搞创作。</li>
+</ol>
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p>CLIP 是 AI 历史上的一个转折点。它打破了 Vision 和 Language 的界限，用<strong>4亿对图文数据</strong>暴力美学地证明了：<strong>语言是理解视觉的最佳监督信号。</strong></p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/02/19/20260219-%E5%8F%8C%E6%8C%87%E9%92%88%E6%95%99%E7%A8%8B/">双指针（Two Pointers）Feynman 风格教程</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/02/08/MoE-Switch-Transformer-Mixtral-Deep-Dive/">MoE 深度解析：Switch Transformer 与 Mixtral 的稀疏之道</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#CLIP-Contrastive-Language-Image-Pre-Training-%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90"><span class="toc-text">CLIP (Contrastive Language-Image Pre-Training) 深度解析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81STAR-%E6%A1%86%E6%9E%B6%EF%BC%9ACLIP-%E7%9A%84%E8%AF%9E%E7%94%9F%E4%B8%8E%E9%9D%A9%E5%91%BD"><span class="toc-text">一、STAR 框架：CLIP 的诞生与革命</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Situation-%E8%83%8C%E6%99%AF%E4%B8%8E%E7%97%9B%E7%82%B9"><span class="toc-text">1. Situation (背景与痛点)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Task-%E4%BB%BB%E5%8A%A1%E7%9B%AE%E6%A0%87"><span class="toc-text">2. Task (任务目标)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Action-%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="toc-text">3. Action (核心方法)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Result-%E7%BB%93%E6%9E%9C%E4%B8%8E%E5%BD%B1%E5%93%8D"><span class="toc-text">4. Result (结果与影响)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%B7%B1%E5%BA%A6%E5%8E%9F%E7%90%86%EF%BC%9A%E4%BB%8E-Tensor-%E6%B5%81%E5%90%91%E5%88%B0%E6%A2%AF%E5%BA%A6%E5%9B%9E%E4%BC%A0"><span class="toc-text">二、深度原理：从 Tensor 流向到梯度回传</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%95%B0%E6%8D%AE%E6%B5%81-The-Flow"><span class="toc-text">2.1 架构与数据流 (The Flow)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E6%8B%86%E8%A7%A3-%E4%BB%A5-ViT-B-x2F-32-%E4%B8%BA%E4%BE%8B"><span class="toc-text">数据流拆解 (以 ViT-B&#x2F;32 为例)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E6%A0%B8%E5%BF%83%E6%9C%BA%E5%88%B6%EF%BC%9A%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E4%B8%8E-InfoNCE-Loss"><span class="toc-text">2.2 核心机制：对比学习与 InfoNCE Loss</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#InfoNCE-Loss-%E8%AF%A6%E8%A7%A3"><span class="toc-text">InfoNCE Loss 详解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B4%B9%E6%9B%BC%E7%9B%B4%E8%A7%89%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%EF%BC%9F"><span class="toc-text">费曼直觉：为什么要用对比学习？</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81Zero-Shot-%E6%9C%BA%E5%88%B6%EF%BC%9A%E5%A6%82%E4%BD%95%E2%80%9D%E5%90%AC%E6%87%82%E4%BA%BA%E8%AF%9D%E2%80%9D%EF%BC%9F"><span class="toc-text">三、Zero-Shot 机制：如何”听懂人话”？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%8A%A8%E6%80%81%E5%88%86%E7%B1%BB%E5%99%A8-Dynamic-Classifier"><span class="toc-text">3.1 动态分类器 (Dynamic Classifier)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-Prompt-Engineering-%E7%9A%84%E8%B5%B7%E6%BA%90"><span class="toc-text">3.2 Prompt Engineering 的起源</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BA%94%E7%94%A8%EF%BC%9ACLIP-%E6%98%AF-AI-%E7%9A%84%E2%80%9D%E8%A7%86%E8%A7%89%E6%8E%A5%E5%8F%A3%E2%80%9D"><span class="toc-text">四、大模型应用：CLIP 是 AI 的”视觉接口”</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-Stable-Diffusion-AI-%E7%BB%98%E7%94%BB"><span class="toc-text">4.1 Stable Diffusion (AI 绘画)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-LLaVA-x2F-GPT-4V-%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B"><span class="toc-text">4.2 LLaVA &#x2F; GPT-4V (多模态大模型)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-PyTorch"><span class="toc-text">五、核心代码实现 (PyTorch)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E5%B1%80%E9%99%90%E6%80%A7%E4%B8%8E%E6%80%9D%E8%80%83"><span class="toc-text">六、局限性与思考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-text">七、总结</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

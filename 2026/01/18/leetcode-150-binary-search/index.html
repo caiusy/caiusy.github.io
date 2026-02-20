@@ -1,0 +1,974 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>🔢 LeetCode 150 - 二分查找专题 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀">
+<meta property="og:type" content="article">
+<meta property="og:title" content="🔢 LeetCode 150 - 二分查找专题">
+<meta property="og:url" content="https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-01-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-17T16:00:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="LeetCode - LeetCode - leetcode面试150 - 二分查找 - Binary Search - 面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="LeetCode - LeetCode - leetcode面试150 - 二分查找 - Binary Search - 面试">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-01-18T00:00:00+08:00","dateModified":"2026-01-18T00:00:00+08:00","datePublished":"2026-01-18T00:00:00+08:00","description":"","headline":"🔢 LeetCode 150 - 二分查找专题","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/","keywords":"LeetCode - LeetCode - leetcode面试150 - 二分查找 - Binary Search - 面试","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/">LeetCode</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/%E7%AE%97%E6%B3%95/">算法</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/%E7%AE%97%E6%B3%95/LeetCode/">LeetCode</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-01-17T16:00:00.000Z">2026-01-18</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-01-17T16:00:00.000Z">2026-01-18</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>🔢 LeetCode 150 - 二分查找专题</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h1 id="🔢-二分查找专题-7题"><a href="#🔢-二分查找专题-7题" class="headerlink" title="🔢 二分查找专题 (7题)"></a>🔢 二分查找专题 (7题)</h1><blockquote>
+<p>🎯 <strong>核心思想</strong>：每次排除一半的搜索空间，时间复杂度 O(log n)</p>
+</blockquote>
+<hr>
+<h2 id="🗺️-二分查找的本质"><a href="#🗺️-二分查找的本质" class="headerlink" title="🗺️ 二分查找的本质"></a>🗺️ 二分查找的本质</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│                   二分查找的本质                             │</span><br><span class="line">├─────────────────────────────────────────────────────────────┤</span><br><span class="line">│                                                             │</span><br><span class="line">│  二分查找的本质是：在有序（或部分有序）的空间中               │</span><br><span class="line">│  找到满足某个条件的边界点                                    │</span><br><span class="line">│                                                             │</span><br><span class="line">│  🔵🔵🔵🔵🔵🔴🔴🔴🔴🔴🔴                                    │</span><br><span class="line">│  ↑         ↑                                                │</span><br><span class="line">│  蓝色区域   红色区域                                         │</span><br><span class="line">│  (不满足)   (满足)                                          │</span><br><span class="line">│                                                             │</span><br><span class="line">│  目标：找到第一个红色（或最后一个蓝色）                      │</span><br><span class="line">│                                                             │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="🔧-二分查找模板"><a href="#🔧-二分查找模板" class="headerlink" title="🔧 二分查找模板"></a>🔧 二分查找模板</h2><h3 id="模板1：找第一个满足条件的位置"><a href="#模板1：找第一个满足条件的位置" class="headerlink" title="模板1：找第一个满足条件的位置"></a>模板1：找第一个满足条件的位置</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">binary_search_first</span>(<span class="params">nums, target</span>):</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(nums)  <span class="comment"># 左闭右开</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        mid = left + (right - left) // <span class="number">2</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> condition(mid):    <span class="comment"># 满足条件</span></span><br><span class="line">            right = mid       <span class="comment"># 答案在 [left, mid]</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            left = mid + <span class="number">1</span>    <span class="comment"># 答案在 [mid+1, right)</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> left  <span class="comment"># 第一个满足条件的位置</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="模板2：找最后一个满足条件的位置"><a href="#模板2：找最后一个满足条件的位置" class="headerlink" title="模板2：找最后一个满足条件的位置"></a>模板2：找最后一个满足条件的位置</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">binary_search_last</span>(<span class="params">nums, target</span>):</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(nums)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        mid = left + (right - left + <span class="number">1</span>) // <span class="number">2</span>  <span class="comment"># 向上取整</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> condition(mid):    <span class="comment"># 满足条件</span></span><br><span class="line">            left = mid        <span class="comment"># 答案在 [mid, right)</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            right = mid - <span class="number">1</span>   <span class="comment"># 答案在 [left, mid-1]</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> left  <span class="comment"># 最后一个满足条件的位置</span></span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="1️⃣-LC-35-搜索插入位置-🟢"><a href="#1️⃣-LC-35-搜索插入位置-🟢" class="headerlink" title="1️⃣ LC 35. 搜索插入位置 🟢"></a>1️⃣ LC 35. 搜索插入位置 🟢</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>在排序数组中找到目标值的位置，如果不存在则返回应该插入的位置。</p>
+<h3 id="🎨-图解思路"><a href="#🎨-图解思路" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">nums = [1, 3, 5, 6], target = 5</span><br><span class="line"></span><br><span class="line">找第一个 &gt;= target 的位置</span><br><span class="line"></span><br><span class="line">  1   3   5   6</span><br><span class="line">  ↑       ↑</span><br><span class="line"> &lt;5      &gt;=5</span><br><span class="line"></span><br><span class="line">二分查找：</span><br><span class="line">初始: left=0, right=4</span><br><span class="line">mid=2, nums[2]=5 &gt;= 5, right=2</span><br><span class="line">mid=1, nums[1]=3 &lt; 5, left=2</span><br><span class="line">left == right, 返回 2</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="💻-代码实现"><a href="#💻-代码实现" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">searchInsert</span>(<span class="params">nums: <span class="built_in">list</span>, target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(nums)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        mid = left + (right - left) // <span class="number">2</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> nums[mid] &gt;= target:</span><br><span class="line">            right = mid</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            left = mid + <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> left</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“找第一个不小于目标的位置”</strong></p>
+</blockquote>
+<hr>
+<h2 id="2️⃣-LC-74-搜索二维矩阵-🟡"><a href="#2️⃣-LC-74-搜索二维矩阵-🟡" class="headerlink" title="2️⃣ LC 74. 搜索二维矩阵 🟡"></a>2️⃣ LC 74. 搜索二维矩阵 🟡</h2><h3 id="题目描述-1"><a href="#题目描述-1" class="headerlink" title="题目描述"></a>题目描述</h3><p>在行列都有序的二维矩阵中搜索目标值。</p>
+<h3 id="🎨-图解思路-1"><a href="#🎨-图解思路-1" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">matrix:</span><br><span class="line">[1,  3,  5,  7]</span><br><span class="line">[10, 11, 16, 20]</span><br><span class="line">[23, 30, 34, 60]</span><br><span class="line"></span><br><span class="line">将 2D 矩阵看作 1D 数组:</span><br><span class="line">[1, 3, 5, 7, 10, 11, 16, 20, 23, 30, 34, 60]</span><br><span class="line"></span><br><span class="line">坐标转换:</span><br><span class="line">index → (index // n, index % n)</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="💻-代码实现-1"><a href="#💻-代码实现-1" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">searchMatrix</span>(<span class="params">matrix: <span class="built_in">list</span>, target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">bool</span>:</span><br><span class="line">    m, n = <span class="built_in">len</span>(matrix), <span class="built_in">len</span>(matrix[<span class="number">0</span>])</span><br><span class="line">    left, right = <span class="number">0</span>, m * n</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        mid = left + (right - left) // <span class="number">2</span></span><br><span class="line">        row, col = mid // n, mid % n</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> matrix[row][col] == target:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="keyword">elif</span> matrix[row][col] &lt; target:</span><br><span class="line">            left = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            right = mid</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="🧠-记忆口诀-1"><a href="#🧠-记忆口诀-1" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“2D变1D，除法取行，余数取列”</strong></p>
+</blockquote>
+<hr>
+<h2 id="3️⃣-LC-162-寻找峰值-🟡"><a href="#3️⃣-LC-162-寻找峰值-🟡" class="headerlink" title="3️⃣ LC 162. 寻找峰值 🟡"></a>3️⃣ LC 162. 寻找峰值 🟡</h2><h3 id="题目描述-2"><a href="#题目描述-2" class="headerlink" title="题目描述"></a>题目描述</h3><p>找到数组中任意一个峰值元素的索引（比左右邻居都大）。</p>
+<h3 id="🎨-图解思路-2"><a href="#🎨-图解思路-2" class="headerlink" title="🎨 图解思路"></a>🎨 图解思路</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">nums = [1, 2, 1, 3, 5, 6, 4]</span><br><span class="line"></span><br><span class="line">峰值: 索引 1 (值为2) 或 索引 5 (值为6)</span><br><span class="line"></span><br><span class="line">二分思路:</span><br><span class="line">- 如果 mid 在上坡，峰值在右边</span><br><span class="line">- 如果 mid 在下坡，峰值在左边</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line">   5 \4</span><br><span class="line">  /</span><br><span class="line"> / \</span><br><span class="line">1   1</span><br><span class="line">mid 处于上坡 → 往右找</span><br><span class="line">mid 处于下坡 → 往左找（包含mid）</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="💻-代码实现-2"><a href="#💻-代码实现-2" class="headerlink" title="💻 代码实现"></a>💻 代码实现</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">findPeakElement</span>(<span class="params">nums: <span class="built_in">list</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        mid = left + (right - left) // <span class="number">2</span></span><br><span class="line">        <span class="keyword">if</span> nums[mid] &lt; nums[mid + <span class="number">1</span>]:</span><br><span class="line">            <span class="comment"># 上坡，峰值在右边</span></span><br><span class="line">            left = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 下坡或峰值，峰值在左边（包含mid）</span></span><br><span class="line">            right = mid</span><br><span class="line">    <span class="keyword">return</span> left</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="🧠-记忆口诀-2"><a href="#🧠-记忆口诀-2" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h3><blockquote>
+<p><strong>“上坡往右，下坡往左”</strong></p>
+</blockquote>
+<hr>
+<h2 id="4️⃣-LC-33-搜索旋转排序数组-🟡"><a href="#4️⃣-LC-33-搜索旋转排序数组-🟡" class="headerlink" title="4️⃣ LC 33. 搜索旋转排序数组 🟡"></a>4️⃣ LC 33. 搜索旋转排序数组 🟡</h2><h3 id="题目描述-3"><a href="#题目描述-3" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="在旋转后的有序数组中搜索目标值。-🎨-图解思路-💻-代码实现-🧠-记忆口诀-gt-“先判断哪边有序，再判断目标在哪边”"><a href="#在旋转后的有序数组中搜索目标值。-🎨-图解思路-💻-代码实现-🧠-记忆口诀-gt-“先判断哪边有序，再判断目标在哪边”" class="headerlink" title="在旋转后的有序数组中搜索目标值。### 🎨 图解思路### 💻 代码实现### 🧠 记忆口诀> “先判断哪边有序，再判断目标在哪边”"></a>在旋转后的有序数组中搜索目标值。<br>### 🎨 图解思路<br><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">nums = [4, 5, 6, 7, 0, 1, 2], target = 0</span><br><span class="line">旋转后的数组特点:</span><br><span class="line">   6  \</span><br><span class="line">  5    0</span><br><span class="line"> 4      \</span><br><span class="line">二分策略:</span><br><span class="line">1. 判断 mid 在左半段还是右半段</span><br><span class="line">2. 判断 target 在 mid 的哪边</span><br></pre></td></tr></tbody></table></figure><br>### 💻 代码实现<br><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">search</span>(<span class="params">nums: <span class="built_in">list</span>, target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> left &lt;= right:</span><br><span class="line">        mid = left + (right - left) // <span class="number">2</span></span><br><span class="line">        <span class="keyword">if</span> nums[mid] == target:</span><br><span class="line">            <span class="keyword">return</span> mid</span><br><span class="line">        <span class="comment"># 判断 mid 在左半段还是右半段</span></span><br><span class="line">        <span class="keyword">if</span> nums[left] &lt;= nums[mid]:</span><br><span class="line">            <span class="comment"># mid 在左半段（有序）</span></span><br><span class="line">            <span class="keyword">if</span> nums[left] &lt;= target &lt; nums[mid]:</span><br><span class="line">                right = mid - <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                left = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># mid 在右半段（有序）</span></span><br><span class="line">            <span class="keyword">if</span> nums[mid] &lt; target &lt;= nums[right]:</span><br><span class="line">                left = mid + <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                right = mid - <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></tbody></table></figure><br>### 🧠 记忆口诀<br>&gt; <strong>“先判断哪边有序，再判断目标在哪边”</strong></h2><h2 id="5️⃣-LC-34-查找元素的第一个和最后一个位置-🟡"><a href="#5️⃣-LC-34-查找元素的第一个和最后一个位置-🟡" class="headerlink" title="5️⃣ LC 34. 查找元素的第一个和最后一个位置 🟡"></a>5️⃣ LC 34. 查找元素的第一个和最后一个位置 🟡</h2><h3 id="题目描述-4"><a href="#题目描述-4" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="在排序数组中找到目标值的起始和结束位置。-🎨-图解思路-💻-代码实现-🧠-记忆口诀-gt-“找第一个-gt-x3D-，找第一个-gt-再减1”"><a href="#在排序数组中找到目标值的起始和结束位置。-🎨-图解思路-💻-代码实现-🧠-记忆口诀-gt-“找第一个-gt-x3D-，找第一个-gt-再减1”" class="headerlink" title="在排序数组中找到目标值的起始和结束位置。### 🎨 图解思路### 💻 代码实现### 🧠 记忆口诀> “找第一个>=，找第一个>再减1”"></a>在排序数组中找到目标值的起始和结束位置。<br>### 🎨 图解思路<br><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">nums = [5, 7, 7, 8, 8, 10], target = 8</span><br><span class="line">找第一个 8: 索引 3</span><br><span class="line">找最后一个 8: 索引 4</span><br><span class="line">  5   7   7   8   8   10</span><br><span class="line">              ↑   ↑</span><br><span class="line">            first last</span><br></pre></td></tr></tbody></table></figure><br>### 💻 代码实现<br><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">searchRange</span>(<span class="params">nums: <span class="built_in">list</span>, target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">list</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">find_first</span>():</span><br><span class="line">        left, right = <span class="number">0</span>, <span class="built_in">len</span>(nums)</span><br><span class="line">        <span class="keyword">while</span> left &lt; right:</span><br><span class="line">            mid = left + (right - left) // <span class="number">2</span></span><br><span class="line">            <span class="keyword">if</span> nums[mid] &gt;= target:</span><br><span class="line">                right = mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                left = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> left</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">find_last</span>():</span><br><span class="line">        left, right = <span class="number">0</span>, <span class="built_in">len</span>(nums)</span><br><span class="line">        <span class="keyword">while</span> left &lt; right:</span><br><span class="line">            mid = left + (right - left) // <span class="number">2</span></span><br><span class="line">            <span class="keyword">if</span> nums[mid] &gt; target:</span><br><span class="line">                right = mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                left = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> left - <span class="number">1</span></span><br><span class="line">    first = find_first()</span><br><span class="line">    <span class="keyword">if</span> first == <span class="built_in">len</span>(nums) <span class="keyword">or</span> nums[first] != target:</span><br><span class="line">        <span class="keyword">return</span> [-<span class="number">1</span>, -<span class="number">1</span>]</span><br><span class="line">    last = find_last()</span><br><span class="line">    <span class="keyword">return</span> [first, last]</span><br></pre></td></tr></tbody></table></figure><br>### 🧠 记忆口诀<br>&gt; <strong>“找第一个&gt;=，找第一个&gt;再减1”</strong></h2><h2 id="6️⃣-LC-153-寻找旋转排序数组中的最小值-🟡"><a href="#6️⃣-LC-153-寻找旋转排序数组中的最小值-🟡" class="headerlink" title="6️⃣ LC 153. 寻找旋转排序数组中的最小值 🟡"></a>6️⃣ LC 153. 寻找旋转排序数组中的最小值 🟡</h2><h3 id="题目描述-5"><a href="#题目描述-5" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="在旋转后的有序数组中找到最小值。-🎨-图解思路-💻-代码实现-🧠-记忆口诀-gt-“比右边大就往右，否则往左”"><a href="#在旋转后的有序数组中找到最小值。-🎨-图解思路-💻-代码实现-🧠-记忆口诀-gt-“比右边大就往右，否则往左”" class="headerlink" title="在旋转后的有序数组中找到最小值。### 🎨 图解思路### 💻 代码实现### 🧠 记忆口诀> “比右边大就往右，否则往左”"></a>在旋转后的有序数组中找到最小值。<br>### 🎨 图解思路<br><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">nums = [3, 4, 5, 1, 2]</span><br><span class="line">   4  \</span><br><span class="line">  3    1</span><br><span class="line">        \</span><br><span class="line">最小值是旋转点</span><br><span class="line">比较 nums[mid] 和 nums[right]:</span><br><span class="line">- nums[mid] &gt; nums[right]: 最小值在右边</span><br><span class="line">- nums[mid] &lt;= nums[right]: 最小值在左边（包含mid）</span><br></pre></td></tr></tbody></table></figure><br>### 💻 代码实现<br><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">findMin</span>(<span class="params">nums: <span class="built_in">list</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        mid = left + (right - left) // <span class="number">2</span></span><br><span class="line">        <span class="keyword">if</span> nums[mid] &gt; nums[right]:</span><br><span class="line">            <span class="comment"># 最小值在右边</span></span><br><span class="line">            left = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 最小值在左边（包含mid）</span></span><br><span class="line">            right = mid</span><br><span class="line">    <span class="keyword">return</span> nums[left]</span><br></pre></td></tr></tbody></table></figure><br>### 🧠 记忆口诀<br>&gt; <strong>“比右边大就往右，否则往左”</strong></h2><h2 id="7️⃣-LC-4-寻找两个正序数组的中位数-🔴"><a href="#7️⃣-LC-4-寻找两个正序数组的中位数-🔴" class="headerlink" title="7️⃣ LC 4. 寻找两个正序数组的中位数 🔴"></a>7️⃣ LC 4. 寻找两个正序数组的中位数 🔴</h2><h3 id="题目描述-6"><a href="#题目描述-6" class="headerlink" title="题目描述"></a>题目描述</h3><h2 id="找到两个正序数组的中位数，要求时间复杂度-O-log-m-n-。-🎨-图解思路-💻-代码实现-🧠-记忆口诀-gt-“短数组二分，找正确划分”"><a href="#找到两个正序数组的中位数，要求时间复杂度-O-log-m-n-。-🎨-图解思路-💻-代码实现-🧠-记忆口诀-gt-“短数组二分，找正确划分”" class="headerlink" title="找到两个正序数组的中位数，要求时间复杂度 O(log(m+n))。### 🎨 图解思路### 💻 代码实现### 🧠 记忆口诀> “短数组二分，找正确划分”"></a>找到两个正序数组的中位数，要求时间复杂度 O(log(m+n))。<br>### 🎨 图解思路<br><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">nums1 = [1, 3], nums2 = [2]</span><br><span class="line">合并后: [1, 2, 3]</span><br><span class="line">中位数: 2</span><br><span class="line">二分思路:</span><br><span class="line">在较短的数组上二分，找到一个划分点 i</span><br><span class="line">使得 nums1[0:i] 和 nums2[0:j] 的总数 = (m+n+1)//2</span><br><span class="line">       nums1:  1 | 3</span><br><span class="line">       nums2:  2 |</span><br><span class="line">               ↑</span><br><span class="line">              划分点</span><br><span class="line">左半边最大值 &lt;= 右半边最小值</span><br></pre></td></tr></tbody></table></figure><br>### 💻 代码实现<br><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">findMedianSortedArrays</span>(<span class="params">nums1: <span class="built_in">list</span>, nums2: <span class="built_in">list</span></span>) -&gt; <span class="built_in">float</span>:</span><br><span class="line">    <span class="comment"># 确保 nums1 是较短的数组</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(nums1) &gt; <span class="built_in">len</span>(nums2):</span><br><span class="line">        nums1, nums2 = nums2, nums1</span><br><span class="line">    m, n = <span class="built_in">len</span>(nums1), <span class="built_in">len</span>(nums2)</span><br><span class="line">    left, right = <span class="number">0</span>, m</span><br><span class="line">    <span class="keyword">while</span> left &lt;= right:</span><br><span class="line">        i = (left + right) // <span class="number">2</span></span><br><span class="line">        j = (m + n + <span class="number">1</span>) // <span class="number">2</span> - i</span><br><span class="line">        <span class="comment"># 边界处理</span></span><br><span class="line">        nums1_left = <span class="built_in">float</span>(<span class="string">'-inf'</span>) <span class="keyword">if</span> i == <span class="number">0</span> <span class="keyword">else</span> nums1[i - <span class="number">1</span>]</span><br><span class="line">        nums1_right = <span class="built_in">float</span>(<span class="string">'inf'</span>) <span class="keyword">if</span> i == m <span class="keyword">else</span> nums1[i]</span><br><span class="line">        nums2_left = <span class="built_in">float</span>(<span class="string">'-inf'</span>) <span class="keyword">if</span> j == <span class="number">0</span> <span class="keyword">else</span> nums2[j - <span class="number">1</span>]</span><br><span class="line">        nums2_right = <span class="built_in">float</span>(<span class="string">'inf'</span>) <span class="keyword">if</span> j == n <span class="keyword">else</span> nums2[j]</span><br><span class="line">        <span class="keyword">if</span> nums1_left &lt;= nums2_right <span class="keyword">and</span> nums2_left &lt;= nums1_right:</span><br><span class="line">            <span class="comment"># 找到正确的划分</span></span><br><span class="line">            <span class="keyword">if</span> (m + n) % <span class="number">2</span> == <span class="number">1</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="built_in">max</span>(nums1_left, nums2_left)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> (<span class="built_in">max</span>(nums1_left, nums2_left) +</span><br><span class="line">                        <span class="built_in">min</span>(nums1_right, nums2_right)) / <span class="number">2</span></span><br><span class="line">        <span class="keyword">elif</span> nums1_left &gt; nums2_right:</span><br><span class="line">            <span class="comment"># nums1 划分点太靠右</span></span><br><span class="line">            right = i - <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># nums1 划分点太靠左</span></span><br><span class="line">            left = i + <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0.0</span></span><br></pre></td></tr></tbody></table></figure><br>### 🧠 记忆口诀<br>&gt; <strong>“短数组二分，找正确划分”</strong></h2><h2 id="📊-本章总结"><a href="#📊-本章总结" class="headerlink" title="📊 本章总结"></a>📊 本章总结</h2><h3 id="二分查找场景"><a href="#二分查找场景" class="headerlink" title="二分查找场景"></a>二分查找场景</h3><p>| 场景 | 关键点 | 典型题目 |</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">| 有序数组查找 | 直接二分 | 35, 74 |</span><br><span class="line">| 旋转数组 | 判断有序段 | 33, 153 |</span><br><span class="line">| 峰值问题 | 比较相邻元素 | 162 |</span><br><span class="line">| 边界问题 | &gt;=和&gt;的区别 | 34 |</span><br><span class="line">| 双数组 | 在短数组二分 | 4 |</span><br><span class="line"></span><br><span class="line">### 🧠 全章记忆口诀</span><br><span class="line"></span><br></pre></td></tr></tbody></table></figure>
+<p>插矩峰旋范围最中<br>二分七题要记清</p>
+<p>插 - 搜索插入位置 (35)<br>矩 - 搜索二维矩阵 (74)<br>峰 - 寻找峰值 (162)<br>旋 - 搜索旋转排序数组 (33)<br>范围 - 查找元素的第一个和最后一个位置 (34)<br>最 - 寻找旋转排序数组中的最小值 (153)<br>中 - 寻找两个正序数组的中位数 (4)</p>
+<pre><code>
+---
+
+&gt; 📖 **下一篇**：[位运算专题](/2026/01/18/leetcode-150-bit/)
+</code></pre>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2026/01/18/leetcode-150-backtrack/">🔢 LeetCode 150 - 回溯算法专题</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/01/18/leetcode-150-binary-tree/">🌳 LeetCode 150 - 二叉树专题</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%F0%9F%94%A2-%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E4%B8%93%E9%A2%98-7%E9%A2%98"><span class="toc-text">🔢 二分查找专题 (7题)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%97%BA%EF%B8%8F-%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-text">🗺️ 二分查找的本质</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%A7-%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E6%A8%A1%E6%9D%BF"><span class="toc-text">🔧 二分查找模板</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF1%EF%BC%9A%E6%89%BE%E7%AC%AC%E4%B8%80%E4%B8%AA%E6%BB%A1%E8%B6%B3%E6%9D%A1%E4%BB%B6%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-text">模板1：找第一个满足条件的位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E6%9D%BF2%EF%BC%9A%E6%89%BE%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E6%BB%A1%E8%B6%B3%E6%9D%A1%E4%BB%B6%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-text">模板2：找最后一个满足条件的位置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%B8%8F%E2%83%A3-LC-35-%E6%90%9C%E7%B4%A2%E6%8F%92%E5%85%A5%E4%BD%8D%E7%BD%AE-%F0%9F%9F%A2"><span class="toc-text">1️⃣ LC 35. 搜索插入位置 🟢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%EF%B8%8F%E2%83%A3-LC-74-%E6%90%9C%E7%B4%A2%E4%BA%8C%E7%BB%B4%E7%9F%A9%E9%98%B5-%F0%9F%9F%A1"><span class="toc-text">2️⃣ LC 74. 搜索二维矩阵 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-1"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-1"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-1"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%EF%B8%8F%E2%83%A3-LC-162-%E5%AF%BB%E6%89%BE%E5%B3%B0%E5%80%BC-%F0%9F%9F%A1"><span class="toc-text">3️⃣ LC 162. 寻找峰值 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-2"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-2"><span class="toc-text">🎨 图解思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-2"><span class="toc-text">💻 代码实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-2"><span class="toc-text">🧠 记忆口诀</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%EF%B8%8F%E2%83%A3-LC-33-%E6%90%9C%E7%B4%A2%E6%97%8B%E8%BD%AC%E6%8E%92%E5%BA%8F%E6%95%B0%E7%BB%84-%F0%9F%9F%A1"><span class="toc-text">4️⃣ LC 33. 搜索旋转排序数组 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-3"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E6%97%8B%E8%BD%AC%E5%90%8E%E7%9A%84%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E4%B8%AD%E6%90%9C%E7%B4%A2%E7%9B%AE%E6%A0%87%E5%80%BC%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E5%85%88%E5%88%A4%E6%96%AD%E5%93%AA%E8%BE%B9%E6%9C%89%E5%BA%8F%EF%BC%8C%E5%86%8D%E5%88%A4%E6%96%AD%E7%9B%AE%E6%A0%87%E5%9C%A8%E5%93%AA%E8%BE%B9%E2%80%9D"><span class="toc-text">在旋转后的有序数组中搜索目标值。### 🎨 图解思路12345678nums &#x3D; [4, 5, 6, 7, 0, 1, 2], target &#x3D; 0旋转后的数组特点:   6  \  5    0 4      \二分策略:1. 判断 mid 在左半段还是右半段2. 判断 target 在 mid 的哪边### 💻 代码实现1234567891011121314151617181920def search(nums: list, target: int) -&gt; int:    left, right &#x3D; 0, len(nums) - 1    while left &lt;&#x3D; right:        mid &#x3D; left + (right - left) &#x2F;&#x2F; 2        if nums[mid] &#x3D;&#x3D; target:            return mid        # 判断 mid 在左半段还是右半段        if nums[left] &lt;&#x3D; nums[mid]:            # mid 在左半段（有序）            if nums[left] &lt;&#x3D; target &lt; nums[mid]:                right &#x3D; mid - 1            else:                left &#x3D; mid + 1        else:            # mid 在右半段（有序）            if nums[mid] &lt; target &lt;&#x3D; nums[right]:                left &#x3D; mid + 1            else:                right &#x3D; mid - 1    return -1### 🧠 记忆口诀&gt; “先判断哪边有序，再判断目标在哪边”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%EF%B8%8F%E2%83%A3-LC-34-%E6%9F%A5%E6%89%BE%E5%85%83%E7%B4%A0%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%92%8C%E6%9C%80%E5%90%8E%E4%B8%80%E4%B8%AA%E4%BD%8D%E7%BD%AE-%F0%9F%9F%A1"><span class="toc-text">5️⃣ LC 34. 查找元素的第一个和最后一个位置 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-4"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E6%8E%92%E5%BA%8F%E6%95%B0%E7%BB%84%E4%B8%AD%E6%89%BE%E5%88%B0%E7%9B%AE%E6%A0%87%E5%80%BC%E7%9A%84%E8%B5%B7%E5%A7%8B%E5%92%8C%E7%BB%93%E6%9D%9F%E4%BD%8D%E7%BD%AE%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E6%89%BE%E7%AC%AC%E4%B8%80%E4%B8%AA-gt-x3D-%EF%BC%8C%E6%89%BE%E7%AC%AC%E4%B8%80%E4%B8%AA-gt-%E5%86%8D%E5%87%8F1%E2%80%9D"><span class="toc-text">在排序数组中找到目标值的起始和结束位置。### 🎨 图解思路123456nums &#x3D; [5, 7, 7, 8, 8, 10], target &#x3D; 8找第一个 8: 索引 3找最后一个 8: 索引 4  5   7   7   8   8   10              ↑   ↑            first last### 💻 代码实现123456789101112131415161718192021222324def searchRange(nums: list, target: int) -&gt; list:    def find_first():        left, right &#x3D; 0, len(nums)        while left &lt; right:            mid &#x3D; left + (right - left) &#x2F;&#x2F; 2            if nums[mid] &gt;&#x3D; target:                right &#x3D; mid            else:                left &#x3D; mid + 1        return left    def find_last():        left, right &#x3D; 0, len(nums)        while left &lt; right:            mid &#x3D; left + (right - left) &#x2F;&#x2F; 2            if nums[mid] &gt; target:                right &#x3D; mid            else:                left &#x3D; mid + 1        return left - 1    first &#x3D; find_first()    if first &#x3D;&#x3D; len(nums) or nums[first] !&#x3D; target:        return [-1, -1]    last &#x3D; find_last()    return [first, last]### 🧠 记忆口诀&gt; “找第一个&gt;&#x3D;，找第一个&gt;再减1”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6%EF%B8%8F%E2%83%A3-LC-153-%E5%AF%BB%E6%89%BE%E6%97%8B%E8%BD%AC%E6%8E%92%E5%BA%8F%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9C%80%E5%B0%8F%E5%80%BC-%F0%9F%9F%A1"><span class="toc-text">6️⃣ LC 153. 寻找旋转排序数组中的最小值 🟡</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-5"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E6%97%8B%E8%BD%AC%E5%90%8E%E7%9A%84%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E4%B8%AD%E6%89%BE%E5%88%B0%E6%9C%80%E5%B0%8F%E5%80%BC%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E6%AF%94%E5%8F%B3%E8%BE%B9%E5%A4%A7%E5%B0%B1%E5%BE%80%E5%8F%B3%EF%BC%8C%E5%90%A6%E5%88%99%E5%BE%80%E5%B7%A6%E2%80%9D"><span class="toc-text">在旋转后的有序数组中找到最小值。### 🎨 图解思路12345678nums &#x3D; [3, 4, 5, 1, 2]   4  \  3    1        \最小值是旋转点比较 nums[mid] 和 nums[right]:- nums[mid] &gt; nums[right]: 最小值在右边- nums[mid] &lt;&#x3D; nums[right]: 最小值在左边（包含mid）### 💻 代码实现1234567891011def findMin(nums: list) -&gt; int:    left, right &#x3D; 0, len(nums) - 1    while left &lt; right:        mid &#x3D; left + (right - left) &#x2F;&#x2F; 2        if nums[mid] &gt; nums[right]:            # 最小值在右边            left &#x3D; mid + 1        else:            # 最小值在左边（包含mid）            right &#x3D; mid    return nums[left]### 🧠 记忆口诀&gt; “比右边大就往右，否则往左”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7%EF%B8%8F%E2%83%A3-LC-4-%E5%AF%BB%E6%89%BE%E4%B8%A4%E4%B8%AA%E6%AD%A3%E5%BA%8F%E6%95%B0%E7%BB%84%E7%9A%84%E4%B8%AD%E4%BD%8D%E6%95%B0-%F0%9F%94%B4"><span class="toc-text">7️⃣ LC 4. 寻找两个正序数组的中位数 🔴</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-6"><span class="toc-text">题目描述</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%BE%E5%88%B0%E4%B8%A4%E4%B8%AA%E6%AD%A3%E5%BA%8F%E6%95%B0%E7%BB%84%E7%9A%84%E4%B8%AD%E4%BD%8D%E6%95%B0%EF%BC%8C%E8%A6%81%E6%B1%82%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6-O-log-m-n-%E3%80%82-%F0%9F%8E%A8-%E5%9B%BE%E8%A7%A3%E6%80%9D%E8%B7%AF-%F0%9F%92%BB-%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80-gt-%E2%80%9C%E7%9F%AD%E6%95%B0%E7%BB%84%E4%BA%8C%E5%88%86%EF%BC%8C%E6%89%BE%E6%AD%A3%E7%A1%AE%E5%88%92%E5%88%86%E2%80%9D"><span class="toc-text">找到两个正序数组的中位数，要求时间复杂度 O(log(m+n))。### 🎨 图解思路1234567891011nums1 &#x3D; [1, 3], nums2 &#x3D; [2]合并后: [1, 2, 3]中位数: 2二分思路:在较短的数组上二分，找到一个划分点 i使得 nums1[0:i] 和 nums2[0:j] 的总数 &#x3D; (m+n+1)&#x2F;&#x2F;2       nums1:  1 | 3       nums2:  2 |               ↑              划分点左半边最大值 &lt;&#x3D; 右半边最小值### 💻 代码实现12345678910111213141516171819202122232425262728def findMedianSortedArrays(nums1: list, nums2: list) -&gt; float:    # 确保 nums1 是较短的数组    if len(nums1) &gt; len(nums2):        nums1, nums2 &#x3D; nums2, nums1    m, n &#x3D; len(nums1), len(nums2)    left, right &#x3D; 0, m    while left &lt;&#x3D; right:        i &#x3D; (left + right) &#x2F;&#x2F; 2        j &#x3D; (m + n + 1) &#x2F;&#x2F; 2 - i        # 边界处理        nums1_left &#x3D; float(&#39;-inf&#39;) if i &#x3D;&#x3D; 0 else nums1[i - 1]        nums1_right &#x3D; float(&#39;inf&#39;) if i &#x3D;&#x3D; m else nums1[i]        nums2_left &#x3D; float(&#39;-inf&#39;) if j &#x3D;&#x3D; 0 else nums2[j - 1]        nums2_right &#x3D; float(&#39;inf&#39;) if j &#x3D;&#x3D; n else nums2[j]        if nums1_left &lt;&#x3D; nums2_right and nums2_left &lt;&#x3D; nums1_right:            # 找到正确的划分            if (m + n) % 2 &#x3D;&#x3D; 1:                return max(nums1_left, nums2_left)            else:                return (max(nums1_left, nums2_left) +                        min(nums1_right, nums2_right)) &#x2F; 2        elif nums1_left &gt; nums2_right:            # nums1 划分点太靠右            right &#x3D; i - 1        else:            # nums1 划分点太靠左            left &#x3D; i + 1    return 0.0### 🧠 记忆口诀&gt; “短数组二分，找正确划分”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8A-%E6%9C%AC%E7%AB%A0%E6%80%BB%E7%BB%93"><span class="toc-text">📊 本章总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E5%9C%BA%E6%99%AF"><span class="toc-text">二分查找场景</span></a></li></ol></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

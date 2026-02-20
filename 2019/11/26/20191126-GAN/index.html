@@ -1,0 +1,970 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>GAN - Caius的日常博客</title>
+
+  
+    <meta name="description" content="对抗生成网络 GAN(Generative Adversarial Nets) Adversarial Nets Framework 生成器与判别器状态相等 损失函数它做的是去最大化 D的区分度，最小化G和real数据集的数据分布 判别模型： D1 和 D2 相同的，是判别器，G是生成器 生成模型： 先训练判别器，在训练生成器。 1234567891011121314151617181920212">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GAN">
+<meta property="og:url" content="https://caiusy.github.io/2019/11/26/20191126-GAN/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="对抗生成网络 GAN(Generative Adversarial Nets) Adversarial Nets Framework 生成器与判别器状态相等 损失函数它做的是去最大化 D的区分度，最小化G和real数据集的数据分布 判别模型： D1 和 D2 相同的，是判别器，G是生成器 生成模型： 先训练判别器，在训练生成器。 1234567891011121314151617181920212">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2019-11-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-20T06:58:57.409Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="深度学习 - tensorflow - GAN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="深度学习 - tensorflow - GAN">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2019-11-26T00:00:00+08:00","dateModified":"2026-02-20T14:58:57+08:00","datePublished":"2019-11-26T00:00:00+08:00","description":"","headline":"GAN","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2019/11/26/20191126-GAN/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2019/11/26/20191126-GAN/","keywords":"深度学习 - tensorflow - GAN","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2019-11-25T16:00:00.000Z">2019-11-26</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-20T06:58:57.409Z">2026-02-20</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>GAN</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h3 id="对抗生成网络-GAN-Generative-Adversarial-Nets"><a href="#对抗生成网络-GAN-Generative-Adversarial-Nets" class="headerlink" title="对抗生成网络 GAN(Generative Adversarial Nets)"></a>对抗生成网络 GAN(Generative Adversarial Nets)</h3><p><img src="/images/20191126_GAN_%E5%9B%BE%E7%89%871.png" alt="图片1"></p>
+<h3 id="Adversarial-Nets-Framework"><a href="#Adversarial-Nets-Framework" class="headerlink" title="Adversarial Nets Framework"></a><strong>Adversarial Nets Framework</strong></h3><p><img src="/images/20191126_GAN_%E5%9B%BE%E7%89%872.png" alt="图片2"></p>
+<p>生成器与判别器状态相等</p>
+<h4 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h4><p>它做的是去最大化 D的区分度，最小化G和real数据集的数据分布</p>
+<p>判别模型：</p>
+<p>D1 和 D2 相同的，是判别器，G是生成器</p>
+<p>生成模型：</p>
+<p>先训练判别器，在训练生成器。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="comment"># @Author: Your name</span></span><br><span class="line"><span class="comment"># @Date:   2019-11-26 09:12:52</span></span><br><span class="line"><span class="comment"># @Last Modified by:   Your name</span></span><br><span class="line"><span class="comment"># @Last Modified time: 2019-11-26 09:12:52</span></span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy.stats <span class="keyword">import</span> norm</span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> matplotlib <span class="keyword">import</span> animation</span><br><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br><span class="line">sns.<span class="built_in">set</span>(color_codes=<span class="literal">True</span>)</span><br><span class="line">seed = <span class="number">42</span></span><br><span class="line">np.random.seed(seed)</span><br><span class="line">tf.set_random_seed(seed)</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DataDistribution</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.mu = <span class="number">4</span></span><br><span class="line">        self.sigma = <span class="number">0.5</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">sample</span>(<span class="params">self, N</span>):</span><br><span class="line">        samples = np.random.normal(self.mu, self.sigma, N) <span class="comment"># 生成高斯分布的概率密度随机数 均值，标准差</span></span><br><span class="line">        samples.sort()</span><br><span class="line">        <span class="keyword">return</span> samples</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">GeneratorDistribution</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, <span class="built_in">range</span></span>):</span><br><span class="line">        self.<span class="built_in">range</span> = <span class="built_in">range</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">sample</span>(<span class="params">self, N</span>):</span><br><span class="line">        <span class="keyword">return</span> np.linspace(-self.<span class="built_in">range</span>, self.<span class="built_in">range</span>, N) + \</span><br><span class="line">            np.random.random(N) * <span class="number">0.01</span>  <span class="comment"># 生成随机数</span></span><br><span class="line"><span class="comment"># 对线性相乘进行初始化</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">linear</span>(<span class="params"><span class="built_in">input</span>, output_dim, scope=<span class="literal">None</span>, stddev=<span class="number">1.0</span></span>):</span><br><span class="line">    norm = tf.random_normal_initializer(stddev=stddev)</span><br><span class="line">    const = tf.constant_initializer(<span class="number">0.0</span>)</span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(scope <span class="keyword">or</span> <span class="string">'linear'</span>): <span class="comment"># 定义命名空间</span></span><br><span class="line">        w = tf.get_variable(<span class="string">'w'</span>, [<span class="built_in">input</span>.get_shape()[<span class="number">1</span>], output_dim], initializer=norm)</span><br><span class="line">        b = tf.get_variable(<span class="string">'b'</span>, [output_dim], initializer=const)</span><br><span class="line">        <span class="keyword">return</span> tf.matmul(<span class="built_in">input</span>, w) + b</span><br><span class="line"><span class="comment"># 生成器</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generator</span>(<span class="params"><span class="built_in">input</span>, h_dim</span>):</span><br><span class="line">    <span class="comment"># 这个函数的作用是计算激活函数softplus，即log( exp( features ) + 1)</span></span><br><span class="line">    h0 = tf.nn.softplus(linear(<span class="built_in">input</span>, h_dim, <span class="string">'g0'</span>))</span><br><span class="line">    h1 = linear(h0, <span class="number">1</span>, <span class="string">'g1'</span>)</span><br><span class="line">    <span class="keyword">return</span> h1</span><br><span class="line"><span class="comment"># 判别器</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">discriminator</span>(<span class="params"><span class="built_in">input</span>, h_dim</span>):</span><br><span class="line">    h0 = tf.tanh(linear(<span class="built_in">input</span>, h_dim * <span class="number">2</span>, <span class="string">'d0'</span>))</span><br><span class="line">    h1 = tf.tanh(linear(h0, h_dim * <span class="number">2</span>, <span class="string">'d1'</span>))</span><br><span class="line">    h2 = tf.tanh(linear(h1, h_dim * <span class="number">2</span>, scope=<span class="string">'d2'</span>))</span><br><span class="line">    h3 = tf.sigmoid(linear(h2, <span class="number">1</span>, scope=<span class="string">'d3'</span>))</span><br><span class="line">    <span class="keyword">return</span> h3</span><br><span class="line"><span class="comment"># 优化器</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">optimizer</span>(<span class="params">loss, var_list, initial_learning_rate</span>):</span><br><span class="line">    decay = <span class="number">0.95</span></span><br><span class="line">    num_decay_steps = <span class="number">150</span></span><br><span class="line">    batch = tf.Variable(<span class="number">0</span>)</span><br><span class="line">    learning_rate = tf.train.exponential_decay(</span><br><span class="line">        initial_learning_rate,</span><br><span class="line">        batch,</span><br><span class="line">        num_decay_steps,</span><br><span class="line">        decay,</span><br><span class="line">        staircase=<span class="literal">True</span></span><br><span class="line">    )</span><br><span class="line">    optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(</span><br><span class="line">        loss,</span><br><span class="line">        global_step=batch,</span><br><span class="line">        var_list=var_list</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> optimizer</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">GAN</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, data, gen, num_steps, batch_size, log_every</span>):</span><br><span class="line">        self.data = data</span><br><span class="line">        self.gen = gen</span><br><span class="line">        self.num_steps = num_steps</span><br><span class="line">        self.batch_size = batch_size</span><br><span class="line">        self.log_every = log_every</span><br><span class="line">        self.mlp_hidden_size = <span class="number">4</span></span><br><span class="line">        self.learning_rate = <span class="number">0.03</span></span><br><span class="line">        self._create_model()</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_create_model</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">with</span> tf.variable_scope(<span class="string">'D_pre'</span>):</span><br><span class="line">            self.pre_input = tf.placeholder(tf.float32, shape=(self.batch_size, <span class="number">1</span>))</span><br><span class="line">            self.pre_labels = tf.placeholder(tf.float32, shape=(self.batch_size, <span class="number">1</span>))</span><br><span class="line">            D_pre = discriminator(self.pre_input, self.mlp_hidden_size)</span><br><span class="line">            self.pre_loss = tf.reduce_mean(tf.square(D_pre - self.pre_labels))</span><br><span class="line">            self.pre_opt = optimizer(self.pre_loss, <span class="literal">None</span>, self.learning_rate)</span><br><span class="line">        <span class="comment"># This defines the generator network - it takes samples from a noise</span></span><br><span class="line">        <span class="comment"># distribution as input, and passes them through an MLP.</span></span><br><span class="line">        <span class="keyword">with</span> tf.variable_scope(<span class="string">'Gen'</span>):</span><br><span class="line">            self.z = tf.placeholder(tf.float32, shape=(self.batch_size, <span class="number">1</span>))</span><br><span class="line">            self.G = generator(self.z, self.mlp_hidden_size)</span><br><span class="line">        <span class="comment"># The discriminator tries to tell the difference between samples from the</span></span><br><span class="line">        <span class="comment"># true data distribution (self.x) and the generated samples (self.z).</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment"># Here we create two copies of the discriminator network (that share parameters),</span></span><br><span class="line">        <span class="comment"># as you cannot use the same network with different inputs in TensorFlow.</span></span><br><span class="line">        <span class="keyword">with</span> tf.variable_scope(<span class="string">'Disc'</span>) <span class="keyword">as</span> scope:</span><br><span class="line">            self.x = tf.placeholder(tf.float32, shape=(self.batch_size, <span class="number">1</span>))</span><br><span class="line">            self.D1 = discriminator(self.x, self.mlp_hidden_size)</span><br><span class="line">            scope.reuse_variables()</span><br><span class="line">            self.D2 = discriminator(self.G, self.mlp_hidden_size)</span><br><span class="line">        <span class="comment"># Define the loss for discriminator and generator networks (see the original</span></span><br><span class="line">        <span class="comment"># paper for details), and create optimizers for both</span></span><br><span class="line">        self.loss_d = tf.reduce_mean(-tf.log(self.D1) - tf.log(<span class="number">1</span> - self.D2))</span><br><span class="line">        self.loss_g = tf.reduce_mean(-tf.log(self.D2))</span><br><span class="line">        self.d_pre_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=<span class="string">'D_pre'</span>)</span><br><span class="line">        self.d_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=<span class="string">'Disc'</span>)</span><br><span class="line">        self.g_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=<span class="string">'Gen'</span>)</span><br><span class="line">        self.opt_d = optimizer(self.loss_d, self.d_params, self.learning_rate)</span><br><span class="line">        self.opt_g = optimizer(self.loss_g, self.g_params, self.learning_rate)</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">train</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">with</span> tf.Session() <span class="keyword">as</span> session:</span><br><span class="line">            tf.global_variables_initializer().run()</span><br><span class="line">            <span class="comment"># pretraining discriminator</span></span><br><span class="line">            num_pretrain_steps = <span class="number">1000</span></span><br><span class="line">            <span class="keyword">for</span> step <span class="keyword">in</span> <span class="built_in">range</span>(num_pretrain_steps):</span><br><span class="line">                d = (np.random.random(self.batch_size) - <span class="number">0.5</span>) * <span class="number">10.0</span></span><br><span class="line">                labels = norm.pdf(d, loc=self.data.mu, scale=self.data.sigma) <span class="comment"># norm.pdf:正态概率密度函数</span></span><br><span class="line">                pretrain_loss, _ = session.run([self.pre_loss, self.pre_opt], {</span><br><span class="line">                    self.pre_input: np.reshape(d, (self.batch_size, <span class="number">1</span>)),</span><br><span class="line">                    self.pre_labels: np.reshape(labels, (self.batch_size, <span class="number">1</span>))</span><br><span class="line">                })</span><br><span class="line">            self.weightsD = session.run(self.d_pre_params)</span><br><span class="line">            <span class="comment"># copy weights from pre-training over to new D network</span></span><br><span class="line">            <span class="keyword">for</span> i, v <span class="keyword">in</span> <span class="built_in">enumerate</span>(self.d_params):</span><br><span class="line">                session.run(v.assign(self.weightsD[i]))</span><br><span class="line">            <span class="keyword">for</span> step <span class="keyword">in</span> <span class="built_in">range</span>(self.num_steps):</span><br><span class="line">                <span class="comment"># update discriminator</span></span><br><span class="line">                x = self.data.sample(self.batch_size)</span><br><span class="line">                z = self.gen.sample(self.batch_size)</span><br><span class="line">                loss_d, _ = session.run([self.loss_d, self.opt_d], {</span><br><span class="line">                    self.x: np.reshape(x, (self.batch_size, <span class="number">1</span>)),</span><br><span class="line">                    self.z: np.reshape(z, (self.batch_size, <span class="number">1</span>))</span><br><span class="line">                })</span><br><span class="line">                <span class="comment"># update generator</span></span><br><span class="line">                z = self.gen.sample(self.batch_size)</span><br><span class="line">                loss_g, _ = session.run([self.loss_g, self.opt_g], {</span><br><span class="line">                    self.z: np.reshape(z, (self.batch_size, <span class="number">1</span>))</span><br><span class="line">                })</span><br><span class="line">                <span class="keyword">if</span> step % self.log_every == <span class="number">0</span>:</span><br><span class="line">                    <span class="built_in">print</span>(<span class="string">'{}: {}\t{}'</span>.<span class="built_in">format</span>(step, loss_d, loss_g))</span><br><span class="line">                <span class="keyword">if</span> step % <span class="number">100</span> == <span class="number">0</span> <span class="keyword">or</span> step==<span class="number">0</span> <span class="keyword">or</span> step == self.num_steps -<span class="number">1</span> :</span><br><span class="line">                    self._plot_distributions(session)</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_samples</span>(<span class="params">self, session, num_points=<span class="number">10000</span>, num_bins=<span class="number">100</span></span>):</span><br><span class="line">        xs = np.linspace(-self.gen.<span class="built_in">range</span>, self.gen.<span class="built_in">range</span>, num_points)</span><br><span class="line">        bins = np.linspace(-self.gen.<span class="built_in">range</span>, self.gen.<span class="built_in">range</span>, num_bins)</span><br><span class="line">        <span class="comment"># data distribution</span></span><br><span class="line">        d = self.data.sample(num_points)</span><br><span class="line">        pd, _ = np.histogram(d, bins=bins, density=<span class="literal">True</span>)</span><br><span class="line">        <span class="comment"># generated samples</span></span><br><span class="line">        zs = np.linspace(-self.gen.<span class="built_in">range</span>, self.gen.<span class="built_in">range</span>, num_points)</span><br><span class="line">        g = np.zeros((num_points, <span class="number">1</span>))</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(num_points // self.batch_size):</span><br><span class="line">            g[self.batch_size * i:self.batch_size * (i + <span class="number">1</span>)] = session.run(self.G, {</span><br><span class="line">                self.z: np.reshape(</span><br><span class="line">                    zs[self.batch_size * i:self.batch_size * (i + <span class="number">1</span>)],</span><br><span class="line">                    (self.batch_size, <span class="number">1</span>)</span><br><span class="line">                )</span><br><span class="line">            })</span><br><span class="line">        pg, _ = np.histogram(g, bins=bins, density=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> pd, pg</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_plot_distributions</span>(<span class="params">self, session</span>):</span><br><span class="line">        pd, pg = self._samples(session)</span><br><span class="line">        p_x = np.linspace(-self.gen.<span class="built_in">range</span>, self.gen.<span class="built_in">range</span>, <span class="built_in">len</span>(pd))</span><br><span class="line">        f, ax = plt.subplots(<span class="number">1</span>)</span><br><span class="line">        ax.set_ylim(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">        plt.plot(p_x, pd, label=<span class="string">'real data'</span>)</span><br><span class="line">        plt.plot(p_x, pg, label=<span class="string">'generated data'</span>)</span><br><span class="line">        plt.title(<span class="string">'1D Generative Adversarial Network'</span>)</span><br><span class="line">        plt.xlabel(<span class="string">'Data values'</span>)</span><br><span class="line">        plt.ylabel(<span class="string">'Probability density'</span>)</span><br><span class="line">        plt.legend()</span><br><span class="line">        plt.show()</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>(<span class="params">args</span>):</span><br><span class="line">    model = GAN(</span><br><span class="line">        DataDistribution(),</span><br><span class="line">        GeneratorDistribution(<span class="built_in">range</span>=<span class="number">8</span>),</span><br><span class="line">        args.num_steps,</span><br><span class="line">        args.batch_size,</span><br><span class="line">        args.log_every,</span><br><span class="line">    )</span><br><span class="line">    model.train()</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">parse_args</span>():</span><br><span class="line">    parser = argparse.ArgumentParser()</span><br><span class="line">    parser.add_argument(<span class="string">'--num-steps'</span>, <span class="built_in">type</span>=<span class="built_in">int</span>, default=<span class="number">12000</span>,</span><br><span class="line">                        <span class="built_in">help</span>=<span class="string">'the number of training steps to take'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--batch-size'</span>, <span class="built_in">type</span>=<span class="built_in">int</span>, default=<span class="number">12</span>,</span><br><span class="line">                        <span class="built_in">help</span>=<span class="string">'the batch size'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--log-every'</span>, <span class="built_in">type</span>=<span class="built_in">int</span>, default=<span class="number">10</span>,</span><br><span class="line">                        <span class="built_in">help</span>=<span class="string">'print loss after this many steps'</span>)</span><br><span class="line">    <span class="keyword">return</span> parser.parse_args()</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main(parse_args())</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/images/20191126_GAN_myplot.png" alt="myplot"></p>
+<h4 id="DCGAN"><a href="#DCGAN" class="headerlink" title="DCGAN"></a>DCGAN</h4><ol>
+<li><p>将pooling层convolutions替代 </p>
+<ul>
+<li><p>对于判别模型：容许网络学习自己的空间下采样</p>
+</li>
+<li><p>对于生成模型：容许它学习自己的空间上采样</p>
+</li>
+</ul>
+</li>
+<li><p>在generator和discriminator上都使用batchnorm </p>
+<ul>
+<li>解决初始化差的问题</li>
+<li>帮助梯度传播到每一层</li>
+<li>防止generator把所有的样本都收敛到同一个点。</li>
+</ul>
+</li>
+<li><p>在CNN中移除全连接层</p>
+</li>
+<li><p>在generator的除了输出层外的所有层使用ReLU，输出层采用tanh。</p>
+</li>
+<li><p>在discriminator的所有层上使用LeakyReLU</p>
+</li>
+</ol>
+<p><img src="/images/20191126_GAN_33.png" alt="33"></p>
+<p>100维的向量转为为特征图相似的东西， 再将这个向量reshape 。使用反卷积操作。</p>
+<p><img src="/images/20191126_GAN_a22.png" alt="a22"></p>
+<p>输入图片，得到一个值是0或者1，这个是判别网络</p>
+<p><img src="/images/20191126_GAN_aa1.png" alt="aa1"></p>
+<p>这个是生成网络。<br>model.py  </p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> division</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"><span class="keyword">from</span> glob <span class="keyword">import</span> glob</span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> six.moves <span class="keyword">import</span> xrange</span><br><span class="line"><span class="keyword">from</span> ops <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> utils <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">conv_out_size_same</span>(<span class="params">size, stride</span>):</span><br><span class="line">  <span class="keyword">return</span> math.ceil(<span class="built_in">float</span>(size) / <span class="built_in">float</span>(stride))</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DCGAN</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, sess, input_height=<span class="number">108</span>, input_width=<span class="number">108</span>, is_crop=<span class="literal">True</span>,</span></span><br><span class="line"><span class="params">         batch_size=<span class="number">64</span>, sample_num = <span class="number">64</span>, output_height=<span class="number">64</span>, output_width=<span class="number">64</span>,</span></span><br><span class="line"><span class="params">         y_dim=<span class="literal">None</span>, z_dim=<span class="number">100</span>, gf_dim=<span class="number">64</span>, df_dim=<span class="number">64</span>,</span></span><br><span class="line"><span class="params">         gfc_dim=<span class="number">1024</span>, dfc_dim=<span class="number">1024</span>, c_dim=<span class="number">3</span>, dataset_name=<span class="string">'default'</span>,</span></span><br><span class="line"><span class="params">         input_fname_pattern=<span class="string">'*.jpg'</span>, checkpoint_dir=<span class="literal">None</span>, sample_dir=<span class="literal">None</span></span>):</span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    # sample number  测试噪音的输出，y代表label</span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">      sess: TensorFlow session</span></span><br><span class="line"><span class="string">      batch_size: The size of batch. Should be specified before training.</span></span><br><span class="line"><span class="string">      y_dim: (optional) Dimension of dim for y. [None]</span></span><br><span class="line"><span class="string">      z_dim: (optional) Dimension of dim for Z. [100]</span></span><br><span class="line"><span class="string">      gf_dim: (optional) Dimension of gen filters in first conv layer. [64]</span></span><br><span class="line"><span class="string">      df_dim: (optional) Dimension of discrim filters in first conv layer. [64]</span></span><br><span class="line"><span class="string">      gfc_dim: (optional) Dimension of gen units for for fully connected layer. [1024]</span></span><br><span class="line"><span class="string">      dfc_dim: (optional) Dimension of discrim units for fully connected layer. [1024]</span></span><br><span class="line"><span class="string">      c_dim: (optional) Dimension of image color. For grayscale input, set to 1. [3]</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    self.sess = sess</span><br><span class="line">    self.is_crop = is_crop</span><br><span class="line">    self.is_grayscale = (c_dim == <span class="number">1</span>)</span><br><span class="line">    self.batch_size = batch_size</span><br><span class="line">    self.sample_num = sample_num</span><br><span class="line">    self.input_height = input_height</span><br><span class="line">    self.input_width = input_width</span><br><span class="line">    self.output_height = output_height</span><br><span class="line">    self.output_width = output_width</span><br><span class="line">    self.y_dim = y_dim <span class="comment"># null</span></span><br><span class="line">    self.z_dim = z_dim <span class="comment"># 噪音点的维度 100</span></span><br><span class="line">    self.gf_dim = gf_dim <span class="comment"># 最终多少个filter的个数 基数</span></span><br><span class="line">    self.df_dim = df_dim <span class="comment"># 64</span></span><br><span class="line">    self.gfc_dim = gfc_dim<span class="comment"># 生成和判别的全连接 1024</span></span><br><span class="line">    self.dfc_dim = dfc_dim <span class="comment"># 1024</span></span><br><span class="line">    self.c_dim = c_dim<span class="comment"># 生成的是彩色图 3</span></span><br><span class="line">    <span class="comment"># batch normalization : deals with poor initialization helps gradient flow</span></span><br><span class="line">    self.d_bn1 = batch_norm(name=<span class="string">'d_bn1'</span>)<span class="comment"># bacth在relu之前卷积之后</span></span><br><span class="line">    self.d_bn2 = batch_norm(name=<span class="string">'d_bn2'</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> self.y_dim:</span><br><span class="line">      self.d_bn3 = batch_norm(name=<span class="string">'d_bn3'</span>)</span><br><span class="line">    self.g_bn0 = batch_norm(name=<span class="string">'g_bn0'</span>)</span><br><span class="line">    self.g_bn1 = batch_norm(name=<span class="string">'g_bn1'</span>)</span><br><span class="line">    self.g_bn2 = batch_norm(name=<span class="string">'g_bn2'</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> self.y_dim:</span><br><span class="line">      self.g_bn3 = batch_norm(name=<span class="string">'g_bn3'</span>)</span><br><span class="line">    self.dataset_name = dataset_name</span><br><span class="line">    self.input_fname_pattern = input_fname_pattern</span><br><span class="line">    self.checkpoint_dir = checkpoint_dir</span><br><span class="line">    self.build_model()</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">build_model</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="keyword">if</span> self.y_dim:</span><br><span class="line">      self.y= tf.placeholder(tf.float32, [self.batch_size, self.y_dim], name=<span class="string">'y'</span>)</span><br><span class="line">    <span class="keyword">if</span> self.is_crop:</span><br><span class="line">      image_dims = [self.output_height, self.output_width, self.c_dim]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      image_dims = [self.input_height, self.input_height, self.c_dim]</span><br><span class="line">    self.inputs = tf.placeholder(</span><br><span class="line">      tf.float32, [self.batch_size] + image_dims, name=<span class="string">'real_images'</span>)</span><br><span class="line">    self.sample_inputs = tf.placeholder(  <span class="comment"># 64 108 108 3，iamge_dim 108 108 3</span></span><br><span class="line">      tf.float32, [self.sample_num] + image_dims, name=<span class="string">'sample_inputs'</span>)</span><br><span class="line">    inputs = self.inputs  <span class="comment"># 64 108 108 3</span></span><br><span class="line">    sample_inputs = self.sample_inputs</span><br><span class="line">    self.z = tf.placeholder(</span><br><span class="line">      tf.float32, [<span class="literal">None</span>, self.z_dim], name=<span class="string">'z'</span>)  <span class="comment">## 生成网络组最开始的输入，float32  # B， 100</span></span><br><span class="line">    self.z_sum = histogram_summary(<span class="string">"z"</span>, self.z)  <span class="comment"># 在训练神经网络时，当需要查看一个张量在训练过程中值的分布情况时，可通过tf.summary.histogram()将其分布情况以直方图的形式在TensorBoard直方图仪表板上显示．</span></span><br><span class="line">    <span class="keyword">if</span> self.y_dim:</span><br><span class="line">      self.G = self.generator(self.z, self.y)</span><br><span class="line">      self.D, self.D_logits = \</span><br><span class="line">          self.discriminator(inputs, self.y, reuse=<span class="literal">False</span>)</span><br><span class="line">      self.sampler = self.sampler(self.z, self.y)</span><br><span class="line">      self.D_, self.D_logits_ = \</span><br><span class="line">          self.discriminator(self.G, self.y, reuse=<span class="literal">True</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      self.G = self.generator(self.z)  <span class="comment"># 64 64 64 3</span></span><br><span class="line">      self.D, self.D_logits = self.discriminator(inputs)  <span class="comment"># 64 108 108 3</span></span><br><span class="line">      self.sampler = self.sampler(self.z)</span><br><span class="line">      self.D_, self.D_logits_ = self.discriminator(self.G, reuse=<span class="literal">True</span>)</span><br><span class="line">    self.d_sum = histogram_summary(<span class="string">"d"</span>, self.D)</span><br><span class="line">    self.d__sum = histogram_summary(<span class="string">"d_"</span>, self.D_)</span><br><span class="line">    self.G_sum = image_summary(<span class="string">"G"</span>, self.G)</span><br><span class="line">    <span class="comment"># tf.nn.sigmoid_cross_entropy_with_logits(logits=self.D_logits,l)</span></span><br><span class="line">    self.d_loss_real = tf.reduce_mean(</span><br><span class="line">      tf.nn.sigmoid_cross_entropy_with_logits(</span><br><span class="line">        logits=self.D_logits, labels=tf.ones_like(self.D)))</span><br><span class="line">    self.d_loss_fake = tf.reduce_mean(</span><br><span class="line">      tf.nn.sigmoid_cross_entropy_with_logits(</span><br><span class="line">        logits=self.D_logits_, labels=tf.zeros_like(self.D_)))</span><br><span class="line">    self.g_loss = tf.reduce_mean(</span><br><span class="line">      tf.nn.sigmoid_cross_entropy_with_logits(</span><br><span class="line">        logits=self.D_logits_, labels=tf.ones_like(self.D_)))</span><br><span class="line">    self.d_loss_real_sum = scalar_summary(<span class="string">"d_loss_real"</span>, self.d_loss_real)</span><br><span class="line">    self.d_loss_fake_sum = scalar_summary(<span class="string">"d_loss_fake"</span>, self.d_loss_fake)</span><br><span class="line">    self.d_loss = self.d_loss_real + self.d_loss_fake</span><br><span class="line">    self.g_loss_sum = scalar_summary(<span class="string">"g_loss"</span>, self.g_loss)</span><br><span class="line">    self.d_loss_sum = scalar_summary(<span class="string">"d_loss"</span>, self.d_loss)</span><br><span class="line">    t_vars = tf.trainable_variables()</span><br><span class="line">    self.d_vars = [var <span class="keyword">for</span> var <span class="keyword">in</span> t_vars <span class="keyword">if</span> <span class="string">'d_'</span> <span class="keyword">in</span> var.name]</span><br><span class="line">    self.g_vars = [var <span class="keyword">for</span> var <span class="keyword">in</span> t_vars <span class="keyword">if</span> <span class="string">'g_'</span> <span class="keyword">in</span> var.name]</span><br><span class="line">    self.saver = tf.train.Saver()</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">train</span>(<span class="params">self, config</span>):</span><br><span class="line">    <span class="string">"""Train DCGAN"""</span></span><br><span class="line">    <span class="keyword">if</span> config.dataset == <span class="string">'mnist'</span>:</span><br><span class="line">      data_X, data_y = self.load_mnist()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      data = glob(os.path.join(<span class="string">"./data"</span>, config.dataset, self.input_fname_pattern))</span><br><span class="line">    <span class="comment">#np.random.shuffle(data)</span></span><br><span class="line">    d_optim = tf.train.AdamOptimizer(config.learning_rate, beta1=config.beta1) \</span><br><span class="line">              .minimize(self.d_loss, var_list=self.d_vars)</span><br><span class="line">    g_optim = tf.train.AdamOptimizer(config.learning_rate, beta1=config.beta1) \</span><br><span class="line">              .minimize(self.g_loss, var_list=self.g_vars)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">      tf.global_variables_initializer().run()</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">      tf.initialize_all_variables().run()</span><br><span class="line">    self.g_sum = merge_summary([self.z_sum, self.d__sum,</span><br><span class="line">      self.G_sum, self.d_loss_fake_sum, self.g_loss_sum])</span><br><span class="line">    self.d_sum = merge_summary(</span><br><span class="line">        [self.z_sum, self.d_sum, self.d_loss_real_sum, self.d_loss_sum])</span><br><span class="line">    self.writer = SummaryWriter(<span class="string">"./logs"</span>, self.sess.graph)</span><br><span class="line">    sample_z = np.random.uniform(-<span class="number">1</span>, <span class="number">1</span>, size=(self.sample_num , self.z_dim))</span><br><span class="line">    <span class="keyword">if</span> config.dataset == <span class="string">'mnist'</span>:</span><br><span class="line">      sample_inputs = data_X[<span class="number">0</span>:self.sample_num]</span><br><span class="line">      sample_labels = data_y[<span class="number">0</span>:self.sample_num]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      sample_files = data[<span class="number">0</span>:self.sample_num]</span><br><span class="line">      sample = [</span><br><span class="line">          get_image(sample_file,</span><br><span class="line">                    input_height=self.input_height,</span><br><span class="line">                    input_width=self.input_width,</span><br><span class="line">                    resize_height=self.output_height,</span><br><span class="line">                    resize_width=self.output_width,</span><br><span class="line">                    is_crop=self.is_crop,</span><br><span class="line">                    is_grayscale=self.is_grayscale) <span class="keyword">for</span> sample_file <span class="keyword">in</span> sample_files]</span><br><span class="line">      <span class="keyword">if</span> (self.is_grayscale):</span><br><span class="line">        sample_inputs = np.array(sample).astype(np.float32)[:, :, :, <span class="literal">None</span>]</span><br><span class="line">      <span class="keyword">else</span>:</span><br><span class="line">        sample_inputs = np.array(sample).astype(np.float32)</span><br><span class="line">    counter = <span class="number">1</span></span><br><span class="line">    start_time = time.time()</span><br><span class="line">    <span class="keyword">if</span> self.load(self.checkpoint_dir):</span><br><span class="line">      <span class="built_in">print</span>(<span class="string">" [*] Load SUCCESS"</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      <span class="built_in">print</span>(<span class="string">" [!] Load failed..."</span>)</span><br><span class="line">    <span class="keyword">for</span> epoch <span class="keyword">in</span> xrange(config.epoch):</span><br><span class="line">      <span class="keyword">if</span> config.dataset == <span class="string">'mnist'</span>:</span><br><span class="line">        batch_idxs = <span class="built_in">min</span>(<span class="built_in">len</span>(data_X), config.train_size) // config.batch_size</span><br><span class="line">      <span class="keyword">else</span>:</span><br><span class="line">        data = glob(os.path.join(</span><br><span class="line">          <span class="string">"./data"</span>, config.dataset, self.input_fname_pattern))</span><br><span class="line">        batch_idxs = <span class="built_in">min</span>(<span class="built_in">len</span>(data), config.train_size) // config.batch_size</span><br><span class="line">      <span class="keyword">for</span> idx <span class="keyword">in</span> xrange(<span class="number">0</span>, batch_idxs):</span><br><span class="line">        <span class="keyword">if</span> config.dataset == <span class="string">'mnist'</span>:</span><br><span class="line">          batch_images = data_X[idx*config.batch_size:(idx+<span class="number">1</span>)*config.batch_size]</span><br><span class="line">          batch_labels = data_y[idx*config.batch_size:(idx+<span class="number">1</span>)*config.batch_size]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">          batch_files = data[idx*config.batch_size:(idx+<span class="number">1</span>)*config.batch_size]</span><br><span class="line">          batch = [</span><br><span class="line">              get_image(batch_file,</span><br><span class="line">                        input_height=self.input_height,</span><br><span class="line">                        input_width=self.input_width,</span><br><span class="line">                        resize_height=self.output_height,</span><br><span class="line">                        resize_width=self.output_width,</span><br><span class="line">                        is_crop=self.is_crop,</span><br><span class="line">                        is_grayscale=self.is_grayscale) <span class="keyword">for</span> batch_file <span class="keyword">in</span> batch_files]</span><br><span class="line">          <span class="keyword">if</span> (self.is_grayscale):</span><br><span class="line">            batch_images = np.array(batch).astype(np.float32)[:, :, :, <span class="literal">None</span>]</span><br><span class="line">          <span class="keyword">else</span>:</span><br><span class="line">            batch_images = np.array(batch).astype(np.float32)</span><br><span class="line">        <span class="comment">#  一个均匀分布[low,high)中随机采样 从+1和-1之间随才采样</span></span><br><span class="line">        batch_z = np.random.uniform(-<span class="number">1</span>, <span class="number">1</span>, [config.batch_size, self.z_dim]) \</span><br><span class="line">          .astype(np.float32)</span><br><span class="line">        <span class="keyword">if</span> config.dataset == <span class="string">'mnist'</span>:</span><br><span class="line">          <span class="comment"># Update D network</span></span><br><span class="line">          _, summary_str = self.sess.run([d_optim, self.d_sum],</span><br><span class="line">            feed_dict={</span><br><span class="line">              self.inputs: batch_images,</span><br><span class="line">              self.z: batch_z,</span><br><span class="line">              self.y:batch_labels,</span><br><span class="line">            })</span><br><span class="line">          self.writer.add_summary(summary_str, counter)</span><br><span class="line">          <span class="comment"># Update G network</span></span><br><span class="line">          _, summary_str = self.sess.run([g_optim, self.g_sum],</span><br><span class="line">            feed_dict={</span><br><span class="line">              self.z: batch_z,</span><br><span class="line">              self.y:batch_labels,</span><br><span class="line">            })</span><br><span class="line">          self.writer.add_summary(summary_str, counter)</span><br><span class="line">          <span class="comment"># Run g_optim twice to make sure that d_loss does not go to zero (different from paper)</span></span><br><span class="line">          _, summary_str = self.sess.run([g_optim, self.g_sum],</span><br><span class="line">            feed_dict={ self.z: batch_z, self.y:batch_labels })</span><br><span class="line">          self.writer.add_summary(summary_str, counter)</span><br><span class="line">          errD_fake = self.d_loss_fake.<span class="built_in">eval</span>({</span><br><span class="line">              self.z: batch_z,</span><br><span class="line">              self.y:batch_labels</span><br><span class="line">          })</span><br><span class="line">          errD_real = self.d_loss_real.<span class="built_in">eval</span>({</span><br><span class="line">              self.inputs: batch_images,</span><br><span class="line">              self.y:batch_labels</span><br><span class="line">          })</span><br><span class="line">          errG = self.g_loss.<span class="built_in">eval</span>({</span><br><span class="line">              self.z: batch_z,</span><br><span class="line">              self.y: batch_labels</span><br><span class="line">          })</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">          <span class="comment"># Update D network</span></span><br><span class="line">          _, summary_str = self.sess.run([d_optim, self.d_sum],</span><br><span class="line">            feed_dict={ self.inputs: batch_images, self.z: batch_z })</span><br><span class="line">          self.writer.add_summary(summary_str, counter)</span><br><span class="line">          <span class="comment"># Update G network</span></span><br><span class="line">          _, summary_str = self.sess.run([g_optim, self.g_sum],</span><br><span class="line">            feed_dict={ self.z: batch_z })</span><br><span class="line">          self.writer.add_summary(summary_str, counter)</span><br><span class="line">          <span class="comment"># Run g_optim twice to make sure that d_loss does not go to zero (different from paper)</span></span><br><span class="line">          _, summary_str = self.sess.run([g_optim, self.g_sum],</span><br><span class="line">            feed_dict={ self.z: batch_z })</span><br><span class="line">          self.writer.add_summary(summary_str, counter)</span><br><span class="line">          errD_fake = self.d_loss_fake.<span class="built_in">eval</span>({ self.z: batch_z })</span><br><span class="line">          errD_real = self.d_loss_real.<span class="built_in">eval</span>({ self.inputs: batch_images })</span><br><span class="line">          errG = self.g_loss.<span class="built_in">eval</span>({self.z: batch_z})</span><br><span class="line">        counter += <span class="number">1</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"Epoch: [%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f"</span> \</span><br><span class="line">          % (epoch, idx, batch_idxs,</span><br><span class="line">            time.time() - start_time, errD_fake+errD_real, errG))</span><br><span class="line">        <span class="keyword">if</span> np.mod(counter, <span class="number">100</span>) == <span class="number">1</span>:</span><br><span class="line">          <span class="keyword">if</span> config.dataset == <span class="string">'mnist'</span>:</span><br><span class="line">            samples, d_loss, g_loss = self.sess.run(</span><br><span class="line">              [self.sampler, self.d_loss, self.g_loss],</span><br><span class="line">              feed_dict={</span><br><span class="line">                  self.z: sample_z,</span><br><span class="line">                  self.inputs: sample_inputs,</span><br><span class="line">                  self.y:sample_labels,</span><br><span class="line">              }</span><br><span class="line">            )</span><br><span class="line">            save_images(samples, [<span class="number">8</span>, <span class="number">8</span>],</span><br><span class="line">                  <span class="string">'./{}/train_{:02d}_{:04d}.png'</span>.<span class="built_in">format</span>(config.sample_dir, epoch, idx))</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">"[Sample] d_loss: %.8f, g_loss: %.8f"</span> % (d_loss, g_loss))</span><br><span class="line">          <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">              samples, d_loss, g_loss = self.sess.run(</span><br><span class="line">                [self.sampler, self.d_loss, self.g_loss],</span><br><span class="line">                feed_dict={</span><br><span class="line">                    self.z: sample_z,</span><br><span class="line">                    self.inputs: sample_inputs,</span><br><span class="line">                },</span><br><span class="line">              )</span><br><span class="line">              save_images(samples, [<span class="number">8</span>, <span class="number">8</span>],</span><br><span class="line">                    <span class="string">'./{}/train_{:02d}_{:04d}.png'</span>.<span class="built_in">format</span>(config.sample_dir, epoch, idx))</span><br><span class="line">              <span class="built_in">print</span>(<span class="string">"[Sample] d_loss: %.8f, g_loss: %.8f"</span> % (d_loss, g_loss))</span><br><span class="line">            <span class="keyword">except</span>:</span><br><span class="line">              <span class="built_in">print</span>(<span class="string">"one pic error!..."</span>)</span><br><span class="line">        <span class="keyword">if</span> counter//<span class="number">10</span> == <span class="number">2</span>:</span><br><span class="line">          self.save(config.checkpoint_dir, counter)</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">discriminator</span>(<span class="params">self, image, y=<span class="literal">None</span>, reuse=<span class="literal">False</span></span>):</span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">"discriminator"</span>) <span class="keyword">as</span> scope:</span><br><span class="line">      <span class="keyword">if</span> reuse:</span><br><span class="line">        scope.reuse_variables()</span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">not</span> self.y_dim:</span><br><span class="line">        h0 = lrelu(conv2d(image, self.df_dim, name=<span class="string">'d_h0_conv'</span>))</span><br><span class="line">        h1 = lrelu(self.d_bn1(conv2d(h0, self.df_dim*<span class="number">2</span>, name=<span class="string">'d_h1_conv'</span>)))</span><br><span class="line">        h2 = lrelu(self.d_bn2(conv2d(h1, self.df_dim*<span class="number">4</span>, name=<span class="string">'d_h2_conv'</span>)))</span><br><span class="line">        h3 = lrelu(self.d_bn3(conv2d(h2, self.df_dim*<span class="number">8</span>, name=<span class="string">'d_h3_conv'</span>))) <span class="comment"># 64 14 14 256 -&gt;64 7 7 512</span></span><br><span class="line">        aa = tf.reshape(h3, [self.batch_size, -<span class="number">1</span>])</span><br><span class="line">        h4 = linear(aa, <span class="number">1</span>, <span class="string">'d_h3_lin'</span>)</span><br><span class="line">        <span class="keyword">return</span> tf.nn.sigmoid(h4), h4</span><br><span class="line">      <span class="keyword">else</span>:</span><br><span class="line">        yb = tf.reshape(y, [self.batch_size, <span class="number">1</span>, <span class="number">1</span>, self.y_dim])</span><br><span class="line">        x = conv_cond_concat(image, yb)</span><br><span class="line">        h0 = lrelu(conv2d(x, self.c_dim + self.y_dim, name=<span class="string">'d_h0_conv'</span>))</span><br><span class="line">        h0 = conv_cond_concat(h0, yb)</span><br><span class="line">        h1 = lrelu(self.d_bn1(conv2d(h0, self.df_dim + self.y_dim, name=<span class="string">'d_h1_conv'</span>)))</span><br><span class="line">        h1 = tf.reshape(h1, [self.batch_size, -<span class="number">1</span>])</span><br><span class="line">        h1 = concat([h1, y], <span class="number">1</span>)</span><br><span class="line">        h2 = lrelu(self.d_bn2(linear(h1, self.dfc_dim, <span class="string">'d_h2_lin'</span>)))</span><br><span class="line">        h2 = concat([h2, y], <span class="number">1</span>)</span><br><span class="line">        h3 = linear(h2, <span class="number">1</span>, <span class="string">'d_h3_lin'</span>)</span><br><span class="line">        <span class="keyword">return</span> tf.nn.sigmoid(h3), h3</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">generator</span>(<span class="params">self, z, y=<span class="literal">None</span></span>):</span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">"generator"</span>) <span class="keyword">as</span> scope:</span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">not</span> self.y_dim:</span><br><span class="line">        s_h, s_w = self.output_height, self.output_width</span><br><span class="line">        s_h2, s_w2 = conv_out_size_same(s_h, <span class="number">2</span>), conv_out_size_same(s_w, <span class="number">2</span>) <span class="comment"># 先把特征图大小确定出来</span></span><br><span class="line">        s_h4, s_w4 = conv_out_size_same(s_h2, <span class="number">2</span>), conv_out_size_same(s_w2, <span class="number">2</span>)</span><br><span class="line">        s_h8, s_w8 = conv_out_size_same(s_h4, <span class="number">2</span>), conv_out_size_same(s_w4, <span class="number">2</span>)</span><br><span class="line">        s_h16, s_w16 = conv_out_size_same(s_h8, <span class="number">2</span>), conv_out_size_same(s_w8, <span class="number">2</span>)</span><br><span class="line">        <span class="comment"># project `z` and reshape</span></span><br><span class="line">        self.z_, self.h0_w, self.h0_b = linear(</span><br><span class="line">            z, self.gf_dim*<span class="number">8</span>*s_h16*s_w16, <span class="string">'g_h0_lin'</span>, with_w=<span class="literal">True</span>)</span><br><span class="line">        self.h0 = tf.reshape(</span><br><span class="line">            self.z_, [-<span class="number">1</span>, s_h16, s_w16, self.gf_dim * <span class="number">8</span>])</span><br><span class="line">        h0 = tf.nn.relu(self.g_bn0(self.h0))</span><br><span class="line">        self.h1, self.h1_w, self.h1_b = deconv2d(</span><br><span class="line">            h0, [self.batch_size, s_h8, s_w8, self.gf_dim*<span class="number">4</span>], name=<span class="string">'g_h1'</span>, with_w=<span class="literal">True</span>)</span><br><span class="line">        h1 = tf.nn.relu(self.g_bn1(self.h1))</span><br><span class="line">        h2, self.h2_w, self.h2_b = deconv2d(</span><br><span class="line">            h1, [self.batch_size, s_h4, s_w4, self.gf_dim*<span class="number">2</span>], name=<span class="string">'g_h2'</span>, with_w=<span class="literal">True</span>)</span><br><span class="line">        h2 = tf.nn.relu(self.g_bn2(h2))</span><br><span class="line">        h3, self.h3_w, self.h3_b = deconv2d(</span><br><span class="line">            h2, [self.batch_size, s_h2, s_w2, self.gf_dim*<span class="number">1</span>], name=<span class="string">'g_h3'</span>, with_w=<span class="literal">True</span>)</span><br><span class="line">        h3 = tf.nn.relu(self.g_bn3(h3))</span><br><span class="line">        h4, self.h4_w, self.h4_b = deconv2d(</span><br><span class="line">            h3, [self.batch_size, s_h, s_w, self.c_dim], name=<span class="string">'g_h4'</span>, with_w=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> tf.nn.tanh(h4)</span><br><span class="line">      <span class="keyword">else</span>:</span><br><span class="line">        s_h, s_w = self.output_height, self.output_width</span><br><span class="line">        s_h2, s_h4 = <span class="built_in">int</span>(s_h/<span class="number">2</span>), <span class="built_in">int</span>(s_h/<span class="number">4</span>)</span><br><span class="line">        s_w2, s_w4 = <span class="built_in">int</span>(s_w/<span class="number">2</span>), <span class="built_in">int</span>(s_w/<span class="number">4</span>)</span><br><span class="line">        <span class="comment"># yb = tf.expand_dims(tf.expand_dims(y, 1),2)</span></span><br><span class="line">        yb = tf.reshape(y, [self.batch_size, <span class="number">1</span>, <span class="number">1</span>, self.y_dim])</span><br><span class="line">        z = concat([z, y], <span class="number">1</span>)</span><br><span class="line">        h0 = tf.nn.relu(</span><br><span class="line">            self.g_bn0(linear(z, self.gfc_dim, <span class="string">'g_h0_lin'</span>)))</span><br><span class="line">        h0 = concat([h0, y], <span class="number">1</span>)</span><br><span class="line">        h1 = tf.nn.relu(self.g_bn1(</span><br><span class="line">            linear(h0, self.gf_dim*<span class="number">2</span>*s_h4*s_w4, <span class="string">'g_h1_lin'</span>)))</span><br><span class="line">        h1 = tf.reshape(h1, [self.batch_size, s_h4, s_w4, self.gf_dim * <span class="number">2</span>])</span><br><span class="line">        h1 = conv_cond_concat(h1, yb)</span><br><span class="line">        h2 = tf.nn.relu(self.g_bn2(deconv2d(h1,</span><br><span class="line">            [self.batch_size, s_h2, s_w2, self.gf_dim * <span class="number">2</span>], name=<span class="string">'g_h2'</span>)))</span><br><span class="line">        h2 = conv_cond_concat(h2, yb)</span><br><span class="line">        <span class="keyword">return</span> tf.nn.sigmoid(</span><br><span class="line">            deconv2d(h2, [self.batch_size, s_h, s_w, self.c_dim], name=<span class="string">'g_h3'</span>))</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">sampler</span>(<span class="params">self, z, y=<span class="literal">None</span></span>):</span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">"generator"</span>) <span class="keyword">as</span> scope:</span><br><span class="line">      scope.reuse_variables()</span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">not</span> self.y_dim:</span><br><span class="line">        s_h, s_w = self.output_height, self.output_width</span><br><span class="line">        s_h2, s_w2 = conv_out_size_same(s_h, <span class="number">2</span>), conv_out_size_same(s_w, <span class="number">2</span>)</span><br><span class="line">        s_h4, s_w4 = conv_out_size_same(s_h2, <span class="number">2</span>), conv_out_size_same(s_w2, <span class="number">2</span>)</span><br><span class="line">        s_h8, s_w8 = conv_out_size_same(s_h4, <span class="number">2</span>), conv_out_size_same(s_w4, <span class="number">2</span>)</span><br><span class="line">        s_h16, s_w16 = conv_out_size_same(s_h8, <span class="number">2</span>), conv_out_size_same(s_w8, <span class="number">2</span>)</span><br><span class="line">        <span class="comment"># project `z` and reshape</span></span><br><span class="line">        h0 = tf.reshape(</span><br><span class="line">            linear(z, self.gf_dim*<span class="number">8</span>*s_h16*s_w16, <span class="string">'g_h0_lin'</span>),</span><br><span class="line">            [-<span class="number">1</span>, s_h16, s_w16, self.gf_dim * <span class="number">8</span>])</span><br><span class="line">        h0 = tf.nn.relu(self.g_bn0(h0, train=<span class="literal">False</span>))</span><br><span class="line">        h1 = deconv2d(h0, [self.batch_size, s_h8, s_w8, self.gf_dim*<span class="number">4</span>], name=<span class="string">'g_h1'</span>)</span><br><span class="line">        h1 = tf.nn.relu(self.g_bn1(h1, train=<span class="literal">False</span>))</span><br><span class="line">        h2 = deconv2d(h1, [self.batch_size, s_h4, s_w4, self.gf_dim*<span class="number">2</span>], name=<span class="string">'g_h2'</span>)</span><br><span class="line">        h2 = tf.nn.relu(self.g_bn2(h2, train=<span class="literal">False</span>))</span><br><span class="line">        h3 = deconv2d(h2, [self.batch_size, s_h2, s_w2, self.gf_dim*<span class="number">1</span>], name=<span class="string">'g_h3'</span>)</span><br><span class="line">        h3 = tf.nn.relu(self.g_bn3(h3, train=<span class="literal">False</span>))</span><br><span class="line">        h4 = deconv2d(h3, [self.batch_size, s_h, s_w, self.c_dim], name=<span class="string">'g_h4'</span>)</span><br><span class="line">        <span class="keyword">return</span> tf.nn.tanh(h4)</span><br><span class="line">      <span class="keyword">else</span>:</span><br><span class="line">        s_h, s_w = self.output_height, self.output_width</span><br><span class="line">        s_h2, s_h4 = <span class="built_in">int</span>(s_h/<span class="number">2</span>), <span class="built_in">int</span>(s_h/<span class="number">4</span>)</span><br><span class="line">        s_w2, s_w4 = <span class="built_in">int</span>(s_w/<span class="number">2</span>), <span class="built_in">int</span>(s_w/<span class="number">4</span>)</span><br><span class="line">        <span class="comment"># yb = tf.reshape(y, [-1, 1, 1, self.y_dim])</span></span><br><span class="line">        yb = tf.reshape(y, [self.batch_size, <span class="number">1</span>, <span class="number">1</span>, self.y_dim])</span><br><span class="line">        z = concat([z, y], <span class="number">1</span>)</span><br><span class="line">        h0 = tf.nn.relu(self.g_bn0(linear(z, self.gfc_dim, <span class="string">'g_h0_lin'</span>)))</span><br><span class="line">        h0 = concat([h0, y], <span class="number">1</span>)</span><br><span class="line">        h1 = tf.nn.relu(self.g_bn1(</span><br><span class="line">            linear(h0, self.gf_dim*<span class="number">2</span>*s_h4*s_w4, <span class="string">'g_h1_lin'</span>), train=<span class="literal">False</span>))</span><br><span class="line">        h1 = tf.reshape(h1, [self.batch_size, s_h4, s_w4, self.gf_dim * <span class="number">2</span>])</span><br><span class="line">        h1 = conv_cond_concat(h1, yb)</span><br><span class="line">        h2 = tf.nn.relu(self.g_bn2(</span><br><span class="line">            deconv2d(h1, [self.batch_size, s_h2, s_w2, self.gf_dim * <span class="number">2</span>], name=<span class="string">'g_h2'</span>), train=<span class="literal">False</span>))</span><br><span class="line">        h2 = conv_cond_concat(h2, yb)</span><br><span class="line">        <span class="keyword">return</span> tf.nn.sigmoid(deconv2d(h2, [self.batch_size, s_h, s_w, self.c_dim], name=<span class="string">'g_h3'</span>))</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">load_mnist</span>(<span class="params">self</span>):</span><br><span class="line">    data_dir = os.path.join(<span class="string">"./data"</span>, self.dataset_name)</span><br><span class="line">    fd = <span class="built_in">open</span>(os.path.join(data_dir,<span class="string">'train-images-idx3-ubyte'</span>))</span><br><span class="line">    loaded = np.fromfile(file=fd,dtype=np.uint8)</span><br><span class="line">    trX = loaded[<span class="number">16</span>:].reshape((<span class="number">60000</span>,<span class="number">28</span>,<span class="number">28</span>,<span class="number">1</span>)).astype(np.<span class="built_in">float</span>)</span><br><span class="line">    fd = <span class="built_in">open</span>(os.path.join(data_dir,<span class="string">'train-labels-idx1-ubyte'</span>))</span><br><span class="line">    loaded = np.fromfile(file=fd,dtype=np.uint8)</span><br><span class="line">    trY = loaded[<span class="number">8</span>:].reshape((<span class="number">60000</span>)).astype(np.<span class="built_in">float</span>)</span><br><span class="line">    fd = <span class="built_in">open</span>(os.path.join(data_dir,<span class="string">'t10k-images-idx3-ubyte'</span>))</span><br><span class="line">    loaded = np.fromfile(file=fd,dtype=np.uint8)</span><br><span class="line">    teX = loaded[<span class="number">16</span>:].reshape((<span class="number">10000</span>,<span class="number">28</span>,<span class="number">28</span>,<span class="number">1</span>)).astype(np.<span class="built_in">float</span>)</span><br><span class="line">    fd = <span class="built_in">open</span>(os.path.join(data_dir,<span class="string">'t10k-labels-idx1-ubyte'</span>))</span><br><span class="line">    loaded = np.fromfile(file=fd,dtype=np.uint8)</span><br><span class="line">    teY = loaded[<span class="number">8</span>:].reshape((<span class="number">10000</span>)).astype(np.<span class="built_in">float</span>)</span><br><span class="line">    trY = np.asarray(trY)</span><br><span class="line">    teY = np.asarray(teY)</span><br><span class="line">    X = np.concatenate((trX, teX), axis=<span class="number">0</span>)</span><br><span class="line">    y = np.concatenate((trY, teY), axis=<span class="number">0</span>).astype(np.<span class="built_in">int</span>)</span><br><span class="line">    seed = <span class="number">547</span></span><br><span class="line">    np.random.seed(seed)</span><br><span class="line">    np.random.shuffle(X)</span><br><span class="line">    np.random.seed(seed)</span><br><span class="line">    np.random.shuffle(y)</span><br><span class="line">    y_vec = np.zeros((<span class="built_in">len</span>(y), self.y_dim), dtype=np.<span class="built_in">float</span>)</span><br><span class="line">    <span class="keyword">for</span> i, label <span class="keyword">in</span> <span class="built_in">enumerate</span>(y):</span><br><span class="line">      y_vec[i,y[i]] = <span class="number">1.0</span></span><br><span class="line">    <span class="keyword">return</span> X/<span class="number">255.</span>,y_vec</span><br><span class="line"><span class="meta">  @property</span></span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">model_dir</span>(<span class="params">self</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"{}_{}_{}_{}"</span>.<span class="built_in">format</span>(</span><br><span class="line">        self.dataset_name, self.batch_size,</span><br><span class="line">        self.output_height, self.output_width)</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">save</span>(<span class="params">self, checkpoint_dir, step</span>):</span><br><span class="line">    model_name = <span class="string">"DCGAN.model"</span></span><br><span class="line">    checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(checkpoint_dir):</span><br><span class="line">      os.makedirs(checkpoint_dir)</span><br><span class="line">    self.saver.save(self.sess,</span><br><span class="line">            os.path.join(checkpoint_dir, model_name),</span><br><span class="line">            global_step=step)</span><br><span class="line">  <span class="keyword">def</span> <span class="title function_">load</span>(<span class="params">self, checkpoint_dir</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">" [*] Reading checkpoints..."</span>)</span><br><span class="line">    checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)</span><br><span class="line">    ckpt = tf.train.get_checkpoint_state(checkpoint_dir)</span><br><span class="line">    <span class="keyword">if</span> ckpt <span class="keyword">and</span> ckpt.model_checkpoint_path:</span><br><span class="line">      ckpt_name = os.path.basename(ckpt.model_checkpoint_path)</span><br><span class="line">      self.saver.restore(self.sess, os.path.join(checkpoint_dir, ckpt_name))</span><br><span class="line">      <span class="built_in">print</span>(<span class="string">" [*] Success to read {}"</span>.<span class="built_in">format</span>(ckpt_name))</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      <span class="built_in">print</span>(<span class="string">" [*] Failed to find a checkpoint"</span>)</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></tbody></table></figure>
+
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2019/11/26/20191126-GAN/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2019/11/26/20191126-GAN/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/11/28/HMM/">隐马尔可夫HMM</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/11/26/GAN/">GAN</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E6%8A%97%E7%94%9F%E6%88%90%E7%BD%91%E7%BB%9C-GAN-Generative-Adversarial-Nets"><span class="toc-text">对抗生成网络 GAN(Generative Adversarial Nets)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Adversarial-Nets-Framework"><span class="toc-text">Adversarial Nets Framework</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="toc-text">损失函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DCGAN"><span class="toc-text">DCGAN</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2019/11/26/20191126-GAN/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

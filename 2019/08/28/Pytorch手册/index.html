@@ -1,0 +1,1890 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>Pytorch手册 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="PyTorch 主要提供以下两大特色：  支持强力GPU加速的Tensor计算能力 基于tape的具有自动微分求导能力的深度神经网络框架  PyTorch 主要包含以下组成要素:    组成要素 描述说明    torch 一个类似于numpy的tensor哭, 提供强力的GPU支持   torch.autograd 一个基于tape的具有自动微分求导能力的库, 可以支持几乎所有的tesnor o">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pytorch手册">
+<meta property="og:url" content="https://caiusy.github.io/2019/08/28/Pytorch%E6%89%8B%E5%86%8C/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="PyTorch 主要提供以下两大特色：  支持强力GPU加速的Tensor计算能力 基于tape的具有自动微分求导能力的深度神经网络框架  PyTorch 主要包含以下组成要素:    组成要素 描述说明    torch 一个类似于numpy的tensor哭, 提供强力的GPU支持   torch.autograd 一个基于tape的具有自动微分求导能力的库, 可以支持几乎所有的tesnor o">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2019-08-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-20T06:58:57.403Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="OpenCV">
+<meta property="article:tag" content="PyTorch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="Python,OpenCV,PyTorch">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2019-08-28T00:00:00+08:00","dateModified":"2026-02-20T14:58:57+08:00","datePublished":"2019-08-28T00:00:00+08:00","description":"","headline":"Pytorch手册","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2019/08/28/Pytorch%E6%89%8B%E5%86%8C/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2019/08/28/Pytorch%E6%89%8B%E5%86%8C/","keywords":"Python, OpenCV, PyTorch","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2019-08-27T16:00:00.000Z">2019-08-28</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-20T06:58:57.403Z">2026-02-20</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>Pytorch手册</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><p>PyTorch 主要提供以下两大特色：</p>
+<ul>
+<li>支持强力GPU加速的Tensor计算能力</li>
+<li>基于tape的具有自动微分求导能力的深度神经网络框架</li>
+</ul>
+<p>PyTorch 主要包含以下组成要素:</p>
+<table>
+<thead>
+<tr>
+<th>组成要素</th>
+<th>描述说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>torch</td>
+<td>一个类似于numpy的tensor哭, 提供强力的GPU支持</td>
+</tr>
+<tr>
+<td>torch.autograd</td>
+<td>一个基于tape的具有自动微分求导能力的库, 可以支持几乎所有的tesnor operatioin</td>
+</tr>
+<tr>
+<td>torch.nn</td>
+<td>一个神经网络库, 与autograd深度整合, 可以提供最大限度的灵活性</td>
+</tr>
+<tr>
+<td>torch.multiprocessing</td>
+<td>Python的多线程处理, 可以提供torch Tensors之间的内存共享, 对于加载数据和Hogwild training来说十分有用</td>
+</tr>
+<tr>
+<td>torch.utils</td>
+<td>一些功能类和函数, 如DataLoader, Trainer等等</td>
+</tr>
+<tr>
+<td>torch.legacy(.nn/.optim)</td>
+<td>为了兼容性而存在的一些代码和实现</td>
+</tr>
+</tbody></table>
+<p>Pytorch通常可以作为以下用途使用:</p>
+<ul>
+<li>为了使用GPUs性能的numpy替代品</li>
+<li>可以提供强大灵活力和速度优势的深度学习平台.</li>
+</ul>
+<h2 id="torch"><a href="#torch" class="headerlink" title="torch"></a>torch</h2><h2 id="backends-cudnn"><a href="#backends-cudnn" class="headerlink" title="backends.cudnn"></a>backends.cudnn</h2><pre><code>    1  
+    
+</code></pre>
+<p>| </p>
+<pre><code>    torch.backends.cudnn.benchmark = True  
+      
+</code></pre>
+<p>—|—  </p>
+<p>上述设置可以让内置的cudnn的auto-tuner自动寻找最合适当前配置的搞笑算法, 来达到优化运行效率的目标, 在使用时, 应该遵循以下两个准则:</p>
+<ol>
+<li>如果网络的输入数据维度或类型上变化不大, 则该设置可以增加运行效率</li>
+<li>如果网络的输入数据在每次的iteration中都变化的话, 会导致cudnn每次都寻找一遍最优配置, 这样反而 会降低 运行效率.</li>
+</ol>
+<h3 id="torch-cat"><a href="#torch-cat" class="headerlink" title="torch.cat()"></a>torch.cat()</h3><pre><code>     1  
+     
+</code></pre>
+<p>| </p>
+<pre><code>     torch.cat(seq, dim=0, out=None) # 返回连接后的tensor  
+       
+</code></pre>
+<p>—|—  </p>
+<p>将给定的 tensor 序列 seq 按照维度连接起来. 默认维度为0, 说明会将其在第 0 个维度上进行拼接.(最后的结果是第 0 维度增大, 例如三个2行3列的 tensor 按照第0维度拼接, 最后得到的 tensor 维度为6行3列)</p>
+<h3 id="clamp-x2F-clamp"><a href="#clamp-x2F-clamp" class="headerlink" title="clamp()/clamp_()"></a>clamp()/clamp_()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.clamp(input, min, max, out=None) -&gt; Tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>将input里面元素全部划分到[min,max]区间内, 小于min的置为min, 大于max的置为max. 如果不指定min或者max,则认为无下界或上界<br>其他调用形式:  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor(min, max) # 调用tensor为input, 返回值为out  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="device"><a href="#device" class="headerlink" title="device()"></a>device()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="gather"><a href="#gather" class="headerlink" title="gather()"></a>gather()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.gather(input, dim, index, out=None) -&gt; Tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>沿着dim指定的轴按着index指定的值重新组合成一个新的tensor.  </p>
+<pre><code>1  
+2  
+3  
+</code></pre>
+<p>| </p>
+<pre><code>out[i][j][k] = input[index[i][j][k]][j][k]  # if dim == 0  
+out[i][j][k] = input[i][index[i][j][k]][k]  # if dim == 1  
+out[i][j][k] = input[i][j][index[i][j][k]]  # if dim == 2  
+  
+</code></pre>
+<p>—|—  </p>
+<p>即假设input是一个 n 维的tensor, 其 size 为 (x0,x1,…,xi−1,xi,xi+1,…,xn−1), 若dim=i, 则 index 必须也是一个 n 维的tensor, 其 size 为 (x0,x1,…,xi−1,y,xi+1,…,xn−1), 其中 y≥1, 而返回的 tensor out 的 size 和 index 的 size 相同.<br>一句来说 gather 的作用就是, 在指定的维度上筛选给给定下标index指示的值, 其他值舍弃.<br><strong>一个例子说明:</strong><br>scores是一个计算出来的分数，类型为[torch.FloatTensor of size 5x1000]<br>而y_var是正确分数的索引，类型为[torch.LongTensor of size 5]<br>容易知道，这里有1000个类别，有5个输入图像，每个图像得出的分数中只有一个是正确的，正确的索引就在y_var中，这里要做的是将正确分数根据索引标号提取出来。  </p>
+<pre><code>1  
+2  
+</code></pre>
+<p>| </p>
+<pre><code>scores = model(X_var)  # 分数  
+scores = scores.gather(1, y_var.view(-1, 1)).squeeze()  #进行提取  
+  
+</code></pre>
+<p>—|—  </p>
+<p>提取后的scores格式也为[torch.FloatTensor of size 5]<br>这里讲一下变化过程：</p>
+<ol>
+<li><p>首先要知道之前的scores的size为[5,1000]，而y_var的size为[5]，scores为2维，y_var为1维不匹配，所以先用view将其展开为[5,1]的size，这样维数n就与scroes匹配了。</p>
+</li>
+<li><p>接下来进行gather，gather函数中第一个参数为1，意思是在第二维进行汇聚，也就是说通过y_var中的五个值来在scroes中第二维的5个1000中进行一一挑选，挑选出来后的size也为[5,1]，然后再通过squeeze将那个一维去掉，最后结果为[5].<br><strong>Tensor形式</strong></p>
+<pre><code>1
+</code></pre>
+</li>
+</ol>
+<p>| </p>
+<pre><code>     torch.Tensor.gather(dim, index) -&gt; Tensor  
+       
+</code></pre>
+<p>—|—  </p>
+<h3 id="torch-ge"><a href="#torch-ge" class="headerlink" title="torch.ge()"></a>torch.ge()</h3><h3 id="torch-gt"><a href="#torch-gt" class="headerlink" title="torch.gt()"></a>torch.gt()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.gt(input, other, out=None) # -&gt; Tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>根据 input 和 other 的值返回一个二值 tensor, 如果满足大于条件则为1, 不满足则为0.<br>other 可以是能够转换成 input size 的tensor, 也可以是一个 float 标量.</p>
+<h3 id="torch-index-select"><a href="#torch-index-select" class="headerlink" title="torch.index_select()"></a>torch.index_select()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.index_select(input, dim, index, out=None) # -&gt; Tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>返回在 dim 维度上的 index 指明的下标组成的 tensor.<br>返回的 tensor 的维度的数量和 input 是相同的, 但是第 dim 维度的 size 会和 index size大小相同. 其他维度的 size 保持不变.</p>
+<h3 id="torch-le"><a href="#torch-le" class="headerlink" title="torch.le()"></a>torch.le()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.le(input, other, out=None) # -&gt;Tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>按元素计算 input≤other.</p>
+<h3 id="max"><a href="#max" class="headerlink" title="max()"></a>max()</h3><pre><code>1  
+2  
+3  
+</code></pre>
+<p>| </p>
+<pre><code>torch.max(input) # 返回一个Tensor, 代表所有元素中的最大值  
+  
+torch.max(input,dim,keepdim=False,out=None) # 返回一个元组:(Tensor, LongTensor)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>第二种形式会返回一个元组, 元组内元素类型为: (Tensor, LongTensor), 其中, 前者代表对应 dim 上 reduce 后的最大值, 后者代表最大值在维度 dim 中对应的下标.<br>如果keepdim=True, 则输出的 tensor 的 size 会和输入的相同, 只不过对应 dim 维度上的size为1. 否则, 对应 dim 维度会被 squeeze/reduce, 使得输出的维度比输入的维度少1.  </p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+</code></pre>
+<p>| </p>
+<pre><code>&gt;&gt;&gt; a = torch.randn(4, 4)  
+&gt;&gt;&gt; a  
+tensor([[-1.2360, -0.2942, -0.1222,  0.8475],  
+        [ 1.1949, -1.1127, -2.2379, -0.6702],  
+        [ 1.5717, -0.9207,  0.1297, -1.8768],  
+        [-0.6172,  1.0036, -0.6060, -0.2432]])  
+&gt;&gt;&gt; torch.max(a, 1)  
+(tensor([ 0.8475,  1.1949,  1.5717,  1.0036]), tensor([ 3,  0,  0,  1]))  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="mm"><a href="#mm" class="headerlink" title="mm()"></a>mm()</h3><p>注意, 没有torch.mm_版本  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.mm(mat1, mat2, out=None) # 返回值为Tensor, 也可以使用out记录返回值  
+  
+</code></pre>
+<p>—|—  </p>
+<p>两矩阵相乘, 矩阵的size需要满足乘法规则<br>其他调用形式:  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor(mat2) # 调用者为mat1  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="norm"><a href="#norm" class="headerlink" title="norm()"></a>norm()</h3><p>返回输入tensor的p-norm标量  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.norm(input, p=2) # 返回一个标量tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="numel"><a href="#numel" class="headerlink" title="numel()"></a>numel()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.numel(input)  #返回一个int值  
+  
+</code></pre>
+<p>—|—  </p>
+<p>返回 inpput tensor 中的元素的总个数  </p>
+<pre><code>1  
+2  
+</code></pre>
+<p>| </p>
+<pre><code>a = torch.randn(1,2,3,4,5)  
+print(torch.numel(a)) # 120  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="ones"><a href="#ones" class="headerlink" title="ones()"></a>ones()</h3><h3 id="randn"><a href="#randn" class="headerlink" title="randn()"></a>randn()</h3><p>标准正太分布随机基础, 传入参数为维度信息</p>
+<h3 id="torch-sort"><a href="#torch-sort" class="headerlink" title="torch.sort()"></a>torch.sort()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.sort(input, dim=None, descending=False, out=None) # 返回 (Tensor, LongTensor)  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="sum"><a href="#sum" class="headerlink" title="sum()"></a>sum()</h3><pre><code>1  
+2  
+3  
+4  
+</code></pre>
+<p>| </p>
+<pre><code>torch.sum(input, dtype=None) # 返回求和后的Tensor(只有一个元素)  
+  
+torch.sum(input, dim, keepdim=False, dtype=None) # 返回在dim上reduce的sum和, 如果dim包含多个维度, 则都进行reduce求和.  
+# reduce这个词很形象, 因为返回的Tensor的维度刚好没有了dim指示的那些维度  
+  
+</code></pre>
+<p>—|—  </p>
+<p>其他形式:  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.sum()  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="torch-t"><a href="#torch-t" class="headerlink" title="torch.t()"></a>torch.t()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.t(input) # 返回转置后的Tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>其他形式:  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.t()  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="unsqueeze"><a href="#unsqueeze" class="headerlink" title="unsqueeze()"></a>unsqueeze()</h3><p>在指定维度上插入一个 singleton 维度(一般用于将单一数据处理用 batch 的形式)  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.unsqueeze(input, dim, out=None) # -&gt; Tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>返回的tensor与input tensor 共享数据</p>
+<p>dim 的取值范围在 [-input.dim()-1, input.dim()+1] 之间, 如果为负值, 则相当于 dim = dim + input.dim() + 1.</p>
+<h3 id="zeros"><a href="#zeros" class="headerlink" title="zeros()"></a>zeros()</h3><h2 id="torch-cuda"><a href="#torch-cuda" class="headerlink" title="torch.cuda"></a>torch.cuda</h2><h3 id="torch-cuda-empty-cache"><a href="#torch-cuda-empty-cache" class="headerlink" title="torch.cuda.empty_cache()"></a>torch.cuda.empty_cache()</h3><p>释放所有未使用的 GPU 内存, 使用这些内存可以被其他 GPU 应用使用, 并且可以被 nvidia-smi 查到.<br>empty_cache() 并不会强制提升供 PyTorch 使用的显卡内存的大小, 查看Memory management</p>
+<h2 id="torch-Tensor"><a href="#torch-Tensor" class="headerlink" title="torch.Tensor"></a>torch.Tensor</h2><p>torch.Tensor 是默认类型 torch.FloatTensor 的别名, 使用 torch.Tenosr 的构造函数创建 tensor 变量时, 传入的是维度信息(注意与 torch.tensor() 的区别):  </p>
+<pre><code>1  
+2  
+</code></pre>
+<p>| </p>
+<pre><code>t = torch.Tensor(2,3,4) # 里面的数值未初始化, 是随机的  
+print(t.size()) # torch.Size([2,3,4])  
+  
+</code></pre>
+<p>—|—  </p>
+<p>torch.LongTesnor 使用方法相似, 只不过数据类型是长整型.</p>
+<h3 id="troch-tensor"><a href="#troch-tensor" class="headerlink" title="troch.tensor()"></a>troch.tensor()</h3><p>创建tensor  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.tensor(data, dtype=None, device=None, requires_grad=False)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>可以利用torch.tensor从python的list数据或者其他序列数据中创建tensor对象  </p>
+<pre><code>1  
+2  
+</code></pre>
+<p>| </p>
+<pre><code>torch.tensor([[1,-1],[1,-1]])  
+torch.tensor(np.array([[1,2,3],[4,5,6]]))  
+  
+</code></pre>
+<p>—|—  </p>
+<p>注意, torch.tensor()函数总是会对数据进行复制操作, 因此, 如果你仅仅是想将数据的requires_grad标志改变, 那么就应该使用required_grad_()或者detach()函数来避免复制. 同时, 对numpy数组使用torch.as_tensor()将其转换成tensor而无需复制</p>
+<h3 id="torch-Tensor-cpu"><a href="#torch-Tensor-cpu" class="headerlink" title="torch.Tensor.cpu()"></a>torch.Tensor.cpu()</h3><pre><code>1  
+2  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.cpu()  
+z = x.cpu()  
+  
+</code></pre>
+<p>—|—  </p>
+<p>将tensor移动到cpu上, 注意返回值z是cpu上的数据, tensor x 本身的device属性不变</p>
+<h3 id="torch-Tensor-cuda"><a href="#torch-Tensor-cuda" class="headerlink" title="torch.Tensor.cuda()"></a>torch.Tensor.cuda()</h3><pre><code>1  
+2  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.cuda()  
+z = x.cuda()  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="torch-Tensor-dim"><a href="#torch-Tensor-dim" class="headerlink" title="torch.Tensor.dim()"></a>torch.Tensor.dim()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.dim() -&gt; int  
+  
+</code></pre>
+<p>—|—  </p>
+<p>返回 tensor 的维度的个数.</p>
+<h3 id="torch-Tensor-max"><a href="#torch-Tensor-max" class="headerlink" title="torch.Tensor.max()"></a>torch.Tensor.max()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.max(dim=None, keepdim=False) -&gt; Tensor or (Tensor, Tensor)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>详情见 torch.max()</p>
+<h3 id="torch-Tensor-numel"><a href="#torch-Tensor-numel" class="headerlink" title="torch.Tensor.numel()"></a>torch.Tensor.numel()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.numel()  
+  
+</code></pre>
+<p>—|—  </p>
+<p>详见 torch.numel()</p>
+<h3 id="torch-Tensor-to"><a href="#torch-Tensor-to" class="headerlink" title="torch.Tensor.to()"></a>torch.Tensor.to()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.to(*args, *kwargs)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>返回一个转移后的tensor, 而自身维持不变  </p>
+<pre><code>1  
+2  
+3  
+4  
+</code></pre>
+<p>| </p>
+<pre><code>t = torch.randn(2,3)  
+t.to(torch.float64)  
+t.to(device)  
+t.to("cuda:0")  
+  
+</code></pre>
+<p>—|—  </p>
+<p>将tensor移动到gpu上, 注意返回值 z 是gpu 上的数据, tensor x 本身的 device 属性不变</p>
+<h3 id="torch-Tensor-numpy"><a href="#torch-Tensor-numpy" class="headerlink" title="torch.Tensor.numpy()"></a>torch.Tensor.numpy()</h3><p>tensor与numpy数组的转换  </p>
+<pre><code>1  
+2  
+3  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.numpy() # 返回tensor对应的numpy数组  
+  
+torch.from_numpy(ndarray) # 将numpy数组ndarray转换成对应的tensor并返回.  
+  
+</code></pre>
+<p>—|—  </p>
+<p>torch.Tensor 实际上是 torch.FloatFensor 的别名</p>
+<h3 id="torch-Tensor-permute"><a href="#torch-Tensor-permute" class="headerlink" title="torch.Tensor.permute()"></a>torch.Tensor.permute()</h3><p>重新排列tensor的维度  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.permute(*dims) # 返回一个重新排列维度后的 tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="torch-Tensor-unsqueeze"><a href="#torch-Tensor-unsqueeze" class="headerlink" title="torch.Tensor.unsqueeze()"></a>torch.Tensor.unsqueeze()</h3><p>详细可见torch.unsqueeze</p>
+<h3 id="torch-Tensor-expand"><a href="#torch-Tensor-expand" class="headerlink" title="torch.Tensor.expand()"></a>torch.Tensor.expand()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.expand(*sizes) # 返回 tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>将 tensor 中的 singleton 维度扩展到一个更大的 size.<br>参数 -1 意味着不改变原始的维度<br>新增的维度的元素被被添加到前头, size不能设置为-1.<br>expand 并没有申请新的内存, 而仅仅是在当前已经存在的 tensor 上面创建了新的视图(view), 使得 singleton 维度被扩展成了一个更大的尺寸.<br>Any dimension of size 1 can be expanded to an arbitrary value without new memory.  </p>
+<pre><code>1  
+2  
+3  
+4  
+</code></pre>
+<p>| </p>
+<pre><code>x = torch.tensor([1],[2],[3])  
+print(x.size())  # torch.Size([3,1])  
+print(x.expand(3,4)) # torch.Size([3,4]) # 将维度为1的扩展到任意尺寸  
+print(x.expand(-1,4)) # torch.Size([3,4]) # -1 代表不改变维度  
+  
+</code></pre>
+<p>—|—  </p>
+<p>注意, 只能对 singleton 的维度进行扩展, 如果强行对其他维度扩展, 则会报错.</p>
+<h3 id="torch-Tensor-expand-as"><a href="#torch-Tensor-expand-as" class="headerlink" title="torch.Tensor.expand_as()"></a>torch.Tensor.expand_as()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.expand_as(other) # 返回 tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>将当前 tensor 扩展到和 other 一样的size.<br>self.expand_as(other) 与 self.expand(other.size()) 等价.</p>
+<h3 id="torch-Tensor-index-fill"><a href="#torch-Tensor-index-fill" class="headerlink" title="torch.Tensor.index_fill_()"></a>torch.Tensor.index_fill_()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.index_fill_(dim, index, val) # 返回tensor  
+  
+</code></pre>
+<p>—|—  </p>
+<p>在给定的维度 dim 上, 用 val 将该维度上的 index 坐标的值填充.  </p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+</code></pre>
+<p>| </p>
+<pre><code>x = torch.tensor([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=torch.float)  
+index = torch.tensor([0, 2])  
+x.index_fill_(1, index, -1)  
+print(x)  
+#tensor([[-1.,  2., -1.],  
+#       [-1.,  5., -1.],  
+#       [-1.,  8., -1.]])  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="torch-Tensor-contiguous"><a href="#torch-Tensor-contiguous" class="headerlink" title="torch.Tensor.contiguous()"></a>torch.Tensor.contiguous()</h3><p>返回一个连续的tensor, 数据内容不变  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.contiguous() # 如果tensor本身就是连续的, 那么就会返回tensor本身  
+  
+</code></pre>
+<p>—|—  </p>
+<p>这里的 contiguous 指的是内存上的连续, 由于在 PyTorch 中, view 只能用在 contiguous 的 tensor 上面, 而如果在 view 之前使用了 transpose, permute 等操作后, 就需要使用 contiguous 来返回一个 contiguous tensor.<br>在 PyTorch 0.4 版本以后, 增加了 torch.reshape(), 这与 numpy.reshape() 的功能类似, 它大致相当于 tensor.contiguous().view() ?</p>
+<h3 id="torch-Tensor-item"><a href="#torch-Tensor-item" class="headerlink" title="torch.Tensor.item()"></a>torch.Tensor.item()</h3><p>当Tensor中只包含一个元素时, 可以利用该函数返回这个元素的标量</p>
+<h3 id="torch-Tensor-tolist"><a href="#torch-Tensor-tolist" class="headerlink" title="torch.Tensor.tolist()"></a>torch.Tensor.tolist()</h3><p>可以将Tensor转换成列表</p>
+<h3 id="torch-Tensor-zero"><a href="#torch-Tensor-zero" class="headerlink" title="torch.Tensor.zero_()"></a>torch.Tensor.zero_()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.Tensor.zero_()  
+  
+</code></pre>
+<p>—|—  </p>
+<p>将当前的 tensor 变量全部置为0(原地)</p>
+<h2 id="torch-autograd"><a href="#torch-autograd" class="headerlink" title="torch.autograd"></a>torch.autograd</h2><h3 id="set-grad-enabled"><a href="#set-grad-enabled" class="headerlink" title="set_grad_enabled()"></a>set_grad_enabled()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.autograd.set_grad_enabled(mode)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>用来控制梯度计算的开关(依据bool类型参数mode决定), 可以当做上下文管理器使用, 也可以当做函数使用  </p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+</code></pre>
+<p>| </p>
+<pre><code># 当做上下文管理器  
+with torch.set_grad_enabled(is_train): # 注意, 这里省略了autograd  
+    loss.backward()  
+    optimizer.step()  
+  
+# 当做函数使用  
+w1 = torch.Tensor([1], requires=True)  
+torch.set_grad_enabled(True)  
+print(w1.requires_grad) # True  
+torch.set_grad_enabled(False)  
+print(w1.requires_grad) # False  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="no-grad"><a href="#no-grad" class="headerlink" title="no_grad()"></a>no_grad()</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.autograd.no_grad  
+  
+</code></pre>
+<p>—|—  </p>
+<p>用于禁用梯度计算的上下文管理器.<br>在测试阶段, 当你确信你不会调用Tensor.backward()时,禁用梯度计算十分有用. 这会降低计算使用内存消耗.  </p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+</code></pre>
+<p>| </p>
+<pre><code>x = torch.tensor([1.0], requires_grad=True)  
+with torch.no_grad(): # 省略了autograd  
+    print(x.requires_grad) # True, 虽然为True, 但在该上下文中, 会无视掉requires_grad参数, 一律做False处理  
+    y = x*2    
+    print(y.requires_grad) # False, 在当前上下文产生的tensor的requires_grad属性为False  
+print(x.requires_grad) # True  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="torch-autograd-Function"><a href="#torch-autograd-Function" class="headerlink" title="torch.autograd.Function"></a>torch.autograd.Function</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.autograd.Function  
+  
+</code></pre>
+<p>—|—  </p>
+<p>为可微分的 ops 记录 operation history, 同时定义计算公式. </p>
+<p>每一个作用在 tensor 上的 operatin 都会创建一个新的 function 对象, 它会执行计算过程并记录相关信息. 这些信息可以从一个由 functions 组成的有向图中获得. 当 backward() 方法被调用时, 就会利用这些信息在 function 上进行反向传播, 并将梯度传给下一个 Funtion.<br>通常情况下, 当用于需要自定义可自动求导的 ops 时, 可以实现一个 Function 的子类.</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+</code></pre>
+<p>| </p>
+<pre><code># Example  
+class Exp(Function):  
+  
+    @staticmethod  
+    def forward(ctx, i):  
+        result = i.exp()  
+        ctx.save_for_backward(result)  
+  
+    @staticmethod  
+    def backward(ctx, grad_output):  
+        result, = ctx.saved_tensors  
+        return grad_output*result  
+  
+</code></pre>
+<p>—|—  </p>
+<p>static forward(ctx, <em>args, kwargs):*</em><br>定义前向计算的逻辑.</p>
+<p>static backward(ctx, *grad_outputs):<br>定义反向传导的逻辑, 如果确定不会使用到反向传播, 则可以不实现该函数.</p>
+<h2 id="torch-nn"><a href="#torch-nn" class="headerlink" title="torch.nn"></a>torch.nn</h2><h3 id="Module"><a href="#Module" class="headerlink" title="Module"></a>Module</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.nn.Module  
+  
+</code></pre>
+<p>—|—  </p>
+<p>所有神经网络Module的基类, 自定义的模型也应该是它的子类.<br>Modules可以包含其他Module(如Linear, Conv2d等等).</p>
+<h3 id="parameters"><a href="#parameters" class="headerlink" title="parameters()"></a>parameters()</h3><pre><code>1  
+2  
+</code></pre>
+<p>| </p>
+<pre><code>for param in model.parameters():  
+    print(param.data, param.size())  
+  
+</code></pre>
+<p>—|—  </p>
+<p>state_dict:  </p>
+<pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.nn.Module.state_dict(destination=None,prefix="",keep_vars=False)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>以字典形式返回整个module的状态</p>
+<h4 id="train"><a href="#train" class="headerlink" title="train"></a>train</h4><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.nn.Module.train(mode=True)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>将module的模式设置为train, 这只对部分module有效, 如Dropout, BatchNorm等, 详细请查看官网.<br>返回值: torch.nn.Module</p>
+<h4 id="training"><a href="#training" class="headerlink" title="training"></a>training</h4><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.nn.Module.training # 属性, 返回一个bool值, 指示当前的模式是否为train  
+  
+</code></pre>
+<p>—|—  </p>
+<h4 id="eval"><a href="#eval" class="headerlink" title="eval"></a>eval</h4><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.nn.Module.eval() # 注意, 和train不同, eval为无参函数  
+  
+</code></pre>
+<p>—|—  </p>
+<p>将module的mode设置为evaluation, 同样, 只对部分module起效.</p>
+<h3 id="Linear"><a href="#Linear" class="headerlink" title="Linear"></a>Linear</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.nn.Linear(in_features, out_features, bias=True)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>全连接层的实现. 输入的shape为 (N,…,infeatures), 输出的shape为 (N,…,outfeatures), 可以看出, 除了最后一维不同外, 其他维度都相同. (通常在使用Linear之前, 会将输入变成二维的矩阵, 其中第一维为batch size, 第二维为特征向量).<br>in_features 和 out_features 可以当做属性用.来获取.</p>
+<h3 id="Conv2d"><a href="#Conv2d" class="headerlink" title="Conv2d"></a>Conv2d</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.nn.Conv2的(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True)  
+  
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li>in_channels(int):</li>
+<li>out_channels(int):</li>
+<li>kernel_size(intortuple):</li>
+<li>stride(intortuple, optional):</li>
+</ul>
+<h3 id="MaxPool2d"><a href="#MaxPool2d" class="headerlink" title="MaxPool2d"></a>MaxPool2d</h3><h3 id="Softmax"><a href="#Softmax" class="headerlink" title="Softmax()"></a>Softmax()</h3><pre><code>    1  
+    
+</code></pre>
+<p>| </p>
+<pre><code>    class torch.nn.Softmax(dim=None)  
+      
+</code></pre>
+<p>—|—  </p>
+<p>dim指明了需要进行 softmax 的维度, 在这个维度上的值, 加起来和为1.</p>
+<h3 id="ReLU"><a href="#ReLU" class="headerlink" title="ReLU"></a>ReLU</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.nn.ReLU(inplace=False)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>输入输出的shape是相同的, 执行relu函数</p>
+<h3 id="torch-nn-Sequential"><a href="#torch-nn-Sequential" class="headerlink" title="torch.nn.Sequential"></a>torch.nn.Sequential</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.nn.Sequential(*args)  
+  
+</code></pre>
+<p>—|—  </p>
+<h3 id="torch-nn-MSELoss"><a href="#torch-nn-MSELoss" class="headerlink" title="torch.nn.MSELoss"></a>torch.nn.MSELoss</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.nn.MSELoss(size_average=None, reduce=None, reduction="elementwise_mean")  
+  
+</code></pre>
+<p>—|—  </p>
+<ol>
+<li><p>size_average(bool, optional): 弃用(见reduction参数). 默认情况下, loss会计算在每个样本上的平均误差. 如果将size_average置为False, 则计算平方误差总和. 当reduce参数为False时, 忽视该参数</p>
+</li>
+<li><p>reduce(bool, optional): 弃用(见reduction参数). reduce参数顾名思义, 就是是否让MSELoss函数返回值的维度减少, 默认为True, 即会将任意维度的输入计算loss后, 返回一个标量(平均or总和取决于size_average), 如果为False, 则说明返回值维度不应该发生变化, 故而返回值就是对每个元素单独进行平方损失计算.</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10
+</code></pre>
+</li>
+</ol>
+<p>| </p>
+<pre><code>     y = torch.tensor([1,2,3,4], dtype=torch.float)  
+     pred_y = torch.tensor([1,1,1,1], dtype=torch.float)  
+     loss_fn1 = torch.nn.MSELoss()  
+     loss1 = loss_fn1(y, pred_y)  
+     loss_fn2 = torch.nn.MSELoss(size_average=False)  
+     loss2 = loss_fn2(y, pred_y)  
+     loss_fn3 = torch.nn.MSELoss(reduce=False)  
+     loss3 = loss_fn3(y, pred_y)  
+     print(loss1,loss2,loss3)  
+     # tensor(3.5000) tensor(14.) tensor([0., 1., 4., 9.])  
+       
+</code></pre>
+<p>—|—<br>  3. reduction(string, optional): 用字符串来替代上面两个参数的作用: “elementwise_mean”(默认) | “sum” | “none” (不进行reduce).</p>
+<h3 id="torch-nn-functional"><a href="#torch-nn-functional" class="headerlink" title="torch.nn.functional"></a>torch.nn.functional</h3><h4 id="conv1d"><a href="#conv1d" class="headerlink" title="conv1d()"></a>conv1d()</h4><h4 id="conv2d"><a href="#conv2d" class="headerlink" title="conv2d()"></a>conv2d()</h4><h4 id="relu"><a href="#relu" class="headerlink" title="relu()"></a>relu()</h4><pre><code>     1  
+     
+</code></pre>
+<p>| </p>
+<pre><code>     torch.nn.functional.relu(input, inplace=True) # 返回 一个 Tenosr  
+       
+</code></pre>
+<p>—|—  </p>
+<h4 id="relu-1"><a href="#relu-1" class="headerlink" title="relu_()"></a>relu_()</h4><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.nn.functional.relu_(input) # relu() 的原地版本  
+  
+</code></pre>
+<p>—|—  </p>
+<h2 id="torch-optim"><a href="#torch-optim" class="headerlink" title="torch.optim"></a>torch.optim</h2><h3 id="lr-scheduler"><a href="#lr-scheduler" class="headerlink" title="lr_scheduler"></a>lr_scheduler</h3><h4 id="StepLR"><a href="#StepLR" class="headerlink" title="StepLR"></a>StepLR</h4><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.optim.lr_schedulr.StepLR(optimizer,step_size,gamma=0.1,last_epoch=-1)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>每经过step_size次epoch之后, lr就会衰减gamma倍(new_lr=lr×gamma), 初始的lr来自于optimizer中的lr参数.  </p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+</code></pre>
+<p>| </p>
+<pre><code># Observe that all parameters are being optimized  
+optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)  
+  
+# Decay LR by a factor of 0.1 every 7 epochs  
+exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)  
+  
+</code></pre>
+<p>—|—  </p>
+<h4 id="ExponentialLR"><a href="#ExponentialLR" class="headerlink" title="ExponentialLR"></a>ExponentialLR</h4><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.optim.lr_scheduler.ExponentialLR(optimizer,gamma,last_epoch=-1)  
+  
+</code></pre>
+<p>—|—  </p>
+<h4 id="CosineAnnealingLR"><a href="#CosineAnnealingLR" class="headerlink" title="CosineAnnealingLR"></a>CosineAnnealingLR</h4><pre><code>1  
+2  
+</code></pre>
+<p>| </p>
+<pre><code>## Adam  
+class torch.optim.Adam(params,lr=0.001,betas=(0.9,0.999),eps=1e-08,weight_decay=0,amsgrad=False)  
+  
+</code></pre>
+<p>—|—  </p>
+<h4 id="conv2d-1"><a href="#conv2d-1" class="headerlink" title="conv2d"></a>conv2d</h4><h2 id="torch-utils-data"><a href="#torch-utils-data" class="headerlink" title="torch.utils.data"></a>torch.utils.data</h2><h3 id="DataLoader"><a href="#DataLoader" class="headerlink" title="DataLoader"></a>DataLoader</h3><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torch.utils.data.DataLoader(dataset,batch_size=1,shuffle=False,sampler=None,batch_sampler=None,num_workers=0,collate_fn=&lt;function default_collate&gt;,pin_memory=False,drop_last=False,timeout=0,worker_init_fn=None)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>数据加载器, 将数据集和采样器结合起来, 并且提供单/多线程的迭代器.</p>
+<ul>
+<li>dataset(utils.data.Dataset):</li>
+<li>batch_size(int,optional): batch中的样本个数</li>
+<li>shuffle(bool,optional)</li>
+<li>num_worker(int,optional): 加载数据的线程个数, 0意味着只有一个主线程.<br>方法：</li>
+<li><strong>iter</strong>(self): 可以当做迭代器使用, 如inputs,class_ids=next(iter(dataloaders)), 其中, input的shape为 (N,C,H,W), class_ids的shape为 (N).</li>
+<li><strong>len</strong>(self): 返回数据集的类别数目</li>
+</ul>
+<h2 id="torchvision"><a href="#torchvision" class="headerlink" title="torchvision"></a>torchvision</h2><h3 id="torchvision-utils"><a href="#torchvision-utils" class="headerlink" title="torchvision.utils"></a>torchvision.utils</h3><h4 id="make-grid"><a href="#make-grid" class="headerlink" title="make_grid"></a>make_grid</h4><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torchvision.utils.make_grid(tensor,nrow=8,padding=2,normalize=False,range=None,scale_each=False,pad_value=0)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>制作一个关于image的grid, 返回值依然是一个tensor, 只不过尺度变成了3D, 相当于把多个图片拼接在一起了, 直接通过plt.imshow(grid)即可输出网格化以后的图片.</p>
+<ul>
+<li>tensor(Tensor/list): 4D的 mini-batch Tensor, Shape为 (N×C×H×W), 或者是同维度的list.</li>
+</ul>
+<h3 id="torchvision-transforms"><a href="#torchvision-transforms" class="headerlink" title="torchvision.transforms"></a>torchvision.transforms</h3><h4 id="torchvision-transforms-Compose"><a href="#torchvision-transforms-Compose" class="headerlink" title="torchvision.transforms.Compose"></a>torchvision.transforms.Compose</h4><pre><code>    1  
+    2  
+    3  
+    4  
+    5  
+    6  
+    7  
+    
+</code></pre>
+<p>| </p>
+<pre><code>    class torchvision.transforms.Compose(transforms)  
+      
+    # 使用  
+    trans.Compose([  
+        transforms.CenterCrop(10),  
+        transforms.ToTensor(),  
+    ])  
+      
+</code></pre>
+<p>—|—  </p>
+<p>将多个transforms操作组合起来, 注意参数是列表形式</p>
+<h4 id="Transforms-on-PIL-Image"><a href="#Transforms-on-PIL-Image" class="headerlink" title="Transforms on PIL Image"></a>Transforms on PIL Image</h4><pre><code>1  
+2  
+3  
+</code></pre>
+<p>| </p>
+<pre><code># cv2 image to PIL Image  
+  
+# skimage to PIL Image  
+  
+</code></pre>
+<p>—|—  </p>
+<p>注意, 以下操作作用在PIL Image上的</p>
+<h5 id="CenterCrop"><a href="#CenterCrop" class="headerlink" title="CenterCrop"></a>CenterCrop</h5><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torchvision.transform.CenterCrop(size)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>size参数表示输出的图谱的大小, 如果只传入了一个数字, 则该数字既表示高度, 又表示宽度.</p>
+<h5 id="Resize"><a href="#Resize" class="headerlink" title="Resize"></a>Resize</h5><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torchvision.transforms.Resize(size, interpolation=2)  
+  
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li>size: 期望的输出size.</li>
+<li>interpolation: 插值方法, 默认为双线性插值</li>
+</ul>
+<h5 id="ToTensor"><a href="#ToTensor" class="headerlink" title="ToTensor"></a>ToTensor</h5><pre><code>    1  
+    
+</code></pre>
+<p>| </p>
+<pre><code>    class torchvision.transforms.ToTensor  
+      
+</code></pre>
+<p>—|—  </p>
+<p>将一个PIL Image或者numpy.ndarray (H×W×C,[0, 255])转换成torch.FloatTensor (C×H×W, [0.0, 1.0]).</p>
+<h5 id="RandomHorizontalFlip"><a href="#RandomHorizontalFlip" class="headerlink" title="RandomHorizontalFlip"></a>RandomHorizontalFlip</h5><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>transforms.RandomHorizontalFlip(p=0.5)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>在给定概率下对PIL Image随机执行水平翻转操作</p>
+<h5 id="RandomResizedCrop"><a href="#RandomResizedCrop" class="headerlink" title="RandomResizedCrop"></a>RandomResizedCrop</h5><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>torch.transforms.RandomResizedCrop(size, scale=(0.08, 1.0), ratio=(0.75, 1.3333333333), interpolation=2)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>对PIL Image随机执行剪裁操作(按照scale和ratio的区间剪裁), 然后将剪裁后的图片放缩都期望的尺寸(默认插值为双线性插值)</p>
+<ul>
+<li>size: 期望得到的尺寸</li>
+<li>scale: 剪裁的面积比例(相对于原始图)</li>
+<li>ratio: 剪裁的宽高比</li>
+<li>interpolation: 默认为:PIL.Image.BILINEAR</li>
+</ul>
+<h3 id="Transforms-on-torch-Tensor"><a href="#Transforms-on-torch-Tensor" class="headerlink" title="Transforms on torch.*Tensor"></a>Transforms on torch.*Tensor</h3><p>注意, 以下操作是作用在tensor上的</p>
+<h4 id="Normalize"><a href="#Normalize" class="headerlink" title="Normalize"></a>Normalize</h4><pre><code>    1  
+    
+</code></pre>
+<p>| </p>
+<pre><code>    class torchvision.transforms.Normalize(mean, std)  
+      
+</code></pre>
+<p>—|—  </p>
+<p>将图片tensor按照均值mean和标准差std进行归一化, 对于n个channels, 有 mean=(M1, …, Mn), std=(S1,…,Sn).<br><strong>注意, 这个归一化操作是原地进行的</strong></p>
+<h3 id="torchvision-datasets"><a href="#torchvision-datasets" class="headerlink" title="torchvision.datasets"></a>torchvision.datasets</h3><h4 id="ImageFolder"><a href="#ImageFolder" class="headerlink" title="ImageFolder"></a>ImageFolder</h4><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>class torchvision.datasets.ImageFolder(root, transform=None, target_transform=None, loader=&lt;function default_loader&gt;)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>一个一般化的数据加载器, 主要针对如下数据排列格式:  </p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+</code></pre>
+<p>| </p>
+<pre><code>root/dog/x.png  
+root/dog/y.png  
+root/dog/z.png  
+...  
+root/cat/123.png  
+root/cat/nsdf3.png  
+root/cat/asd932_.png  
+  
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li>root: 根目录路径</li>
+<li>transform(callable,optional): 对图片要做的变换操作</li>
+<li>target_transform(callable,optional): 对target要做的变换操作</li>
+<li>loader: 用于加载给定路径图片的函数<br>属性：</li>
+<li>classes(list): 返回类别的名字列表 class_names</li>
+<li>class_to_idx(dict): 以字典的形式返回(class_name, class_index)</li>
+<li>imgs(list): 返回元组列表: (image path, class_index)<br>方法：</li>
+<li>getitem(index): 根据index返回(sample,target)元组. 可以使用</li>
+<li>len(imagefolder) 返回类别数量</li>
+</ul>
+<h2 id="sort"><a href="#sort" class="headerlink" title="sort()"></a>sort()</h2><pre><code>1  
+</code></pre>
+<p>| </p>
+<pre><code>sort(dim=None, descending=False)  # 默认为升序, 返回(Tensor, LongTensor)  
+  
+</code></pre>
+<p>—|—  </p>
+<p>详见 torch.sort()</p>
+<h2 id="torch-distributed"><a href="#torch-distributed" class="headerlink" title="torch.distributed"></a>torch.distributed</h2><h3 id="torch-distributed-reduce"><a href="#torch-distributed-reduce" class="headerlink" title="torch.distributed.reduce()"></a>torch.distributed.reduce()</h3><h2 id="inspect-模块"><a href="#inspect-模块" class="headerlink" title="inspect 模块"></a>inspect 模块</h2><pre><code>1  
+2  
+3  
+4  
+</code></pre>
+<p>| </p>
+<pre><code>inspect.signature() # 查看函数签名, python3.6以上  
+inspect.getargspec() # 查看函数签名, python3.6以上  
+inspect.getsource() # 获取模型的code  
+inspect.getabsfile() # 获取模块的路径  
+  
+</code></pre>
+<p>—|—  </p>
+<h2 id="un-normalize"><a href="#un-normalize" class="headerlink" title="un normalize"></a>un normalize</h2><pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+</code></pre>
+<p>| </p>
+<pre><code>mean = torch.tensor([1, 2, 3], dtype=torch.float32)  
+std = torch.tensor([2, 2, 2], dtype=torch.float32)  
+  
+normalize = T.Normalize(mean.tolist(), std.tolist())  
+  
+unnormalize = T.Normalize((-mean / std).tolist(), (1.0 / std).tolist())  
+​~~~s  
+  
+</code></pre>
+<p>—|—</p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2019/08/28/Pytorch%E6%89%8B%E5%86%8C/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2019/08/28/Pytorch%E6%89%8B%E5%86%8C/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/08/28/Pytorch-trick/">Pytorch trick</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/08/28/glob%E6%A8%A1%E5%9D%97/">glob模块</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#torch"><span class="toc-text">torch</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#backends-cudnn"><span class="toc-text">backends.cudnn</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-cat"><span class="toc-text">torch.cat()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#clamp-x2F-clamp"><span class="toc-text">clamp()&#x2F;clamp_()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#device"><span class="toc-text">device()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gather"><span class="toc-text">gather()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-ge"><span class="toc-text">torch.ge()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-gt"><span class="toc-text">torch.gt()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-index-select"><span class="toc-text">torch.index_select()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-le"><span class="toc-text">torch.le()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#max"><span class="toc-text">max()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mm"><span class="toc-text">mm()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#norm"><span class="toc-text">norm()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#numel"><span class="toc-text">numel()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ones"><span class="toc-text">ones()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#randn"><span class="toc-text">randn()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-sort"><span class="toc-text">torch.sort()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sum"><span class="toc-text">sum()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-t"><span class="toc-text">torch.t()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#unsqueeze"><span class="toc-text">unsqueeze()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#zeros"><span class="toc-text">zeros()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#torch-cuda"><span class="toc-text">torch.cuda</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-cuda-empty-cache"><span class="toc-text">torch.cuda.empty_cache()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#torch-Tensor"><span class="toc-text">torch.Tensor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#troch-tensor"><span class="toc-text">troch.tensor()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-cpu"><span class="toc-text">torch.Tensor.cpu()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-cuda"><span class="toc-text">torch.Tensor.cuda()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-dim"><span class="toc-text">torch.Tensor.dim()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-max"><span class="toc-text">torch.Tensor.max()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-numel"><span class="toc-text">torch.Tensor.numel()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-to"><span class="toc-text">torch.Tensor.to()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-numpy"><span class="toc-text">torch.Tensor.numpy()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-permute"><span class="toc-text">torch.Tensor.permute()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-unsqueeze"><span class="toc-text">torch.Tensor.unsqueeze()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-expand"><span class="toc-text">torch.Tensor.expand()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-expand-as"><span class="toc-text">torch.Tensor.expand_as()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-index-fill"><span class="toc-text">torch.Tensor.index_fill_()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-contiguous"><span class="toc-text">torch.Tensor.contiguous()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-item"><span class="toc-text">torch.Tensor.item()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-tolist"><span class="toc-text">torch.Tensor.tolist()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-Tensor-zero"><span class="toc-text">torch.Tensor.zero_()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#torch-autograd"><span class="toc-text">torch.autograd</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#set-grad-enabled"><span class="toc-text">set_grad_enabled()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#no-grad"><span class="toc-text">no_grad()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-autograd-Function"><span class="toc-text">torch.autograd.Function</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#torch-nn"><span class="toc-text">torch.nn</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Module"><span class="toc-text">Module</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#parameters"><span class="toc-text">parameters()</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#train"><span class="toc-text">train</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#training"><span class="toc-text">training</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#eval"><span class="toc-text">eval</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Linear"><span class="toc-text">Linear</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Conv2d"><span class="toc-text">Conv2d</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MaxPool2d"><span class="toc-text">MaxPool2d</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Softmax"><span class="toc-text">Softmax()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReLU"><span class="toc-text">ReLU</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-nn-Sequential"><span class="toc-text">torch.nn.Sequential</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-nn-MSELoss"><span class="toc-text">torch.nn.MSELoss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-nn-functional"><span class="toc-text">torch.nn.functional</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#conv1d"><span class="toc-text">conv1d()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#conv2d"><span class="toc-text">conv2d()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#relu"><span class="toc-text">relu()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#relu-1"><span class="toc-text">relu_()</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#torch-optim"><span class="toc-text">torch.optim</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#lr-scheduler"><span class="toc-text">lr_scheduler</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#StepLR"><span class="toc-text">StepLR</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ExponentialLR"><span class="toc-text">ExponentialLR</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CosineAnnealingLR"><span class="toc-text">CosineAnnealingLR</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#conv2d-1"><span class="toc-text">conv2d</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#torch-utils-data"><span class="toc-text">torch.utils.data</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DataLoader"><span class="toc-text">DataLoader</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#torchvision"><span class="toc-text">torchvision</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#torchvision-utils"><span class="toc-text">torchvision.utils</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#make-grid"><span class="toc-text">make_grid</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torchvision-transforms"><span class="toc-text">torchvision.transforms</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#torchvision-transforms-Compose"><span class="toc-text">torchvision.transforms.Compose</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Transforms-on-PIL-Image"><span class="toc-text">Transforms on PIL Image</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#CenterCrop"><span class="toc-text">CenterCrop</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Resize"><span class="toc-text">Resize</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ToTensor"><span class="toc-text">ToTensor</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#RandomHorizontalFlip"><span class="toc-text">RandomHorizontalFlip</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#RandomResizedCrop"><span class="toc-text">RandomResizedCrop</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Transforms-on-torch-Tensor"><span class="toc-text">Transforms on torch.*Tensor</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Normalize"><span class="toc-text">Normalize</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#torchvision-datasets"><span class="toc-text">torchvision.datasets</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ImageFolder"><span class="toc-text">ImageFolder</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sort"><span class="toc-text">sort()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#torch-distributed"><span class="toc-text">torch.distributed</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#torch-distributed-reduce"><span class="toc-text">torch.distributed.reduce()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#inspect-%E6%A8%A1%E5%9D%97"><span class="toc-text">inspect 模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#un-normalize"><span class="toc-text">un normalize</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2019/08/28/Pytorch%E6%89%8B%E5%86%8C/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

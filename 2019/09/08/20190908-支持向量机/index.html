@@ -1,0 +1,930 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>支持向量机 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="SVM的本质：寻找最大的间隔支持向量：距离超平面最近的那些点SMO算法的原理： 每次循环中选择两个alpha进行优化处理。一旦找到一对合适的alpha，那么就增大其中一个同时减小另一个。合适：条件一，两个alpha要在间隔边界之外；条件二，这两个alpha还没有进行过区间化处理或不在边界上  12345678910111213141516171819202122232425262728293031">
+<meta property="og:type" content="article">
+<meta property="og:title" content="支持向量机">
+<meta property="og:url" content="https://caiusy.github.io/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="SVM的本质：寻找最大的间隔支持向量：距离超平面最近的那些点SMO算法的原理： 每次循环中选择两个alpha进行优化处理。一旦找到一对合适的alpha，那么就增大其中一个同时减小另一个。合适：条件一，两个alpha要在间隔边界之外；条件二，这两个alpha还没有进行过区间化处理或不在边界上  12345678910111213141516171819202122232425262728293031">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2019-09-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-20T06:58:57.410Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="Python - python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="Python - python">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2019-09-08T00:00:00+08:00","dateModified":"2026-02-20T14:58:57+08:00","datePublished":"2019-09-08T00:00:00+08:00","description":"","headline":"支持向量机","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/","keywords":"Python - python","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/09/30/20190930-zhongjie/"><span class="title">zhongjie</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2019/09/08/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"><span class="title">支持向量机</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/Python/">Python</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2019-09-07T16:00:00.000Z">2019-09-08</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-20T06:58:57.410Z">2026-02-20</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>支持向量机</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><p>SVM的本质：寻找最大的间隔<br>支持向量：距离超平面最近的那些点<br><strong>SMO算法的原理：</strong> 每次循环中选择两个alpha进行优化处理。一旦找到一对合适的alpha，那么就增大其中一个同时减小另一个。合适：条件一，两个alpha要在间隔边界之外；条件二，这两个alpha还没有进行过区间化处理或不在边界上</p>
+<p><img src="/images/20190908_%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA_svm.png"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">loadDataSet</span>(<span class="params">filename</span>):  <span class="comment"># 读取数据</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(filename) <span class="keyword">as</span> f:</span><br><span class="line">        dataMat = []</span><br><span class="line">        labelMat = []</span><br><span class="line">        f_csv = csv.reader(f)  <span class="comment">## 用csv读取直接是个list</span></span><br><span class="line">        headers = <span class="built_in">next</span>(f_csv)</span><br><span class="line">        <span class="keyword">for</span> row <span class="keyword">in</span> f_csv:</span><br><span class="line">            dataMat.append([<span class="built_in">float</span>(row[<span class="number">0</span>]), <span class="built_in">float</span>(row[<span class="number">1</span>])])</span><br><span class="line">            labelMat.append(<span class="built_in">float</span>(row[<span class="number">2</span>]))</span><br><span class="line">        f.close()</span><br><span class="line">        <span class="keyword">return</span> dataMat, labelMat</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">selectJrand</span>(<span class="params">i, m</span>):  <span class="comment"># 在0-m中随机选择一个不是i的整数</span></span><br><span class="line">    j = i</span><br><span class="line">    <span class="keyword">while</span> (j == i):</span><br><span class="line">        j = <span class="built_in">int</span>(random.uniform(<span class="number">0</span>, m))</span><br><span class="line">    <span class="keyword">return</span> j</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">clipAlpha</span>(<span class="params">aj, H, L</span>):  <span class="comment"># 保证a在L和H范围内（L &lt;= a &lt;= H）</span></span><br><span class="line">    <span class="keyword">if</span> aj &gt; H:</span><br><span class="line">        aj = H</span><br><span class="line">    <span class="keyword">if</span> L &gt; aj:</span><br><span class="line">        aj = L</span><br><span class="line">    <span class="keyword">return</span> aj</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">kernelTrans</span>(<span class="params">X, A, kTup</span>):  <span class="comment"># 核函数，输入参数,X:支持向量的特征树；A：某一行特征数据；kTup：('lin',k1)核函数的类型和参数</span></span><br><span class="line">    m, n = shape(X)</span><br><span class="line">    K = mat(zeros((m, <span class="number">1</span>)))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"A shape : "</span>,A.shape)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"X shape : "</span>,X.shape)</span><br><span class="line">    <span class="keyword">if</span> kTup[<span class="number">0</span>] == <span class="string">'lin'</span>:  <span class="comment"># 线性函数</span></span><br><span class="line">        K = X * A.T</span><br><span class="line">    <span class="keyword">elif</span> kTup[<span class="number">0</span>] == <span class="string">'rbf'</span>:  <span class="comment"># 径向基函数(radial bias function)</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(m):</span><br><span class="line">            deltaRow = X[j, :] - A</span><br><span class="line">            K[j] = deltaRow * deltaRow.T</span><br><span class="line">        K = exp(K / (-<span class="number">1</span> * kTup[<span class="number">1</span>] ** <span class="number">2</span>))  <span class="comment"># 返回生成的结果</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">raise</span> NameError(<span class="string">'Houston We Have a Problem -- That Kernel is not recognized'</span>)</span><br><span class="line">    <span class="keyword">return</span> K</span><br><span class="line"><span class="comment"># 定义类，方便存储数据</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">optStruct</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, dataMatIn, classLabels, C, toler, kTup</span>):  <span class="comment"># 存储各类参数</span></span><br><span class="line">        self.X = dataMatIn  <span class="comment"># 数据特征</span></span><br><span class="line">        self.labelMat = classLabels  <span class="comment"># 数据类别</span></span><br><span class="line">        self.C = C  <span class="comment"># 软间隔参数C，参数越大，非线性拟合能力越强</span></span><br><span class="line">        self.tol = toler  <span class="comment"># 停止阀值</span></span><br><span class="line">        self.m = shape(dataMatIn)[<span class="number">0</span>]  <span class="comment"># 数据 b行数</span></span><br><span class="line">        self.alphas = mat(zeros((self.m, <span class="number">1</span>)))</span><br><span class="line">        self.b = <span class="number">0</span>  <span class="comment"># 初始设为0</span></span><br><span class="line">        self.eCache = mat(zeros((self.m, <span class="number">2</span>)))  <span class="comment"># 缓存</span></span><br><span class="line">        self.K = mat(zeros((self.m, self.m)))  <span class="comment"># 核函数的计算结果</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(self.m):</span><br><span class="line">            self.K[:, i] = kernelTrans(self.X, self.X[i, :], kTup)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">calcEk</span>(<span class="params">oS, k</span>):  <span class="comment"># 计算Ek（参考《统计学习方法》p127公式7.105）</span></span><br><span class="line">    fXk = <span class="built_in">float</span>(multiply(oS.alphas, oS.labelMat).T * oS.K[:, k] + oS.b)</span><br><span class="line">    Ek = fXk - <span class="built_in">float</span>(oS.labelMat[k])</span><br><span class="line">    <span class="keyword">return</span> Ek</span><br><span class="line"><span class="comment"># 随机选取aj，并返回其E值</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">selectJ</span>(<span class="params">i, oS, Ei</span>):</span><br><span class="line">    maxK = -<span class="number">1</span></span><br><span class="line">    maxDeltaE = <span class="number">0</span></span><br><span class="line">    Ej = <span class="number">0</span></span><br><span class="line">    oS.eCache[i] = [<span class="number">1</span>, Ei]</span><br><span class="line">    validEcacheList = nonzero(oS.eCache[:, <span class="number">0</span>].A)[<span class="number">0</span>]  <span class="comment"># 返回矩阵中的非零位置的行数</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">len</span>(validEcacheList)) &gt; <span class="number">1</span>:</span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> validEcacheList:</span><br><span class="line">            <span class="keyword">if</span> k == i:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            Ek = calcEk(oS, k)</span><br><span class="line">            deltaE = <span class="built_in">abs</span>(Ei - Ek)</span><br><span class="line">            <span class="keyword">if</span> (deltaE &gt; maxDeltaE):  <span class="comment"># 返回步长最大的aj</span></span><br><span class="line">                maxK = k</span><br><span class="line">                maxDeltaE = deltaE</span><br><span class="line">                Ej = Ek</span><br><span class="line">        <span class="keyword">return</span> maxK, Ej</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        j = selectJrand(i, oS.m)</span><br><span class="line">        Ej = calcEk(oS, j)</span><br><span class="line">    <span class="keyword">return</span> j, Ej</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">updateEk</span>(<span class="params">oS, k</span>):  <span class="comment"># 更新os数据</span></span><br><span class="line">    Ek = calcEk(oS, k)</span><br><span class="line">    oS.eCache[k] = [<span class="number">1</span>, Ek]</span><br><span class="line"><span class="comment"># 首先检验ai是否满足KKT条件，如果不满足，随机选择aj进行优化，更新ai,aj,b值</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">innerL</span>(<span class="params">i, oS</span>):  <span class="comment"># 输入参数i和所有参数数据</span></span><br><span class="line">    Ei = calcEk(oS, i)  <span class="comment"># 计算E值</span></span><br><span class="line">    <span class="keyword">if</span> ((oS.labelMat[i] * Ei &lt; -oS.tol) <span class="keyword">and</span> (oS.alphas[i] &lt; oS.C)) <span class="keyword">or</span> (</span><br><span class="line">            (oS.labelMat[i] * Ei &gt; oS.tol) <span class="keyword">and</span> (oS.alphas[i] &gt; <span class="number">0</span>)):  <span class="comment"># 检验这行数据是否符合KKT条件 参考《统计学习方法》p128公式7.111-113</span></span><br><span class="line">        j, Ej = selectJ(i, oS, Ei)  <span class="comment"># 随机选取aj，并返回其E值</span></span><br><span class="line">        alphaIold = oS.alphas[i].copy()</span><br><span class="line">        alphaJold = oS.alphas[j].copy()</span><br><span class="line">        <span class="keyword">if</span> (oS.labelMat[i] != oS.labelMat[j]):  <span class="comment"># 以下代码的公式参考《统计学习方法》p126</span></span><br><span class="line">            L = <span class="built_in">max</span>(<span class="number">0</span>, oS.alphas[j] - oS.alphas[i])</span><br><span class="line">            H = <span class="built_in">min</span>(oS.C, oS.C + oS.alphas[j] - oS.alphas[i])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            L = <span class="built_in">max</span>(<span class="number">0</span>, oS.alphas[j] + oS.alphas[i] - oS.C)</span><br><span class="line">            H = <span class="built_in">min</span>(oS.C, oS.alphas[j] + oS.alphas[i])</span><br><span class="line">        <span class="keyword">if</span> L == H:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">"L==H"</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        eta = <span class="number">2.0</span> * oS.K[i, j] - oS.K[i, i] - oS.K[j, j]  <span class="comment"># 参考《统计学习方法》p127公式7.107</span></span><br><span class="line">        <span class="keyword">if</span> eta &gt;= <span class="number">0</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">"eta&gt;=0"</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        oS.alphas[j] -= oS.labelMat[j] * (Ei - Ej) / eta  <span class="comment"># 参考《统计学习方法》p127公式7.106</span></span><br><span class="line">        oS.alphas[j] = clipAlpha(oS.alphas[j], H, L)  <span class="comment"># 参考《统计学习方法》p127公式7.108</span></span><br><span class="line">        updateEk(oS, j)</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">abs</span>(oS.alphas[j] - alphaJold) &lt; oS.tol):  <span class="comment"># alpha变化大小阀值（自己设定）</span></span><br><span class="line">            <span class="built_in">print</span>(<span class="string">"j not moving enough"</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        oS.alphas[i] += oS.labelMat[j] * oS.labelMat[i] * (alphaJold - oS.alphas[j])  <span class="comment"># 参考《统计学习方法》p127公式7.109</span></span><br><span class="line">        updateEk(oS, i)  <span class="comment"># 更新数据</span></span><br><span class="line">        <span class="comment"># 以下求解b的过程，参考《统计学习方法》p129公式7.114-7.116</span></span><br><span class="line">        b1 = oS.b - Ei - oS.labelMat[i] * (oS.alphas[i] - alphaIold) * oS.K[i, i] - oS.labelMat[j] * (</span><br><span class="line">                    oS.alphas[j] - alphaJold) * oS.K[i, j]</span><br><span class="line">        b2 = oS.b - Ej - oS.labelMat[i] * (oS.alphas[i] - alphaIold) * oS.K[i, j] - oS.labelMat[j] * (</span><br><span class="line">                    oS.alphas[j] - alphaJold) * oS.K[j, j]</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">0</span> &lt; oS.alphas[i] &lt; oS.C):</span><br><span class="line">            oS.b = b1</span><br><span class="line">        <span class="keyword">elif</span> (<span class="number">0</span> &lt; oS.alphas[j] &lt; oS.C):</span><br><span class="line">            oS.b = b2</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            oS.b = (b1 + b2) / <span class="number">2.0</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"><span class="comment"># SMO函数，用于快速求解出alpha</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">smoP</span>(<span class="params">dataMatIn, classLabels, C, toler, maxIter, kTup=(<span class="params"><span class="string">'lin'</span>, <span class="number">0</span></span>)</span>):  <span class="comment"># 输入参数：数据特征，数据类别，参数C，阀值toler，最大迭代次数，核函数（默认线性核）</span></span><br><span class="line">    oS = optStruct(mat(dataMatIn), mat(classLabels).transpose(), C, toler, kTup) <span class="comment"># dataArr, labelArr, 200, 0.0001, 10000, ('rbf', 1.3))  # 通过SMO算法得到b和alpha</span></span><br><span class="line">    <span class="built_in">iter</span> = <span class="number">0</span></span><br><span class="line">    entireSet = <span class="literal">True</span></span><br><span class="line">    alphaPairsChanged = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">iter</span> &lt; maxIter) <span class="keyword">and</span> ((alphaPairsChanged &gt; <span class="number">0</span>) <span class="keyword">or</span> (entireSet)):</span><br><span class="line">        alphaPairsChanged = <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> entireSet:</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(oS.m):  <span class="comment"># 遍历所有数据</span></span><br><span class="line">                alphaPairsChanged += innerL(i, oS)</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">"fullSet, iter: %d i:%d, pairs changed %d"</span> % (</span><br><span class="line">                <span class="built_in">iter</span>, i, alphaPairsChanged))  <span class="comment"># 显示第多少次迭代，那行特征数据使alpha发生了改变，这次改变了多少次alpha</span></span><br><span class="line">            <span class="built_in">iter</span> += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            nonBoundIs = nonzero((oS.alphas.A &gt; <span class="number">0</span>) * (oS.alphas.A &lt; C))[<span class="number">0</span>]</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> nonBoundIs:  <span class="comment"># 遍历非边界的数据</span></span><br><span class="line">                alphaPairsChanged += innerL(i, oS)</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">"non-bound, iter: %d i:%d, pairs changed %d"</span> % (<span class="built_in">iter</span>, i, alphaPairsChanged))</span><br><span class="line">            <span class="built_in">iter</span> += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> entireSet:</span><br><span class="line">            entireSet = <span class="literal">False</span></span><br><span class="line">        <span class="keyword">elif</span> (alphaPairsChanged == <span class="number">0</span>):</span><br><span class="line">            entireSet = <span class="literal">True</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"iteration number: %d"</span> % <span class="built_in">iter</span>)</span><br><span class="line">    <span class="keyword">return</span> oS.b, oS.alphas</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">train</span>(<span class="params">data_train, data_test</span>):</span><br><span class="line">    dataArr, labelArr = loadDataSet(data_train)  <span class="comment"># 读取训练数据</span></span><br><span class="line">    b, alphas = smoP(dataArr, labelArr, <span class="number">200</span>, <span class="number">0.0001</span>, <span class="number">10000</span>, (<span class="string">'rbf'</span>, <span class="number">1.3</span>))  <span class="comment"># 通过SMO算法得到b和alpha</span></span><br><span class="line">    datMat = mat(dataArr)</span><br><span class="line">    labelMat = mat(labelArr).transpose()</span><br><span class="line">    svInd = nonzero(alphas)[<span class="number">0</span>]  <span class="comment"># 选取不为0数据的行数（也就是支持向量）</span></span><br><span class="line">    sVs = datMat[svInd]  <span class="comment"># 支持向量的特征数据</span></span><br><span class="line">    labelSV = labelMat[svInd]  <span class="comment"># 支持向量的类别（1或-1）</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"there are %d Support Vectors"</span> % shape(sVs)[<span class="number">0</span>])  <span class="comment"># 打印出共有多少的支持向量</span></span><br><span class="line">    m, n = shape(datMat)  <span class="comment"># 训练数据的行列数</span></span><br><span class="line">    errorCount = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(m):</span><br><span class="line">        kernelEval = kernelTrans(sVs, datMat[i, :], (<span class="string">'rbf'</span>, <span class="number">1.3</span>))  <span class="comment"># 将支持向量转化为核函数</span></span><br><span class="line">        predict = kernelEval.T * multiply(labelSV, alphas[</span><br><span class="line">            svInd]) + b  <span class="comment"># 这一行的预测结果（代码来源于《统计学习方法》p133里面最后用于预测的公式）注意最后确定的分离平面只有那些支持向量决定。</span></span><br><span class="line">        <span class="keyword">if</span> sign(predict) != sign(labelArr[i]):  <span class="comment"># sign函数 -1 if x &lt; 0, 0 if x==0, 1 if x &gt; 0</span></span><br><span class="line">            errorCount += <span class="number">1</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"the training error rate is: %f"</span> % (<span class="built_in">float</span>(errorCount) / m))  <span class="comment"># 打印出错误率</span></span><br><span class="line">    dataArr_test, labelArr_test = loadDataSet(data_test)  <span class="comment"># 读取测试数据</span></span><br><span class="line">    errorCount_test = <span class="number">0</span></span><br><span class="line">    datMat_test = mat(dataArr_test)</span><br><span class="line">    labelMat = mat(labelArr_test).transpose()</span><br><span class="line">    m, n = shape(datMat_test)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(m):  <span class="comment"># 在测试数据上检验错误率</span></span><br><span class="line">        kernelEval = kernelTrans(sVs, datMat_test[i, :], (<span class="string">'rbf'</span>, <span class="number">1.3</span>))</span><br><span class="line">        predict = kernelEval.T * multiply(labelSV, alphas[svInd]) + b</span><br><span class="line">        <span class="keyword">if</span> sign(predict) != sign(labelArr_test[i]):</span><br><span class="line">            errorCount_test += <span class="number">1</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"the test error rate is: %f"</span> % (<span class="built_in">float</span>(errorCount_test) / m))</span><br><span class="line"><span class="comment"># 主程序</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    filename_traindata = <span class="string">'./train_data.csv'</span></span><br><span class="line">    filename_testdata = <span class="string">'./test_data.csv'</span></span><br><span class="line">    train(filename_traindata, filename_testdata)</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br></pre></td><td class="code"><pre><span class="line">feature1,feature2,label</span><br><span class="line">-0.214824,0.662756,-1.000000</span><br><span class="line">-0.061569,-0.091875,1.000000</span><br><span class="line">0.406933,0.648055,-1.000000</span><br><span class="line">0.223650,0.130142,1.000000</span><br><span class="line">0.231317,0.766906,-1.000000</span><br><span class="line">-0.748800,-0.531637,-1.000000</span><br><span class="line">-0.557789,0.375797,-1.000000</span><br><span class="line">0.207123,-0.019463,1.000000</span><br><span class="line">0.286462,0.719470,-1.000000</span><br><span class="line">0.195300,-0.179039,1.000000</span><br><span class="line">-0.152696,-0.153030,1.000000</span><br><span class="line">0.384471,0.653336,-1.000000</span><br><span class="line">-0.117280,-0.153217,1.000000</span><br><span class="line">-0.238076,0.000583,1.000000</span><br><span class="line">-0.413576,0.145681,1.000000</span><br><span class="line">0.490767,-0.680029,-1.000000</span><br><span class="line">0.199894,-0.199381,1.000000</span><br><span class="line">-0.356048,0.537960,-1.000000</span><br><span class="line">-0.392868,-0.125261,1.000000</span><br><span class="line">0.353588,-0.070617,1.000000</span><br><span class="line">0.020984,0.925720,-1.000000</span><br><span class="line">-0.475167,-0.346247,-1.000000</span><br><span class="line">0.074952,0.042783,1.000000</span><br><span class="line">0.394164,-0.058217,1.000000</span><br><span class="line">0.663418,0.436525,-1.000000</span><br><span class="line">0.402158,0.577744,-1.000000</span><br><span class="line">-0.449349,-0.038074,1.000000</span><br><span class="line">0.619080,-0.088188,-1.000000</span><br><span class="line">0.268066,-0.071621,1.000000</span><br><span class="line">-0.015165,0.359326,1.000000</span><br><span class="line">0.539368,-0.374972,-1.000000</span><br><span class="line">-0.319153,0.629673,-1.000000</span><br><span class="line">0.694424,0.641180,-1.000000</span><br><span class="line">0.079522,0.193198,1.000000</span><br><span class="line">0.253289,-0.285861,1.000000</span><br><span class="line">-0.035558,-0.010086,1.000000</span><br><span class="line">-0.403483,0.474466,-1.000000</span><br><span class="line">-0.034312,0.995685,-1.000000</span><br><span class="line">-0.590657,0.438051,-1.000000</span><br><span class="line">-0.098871,-0.023953,1.000000</span><br><span class="line">-0.250001,0.141621,1.000000</span><br><span class="line">-0.012998,0.525985,-1.000000</span><br><span class="line">0.153738,0.491531,-1.000000</span><br><span class="line">0.388215,-0.656567,-1.000000</span><br><span class="line">0.049008,0.013499,1.000000</span><br><span class="line">0.068286,0.392741,1.000000</span><br><span class="line">0.747800,-0.066630,-1.000000</span><br><span class="line">0.004621,-0.042932,1.000000</span><br><span class="line">-0.701600,0.190983,-1.000000</span><br><span class="line">0.055413,-0.024380,1.000000</span><br><span class="line">0.035398,-0.333682,1.000000</span><br><span class="line">0.211795,0.024689,1.000000</span><br><span class="line">-0.045677,0.172907,1.000000</span><br><span class="line">0.595222,0.209570,-1.000000</span><br><span class="line">0.229465,0.250409,1.000000</span><br><span class="line">-0.089293,0.068198,1.000000</span><br><span class="line">0.384300,-0.176570,1.000000</span><br><span class="line">0.834912,-0.110321,-1.000000</span><br><span class="line">-0.307768,0.503038,-1.000000</span><br><span class="line">-0.777063,-0.348066,-1.000000</span><br><span class="line">0.017390,0.152441,1.000000</span><br><span class="line">-0.293382,-0.139778,1.000000</span><br><span class="line">-0.203272,0.286855,1.000000</span><br><span class="line">0.957812,-0.152444,-1.000000</span><br><span class="line">0.004609,-0.070617,1.000000</span><br><span class="line">-0.755431,0.096711,-1.000000</span><br><span class="line">-0.526487,0.547282,-1.000000</span><br><span class="line">-0.246873,0.833713,-1.000000</span><br><span class="line">0.185639,-0.066162,1.000000</span><br><span class="line">0.851934,0.456603,-1.000000</span><br><span class="line">-0.827912,0.117122,-1.000000</span><br><span class="line">0.233512,-0.106274,1.000000</span><br><span class="line">0.583671,-0.709033,-1.000000</span><br><span class="line">-0.487023,0.625140,-1.000000</span><br><span class="line">-0.448939,0.176725,1.000000</span><br><span class="line">0.155907,-0.166371,1.000000</span><br><span class="line">0.334204,0.381237,-1.000000</span><br><span class="line">0.081536,-0.106212,1.000000</span><br><span class="line">0.227222,0.527437,-1.000000</span><br><span class="line">0.759290,0.330720,-1.000000</span><br><span class="line">0.204177,-0.023516,1.000000</span><br><span class="line">0.577939,0.403784,-1.000000</span><br><span class="line">-0.568534,0.442948,-1.000000</span><br><span class="line">-0.011520,0.021165,1.000000</span><br><span class="line">0.875720,0.422476,-1.000000</span><br><span class="line">0.297885,-0.632874,-1.000000</span><br><span class="line">-0.015821,0.031226,1.000000</span><br><span class="line">0.541359,-0.205969,-1.000000</span><br><span class="line">-0.689946,-0.508674,-1.000000</span><br><span class="line">-0.343049,0.841653,-1.000000</span><br><span class="line">0.523902,-0.436156,-1.000000</span><br><span class="line">0.249281,-0.711840,-1.000000</span><br><span class="line">0.193449,0.574598,-1.000000</span><br><span class="line">-0.257542,-0.753885,-1.000000</span><br><span class="line">-0.021605,0.158080,1.000000</span><br><span class="line">0.601559,-0.727041,-1.000000</span><br><span class="line">-0.791603,0.095651,-1.000000</span><br><span class="line">-0.908298,-0.053376,-1.000000</span><br><span class="line">0.122020,0.850966,-1.000000</span><br><span class="line">-0.725568,-0.292022,-1.000000</span><br><span class="line"> test data</span><br><span class="line">feature1,feature2,label</span><br><span class="line">0.676771,-0.486687,-1.000000</span><br><span class="line">0.008473,0.186070,1.000000</span><br><span class="line">-0.727789,0.594062,-1.000000</span><br><span class="line">0.112367,0.287852,1.000000</span><br><span class="line">0.383633,-0.038068,1.000000</span><br><span class="line">-0.927138,-0.032633,-1.000000</span><br><span class="line">-0.842803,-0.423115,-1.000000</span><br><span class="line">-0.003677,-0.367338,1.000000</span><br><span class="line">0.443211,-0.698469,-1.000000</span><br><span class="line">-0.473835,0.005233,1.000000</span><br><span class="line">0.616741,0.590841,-1.000000</span><br><span class="line">0.557463,-0.373461,-1.000000</span><br><span class="line">-0.498535,-0.223231,-1.000000</span><br><span class="line">-0.246744,0.276413,1.000000</span><br><span class="line">-0.761980,-0.244188,-1.000000</span><br><span class="line">0.641594,-0.479861,-1.000000</span><br><span class="line">-0.659140,0.529830,-1.000000</span><br><span class="line">-0.054873,-0.238900,1.000000</span><br><span class="line">-0.089644,-0.244683,1.000000</span><br><span class="line">-0.431576,-0.481538,-1.000000</span><br><span class="line">-0.099535,0.728679,-1.000000</span><br><span class="line">-0.188428,0.156443,1.000000</span><br><span class="line">0.267051,0.318101,1.000000</span><br><span class="line">0.222114,-0.528887,-1.000000</span><br><span class="line">0.030369,0.113317,1.000000</span><br><span class="line">0.392321,0.026089,1.000000</span><br><span class="line">0.298871,-0.915427,-1.000000</span><br><span class="line">-0.034581,-0.133887,1.000000</span><br><span class="line">0.405956,0.206980,1.000000</span><br><span class="line">0.144902,-0.605762,-1.000000</span><br><span class="line">0.274362,-0.401338,1.000000</span><br><span class="line">0.397998,-0.780144,-1.000000</span><br><span class="line">0.037863,0.155137,1.000000</span><br><span class="line">-0.010363,-0.004170,1.000000</span><br><span class="line">0.506519,0.486619,-1.000000</span><br><span class="line">0.000082,-0.020625,1.000000</span><br><span class="line">0.057761,-0.155140,1.000000</span><br><span class="line">0.027748,-0.553763,-1.000000</span><br><span class="line">-0.413363,-0.746830,-1.000000</span><br><span class="line">0.081500,-0.014264,1.000000</span><br><span class="line">0.047137,-0.491271,1.000000</span><br><span class="line">-0.267459,0.024770,1.000000</span><br><span class="line">-0.148288,-0.532471,-1.000000</span><br><span class="line">-0.225559,-0.201622,1.000000</span><br><span class="line">0.772360,-0.518986,-1.000000</span><br><span class="line">-0.440670,0.688739,-1.000000</span><br><span class="line">0.329064,-0.095349,1.000000</span><br><span class="line">0.970170,-0.010671,-1.000000</span><br><span class="line">-0.689447,-0.318722,-1.000000</span><br><span class="line">-0.465493,-0.227468,-1.000000</span><br><span class="line">-0.049370,0.405711,1.000000</span><br><span class="line">-0.166117,0.274807,1.000000</span><br><span class="line">0.054483,0.012643,1.000000</span><br><span class="line">0.021389,0.076125,1.000000</span><br><span class="line">-0.104404,-0.914042,-1.000000</span><br><span class="line">0.294487,0.440886,-1.000000</span><br><span class="line">0.107915,-0.493703,-1.000000</span><br><span class="line">0.076311,0.438860,1.000000</span><br><span class="line">0.370593,-0.728737,-1.000000</span><br><span class="line">0.409890,0.306851,-1.000000</span><br><span class="line">0.285445,0.474399,-1.000000</span><br><span class="line">-0.870134,-0.161685,-1.000000</span><br><span class="line">-0.654144,-0.675129,-1.000000</span><br><span class="line">0.285278,-0.767310,-1.000000</span><br><span class="line">0.049548,-0.000907,1.000000</span><br><span class="line">0.030014,-0.093265,1.000000</span><br><span class="line">-0.128859,0.278865,1.000000</span><br><span class="line">0.307463,0.085667,1.000000</span><br><span class="line">0.023440,0.298638,1.000000</span><br><span class="line">0.053920,0.235344,1.000000</span><br><span class="line">0.059675,0.533339,-1.000000</span><br><span class="line">0.817125,0.016536,-1.000000</span><br><span class="line">-0.108771,0.477254,1.000000</span><br><span class="line">-0.118106,0.017284,1.000000</span><br><span class="line">0.288339,0.195457,1.000000</span><br><span class="line">0.567309,-0.200203,-1.000000</span><br><span class="line">-0.202446,0.409387,1.000000</span><br><span class="line">-0.330769,-0.240797,1.000000</span><br><span class="line">-0.422377,0.480683,-1.000000</span><br><span class="line">-0.295269,0.326017,1.000000</span><br><span class="line">0.261132,0.046478,1.000000</span><br><span class="line">-0.492244,-0.319998,-1.000000</span><br><span class="line">-0.384419,0.099170,1.000000</span><br><span class="line">0.101882,-0.781145,-1.000000</span><br><span class="line">0.234592,-0.383446,1.000000</span><br><span class="line">-0.020478,-0.901833,-1.000000</span><br><span class="line">0.328449,0.186633,1.000000</span><br><span class="line">-0.150059,-0.409158,1.000000</span><br><span class="line">-0.155876,-0.843413,-1.000000</span><br><span class="line">-0.098134,-0.136786,1.000000</span><br><span class="line">0.110575,-0.197205,1.000000</span><br><span class="line">0.219021,0.054347,1.000000</span><br><span class="line">0.030152,0.251682,1.000000</span><br><span class="line">0.033447,-0.122824,1.000000</span><br><span class="line">-0.686225,-0.020779,-1.000000</span><br><span class="line">-0.911211,-0.262011,-1.000000</span><br><span class="line">0.572557,0.377526,-1.000000</span><br><span class="line">-0.073647,-0.519163,-1.000000</span><br><span class="line">-0.281830,-0.797236,-1.000000</span><br><span class="line">-0.555263,0.126232,-1.000000</span><br></pre></td></tr></tbody></table></figure>
+
+<p>参考链接：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/csqazwsxedc/article/details/71513197">https://blog.csdn.net/csqazwsxedc/article/details/71513197</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/zouxy09/article/details/17291543">https://blog.csdn.net/zouxy09/article/details/17291543</a></p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">Newer</div><a href="/2019/09/08/20190908-%E4%BB%8Ecsv%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%95%B0%E6%8D%AE/">从csv中读取数据</a></div><div class="item" id="next"><div class="note">Older</div><a href="/2019/09/08/%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%AD1%E7%9A%84%E4%B8%AA%E6%95%B0/">二进制中1的个数</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+</aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

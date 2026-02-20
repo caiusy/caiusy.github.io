@@ -2,7 +2,7 @@
 title: 深入浅出 LoRA：大模型微调的核心原理、数学证明与实战指南
 date: 2026-01-25 14:45:00
 tags: [NLP, LLM, LoRA, PEFT, Math]
-categories: AI & Deep Learning
+categories: 深度学习
 cover: /images/lora-math/gradient_stability.png
 ---
 

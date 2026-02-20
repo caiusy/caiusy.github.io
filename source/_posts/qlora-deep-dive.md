@@ -2,7 +2,7 @@
 title: 彻底搞懂 QLoRA：如何用 4-bit 量化技术单卡微调千亿模型？
 date: 2026-01-25 15:30:00
 tags: [NLP, LLM, QLoRA, LoRA, Quantization]
-categories: AI & Deep Learning
+categories: 深度学习
 cover: /images/qlora-math/memory_comparison.png
 ---
 

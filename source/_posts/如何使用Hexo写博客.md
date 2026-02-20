@@ -6,7 +6,8 @@ tags: 工具
   - Hexo
   - 博客
   - 教程
-categories: 工具
+categories:
+  - 工具
 ---
 
 ## 简介

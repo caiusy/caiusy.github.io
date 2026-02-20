@@ -1,6 +1,7 @@
 ---
 title: Python：logging模块
-categories: Python
+categories:
+  - Python
 tags: Python
 date: 2019-11-04 00:00:00
 ---

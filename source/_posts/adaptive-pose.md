@@ -1,6 +1,7 @@
 ---
 title: adaptive_pose
-categories: 技术
+categories:
+  - 技术
 typora-copy-images-to: adaptive_pose
 date: 2023-01-22 21:15:24
 tags: 技术

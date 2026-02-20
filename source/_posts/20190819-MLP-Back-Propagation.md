@@ -1,6 +1,7 @@
 ---
 title: 多层感知机的反向传播
-categories: 深度学习
+categories:
+  - 深度学习
 date: 2019-08-19 00:00:00
 tags: 深度学习
   - Deep Learning

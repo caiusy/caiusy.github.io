@@ -2,7 +2,8 @@
 title: 单调栈完全指南：从 O(n²) 到 O(n) 的优雅跃迁
 date: 2026-02-19 17:00:00
 tags: [算法, 数据结构, 单调栈, LeetCode]
-categories: 算法
+categories:
+  - 算法
 description: 深度解析单调栈的原理、应用和实战技巧，用费曼学习法帮你彻底理解这个强大的算法工具
 ---
 

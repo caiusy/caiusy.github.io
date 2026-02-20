@@ -1,6 +1,7 @@
 ---
 title: python_learn
-categories: Python
+categories:
+  - Python
 date: 2019-11-17 00:00:00
 tags: Python
   - python

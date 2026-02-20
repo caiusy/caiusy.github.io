@@ -1,6 +1,7 @@
 ---
 title: Duplicate
-categories: 算法
+categories:
+  - 算法
 date: 2019-11-17 00:00:00
 tags: 算法
   - python

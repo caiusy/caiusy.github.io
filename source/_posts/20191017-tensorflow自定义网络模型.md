@@ -1,6 +1,7 @@
 ---
 title: tensorflow自定义网络模型
-categories: 深度学习
+categories:
+  - 深度学习
 date: 2019-10-17 00:00:00
 tags: 深度学习
   - python

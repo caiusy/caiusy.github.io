@@ -1,6 +1,7 @@
 ---
 title: 从视频标定到SLAM
-categories: 技术
+categories:
+  - 技术
 typora-copy-images-to: ./从视频标定到SLAM
 date: 2023-01-22 16:55:53
 tags: 技术

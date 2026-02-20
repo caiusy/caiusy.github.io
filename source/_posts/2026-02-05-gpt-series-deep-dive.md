@@ -2,7 +2,8 @@
 title: GPT 系列深度解析：从 GPT-1 到 GPT-3
 date: 2026-02-05 16:30:00
 tags: [Deep Learning, NLP, GPT, Transformer, Paper Reading]
-categories: [深度学习]
+categories:
+  - 深度学习
 mathjax: true
 ---
 

@@ -6,7 +6,8 @@ tags: 计算机视觉
   - 相机标定
   - 多视几何
   - 矩阵分解
-categories: 计算机视觉
+categories:
+  - 计算机视觉
 mathjax: true
 ---
 

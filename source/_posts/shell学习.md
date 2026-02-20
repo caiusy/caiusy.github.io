@@ -1,6 +1,7 @@
 ---
 title: shell学习
-categories: 技术
+categories:
+  - 技术
 typora-copy-images-to: ./shell学习
 date: 2023-01-22 16:55:53
 tags: 技术

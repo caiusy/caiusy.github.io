@@ -1,6 +1,7 @@
 ---
 title: object_track_xmind
-categories: 技术
+categories:
+  - 技术
 date: 2019-10-31 00:00:00
 tags: 技术
   - object_track

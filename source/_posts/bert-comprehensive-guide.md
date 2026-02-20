@@ -7,7 +7,8 @@ tags:
   - BERT
   - Transformer
   - Deep Learning
-categories: 深度学习
+categories:
+  - 深度学习
   - 深度学习
 top_img: /images/bert_guide/bert_architecture.png
 cover: /images/bert_guide/bert_complete_visualizations.png

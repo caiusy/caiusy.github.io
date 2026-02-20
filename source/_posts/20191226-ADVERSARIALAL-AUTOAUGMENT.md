@@ -1,6 +1,7 @@
 ---
 title: ADVERSARIALAL_AUTOAUGMENT
-categories: 深度学习
+categories:
+  - 深度学习
 tags: 深度学习
 date: 2019-12-26 00:00:00
 ---

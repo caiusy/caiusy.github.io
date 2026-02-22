@@ -1,0 +1,1603 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>链表与指针完全图解：从内存本质到 LeetCode 实战 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="费曼说：如果你不能用简单的语言解释一个东西，说明你还没真正理解它。本文用「内存视角」带你从零建立链表直觉，配合 10+ 张原创图解和 LeetCode 经典题，让你彻底搞懂指针到底在干什么。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="链表与指针完全图解：从内存本质到 LeetCode 实战">
+<meta property="og:url" content="https://caiusy.github.io/2026/02/22/linkedlist-pointer-complete-guide/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="费曼说：如果你不能用简单的语言解释一个东西，说明你还没真正理解它。本文用「内存视角」带你从零建立链表直觉，配合 10+ 张原创图解和 LeetCode 经典题，让你彻底搞懂指针到底在干什么。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-02-22T02:54:38.000Z">
+<meta property="article:modified_time" content="2026-02-22T11:02:32.088Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="数据结构">
+<meta property="article:tag" content="链表">
+<meta property="article:tag" content="指针">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="算法,LeetCode,数据结构,链表,指针">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-02-22T10:54:38+08:00","dateModified":"2026-02-22T19:02:32+08:00","datePublished":"2026-02-22T10:54:38+08:00","description":"\n费曼说：如果你不能用简单的语言解释一个东西，说明你还没真正理解它。本文用「内存视角」带你从零建立链表直觉，配合 10+ 张原创图解和 LeetCode 经典题，让你彻底搞懂指针到底在干什么。\n","headline":"链表与指针完全图解：从内存本质到 LeetCode 实战","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/02/22/linkedlist-pointer-complete-guide/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/02/22/linkedlist-pointer-complete-guide/","keywords":"算法, LeetCode, 数据结构, 链表, 指针","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/22/linkedlist-pointer-complete-guide/"><span class="title">链表与指针完全图解：从内存本质到 LeetCode 实战</span></a><a class="item title" href="/2025/07/13/graph-theory-and-search/"><span class="title">图论与搜索专题 — 从零到精通的费曼式深度教程</span></a><a class="item title" href="/2026/02/20/20250220-dynamic-programming-complete-guide/"><span class="title">动态规划完全指南：从入门到精通</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">算法与数据结构</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-02-22T02:54:38.000Z">2026-02-22</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-22T11:02:32.088Z">2026-02-22</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>链表与指针完全图解：从内存本质到 LeetCode 实战</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><blockquote>
+<p><strong>费曼说</strong>：如果你不能用简单的语言解释一个东西，说明你还没真正理解它。<br>本文用「内存视角」带你从零建立链表直觉，配合 10+ 张原创图解和 LeetCode 经典题，让你彻底搞懂指针到底在干什么。</p>
+</blockquote>
+<span id="more"></span>
+
+<hr>
+<h2 id="一、指针的本质：一个存地址的变量"><a href="#一、指针的本质：一个存地址的变量" class="headerlink" title="一、指针的本质：一个存地址的变量"></a>一、指针的本质：一个存地址的变量</h2><h3 id="1-1-先忘掉”指针”这个词"><a href="#1-1-先忘掉”指针”这个词" class="headerlink" title="1.1 先忘掉”指针”这个词"></a>1.1 先忘掉”指针”这个词</h3><p>很多人一听”指针”就怕。其实指针就是一个<strong>存地址的变量</strong>，仅此而已。</p>
+<p>想象你住在一栋公寓楼里：</p>
+<ul>
+<li>每个房间有一个<strong>门牌号</strong>（内存地址）</li>
+<li>房间里放着<strong>东西</strong>（数据）</li>
+<li>你手里有一张<strong>纸条</strong>，上面写着某个门牌号 —— 这张纸条就是指针</li>
+</ul>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">纸条上写着: 0x1010</span><br><span class="line">你去 0x1010 房间一看，里面放着数字 7</span><br></pre></td></tr></tbody></table></figure>
+
+<p>就这么简单。指针不神秘，它就是一个”写着地址的纸条”。</p>
+<h3 id="1-2-内存模型图解"><a href="#1-2-内存模型图解" class="headerlink" title="1.2 内存模型图解"></a>1.2 内存模型图解</h3><p><img src="/images/linkedlist/01_memory_pointer.png" alt="内存模型：指针本质"></p>
+<p>看这张图：</p>
+<ul>
+<li><code>int a = 42</code> 住在地址 <code>0x1000</code>，房间里放着 <code>42</code></li>
+<li><code>int b = 7</code> 住在地址 <code>0x1010</code>，房间里放着 <code>7</code></li>
+<li><code>int *p = &amp;b</code> 住在地址 <code>0x1008</code>，房间里放着 <code>0x1010</code> —— 也就是 b 的地址</li>
+</ul>
+<p>当你写 <code>*p</code> 的时候，计算机做了两步：</p>
+<ol>
+<li>先看 p 里存的地址：<code>0x1010</code></li>
+<li>去 <code>0x1010</code> 取值：<code>7</code></li>
+</ol>
+<p>这就是<strong>解引用（dereference）</strong>，没有任何魔法。</p>
+<h3 id="1-3-用-C-x2F-Python-感受指针"><a href="#1-3-用-C-x2F-Python-感受指针" class="headerlink" title="1.3 用 C/Python 感受指针"></a>1.3 用 C/Python 感受指针</h3><p><strong>C 语言版（显式指针）：</strong></p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> b = <span class="number">7</span>;</span><br><span class="line"><span class="type">int</span> *p = &amp;b;    <span class="comment">// p 存的是 b 的地址</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"%d"</span>, *p); <span class="comment">// 输出 7 —— 通过地址找到值</span></span><br><span class="line">*p = <span class="number">100</span>;        <span class="comment">// 通过地址修改值</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"%d"</span>, b);  <span class="comment">// 输出 100 —— b 被改了！</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>Python 版（隐式引用）：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Python 里一切都是引用（指针的高级包装）</span></span><br><span class="line">a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">b = a          <span class="comment"># b 和 a 指向同一个列表对象</span></span><br><span class="line">b.append(<span class="number">4</span>)</span><br><span class="line"><span class="built_in">print</span>(a)       <span class="comment"># [1, 2, 3, 4] —— a 也变了！因为 b 和 a 是同一个地址</span></span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>费曼笔记</strong>：指针 = 地址。<code>*p</code> = 去那个地址看看。<code>&amp;x</code> = 告诉我 x 的地址。三句话说完了。</p>
+</blockquote>
+<hr>
+<h2 id="二、链表节点：val-next-的组合拳"><a href="#二、链表节点：val-next-的组合拳" class="headerlink" title="二、链表节点：val + next 的组合拳"></a>二、链表节点：val + next 的组合拳</h2><h3 id="2-1-为什么需要链表？"><a href="#2-1-为什么需要链表？" class="headerlink" title="2.1 为什么需要链表？"></a>2.1 为什么需要链表？</h3><p>数组的问题：</p>
+<ul>
+<li>插入/删除要<strong>搬移大量元素</strong>，O(n)</li>
+<li>大小固定（静态数组）或需要重新分配（动态数组）</li>
+</ul>
+<p>链表的优势：</p>
+<ul>
+<li>插入/删除只需要<strong>改几个指针</strong>，O(1)</li>
+<li>大小完全动态，用多少分配多少</li>
+</ul>
+<p>代价：</p>
+<ul>
+<li>不能随机访问（没有 <code>arr[i]</code>），只能从头遍历</li>
+<li>每个节点多存一个指针，空间开销更大</li>
+</ul>
+<h3 id="2-2-节点结构图解"><a href="#2-2-节点结构图解" class="headerlink" title="2.2 节点结构图解"></a>2.2 节点结构图解</h3><p><img src="/images/linkedlist/02_node_structure.png" alt="链表节点结构"></p>
+<p>每个节点就两样东西：</p>
+<ul>
+<li><strong>val</strong>：存数据（蓝色框）</li>
+<li><strong>next</strong>：存下一个节点的地址（橙色框）</li>
+</ul>
+<p>最后一个节点的 next 指向 <strong>NULL</strong>（空），表示链表结束。</p>
+<h3 id="2-3-代码定义"><a href="#2-3-代码定义" class="headerlink" title="2.3 代码定义"></a>2.3 代码定义</h3><p><strong>Python 版：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ListNode</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, val=<span class="number">0</span>, <span class="built_in">next</span>=<span class="literal">None</span></span>):</span><br><span class="line">        self.val = val</span><br><span class="line">        self.<span class="built_in">next</span> = <span class="built_in">next</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建链表: 1 -&gt; 3 -&gt; 5 -&gt; 7</span></span><br><span class="line">node4 = ListNode(<span class="number">7</span>)</span><br><span class="line">node3 = ListNode(<span class="number">5</span>, node4)</span><br><span class="line">node2 = ListNode(<span class="number">3</span>, node3)</span><br><span class="line">head = ListNode(<span class="number">1</span>, node2)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>C++ 版：</strong></p>
+<figure class="highlight cpp"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">ListNode</span> {</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    ListNode* next;</span><br><span class="line">    <span class="built_in">ListNode</span>(<span class="type">int</span> x) : <span class="built_in">val</span>(x), <span class="built_in">next</span>(<span class="literal">nullptr</span>) {}</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="2-4-遍历：链表的基本功"><a href="#2-4-遍历：链表的基本功" class="headerlink" title="2.4 遍历：链表的基本功"></a>2.4 遍历：链表的基本功</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">traverse</span>(<span class="params">head</span>):</span><br><span class="line">    curr = head</span><br><span class="line">    <span class="keyword">while</span> curr:</span><br><span class="line">        <span class="built_in">print</span>(curr.val, end=<span class="string">" -&gt; "</span>)</span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"NULL"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出: 1 -&gt; 3 -&gt; 5 -&gt; 7 -&gt; NULL</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Step 1: curr = head       → curr.val = 1, curr.next = node2</span><br><span class="line">Step 2: curr = curr.next  → curr.val = 3, curr.next = node3</span><br><span class="line">Step 3: curr = curr.next  → curr.val = 5, curr.next = node4</span><br><span class="line">Step 4: curr = curr.next  → curr.val = 7, curr.next = None</span><br><span class="line">Step 5: curr = None       → 循环结束</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>费曼笔记</strong>：遍历链表就像寻宝游戏 —— 每个宝箱里有一个宝物（val）和一张纸条告诉你下一个宝箱在哪（next）。纸条写着”没了”（NULL）就结束。</p>
+</blockquote>
+<hr>
+<h2 id="三、链表的核心操作：插入与删除"><a href="#三、链表的核心操作：插入与删除" class="headerlink" title="三、链表的核心操作：插入与删除"></a>三、链表的核心操作：插入与删除</h2><h3 id="3-1-插入节点：先接后断"><a href="#3-1-插入节点：先接后断" class="headerlink" title="3.1 插入节点：先接后断"></a>3.1 插入节点：先接后断</h3><p>插入的核心原则：<strong>先让新节点接上后面，再让前面接上新节点</strong>。顺序反了就断链了。</p>
+<p><img src="/images/linkedlist/03_insert_node.png" alt="插入节点图解"></p>
+<p><strong>在 node(3) 后面插入 node(9)：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">insert_after</span>(<span class="params">prev_node, new_val</span>):</span><br><span class="line">    new_node = ListNode(new_val)</span><br><span class="line">    new_node.<span class="built_in">next</span> = prev_node.<span class="built_in">next</span>   <span class="comment"># Step 1: 新节点先接上后面</span></span><br><span class="line">    prev_node.<span class="built_in">next</span> = new_node        <span class="comment"># Step 2: 前面再接上新节点</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（插入 9 到 3 后面）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">初始状态: 1 -&gt; 3 -&gt; 5 -&gt; 7 -&gt; NULL</span><br><span class="line">                ↑ prev_node</span><br><span class="line"></span><br><span class="line">Step 1: new_node(9).next = prev_node.next</span><br><span class="line">        → new_node(9).next = node(5)</span><br><span class="line">        此时: 1 -&gt; 3 -&gt; 5 -&gt; 7 -&gt; NULL</span><br><span class="line">                        ↑</span><br><span class="line">              new(9) ---┘</span><br><span class="line"></span><br><span class="line">Step 2: prev_node.next = new_node</span><br><span class="line">        → node(3).next = node(9)</span><br><span class="line">        此时: 1 -&gt; 3 -&gt; 9 -&gt; 5 -&gt; 7 -&gt; NULL  ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>经典错误</strong>：如果先执行 Step 2，<code>prev_node.next</code> 就被覆盖了，你再也找不到原来的 node(5)，链表断裂！</p>
+</blockquote>
+<h3 id="3-2-删除节点：跳过它"><a href="#3-2-删除节点：跳过它" class="headerlink" title="3.2 删除节点：跳过它"></a>3.2 删除节点：跳过它</h3><p>删除不需要真的”销毁”节点，只需要让前一个节点<strong>跳过</strong>它。</p>
+<p><img src="/images/linkedlist/04_delete_node.png" alt="删除节点图解"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">delete_next</span>(<span class="params">prev_node</span>):</span><br><span class="line">    <span class="keyword">if</span> prev_node.<span class="built_in">next</span>:</span><br><span class="line">        prev_node.<span class="built_in">next</span> = prev_node.<span class="built_in">next</span>.<span class="built_in">next</span>  <span class="comment"># 直接跳过下一个节点</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（删除 3）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">初始: 1 -&gt; 3 -&gt; 5 -&gt; 7 -&gt; NULL</span><br><span class="line">      ↑prev</span><br><span class="line"></span><br><span class="line">prev.next = prev.next.next</span><br><span class="line">→ node(1).next = node(5)</span><br><span class="line"></span><br><span class="line">结果: 1 -&gt; 5 -&gt; 7 -&gt; NULL</span><br><span class="line">      node(3) 被跳过，无人引用，等待垃圾回收</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="3-3-时间复杂度对比"><a href="#3-3-时间复杂度对比" class="headerlink" title="3.3 时间复杂度对比"></a>3.3 时间复杂度对比</h3><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>数组</th>
+<th>链表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>按索引访问</td>
+<td>O(1)</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>头部插入</td>
+<td>O(n)</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>中间插入（已知位置）</td>
+<td>O(n)</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>尾部插入</td>
+<td>O(1)*</td>
+<td>O(n)**</td>
+</tr>
+<tr>
+<td>删除（已知位置）</td>
+<td>O(n)</td>
+<td>O(1)</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>*摊还复杂度 **需要遍历到尾部</p>
+</blockquote>
+<blockquote>
+<p><strong>费曼笔记</strong>：插入 = 先接后断（顺序不能反）。删除 = 让前一个直接指向后一个（跳过中间人）。所有链表操作的本质都是在<strong>改 next 指针</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="四、虚拟头节点（Dummy-Head）：消灭特殊情况"><a href="#四、虚拟头节点（Dummy-Head）：消灭特殊情况" class="headerlink" title="四、虚拟头节点（Dummy Head）：消灭特殊情况"></a>四、虚拟头节点（Dummy Head）：消灭特殊情况</h2><h3 id="4-1-痛点：头节点的特殊处理"><a href="#4-1-痛点：头节点的特殊处理" class="headerlink" title="4.1 痛点：头节点的特殊处理"></a>4.1 痛点：头节点的特殊处理</h3><p>删除链表中值为 x 的节点时，如果要删的恰好是头节点怎么办？</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 没有 dummy head 的写法 —— 丑陋且易错</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">remove_val_ugly</span>(<span class="params">head, val</span>):</span><br><span class="line">    <span class="comment"># 特殊处理：头节点就是目标</span></span><br><span class="line">    <span class="keyword">while</span> head <span class="keyword">and</span> head.val == val:</span><br><span class="line">        head = head.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 常规处理：中间节点</span></span><br><span class="line">    curr = head</span><br><span class="line">    <span class="keyword">while</span> curr <span class="keyword">and</span> curr.<span class="built_in">next</span>:</span><br><span class="line">        <span class="keyword">if</span> curr.<span class="built_in">next</span>.val == val:</span><br><span class="line">            curr.<span class="built_in">next</span> = curr.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            curr = curr.<span class="built_in">next</span></span><br><span class="line">    <span class="keyword">return</span> head</span><br></pre></td></tr></tbody></table></figure>
+
+<p>两段逻辑，两种处理方式，容易出 bug。</p>
+<h3 id="4-2-解法：加一个假的头"><a href="#4-2-解法：加一个假的头" class="headerlink" title="4.2 解法：加一个假的头"></a>4.2 解法：加一个假的头</h3><p><img src="/images/linkedlist/08_dummy_head.png" alt="虚拟头节点"></p>
+<p>在真正的头节点前面加一个 <strong>dummy 节点</strong>，这样所有节点（包括原来的头）都有”前一个节点”，逻辑统一。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 有 dummy head 的写法 —— 干净统一</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">remove_val_clean</span>(<span class="params">head, val</span>):</span><br><span class="line">    dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    dummy.<span class="built_in">next</span> = head</span><br><span class="line">    </span><br><span class="line">    curr = dummy</span><br><span class="line">    <span class="keyword">while</span> curr.<span class="built_in">next</span>:</span><br><span class="line">        <span class="keyword">if</span> curr.<span class="built_in">next</span>.val == val:</span><br><span class="line">            curr.<span class="built_in">next</span> = curr.<span class="built_in">next</span>.<span class="built_in">next</span>  <span class="comment"># 统一的删除逻辑</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            curr = curr.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span>  <span class="comment"># 返回真正的头</span></span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>费曼笔记</strong>：Dummy head 就像在队伍最前面放一个”占位的人”。有了它，不管删谁，逻辑都一样：<code>prev.next = prev.next.next</code>。这是链表题的<strong>第一个必备技巧</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="五、双指针技巧：链表的瑞士军刀"><a href="#五、双指针技巧：链表的瑞士军刀" class="headerlink" title="五、双指针技巧：链表的瑞士军刀"></a>五、双指针技巧：链表的瑞士军刀</h2><p>双指针是链表题的核心武器，分三种用法：</p>
+<h3 id="5-1-快慢指针：找中点"><a href="#5-1-快慢指针：找中点" class="headerlink" title="5.1 快慢指针：找中点"></a>5.1 快慢指针：找中点</h3><p><strong>问题</strong>：不知道链表长度，如何一次遍历找到中间节点？</p>
+<p><strong>直觉</strong>：两个人同时从起点出发，一个走一步，一个走两步。快的到终点时，慢的刚好在中间。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">find_middle</span>(<span class="params">head</span>):</span><br><span class="line">    slow = fast = head</span><br><span class="line">    <span class="keyword">while</span> fast <span class="keyword">and</span> fast.<span class="built_in">next</span>:</span><br><span class="line">        slow = slow.<span class="built_in">next</span>        <span class="comment"># 慢指针走 1 步</span></span><br><span class="line">        fast = fast.<span class="built_in">next</span>.<span class="built_in">next</span>   <span class="comment"># 快指针走 2 步</span></span><br><span class="line">    <span class="keyword">return</span> slow  <span class="comment"># slow 就是中点</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 数据流追踪: 1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5</span></span><br><span class="line"><span class="comment"># Step 0: slow=1, fast=1</span></span><br><span class="line"><span class="comment"># Step 1: slow=2, fast=3</span></span><br><span class="line"><span class="comment"># Step 2: slow=3, fast=5</span></span><br><span class="line"><span class="comment"># fast.next=None, 停！slow=3 就是中点 ✓</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>应用场景</strong>：</p>
+<ul>
+<li>LeetCode 876：链表的中间节点</li>
+<li>归并排序链表的分割步骤</li>
+<li>判断回文链表的前半段</li>
+</ul>
+<h3 id="5-2-间距指针：删除倒数第-N-个节点（LeetCode-19）"><a href="#5-2-间距指针：删除倒数第-N-个节点（LeetCode-19）" class="headerlink" title="5.2 间距指针：删除倒数第 N 个节点（LeetCode 19）"></a>5.2 间距指针：删除倒数第 N 个节点（LeetCode 19）</h3><p><strong>问题</strong>：一次遍历删除倒数第 N 个节点。</p>
+<p><strong>直觉</strong>：让 fast 先走 N 步，然后 slow 和 fast 一起走。fast 到终点时，slow 刚好在倒数第 N+1 个位置。</p>
+<p><img src="/images/linkedlist/09_remove_nth.png" alt="删除倒数第N个节点"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">removeNthFromEnd</span>(<span class="params">head, n</span>):</span><br><span class="line">    dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    dummy.<span class="built_in">next</span> = head</span><br><span class="line">    slow = fast = dummy</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># fast 先走 n+1 步</span></span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n + <span class="number">1</span>):</span><br><span class="line">        fast = fast.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 一起走到底</span></span><br><span class="line">    <span class="keyword">while</span> fast:</span><br><span class="line">        slow = slow.<span class="built_in">next</span></span><br><span class="line">        fast = fast.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># slow.next 就是要删的节点</span></span><br><span class="line">    slow.<span class="built_in">next</span> = slow.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（删除倒数第 2 个，即 node(4)）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">链表: D -&gt; 1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5 -&gt; NULL</span><br><span class="line">n=2</span><br><span class="line"></span><br><span class="line">Phase 1: fast 先走 3 步 (n+1)</span><br><span class="line">  fast = D -&gt; 1 -&gt; 2 -&gt; 3</span><br><span class="line">  slow = D</span><br><span class="line"></span><br><span class="line">Phase 2: 一起走</span><br><span class="line">  Step 1: slow=1, fast=4</span><br><span class="line">  Step 2: slow=2, fast=5</span><br><span class="line">  Step 3: slow=3, fast=NULL → 停！</span><br><span class="line"></span><br><span class="line">Delete: slow.next = slow.next.next</span><br><span class="line">  → node(3).next = node(5)</span><br><span class="line">  </span><br><span class="line">结果: 1 -&gt; 2 -&gt; 3 -&gt; 5 -&gt; NULL ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>为什么走 n+1 步而不是 n 步？</strong> 因为我们需要停在目标节点的<strong>前一个</strong>，才能执行 <code>prev.next = prev.next.next</code>。</p>
+</blockquote>
+<hr>
+<h2 id="六、反转链表：链表题的灵魂（LeetCode-206）"><a href="#六、反转链表：链表题的灵魂（LeetCode-206）" class="headerlink" title="六、反转链表：链表题的灵魂（LeetCode 206）"></a>六、反转链表：链表题的灵魂（LeetCode 206）</h2><p>反转链表是链表题的<strong>绝对核心</strong>，至少有 10 道 LeetCode 题是它的变体。不掌握这个，后面的题全卡住。</p>
+<h3 id="6-1-直觉：逐个掰方向"><a href="#6-1-直觉：逐个掰方向" class="headerlink" title="6.1 直觉：逐个掰方向"></a>6.1 直觉：逐个掰方向</h3><p>想象一列火车车厢，每节车厢的挂钩都朝右。反转就是把每个挂钩<strong>掰向左边</strong>。</p>
+<p><img src="/images/linkedlist/05_reverse_list.png" alt="反转链表图解"></p>
+<h3 id="6-2-迭代法（推荐掌握）"><a href="#6-2-迭代法（推荐掌握）" class="headerlink" title="6.2 迭代法（推荐掌握）"></a>6.2 迭代法（推荐掌握）</h3><p>核心思路：用三个指针 <code>prev</code>、<code>curr</code>、<code>next_temp</code>，逐个翻转。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">reverseList</span>(<span class="params">head</span>):</span><br><span class="line">    prev = <span class="literal">None</span></span><br><span class="line">    curr = head</span><br><span class="line">    <span class="keyword">while</span> curr:</span><br><span class="line">        next_temp = curr.<span class="built_in">next</span>   <span class="comment"># 1. 先存下一个（不然断了找不到）</span></span><br><span class="line">        curr.<span class="built_in">next</span> = prev        <span class="comment"># 2. 掰方向：当前节点指向前面</span></span><br><span class="line">        prev = curr             <span class="comment"># 3. prev 前进</span></span><br><span class="line">        curr = next_temp        <span class="comment"># 4. curr 前进</span></span><br><span class="line">    <span class="keyword">return</span> prev  <span class="comment"># prev 就是新的头</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>逐步数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">初始: prev=NULL, curr=1-&gt;2-&gt;3-&gt;NULL</span><br><span class="line"></span><br><span class="line">=== 第 1 轮 ===</span><br><span class="line">next_temp = 2 (保存)</span><br><span class="line">curr(1).next = NULL (prev)     → 1-&gt;NULL</span><br><span class="line">prev = 1</span><br><span class="line">curr = 2</span><br><span class="line">状态: NULL&lt;-1  2-&gt;3-&gt;NULL</span><br><span class="line">      prev↑   curr↑</span><br><span class="line"></span><br><span class="line">=== 第 2 轮 ===</span><br><span class="line">next_temp = 3</span><br><span class="line">curr(2).next = 1 (prev)        → 2-&gt;1-&gt;NULL</span><br><span class="line">prev = 2</span><br><span class="line">curr = 3</span><br><span class="line">状态: NULL&lt;-1&lt;-2  3-&gt;NULL</span><br><span class="line">            prev↑ curr↑</span><br><span class="line"></span><br><span class="line">=== 第 3 轮 ===</span><br><span class="line">next_temp = NULL</span><br><span class="line">curr(3).next = 2 (prev)        → 3-&gt;2-&gt;1-&gt;NULL</span><br><span class="line">prev = 3</span><br><span class="line">curr = NULL</span><br><span class="line">状态: NULL&lt;-1&lt;-2&lt;-3</span><br><span class="line">                  prev↑  curr=NULL → 结束</span><br><span class="line"></span><br><span class="line">返回 prev = node(3)，即新头</span><br><span class="line">结果: 3 -&gt; 2 -&gt; 1 -&gt; NULL ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="6-3-递归法（理解即可）"><a href="#6-3-递归法（理解即可）" class="headerlink" title="6.3 递归法（理解即可）"></a>6.3 递归法（理解即可）</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">reverseList_recursive</span>(<span class="params">head</span>):</span><br><span class="line">    <span class="comment"># base case: 空链表或只有一个节点</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> head <span class="keyword">or</span> <span class="keyword">not</span> head.<span class="built_in">next</span>:</span><br><span class="line">        <span class="keyword">return</span> head</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 递归反转后面的部分</span></span><br><span class="line">    new_head = reverseList_recursive(head.<span class="built_in">next</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 把下一个节点的 next 指回自己</span></span><br><span class="line">    head.<span class="built_in">next</span>.<span class="built_in">next</span> = head</span><br><span class="line">    head.<span class="built_in">next</span> = <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> new_head</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>递归展开追踪（1-&gt;2-&gt;3-&gt;NULL）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">调用栈展开:</span><br><span class="line">  reverse(1) → reverse(2) → reverse(3) → return 3 (base case)</span><br><span class="line"></span><br><span class="line">回溯:</span><br><span class="line">  reverse(2): head=2, new_head=3</span><br><span class="line">    head.next.next = head → node(3).next = node(2)  → 3-&gt;2</span><br><span class="line">    head.next = None      → node(2).next = None     → 3-&gt;2-&gt;NULL</span><br><span class="line">    return 3</span><br><span class="line"></span><br><span class="line">  reverse(1): head=1, new_head=3</span><br><span class="line">    head.next.next = head → node(2).next = node(1)  → 3-&gt;2-&gt;1</span><br><span class="line">    head.next = None      → node(1).next = None     → 3-&gt;2-&gt;1-&gt;NULL</span><br><span class="line">    return 3</span><br><span class="line"></span><br><span class="line">最终: 3-&gt;2-&gt;1-&gt;NULL ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>费曼笔记</strong>：反转链表的本质就是三步舞 —— 存、掰、走。<code>next_temp</code> 存后路，<code>curr.next = prev</code> 掰方向，然后两个指针一起往前走。记住这个节奏，所有反转变体都是它的延伸。</p>
+</blockquote>
+<hr>
+<h2 id="七、环形链表：快慢指针的经典战场（LeetCode-141-x2F-142）"><a href="#七、环形链表：快慢指针的经典战场（LeetCode-141-x2F-142）" class="headerlink" title="七、环形链表：快慢指针的经典战场（LeetCode 141 / 142）"></a>七、环形链表：快慢指针的经典战场（LeetCode 141 / 142）</h2><h3 id="7-1-问题：链表有没有环？"><a href="#7-1-问题：链表有没有环？" class="headerlink" title="7.1 问题：链表有没有环？"></a>7.1 问题：链表有没有环？</h3><p>如果链表的某个节点的 next 指向了前面的某个节点，就形成了<strong>环</strong>。遍历永远不会到 NULL，程序会死循环。</p>
+<p><img src="/images/linkedlist/06_cycle_detection.png" alt="环检测图解"></p>
+<h3 id="7-2-Floyd-判圈算法（龟兔赛跑）"><a href="#7-2-Floyd-判圈算法（龟兔赛跑）" class="headerlink" title="7.2 Floyd 判圈算法（龟兔赛跑）"></a>7.2 Floyd 判圈算法（龟兔赛跑）</h3><p><strong>直觉</strong>：操场跑步，快的人（fast）和慢的人（slow）同时出发。如果操场是环形的，快的人一定会<strong>从后面追上</strong>慢的人。如果操场是直线的，快的人直接跑到终点，永远不会相遇。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># LeetCode 141: 判断是否有环</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">hasCycle</span>(<span class="params">head</span>):</span><br><span class="line">    slow = fast = head</span><br><span class="line">    <span class="keyword">while</span> fast <span class="keyword">and</span> fast.<span class="built_in">next</span>:</span><br><span class="line">        slow = slow.<span class="built_in">next</span></span><br><span class="line">        fast = fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">if</span> slow == fast:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span>   <span class="comment"># 相遇了 → 有环</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span>          <span class="comment"># fast 到终点了 → 无环</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（有环：1-&gt;2-&gt;3-&gt;4-&gt;5-&gt;3）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Step 0: slow=1, fast=1</span><br><span class="line">Step 1: slow=2, fast=3</span><br><span class="line">Step 2: slow=3, fast=5</span><br><span class="line">Step 3: slow=4, fast=4  ← 相遇！有环 ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="7-3-进阶：找环的入口（LeetCode-142）"><a href="#7-3-进阶：找环的入口（LeetCode-142）" class="headerlink" title="7.3 进阶：找环的入口（LeetCode 142）"></a>7.3 进阶：找环的入口（LeetCode 142）</h3><p>不仅要判断有没有环，还要找到<strong>环从哪里开始</strong>。</p>
+<p><strong>数学推导（简化版）：</strong></p>
+<p>设：</p>
+<ul>
+<li>起点到环入口距离 = <code>a</code></li>
+<li>环入口到相遇点距离 = <code>b</code></li>
+<li>环的长度 = <code>c</code></li>
+</ul>
+<p>相遇时：</p>
+<ul>
+<li>slow 走了 <code>a + b</code> 步</li>
+<li>fast 走了 <code>a + b + n*c</code> 步（多绕了 n 圈）</li>
+<li>fast 速度是 slow 的 2 倍：<code>2(a+b) = a + b + n*c</code></li>
+<li>化简：<code>a = n*c - b = (n-1)*c + (c-b)</code></li>
+</ul>
+<p><strong>结论</strong>：从<strong>起点</strong>和<strong>相遇点</strong>同时出发，各走一步，它们会在<strong>环入口</strong>相遇！</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># LeetCode 142: 找环的入口</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">detectCycle</span>(<span class="params">head</span>):</span><br><span class="line">    slow = fast = head</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Phase 1: 找相遇点</span></span><br><span class="line">    <span class="keyword">while</span> fast <span class="keyword">and</span> fast.<span class="built_in">next</span>:</span><br><span class="line">        slow = slow.<span class="built_in">next</span></span><br><span class="line">        fast = fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">if</span> slow == fast:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span>  <span class="comment"># 无环</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Phase 2: 找入口</span></span><br><span class="line">    slow = head  <span class="comment"># slow 回到起点</span></span><br><span class="line">    <span class="keyword">while</span> slow != fast:</span><br><span class="line">        slow = slow.<span class="built_in">next</span></span><br><span class="line">        fast = fast.<span class="built_in">next</span>  <span class="comment"># 注意：这里 fast 也只走一步！</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> slow  <span class="comment"># 相遇点就是环入口</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（1-&gt;2-&gt;3-&gt;4-&gt;5-&gt;3，环入口=3）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Phase 1 (找相遇点):</span><br><span class="line">  slow: 1→2→3→4</span><br><span class="line">  fast: 1→3→5→4</span><br><span class="line">  相遇于 node(4)</span><br><span class="line"></span><br><span class="line">Phase 2 (找入口):</span><br><span class="line">  slow 从 head(1) 出发, fast 从 node(4) 出发</span><br><span class="line">  Step 1: slow=2, fast=5</span><br><span class="line">  Step 2: slow=3, fast=3  ← 相遇！环入口 = node(3) ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>费曼笔记</strong>：判环 = 龟兔赛跑，追上了就有环。找入口 = 数学魔术，从起点和相遇点同速出发，再次相遇就是入口。记住这两个 phase 就够了。</p>
+</blockquote>
+<hr>
+<h2 id="八、合并两个有序链表（LeetCode-21）"><a href="#八、合并两个有序链表（LeetCode-21）" class="headerlink" title="八、合并两个有序链表（LeetCode 21）"></a>八、合并两个有序链表（LeetCode 21）</h2><h3 id="8-1-问题"><a href="#8-1-问题" class="headerlink" title="8.1 问题"></a>8.1 问题</h3><p>给你两个升序链表，合并成一个升序链表。</p>
+<p><img src="/images/linkedlist/07_merge_sorted.png" alt="合并有序链表"></p>
+<h3 id="8-2-思路：拉拉链"><a href="#8-2-思路：拉拉链" class="headerlink" title="8.2 思路：拉拉链"></a>8.2 思路：拉拉链</h3><p>想象你手里有两副扑克牌，都已经从小到大排好了。你要把它们合成一副：</p>
+<ol>
+<li>比较两副牌顶部的牌</li>
+<li>小的那张抽出来放到新牌堆</li>
+<li>重复，直到某一副用完</li>
+<li>把剩下的那副直接接上</li>
+</ol>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">mergeTwoLists</span>(<span class="params">l1, l2</span>):</span><br><span class="line">    dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    curr = dummy</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> l1 <span class="keyword">and</span> l2:</span><br><span class="line">        <span class="keyword">if</span> l1.val &lt;= l2.val:</span><br><span class="line">            curr.<span class="built_in">next</span> = l1</span><br><span class="line">            l1 = l1.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            curr.<span class="built_in">next</span> = l2</span><br><span class="line">            l2 = l2.<span class="built_in">next</span></span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    curr.<span class="built_in">next</span> = l1 <span class="keyword">or</span> l2  <span class="comment"># 接上剩余部分</span></span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（L1: 1-&gt;3-&gt;5, L2: 2-&gt;4-&gt;6）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">初始: dummy -&gt; ?    l1=1, l2=2</span><br><span class="line"></span><br><span class="line">Step 1: 1 &lt; 2 → pick 1    dummy-&gt;1    l1=3, l2=2</span><br><span class="line">Step 2: 3 &gt; 2 → pick 2    dummy-&gt;1-&gt;2    l1=3, l2=4</span><br><span class="line">Step 3: 3 &lt; 4 → pick 3    dummy-&gt;1-&gt;2-&gt;3    l1=5, l2=4</span><br><span class="line">Step 4: 5 &gt; 4 → pick 4    dummy-&gt;1-&gt;2-&gt;3-&gt;4    l1=5, l2=6</span><br><span class="line">Step 5: 5 &lt; 6 → pick 5    dummy-&gt;1-&gt;2-&gt;3-&gt;4-&gt;5    l1=NULL, l2=6</span><br><span class="line">Step 6: l1=NULL → 接上 l2  dummy-&gt;1-&gt;2-&gt;3-&gt;4-&gt;5-&gt;6</span><br><span class="line"></span><br><span class="line">结果: 1-&gt;2-&gt;3-&gt;4-&gt;5-&gt;6 ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="8-3-复杂度"><a href="#8-3-复杂度" class="headerlink" title="8.3 复杂度"></a>8.3 复杂度</h3><ul>
+<li>时间：O(m+n)，每个节点恰好被访问一次</li>
+<li>空间：O(1)，只用了几个指针（不算 dummy）</li>
+</ul>
+<blockquote>
+<p><strong>费曼笔记</strong>：合并有序链表 = 拉拉链。两边比大小，小的先接上。用完一边，另一边直接粘上去。dummy head 让你不用操心”第一个节点接到哪”。</p>
+</blockquote>
+<hr>
+<h2 id="九、LeetCode-实战进阶"><a href="#九、LeetCode-实战进阶" class="headerlink" title="九、LeetCode 实战进阶"></a>九、LeetCode 实战进阶</h2><h3 id="9-1-回文链表（LeetCode-234）"><a href="#9-1-回文链表（LeetCode-234）" class="headerlink" title="9.1 回文链表（LeetCode 234）"></a>9.1 回文链表（LeetCode 234）</h3><p><strong>问题</strong>：判断链表是否是回文（正读反读一样）。</p>
+<p><strong>思路</strong>：三步走 —— 找中点 → 反转后半段 → 逐一比较。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">isPalindrome</span>(<span class="params">head</span>):</span><br><span class="line">    <span class="comment"># Step 1: 快慢指针找中点</span></span><br><span class="line">    slow = fast = head</span><br><span class="line">    <span class="keyword">while</span> fast <span class="keyword">and</span> fast.<span class="built_in">next</span>:</span><br><span class="line">        slow = slow.<span class="built_in">next</span></span><br><span class="line">        fast = fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 2: 反转后半段</span></span><br><span class="line">    prev = <span class="literal">None</span></span><br><span class="line">    curr = slow</span><br><span class="line">    <span class="keyword">while</span> curr:</span><br><span class="line">        next_temp = curr.<span class="built_in">next</span></span><br><span class="line">        curr.<span class="built_in">next</span> = prev</span><br><span class="line">        prev = curr</span><br><span class="line">        curr = next_temp</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 3: 比较前半段和反转后的后半段</span></span><br><span class="line">    left, right = head, prev</span><br><span class="line">    <span class="keyword">while</span> right:</span><br><span class="line">        <span class="keyword">if</span> left.val != right.val:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        left = left.<span class="built_in">next</span></span><br><span class="line">        right = right.<span class="built_in">next</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（1-&gt;2-&gt;3-&gt;2-&gt;1）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Step 1 找中点:</span><br><span class="line">  slow: 1→2→3  fast: 1→3→NULL</span><br><span class="line">  中点 = 3</span><br><span class="line"></span><br><span class="line">Step 2 反转后半段 (3-&gt;2-&gt;1):</span><br><span class="line">  反转后: 1-&gt;2-&gt;3</span><br><span class="line"></span><br><span class="line">Step 3 比较:</span><br><span class="line">  left=1, right=1 → 相等 ✓</span><br><span class="line">  left=2, right=2 → 相等 ✓</span><br><span class="line">  left=3, right=3 → 相等 ✓</span><br><span class="line">  right=NULL → 结束，是回文 ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>这道题把前面学的<strong>快慢指针</strong>和<strong>反转链表</strong>组合起来了。链表题就是这样，基础技巧的排列组合。</p>
+</blockquote>
+<h3 id="9-2-相交链表（LeetCode-160）"><a href="#9-2-相交链表（LeetCode-160）" class="headerlink" title="9.2 相交链表（LeetCode 160）"></a>9.2 相交链表（LeetCode 160）</h3><p><strong>问题</strong>：两个链表可能在某个节点汇合，找到那个交点。</p>
+<p><strong>直觉</strong>：两个人走不同的路，路的终点相同。如果 A 走完自己的路再走 B 的路，B 走完自己的路再走 A 的路，它们走的总距离相同，一定会在交点相遇。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">getIntersectionNode</span>(<span class="params">headA, headB</span>):</span><br><span class="line">    a, b = headA, headB</span><br><span class="line">    <span class="keyword">while</span> a != b:</span><br><span class="line">        a = a.<span class="built_in">next</span> <span class="keyword">if</span> a <span class="keyword">else</span> headB  <span class="comment"># a 走完就去 B 的起点</span></span><br><span class="line">        b = b.<span class="built_in">next</span> <span class="keyword">if</span> b <span class="keyword">else</span> headA  <span class="comment"># b 走完就去 A 的起点</span></span><br><span class="line">    <span class="keyword">return</span> a  <span class="comment"># 相遇点就是交点（或者都是 None = 无交点）</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>为什么有效？</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">A 的路: a1 → a2 → c1 → c2 → c3     (独有2 + 公共3 = 5)</span><br><span class="line">B 的路: b1 → b2 → b3 → c1 → c2 → c3 (独有3 + 公共3 = 6)</span><br><span class="line"></span><br><span class="line">A 走完走 B: a1→a2→c1→c2→c3→b1→b2→b3→c1  (5+3=8步到c1)</span><br><span class="line">B 走完走 A: b1→b2→b3→c1→c2→c3→a1→a2→c1  (6+2=8步到c1)</span><br><span class="line"></span><br><span class="line">两人都在第 8 步到达 c1 → 相遇！</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>费曼笔记</strong>：浪漫算法 —— 你走过我来时的路，我走过你来时的路，我们终将在交汇处相遇。数学上就是 <code>a + c + b = b + c + a</code>。</p>
+</blockquote>
+<h3 id="9-3-两数相加（LeetCode-2）"><a href="#9-3-两数相加（LeetCode-2）" class="headerlink" title="9.3 两数相加（LeetCode 2）"></a>9.3 两数相加（LeetCode 2）</h3><p><strong>问题</strong>：两个链表表示两个数（逆序存储），求它们的和。</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: (2-&gt;4-&gt;3) + (5-&gt;6-&gt;4)</span><br><span class="line">代表: 342 + 465 = 807</span><br><span class="line">输出: 7-&gt;0-&gt;8</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">addTwoNumbers</span>(<span class="params">l1, l2</span>):</span><br><span class="line">    dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    curr = dummy</span><br><span class="line">    carry = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> l1 <span class="keyword">or</span> l2 <span class="keyword">or</span> carry:</span><br><span class="line">        val = carry</span><br><span class="line">        <span class="keyword">if</span> l1:</span><br><span class="line">            val += l1.val</span><br><span class="line">            l1 = l1.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">if</span> l2:</span><br><span class="line">            val += l2.val</span><br><span class="line">            l2 = l2.<span class="built_in">next</span></span><br><span class="line">        </span><br><span class="line">        carry = val // <span class="number">10</span></span><br><span class="line">        curr.<span class="built_in">next</span> = ListNode(val % <span class="number">10</span>)</span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Step 1: 2+5+0=7, carry=0 → 创建 node(7)</span><br><span class="line">Step 2: 4+6+0=10, carry=1 → 创建 node(0)</span><br><span class="line">Step 3: 3+4+1=8, carry=0 → 创建 node(8)</span><br><span class="line">Step 4: 全部为空且 carry=0 → 结束</span><br><span class="line"></span><br><span class="line">结果: 7-&gt;0-&gt;8 ✓ (即 807)</span><br></pre></td></tr></tbody></table></figure>
+
+
+<hr>
+<h2 id="十、进阶：排序链表（LeetCode-148）"><a href="#十、进阶：排序链表（LeetCode-148）" class="headerlink" title="十、进阶：排序链表（LeetCode 148）"></a>十、进阶：排序链表（LeetCode 148）</h2><h3 id="10-1-问题"><a href="#10-1-问题" class="headerlink" title="10.1 问题"></a>10.1 问题</h3><p>对链表进行排序，要求 O(n log n) 时间复杂度。</p>
+<p><strong>思路</strong>：归并排序天然适合链表 —— 找中点分割 + 递归排序 + 合并有序链表。前面学的技巧全用上了。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">sortList</span>(<span class="params">head</span>):</span><br><span class="line">    <span class="comment"># base case</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> head <span class="keyword">or</span> <span class="keyword">not</span> head.<span class="built_in">next</span>:</span><br><span class="line">        <span class="keyword">return</span> head</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 1: 快慢指针找中点，断开</span></span><br><span class="line">    slow, fast = head, head.<span class="built_in">next</span></span><br><span class="line">    <span class="keyword">while</span> fast <span class="keyword">and</span> fast.<span class="built_in">next</span>:</span><br><span class="line">        slow = slow.<span class="built_in">next</span></span><br><span class="line">        fast = fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">    mid = slow.<span class="built_in">next</span></span><br><span class="line">    slow.<span class="built_in">next</span> = <span class="literal">None</span>  <span class="comment"># 断开！</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 2: 递归排序两半</span></span><br><span class="line">    left = sortList(head)</span><br><span class="line">    right = sortList(mid)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 3: 合并（复用 mergeTwoLists）</span></span><br><span class="line">    dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    curr = dummy</span><br><span class="line">    <span class="keyword">while</span> left <span class="keyword">and</span> right:</span><br><span class="line">        <span class="keyword">if</span> left.val &lt;= right.val:</span><br><span class="line">            curr.<span class="built_in">next</span> = left</span><br><span class="line">            left = left.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            curr.<span class="built_in">next</span> = right</span><br><span class="line">            right = right.<span class="built_in">next</span></span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">    curr.<span class="built_in">next</span> = left <span class="keyword">or</span> right</span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>递归分解追踪（4-&gt;2-&gt;1-&gt;3）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sortList(4-&gt;2-&gt;1-&gt;3)</span><br><span class="line">├── 分割: [4-&gt;2] 和 [1-&gt;3]</span><br><span class="line">│   ├── sortList(4-&gt;2)</span><br><span class="line">│   │   ├── 分割: [4] 和 [2]</span><br><span class="line">│   │   └── 合并: 2-&gt;4</span><br><span class="line">│   └── sortList(1-&gt;3)</span><br><span class="line">│       ├── 分割: [1] 和 [3]</span><br><span class="line">│       └── 合并: 1-&gt;3</span><br><span class="line">└── 合并 [2-&gt;4] 和 [1-&gt;3]: 1-&gt;2-&gt;3-&gt;4 ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>费曼笔记</strong>：链表排序 = 找中点（快慢指针）+ 分两半（断开）+ 各自排序（递归）+ 合并（拉拉链）。四个基础操作的组合拳，没有新东西。</p>
+</blockquote>
+<hr>
+<h2 id="十一、K-个一组翻转链表（LeetCode-25）——-链表终极-Boss"><a href="#十一、K-个一组翻转链表（LeetCode-25）——-链表终极-Boss" class="headerlink" title="十一、K 个一组翻转链表（LeetCode 25）—— 链表终极 Boss"></a>十一、K 个一组翻转链表（LeetCode 25）—— 链表终极 Boss</h2><h3 id="11-1-问题"><a href="#11-1-问题" class="headerlink" title="11.1 问题"></a>11.1 问题</h3><p>每 k 个节点一组进行翻转。如果最后不足 k 个，保持原样。</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: 1-&gt;2-&gt;3-&gt;4-&gt;5, k=3</span><br><span class="line">输出: 3-&gt;2-&gt;1-&gt;4-&gt;5</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="11-2-思路拆解"><a href="#11-2-思路拆解" class="headerlink" title="11.2 思路拆解"></a>11.2 思路拆解</h3><ol>
+<li>先数 k 个节点，不够就不翻</li>
+<li>翻转这 k 个节点（就是 LC 206 的子问题）</li>
+<li>递归处理剩余部分</li>
+<li>把翻转后的尾巴接上递归结果</li>
+</ol>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">reverseKGroup</span>(<span class="params">head, k</span>):</span><br><span class="line">    <span class="comment"># Step 1: 检查是否有 k 个节点</span></span><br><span class="line">    curr = head</span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> curr <span class="keyword">and</span> count &lt; k:</span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> count &lt; k:</span><br><span class="line">        <span class="keyword">return</span> head  <span class="comment"># 不足 k 个，不翻转</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 2: 翻转前 k 个</span></span><br><span class="line">    prev = <span class="literal">None</span></span><br><span class="line">    curr = head</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(k):</span><br><span class="line">        next_temp = curr.<span class="built_in">next</span></span><br><span class="line">        curr.<span class="built_in">next</span> = prev</span><br><span class="line">        prev = curr</span><br><span class="line">        curr = next_temp</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># Step 3: head 现在是翻转后的尾巴，接上递归结果</span></span><br><span class="line">    head.<span class="built_in">next</span> = reverseKGroup(curr, k)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> prev  <span class="comment"># prev 是翻转后的新头</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（1-&gt;2-&gt;3-&gt;4-&gt;5, k=3）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">第一次调用: head=1, 数到 k=3 ✓</span><br><span class="line">  翻转 [1,2,3]: prev=3-&gt;2-&gt;1</span><br><span class="line">  head(1).next = reverseKGroup(4-&gt;5, 3)</span><br><span class="line">    第二次调用: head=4, 数到 2 &lt; 3</span><br><span class="line">    → 不翻转，返回 4-&gt;5</span><br><span class="line">  head(1).next = 4-&gt;5</span><br><span class="line">  </span><br><span class="line">最终: 3-&gt;2-&gt;1-&gt;4-&gt;5 ✓</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>费曼笔记</strong>：K 组翻转 = 数够 k 个就翻，翻完递归处理剩下的，不够就不动。核心还是反转链表，只是加了”分段”和”递归”。</p>
+</blockquote>
+<hr>
+<h2 id="十二、链表题型全景图：模式识别"><a href="#十二、链表题型全景图：模式识别" class="headerlink" title="十二、链表题型全景图：模式识别"></a>十二、链表题型全景图：模式识别</h2><p>做了这么多题，我们来提炼<strong>模式</strong>。链表题万变不离其宗，核心就这几个套路：</p>
+<h3 id="12-1-五大核心技巧"><a href="#12-1-五大核心技巧" class="headerlink" title="12.1 五大核心技巧"></a>12.1 五大核心技巧</h3><table>
+<thead>
+<tr>
+<th>技巧</th>
+<th>适用场景</th>
+<th>代表题目</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>虚拟头节点</strong></td>
+<td>需要删除/修改头节点的场景</td>
+<td>LC 203, 21, 19, 82</td>
+</tr>
+<tr>
+<td><strong>快慢指针</strong></td>
+<td>找中点、判环、找环入口</td>
+<td>LC 876, 141, 142, 234</td>
+</tr>
+<tr>
+<td><strong>间距指针</strong></td>
+<td>倒数第 N 个、窗口滑动</td>
+<td>LC 19, 61</td>
+</tr>
+<tr>
+<td><strong>反转链表</strong></td>
+<td>翻转全部/部分/K组</td>
+<td>LC 206, 92, 25, 234</td>
+</tr>
+<tr>
+<td><strong>合并链表</strong></td>
+<td>有序合并、分治</td>
+<td>LC 21, 23, 148</td>
+</tr>
+</tbody></table>
+<h3 id="12-2-解题决策树"><a href="#12-2-解题决策树" class="headerlink" title="12.2 解题决策树"></a>12.2 解题决策树</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">拿到链表题 →</span><br><span class="line">├── 需要删除节点？ → 用 dummy head</span><br><span class="line">├── 需要找中点/判环？ → 用快慢指针</span><br><span class="line">├── 需要倒数第 N 个？ → 用间距指针</span><br><span class="line">├── 需要翻转？ → 用 prev/curr/next 三指针</span><br><span class="line">├── 需要合并？ → 用 dummy + 比较</span><br><span class="line">└── 需要排序？ → 归并排序（找中点+分割+合并）</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="12-3-常见陷阱清单"><a href="#12-3-常见陷阱清单" class="headerlink" title="12.3 常见陷阱清单"></a>12.3 常见陷阱清单</h3><p><strong>1. 空指针访问</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 错误：没检查 curr 是否为 None</span></span><br><span class="line"><span class="keyword">while</span> curr.<span class="built_in">next</span>:  <span class="comment"># 如果 curr 是 None，直接崩溃</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 正确：</span></span><br><span class="line"><span class="keyword">while</span> curr <span class="keyword">and</span> curr.<span class="built_in">next</span>:</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>2. 断链丢失</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 错误：先断后接，丢失后续节点</span></span><br><span class="line">prev.<span class="built_in">next</span> = new_node      <span class="comment"># 原来的 prev.next 丢了！</span></span><br><span class="line">new_node.<span class="built_in">next</span> = ???        <span class="comment"># 找不到了</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 正确：先接后断</span></span><br><span class="line">new_node.<span class="built_in">next</span> = prev.<span class="built_in">next</span>  <span class="comment"># 先保存</span></span><br><span class="line">prev.<span class="built_in">next</span> = new_node       <span class="comment"># 再修改</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>3. 忘记更新指针</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 错误：删除后忘记移动</span></span><br><span class="line"><span class="keyword">while</span> curr.<span class="built_in">next</span>:</span><br><span class="line">    <span class="keyword">if</span> curr.<span class="built_in">next</span>.val == target:</span><br><span class="line">        curr.<span class="built_in">next</span> = curr.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        <span class="comment"># 忘了：这里不应该 curr = curr.next！</span></span><br><span class="line">        <span class="comment"># 因为新的 curr.next 可能还是 target</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>4. 返回值错误</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 错误：返回 head（可能已经被删了）</span></span><br><span class="line"><span class="comment"># 正确：用 dummy head，返回 dummy.next</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+<hr>
+<h2 id="十三、费曼终极总结：用一句话说清每个概念"><a href="#十三、费曼终极总结：用一句话说清每个概念" class="headerlink" title="十三、费曼终极总结：用一句话说清每个概念"></a>十三、费曼终极总结：用一句话说清每个概念</h2><blockquote>
+<p>费曼检验：如果你能用一句话向一个 10 岁小孩解释清楚，你才真正理解了。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>一句话解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>指针</strong></td>
+<td>一张写着门牌号的纸条，拿着它就能找到对应的房间</td>
+</tr>
+<tr>
+<td><strong>链表节点</strong></td>
+<td>一个盒子，里面装着一个东西和一张纸条（指向下一个盒子）</td>
+</tr>
+<tr>
+<td><strong>遍历</strong></td>
+<td>寻宝游戏：打开盒子，看纸条，去下一个盒子，直到纸条写着”没了”</td>
+</tr>
+<tr>
+<td><strong>插入</strong></td>
+<td>新人插队：先让新人拉住后面的人，再让前面的人拉住新人</td>
+</tr>
+<tr>
+<td><strong>删除</strong></td>
+<td>踢出队伍：让前面的人直接拉住后面的人，中间那个自然就出局了</td>
+</tr>
+<tr>
+<td><strong>虚拟头</strong></td>
+<td>在队伍最前面放一个假人，这样不管踢谁，操作都一样</td>
+</tr>
+<tr>
+<td><strong>快慢指针</strong></td>
+<td>两人赛跑，快的走两步慢的走一步，快的到终点时慢的在中间</td>
+</tr>
+<tr>
+<td><strong>判环</strong></td>
+<td>操场跑步，快的追上慢的说明是环形跑道</td>
+</tr>
+<tr>
+<td><strong>反转</strong></td>
+<td>把每节火车车厢的挂钩方向掰过来</td>
+</tr>
+<tr>
+<td><strong>合并</strong></td>
+<td>两副排好的扑克牌，每次比顶上的，小的先出</td>
+</tr>
+</tbody></table>
+<h3 id="链表的本质"><a href="#链表的本质" class="headerlink" title="链表的本质"></a>链表的本质</h3><p><strong>链表的所有操作，归根结底就是在做一件事：改 next 指针。</strong></p>
+<ul>
+<li>插入 = 改两个 next</li>
+<li>删除 = 改一个 next</li>
+<li>反转 = 改所有 next 的方向</li>
+<li>合并 = 按条件决定 next 接谁</li>
+</ul>
+<p>理解了这一点，你就理解了链表的全部。</p>
+<h3 id="从数组到链表的思维转换"><a href="#从数组到链表的思维转换" class="headerlink" title="从数组到链表的思维转换"></a>从数组到链表的思维转换</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">数组思维：我要访问第 i 个元素 → arr[i] → O(1)</span><br><span class="line">链表思维：我要从头走到第 i 个 → 走 i 步 → O(n)</span><br><span class="line"></span><br><span class="line">数组思维：插入一个元素 → 后面全部搬家 → O(n)</span><br><span class="line">链表思维：改两个指针 → O(1)</span><br><span class="line"></span><br><span class="line">数组思维：数据在内存中连续排列</span><br><span class="line">链表思维：数据散落在内存各处，用指针串起来</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>终极费曼笔记</strong>：数组是一排紧挨着的储物柜（连续内存），你知道编号就能直接打开。链表是散落各处的宝箱（离散内存），每个宝箱里有一张纸条告诉你下一个在哪。各有优劣，选择取决于你更需要”快速找到第 N 个”还是”快速插入删除”。</p>
+</blockquote>
+<hr>
+<h2 id="十四、闪记卡片（Flashcards）"><a href="#十四、闪记卡片（Flashcards）" class="headerlink" title="十四、闪记卡片（Flashcards）"></a>十四、闪记卡片（Flashcards）</h2><blockquote>
+<p>以下卡片适合用 Anki 导入，采用 Q/A 格式。每张卡片对应一个核心知识点。</p>
+</blockquote>
+<hr>
+<h3 id="卡片-1：指针是什么？"><a href="#卡片-1：指针是什么？" class="headerlink" title="卡片 1：指针是什么？"></a>卡片 1：指针是什么？</h3><p><strong>Q</strong>: 用一句话解释指针。</p>
+<p><strong>A</strong>: 指针是一个变量，它存储的不是数据本身，而是数据所在的<strong>内存地址</strong>。就像一张写着门牌号的纸条。<code>*p</code> = 去那个地址看看，<code>&amp;x</code> = 告诉我 x 的地址。</p>
+<hr>
+<h3 id="卡片-2：链表节点的结构"><a href="#卡片-2：链表节点的结构" class="headerlink" title="卡片 2：链表节点的结构"></a>卡片 2：链表节点的结构</h3><p><strong>Q</strong>: 链表节点包含哪两个部分？</p>
+<p><strong>A</strong>: <code>val</code>（存数据）和 <code>next</code>（存下一个节点的地址）。最后一个节点的 next 指向 NULL。</p>
+<hr>
+<h3 id="卡片-3：链表插入的正确顺序"><a href="#卡片-3：链表插入的正确顺序" class="headerlink" title="卡片 3：链表插入的正确顺序"></a>卡片 3：链表插入的正确顺序</h3><p><strong>Q</strong>: 在 prev 后面插入 new_node，两步操作的顺序是什么？为什么？</p>
+<p><strong>A</strong>: </p>
+<ol>
+<li><code>new_node.next = prev.next</code>（先接后面）</li>
+<li><code>prev.next = new_node</code>（再断前面）</li>
+</ol>
+<p>顺序不能反！如果先执行 Step 2，<code>prev.next</code> 被覆盖，原来的后续节点就丢了。</p>
+<hr>
+<h3 id="卡片-4：虚拟头节点的作用"><a href="#卡片-4：虚拟头节点的作用" class="headerlink" title="卡片 4：虚拟头节点的作用"></a>卡片 4：虚拟头节点的作用</h3><p><strong>Q</strong>: 什么时候需要 dummy head？它解决什么问题？</p>
+<p><strong>A</strong>: 当操作可能涉及<strong>头节点的删除或修改</strong>时使用。它在真正的 head 前面加一个假节点，使所有节点（包括 head）都有前驱节点，逻辑统一为 <code>prev.next = prev.next.next</code>。最后返回 <code>dummy.next</code>。</p>
+<hr>
+<h3 id="卡片-5：快慢指针找中点"><a href="#卡片-5：快慢指针找中点" class="headerlink" title="卡片 5：快慢指针找中点"></a>卡片 5：快慢指针找中点</h3><p><strong>Q</strong>: 如何一次遍历找到链表中点？</p>
+<p><strong>A</strong>: slow 走 1 步，fast 走 2 步。当 <code>fast</code> 或 <code>fast.next</code> 为 NULL 时，<code>slow</code> 就在中点。原理：fast 速度是 slow 的 2 倍，fast 到终点时 slow 走了一半。</p>
+<hr>
+<h3 id="卡片-6：Floyd-判圈算法"><a href="#卡片-6：Floyd-判圈算法" class="headerlink" title="卡片 6：Floyd 判圈算法"></a>卡片 6：Floyd 判圈算法</h3><p><strong>Q</strong>: 如何判断链表是否有环？如何找到环的入口？</p>
+<p><strong>A</strong>: </p>
+<ul>
+<li><strong>判环</strong>：快慢指针，相遇则有环。</li>
+<li><strong>找入口</strong>：相遇后，让 slow 回到 head，两个指针都走 1 步，再次相遇点就是入口。数学原理：<code>a = (n-1)c + (c-b)</code>。</li>
+</ul>
+<hr>
+<h3 id="卡片-7：反转链表的三步舞"><a href="#卡片-7：反转链表的三步舞" class="headerlink" title="卡片 7：反转链表的三步舞"></a>卡片 7：反转链表的三步舞</h3><p><strong>Q</strong>: 迭代反转链表的核心操作是什么？</p>
+<p><strong>A</strong>: 三个指针 <code>prev, curr, next_temp</code>，循环执行：</p>
+<ol>
+<li><code>next_temp = curr.next</code>（存后路）</li>
+<li><code>curr.next = prev</code>（掰方向）</li>
+<li><code>prev = curr; curr = next_temp</code>（前进）</li>
+</ol>
+<p>循环结束后 <code>prev</code> 是新头。</p>
+<hr>
+<h3 id="卡片-8：合并两个有序链表"><a href="#卡片-8：合并两个有序链表" class="headerlink" title="卡片 8：合并两个有序链表"></a>卡片 8：合并两个有序链表</h3><p><strong>Q</strong>: 合并两个有序链表的核心思路？</p>
+<p><strong>A</strong>: 用 dummy head，每次比较两个链表头部，小的接上去，对应指针前进。某一方用完后，直接把另一方剩余部分接上。时间 O(m+n)，空间 O(1)。</p>
+<hr>
+<h3 id="卡片-9：间距指针删除倒数第-N-个"><a href="#卡片-9：间距指针删除倒数第-N-个" class="headerlink" title="卡片 9：间距指针删除倒数第 N 个"></a>卡片 9：间距指针删除倒数第 N 个</h3><p><strong>Q</strong>: 如何一次遍历删除倒数第 N 个节点？</p>
+<p><strong>A</strong>: fast 先走 N+1 步，然后 slow 和 fast 一起走。fast 到 NULL 时，<code>slow.next</code> 就是要删的节点。用 dummy head 处理删头节点的边界情况。</p>
+<hr>
+<h3 id="卡片-10：链表-vs-数组"><a href="#卡片-10：链表-vs-数组" class="headerlink" title="卡片 10：链表 vs 数组"></a>卡片 10：链表 vs 数组</h3><p><strong>Q</strong>: 链表和数组的核心区别？各自的优势场景？</p>
+<p><strong>A</strong>: </p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>数组</th>
+<th>链表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内存</td>
+<td>连续</td>
+<td>离散</td>
+</tr>
+<tr>
+<td>随机访问</td>
+<td>O(1)</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>插入删除</td>
+<td>O(n)</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>频繁查询</td>
+<td>频繁增删</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="卡片-11：链表排序用什么算法？"><a href="#卡片-11：链表排序用什么算法？" class="headerlink" title="卡片 11：链表排序用什么算法？"></a>卡片 11：链表排序用什么算法？</h3><p><strong>Q</strong>: 对链表排序，最优方案是什么？</p>
+<p><strong>A</strong>: <strong>归并排序</strong>。步骤：快慢指针找中点 → 断开 → 递归排序两半 → 合并有序链表。时间 O(n log n)，空间 O(log n)（递归栈）。不用快排，因为链表不支持随机访问。</p>
+<hr>
+<h3 id="卡片-12：K-个一组翻转的思路"><a href="#卡片-12：K-个一组翻转的思路" class="headerlink" title="卡片 12：K 个一组翻转的思路"></a>卡片 12：K 个一组翻转的思路</h3><p><strong>Q</strong>: LeetCode 25 “K 个一组翻转链表”的核心思路？</p>
+<p><strong>A</strong>: </p>
+<ol>
+<li>数 k 个节点，不够就不翻</li>
+<li>翻转这 k 个（LC 206 子问题）</li>
+<li>原来的 head 变成尾巴，接上递归处理剩余部分的结果</li>
+<li>返回翻转后的新头 prev</li>
+</ol>
+<hr>
+<h2 id="十五、LeetCode-刷题路线图"><a href="#十五、LeetCode-刷题路线图" class="headerlink" title="十五、LeetCode 刷题路线图"></a>十五、LeetCode 刷题路线图</h2><p>按难度递进，建议按顺序刷：</p>
+<h3 id="第一阶段：基础操作（Easy）"><a href="#第一阶段：基础操作（Easy）" class="headerlink" title="第一阶段：基础操作（Easy）"></a>第一阶段：基础操作（Easy）</h3><table>
+<thead>
+<tr>
+<th>#</th>
+<th>题目</th>
+<th>核心技巧</th>
+<th>难度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>206</td>
+<td>反转链表</td>
+<td>prev/curr/next 三指针</td>
+<td>⭐</td>
+</tr>
+<tr>
+<td>21</td>
+<td>合并两个有序链表</td>
+<td>dummy head + 比较</td>
+<td>⭐</td>
+</tr>
+<tr>
+<td>141</td>
+<td>环形链表</td>
+<td>快慢指针</td>
+<td>⭐</td>
+</tr>
+<tr>
+<td>203</td>
+<td>移除链表元素</td>
+<td>dummy head</td>
+<td>⭐</td>
+</tr>
+<tr>
+<td>876</td>
+<td>链表的中间节点</td>
+<td>快慢指针</td>
+<td>⭐</td>
+</tr>
+<tr>
+<td>83</td>
+<td>删除排序链表中的重复元素</td>
+<td>遍历 + 跳过</td>
+<td>⭐</td>
+</tr>
+<tr>
+<td>160</td>
+<td>相交链表</td>
+<td>双指针走对方的路</td>
+<td>⭐</td>
+</tr>
+</tbody></table>
+<h3 id="第二阶段：技巧组合（Medium）"><a href="#第二阶段：技巧组合（Medium）" class="headerlink" title="第二阶段：技巧组合（Medium）"></a>第二阶段：技巧组合（Medium）</h3><table>
+<thead>
+<tr>
+<th>#</th>
+<th>题目</th>
+<th>核心技巧</th>
+<th>难度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>两数相加</td>
+<td>遍历 + 进位</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>19</td>
+<td>删除链表的倒数第 N 个节点</td>
+<td>间距指针 + dummy</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>24</td>
+<td>两两交换链表中的节点</td>
+<td>反转变体</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>142</td>
+<td>环形链表 II</td>
+<td>Floyd 找入口</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>234</td>
+<td>回文链表</td>
+<td>快慢 + 反转 + 比较</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>148</td>
+<td>排序链表</td>
+<td>归并排序</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>82</td>
+<td>删除排序链表中的重复元素 II</td>
+<td>dummy + 跳过所有重复</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>92</td>
+<td>反转链表 II</td>
+<td>区间反转</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>61</td>
+<td>旋转链表</td>
+<td>成环再断开</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>138</td>
+<td>复制带随机指针的链表</td>
+<td>哈希表 / 交织复制</td>
+<td>⭐⭐</td>
+</tr>
+</tbody></table>
+<h3 id="第三阶段：终极挑战（Hard）"><a href="#第三阶段：终极挑战（Hard）" class="headerlink" title="第三阶段：终极挑战（Hard）"></a>第三阶段：终极挑战（Hard）</h3><table>
+<thead>
+<tr>
+<th>#</th>
+<th>题目</th>
+<th>核心技巧</th>
+<th>难度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>25</td>
+<td>K 个一组翻转链表</td>
+<td>分段反转 + 递归</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>23</td>
+<td>合并 K 个升序链表</td>
+<td>分治 / 最小堆</td>
+<td>⭐⭐⭐</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="十六、附录：完整链表工具类"><a href="#十六、附录：完整链表工具类" class="headerlink" title="十六、附录：完整链表工具类"></a>十六、附录：完整链表工具类</h2><p>以下是一个可以直接用于 LeetCode 本地调试的工具类：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ListNode</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, val=<span class="number">0</span>, <span class="built_in">next</span>=<span class="literal">None</span></span>):</span><br><span class="line">        self.val = val</span><br><span class="line">        self.<span class="built_in">next</span> = <span class="built_in">next</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">build_list</span>(<span class="params">arr</span>):</span><br><span class="line">    <span class="string">"""从数组创建链表: [1,2,3] -&gt; 1-&gt;2-&gt;3-&gt;NULL"""</span></span><br><span class="line">    dummy = ListNode(<span class="number">0</span>)</span><br><span class="line">    curr = dummy</span><br><span class="line">    <span class="keyword">for</span> v <span class="keyword">in</span> arr:</span><br><span class="line">        curr.<span class="built_in">next</span> = ListNode(v)</span><br><span class="line">        curr = curr.<span class="built_in">next</span></span><br><span class="line">    <span class="keyword">return</span> dummy.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">to_array</span>(<span class="params">head</span>):</span><br><span class="line">    <span class="string">"""链表转数组: 1-&gt;2-&gt;3-&gt;NULL -&gt; [1,2,3]"""</span></span><br><span class="line">    res = []</span><br><span class="line">    <span class="keyword">while</span> head:</span><br><span class="line">        res.append(head.val)</span><br><span class="line">        head = head.<span class="built_in">next</span></span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">print_list</span>(<span class="params">head</span>):</span><br><span class="line">    <span class="string">"""打印链表: 1 -&gt; 2 -&gt; 3 -&gt; NULL"""</span></span><br><span class="line">    parts = []</span><br><span class="line">    <span class="keyword">while</span> head:</span><br><span class="line">        parts.append(<span class="built_in">str</span>(head.val))</span><br><span class="line">        head = head.<span class="built_in">next</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">" -&gt; "</span>.join(parts) + <span class="string">" -&gt; NULL"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用示例</span></span><br><span class="line">head = build_list([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>])</span><br><span class="line">print_list(head)  <span class="comment"># 1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5 -&gt; NULL</span></span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>链表看似简单，实则是<strong>指针操作的训练场</strong>。掌握了链表，你就掌握了：</p>
+<ul>
+<li><strong>指针思维</strong>：理解引用、地址、间接访问</li>
+<li><strong>边界处理</strong>：空指针、头尾节点、单元素</li>
+<li><strong>画图能力</strong>：复杂指针操作必须画图，脑子里转不过来</li>
+<li><strong>递归直觉</strong>：链表天然适合递归思考</li>
+</ul>
+<p><strong>最重要的一条建议</strong>：做链表题时，一定要<strong>画图</strong>。把每一步的指针变化画出来，比在脑子里想快 10 倍。</p>
+<blockquote>
+<p>“What I cannot create, I do not understand.” — Richard Feynman</p>
+</blockquote>
+<hr>
+<p><em>本文包含 10+ 张原创图解、12 张闪记卡片、20+ 道 LeetCode 题目解析。如果对你有帮助，欢迎收藏和分享。</em></p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/02/22/linkedlist-pointer-complete-guide/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/02/22/linkedlist-pointer-complete-guide/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/02/20/20250220-dynamic-programming-complete-guide/">动态规划完全指南：从入门到精通</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%8C%87%E9%92%88%E7%9A%84%E6%9C%AC%E8%B4%A8%EF%BC%9A%E4%B8%80%E4%B8%AA%E5%AD%98%E5%9C%B0%E5%9D%80%E7%9A%84%E5%8F%98%E9%87%8F"><span class="toc-text">一、指针的本质：一个存地址的变量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E5%85%88%E5%BF%98%E6%8E%89%E2%80%9D%E6%8C%87%E9%92%88%E2%80%9D%E8%BF%99%E4%B8%AA%E8%AF%8D"><span class="toc-text">1.1 先忘掉”指针”这个词</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%9B%BE%E8%A7%A3"><span class="toc-text">1.2 内存模型图解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E7%94%A8-C-x2F-Python-%E6%84%9F%E5%8F%97%E6%8C%87%E9%92%88"><span class="toc-text">1.3 用 C&#x2F;Python 感受指针</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E9%93%BE%E8%A1%A8%E8%8A%82%E7%82%B9%EF%BC%9Aval-next-%E7%9A%84%E7%BB%84%E5%90%88%E6%8B%B3"><span class="toc-text">二、链表节点：val + next 的组合拳</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E9%93%BE%E8%A1%A8%EF%BC%9F"><span class="toc-text">2.1 为什么需要链表？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E8%8A%82%E7%82%B9%E7%BB%93%E6%9E%84%E5%9B%BE%E8%A7%A3"><span class="toc-text">2.2 节点结构图解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E4%BB%A3%E7%A0%81%E5%AE%9A%E4%B9%89"><span class="toc-text">2.3 代码定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E9%81%8D%E5%8E%86%EF%BC%9A%E9%93%BE%E8%A1%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8A%9F"><span class="toc-text">2.4 遍历：链表的基本功</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E9%93%BE%E8%A1%A8%E7%9A%84%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C%EF%BC%9A%E6%8F%92%E5%85%A5%E4%B8%8E%E5%88%A0%E9%99%A4"><span class="toc-text">三、链表的核心操作：插入与删除</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E6%8F%92%E5%85%A5%E8%8A%82%E7%82%B9%EF%BC%9A%E5%85%88%E6%8E%A5%E5%90%8E%E6%96%AD"><span class="toc-text">3.1 插入节点：先接后断</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9%EF%BC%9A%E8%B7%B3%E8%BF%87%E5%AE%83"><span class="toc-text">3.2 删除节点：跳过它</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%AF%B9%E6%AF%94"><span class="toc-text">3.3 时间复杂度对比</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E8%99%9A%E6%8B%9F%E5%A4%B4%E8%8A%82%E7%82%B9%EF%BC%88Dummy-Head%EF%BC%89%EF%BC%9A%E6%B6%88%E7%81%AD%E7%89%B9%E6%AE%8A%E6%83%85%E5%86%B5"><span class="toc-text">四、虚拟头节点（Dummy Head）：消灭特殊情况</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E7%97%9B%E7%82%B9%EF%BC%9A%E5%A4%B4%E8%8A%82%E7%82%B9%E7%9A%84%E7%89%B9%E6%AE%8A%E5%A4%84%E7%90%86"><span class="toc-text">4.1 痛点：头节点的特殊处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E8%A7%A3%E6%B3%95%EF%BC%9A%E5%8A%A0%E4%B8%80%E4%B8%AA%E5%81%87%E7%9A%84%E5%A4%B4"><span class="toc-text">4.2 解法：加一个假的头</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%8F%8C%E6%8C%87%E9%92%88%E6%8A%80%E5%B7%A7%EF%BC%9A%E9%93%BE%E8%A1%A8%E7%9A%84%E7%91%9E%E5%A3%AB%E5%86%9B%E5%88%80"><span class="toc-text">五、双指针技巧：链表的瑞士军刀</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88%EF%BC%9A%E6%89%BE%E4%B8%AD%E7%82%B9"><span class="toc-text">5.1 快慢指针：找中点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E9%97%B4%E8%B7%9D%E6%8C%87%E9%92%88%EF%BC%9A%E5%88%A0%E9%99%A4%E5%80%92%E6%95%B0%E7%AC%AC-N-%E4%B8%AA%E8%8A%82%E7%82%B9%EF%BC%88LeetCode-19%EF%BC%89"><span class="toc-text">5.2 间距指针：删除倒数第 N 个节点（LeetCode 19）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8%E9%A2%98%E7%9A%84%E7%81%B5%E9%AD%82%EF%BC%88LeetCode-206%EF%BC%89"><span class="toc-text">六、反转链表：链表题的灵魂（LeetCode 206）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E7%9B%B4%E8%A7%89%EF%BC%9A%E9%80%90%E4%B8%AA%E6%8E%B0%E6%96%B9%E5%90%91"><span class="toc-text">6.1 直觉：逐个掰方向</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E8%BF%AD%E4%BB%A3%E6%B3%95%EF%BC%88%E6%8E%A8%E8%8D%90%E6%8E%8C%E6%8F%A1%EF%BC%89"><span class="toc-text">6.2 迭代法（推荐掌握）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E9%80%92%E5%BD%92%E6%B3%95%EF%BC%88%E7%90%86%E8%A7%A3%E5%8D%B3%E5%8F%AF%EF%BC%89"><span class="toc-text">6.3 递归法（理解即可）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88%E7%9A%84%E7%BB%8F%E5%85%B8%E6%88%98%E5%9C%BA%EF%BC%88LeetCode-141-x2F-142%EF%BC%89"><span class="toc-text">七、环形链表：快慢指针的经典战场（LeetCode 141 &#x2F; 142）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-%E9%97%AE%E9%A2%98%EF%BC%9A%E9%93%BE%E8%A1%A8%E6%9C%89%E6%B2%A1%E6%9C%89%E7%8E%AF%EF%BC%9F"><span class="toc-text">7.1 问题：链表有没有环？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-Floyd-%E5%88%A4%E5%9C%88%E7%AE%97%E6%B3%95%EF%BC%88%E9%BE%9F%E5%85%94%E8%B5%9B%E8%B7%91%EF%BC%89"><span class="toc-text">7.2 Floyd 判圈算法（龟兔赛跑）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-%E8%BF%9B%E9%98%B6%EF%BC%9A%E6%89%BE%E7%8E%AF%E7%9A%84%E5%85%A5%E5%8F%A3%EF%BC%88LeetCode-142%EF%BC%89"><span class="toc-text">7.3 进阶：找环的入口（LeetCode 142）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8%EF%BC%88LeetCode-21%EF%BC%89"><span class="toc-text">八、合并两个有序链表（LeetCode 21）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-%E9%97%AE%E9%A2%98"><span class="toc-text">8.1 问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-%E6%80%9D%E8%B7%AF%EF%BC%9A%E6%8B%89%E6%8B%89%E9%93%BE"><span class="toc-text">8.2 思路：拉拉链</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="toc-text">8.3 复杂度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81LeetCode-%E5%AE%9E%E6%88%98%E8%BF%9B%E9%98%B6"><span class="toc-text">九、LeetCode 实战进阶</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-1-%E5%9B%9E%E6%96%87%E9%93%BE%E8%A1%A8%EF%BC%88LeetCode-234%EF%BC%89"><span class="toc-text">9.1 回文链表（LeetCode 234）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-%E7%9B%B8%E4%BA%A4%E9%93%BE%E8%A1%A8%EF%BC%88LeetCode-160%EF%BC%89"><span class="toc-text">9.2 相交链表（LeetCode 160）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-%E4%B8%A4%E6%95%B0%E7%9B%B8%E5%8A%A0%EF%BC%88LeetCode-2%EF%BC%89"><span class="toc-text">9.3 两数相加（LeetCode 2）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E3%80%81%E8%BF%9B%E9%98%B6%EF%BC%9A%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%EF%BC%88LeetCode-148%EF%BC%89"><span class="toc-text">十、进阶：排序链表（LeetCode 148）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-%E9%97%AE%E9%A2%98"><span class="toc-text">10.1 问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81K-%E4%B8%AA%E4%B8%80%E7%BB%84%E7%BF%BB%E8%BD%AC%E9%93%BE%E8%A1%A8%EF%BC%88LeetCode-25%EF%BC%89%E2%80%94%E2%80%94-%E9%93%BE%E8%A1%A8%E7%BB%88%E6%9E%81-Boss"><span class="toc-text">十一、K 个一组翻转链表（LeetCode 25）—— 链表终极 Boss</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-1-%E9%97%AE%E9%A2%98"><span class="toc-text">11.1 问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-2-%E6%80%9D%E8%B7%AF%E6%8B%86%E8%A7%A3"><span class="toc-text">11.2 思路拆解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E9%93%BE%E8%A1%A8%E9%A2%98%E5%9E%8B%E5%85%A8%E6%99%AF%E5%9B%BE%EF%BC%9A%E6%A8%A1%E5%BC%8F%E8%AF%86%E5%88%AB"><span class="toc-text">十二、链表题型全景图：模式识别</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#12-1-%E4%BA%94%E5%A4%A7%E6%A0%B8%E5%BF%83%E6%8A%80%E5%B7%A7"><span class="toc-text">12.1 五大核心技巧</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-2-%E8%A7%A3%E9%A2%98%E5%86%B3%E7%AD%96%E6%A0%91"><span class="toc-text">12.2 解题决策树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-3-%E5%B8%B8%E8%A7%81%E9%99%B7%E9%98%B1%E6%B8%85%E5%8D%95"><span class="toc-text">12.3 常见陷阱清单</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%89%E3%80%81%E8%B4%B9%E6%9B%BC%E7%BB%88%E6%9E%81%E6%80%BB%E7%BB%93%EF%BC%9A%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E8%AF%B4%E6%B8%85%E6%AF%8F%E4%B8%AA%E6%A6%82%E5%BF%B5"><span class="toc-text">十三、费曼终极总结：用一句话说清每个概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%93%BE%E8%A1%A8%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-text">链表的本质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E6%95%B0%E7%BB%84%E5%88%B0%E9%93%BE%E8%A1%A8%E7%9A%84%E6%80%9D%E7%BB%B4%E8%BD%AC%E6%8D%A2"><span class="toc-text">从数组到链表的思维转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E5%9B%9B%E3%80%81%E9%97%AA%E8%AE%B0%E5%8D%A1%E7%89%87%EF%BC%88Flashcards%EF%BC%89"><span class="toc-text">十四、闪记卡片（Flashcards）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-1%EF%BC%9A%E6%8C%87%E9%92%88%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">卡片 1：指针是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-2%EF%BC%9A%E9%93%BE%E8%A1%A8%E8%8A%82%E7%82%B9%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-text">卡片 2：链表节点的结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-3%EF%BC%9A%E9%93%BE%E8%A1%A8%E6%8F%92%E5%85%A5%E7%9A%84%E6%AD%A3%E7%A1%AE%E9%A1%BA%E5%BA%8F"><span class="toc-text">卡片 3：链表插入的正确顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-4%EF%BC%9A%E8%99%9A%E6%8B%9F%E5%A4%B4%E8%8A%82%E7%82%B9%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-text">卡片 4：虚拟头节点的作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-5%EF%BC%9A%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88%E6%89%BE%E4%B8%AD%E7%82%B9"><span class="toc-text">卡片 5：快慢指针找中点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-6%EF%BC%9AFloyd-%E5%88%A4%E5%9C%88%E7%AE%97%E6%B3%95"><span class="toc-text">卡片 6：Floyd 判圈算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-7%EF%BC%9A%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8%E7%9A%84%E4%B8%89%E6%AD%A5%E8%88%9E"><span class="toc-text">卡片 7：反转链表的三步舞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-8%EF%BC%9A%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8"><span class="toc-text">卡片 8：合并两个有序链表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-9%EF%BC%9A%E9%97%B4%E8%B7%9D%E6%8C%87%E9%92%88%E5%88%A0%E9%99%A4%E5%80%92%E6%95%B0%E7%AC%AC-N-%E4%B8%AA"><span class="toc-text">卡片 9：间距指针删除倒数第 N 个</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-10%EF%BC%9A%E9%93%BE%E8%A1%A8-vs-%E6%95%B0%E7%BB%84"><span class="toc-text">卡片 10：链表 vs 数组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-11%EF%BC%9A%E9%93%BE%E8%A1%A8%E6%8E%92%E5%BA%8F%E7%94%A8%E4%BB%80%E4%B9%88%E7%AE%97%E6%B3%95%EF%BC%9F"><span class="toc-text">卡片 11：链表排序用什么算法？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%87-12%EF%BC%9AK-%E4%B8%AA%E4%B8%80%E7%BB%84%E7%BF%BB%E8%BD%AC%E7%9A%84%E6%80%9D%E8%B7%AF"><span class="toc-text">卡片 12：K 个一组翻转的思路</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%94%E3%80%81LeetCode-%E5%88%B7%E9%A2%98%E8%B7%AF%E7%BA%BF%E5%9B%BE"><span class="toc-text">十五、LeetCode 刷题路线图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C%EF%BC%88Easy%EF%BC%89"><span class="toc-text">第一阶段：基础操作（Easy）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E9%98%B6%E6%AE%B5%EF%BC%9A%E6%8A%80%E5%B7%A7%E7%BB%84%E5%90%88%EF%BC%88Medium%EF%BC%89"><span class="toc-text">第二阶段：技巧组合（Medium）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E9%98%B6%E6%AE%B5%EF%BC%9A%E7%BB%88%E6%9E%81%E6%8C%91%E6%88%98%EF%BC%88Hard%EF%BC%89"><span class="toc-text">第三阶段：终极挑战（Hard）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E5%85%AD%E3%80%81%E9%99%84%E5%BD%95%EF%BC%9A%E5%AE%8C%E6%95%B4%E9%93%BE%E8%A1%A8%E5%B7%A5%E5%85%B7%E7%B1%BB"><span class="toc-text">十六、附录：完整链表工具类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E6%9C%80%E5%90%8E"><span class="toc-text">写在最后</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/02/22/linkedlist-pointer-complete-guide/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

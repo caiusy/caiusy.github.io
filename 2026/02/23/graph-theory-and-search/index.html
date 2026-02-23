@@ -1,0 +1,1596 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>图论与搜索：从零到精通的费曼式完全指南 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="费曼说： “如果你不能把一个概念解释给一个 10 岁小孩听，说明你自己也没真正理解它。”  这篇文章用费曼式教学法，带你从「图是什么」一路打通到「LeetCode 实战」。每个概念都有具体例子、可视化图解、完整代码和数据流追踪。不讲废话，直击本质。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图论与搜索：从零到精通的费曼式完全指南">
+<meta property="og:url" content="https://caiusy.github.io/2026/02/23/graph-theory-and-search/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="费曼说： “如果你不能把一个概念解释给一个 10 岁小孩听，说明你自己也没真正理解它。”  这篇文章用费曼式教学法，带你从「图是什么」一路打通到「LeetCode 实战」。每个概念都有具体例子、可视化图解、完整代码和数据流追踪。不讲废话，直击本质。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-02-22T22:38:34.000Z">
+<meta property="article:modified_time" content="2026-02-23T07:08:14.097Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="BFS">
+<meta property="article:tag" content="图论">
+<meta property="article:tag" content="DFS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="算法,LeetCode,BFS,图论,DFS">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-02-23T06:38:34+08:00","dateModified":"2026-02-23T15:08:14+08:00","datePublished":"2026-02-23T06:38:34+08:00","description":"\n费曼说： “如果你不能把一个概念解释给一个 10 岁小孩听，说明你自己也没真正理解它。”\n\n这篇文章用费曼式教学法，带你从「图是什么」一路打通到「LeetCode 实战」。每个概念都有具体例子、可视化图解、完整代码和数据流追踪。不讲废话，直击本质。","headline":"图论与搜索：从零到精通的费曼式完全指南","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/02/23/graph-theory-and-search/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/02/23/graph-theory-and-search/","keywords":"算法, LeetCode, BFS, 图论, DFS","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/02/23/graph-theory-and-search/"><span class="title">图论与搜索：从零到精通的费曼式完全指南</span></a><a class="item title" href="/2026/02/22/linkedlist-pointer-complete-guide/"><span class="title">链表与指针完全图解：从内存本质到 LeetCode 实战</span></a><a class="item title" href="/2026/02/20/20250220-dynamic-programming-complete-guide/"><span class="title">动态规划完全指南：从入门到精通</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/"><span class="title">opencv模块</span></a><a class="item title" href="/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/"><span class="title">用两个栈实现队列</span></a><a class="item title" href="/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/"><span class="title">反转链表</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">算法与数据结构</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-02-22T22:38:34.000Z">2026-02-23</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-02-23T07:08:14.097Z">2026-02-23</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>图论与搜索：从零到精通的费曼式完全指南</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><blockquote>
+<p><strong>费曼说：</strong> “如果你不能把一个概念解释给一个 10 岁小孩听，说明你自己也没真正理解它。”</p>
+</blockquote>
+<p>这篇文章用费曼式教学法，带你从「图是什么」一路打通到「LeetCode 实战」。每个概念都有具体例子、可视化图解、完整代码和数据流追踪。不讲废话，直击本质。</p>
+<span id="more"></span>
+
+<hr>
+<h2 id="第一章：基础篇-—-图的世界观"><a href="#第一章：基础篇-—-图的世界观" class="headerlink" title="第一章：基础篇 — 图的世界观"></a>第一章：基础篇 — 图的世界观</h2><hr>
+<h3 id="1-1-图到底是什么？"><a href="#1-1-图到底是什么？" class="headerlink" title="1.1 图到底是什么？"></a>1.1 图到底是什么？</h3><p><strong>费曼一句话：</strong> 图就是「一堆东西」加上「它们之间的关系」。就像你的朋友圈——人是节点，互相认识就连条线。</p>
+<p>形式化定义：图 $G = (V, E)$，其中 $V$ 是节点集合，$E$ 是边集合。</p>
+<p>但定义不重要，重要的是：<strong>你怎么在电脑里存一张图？</strong></p>
+<p>这就引出了三种表示法。</p>
+<hr>
+<h3 id="1-2-图的三种表示法"><a href="#1-2-图的三种表示法" class="headerlink" title="1.2 图的三种表示法"></a>1.2 图的三种表示法</h3><p>我们用这张图作为贯穿全文的例子：</p>
+<p><img src="/images/graph-theory/02_example_graph.png" alt="示例图"></p>
+<p>5 个节点（0-4），6 条边。下面分别看三种存法。</p>
+<p><img src="/images/graph-theory/01_three_representations.png" alt="三种表示法对比"></p>
+<h4 id="1-2-1-邻接矩阵-Adjacency-Matrix"><a href="#1-2-1-邻接矩阵-Adjacency-Matrix" class="headerlink" title="1.2.1 邻接矩阵 (Adjacency Matrix)"></a>1.2.1 邻接矩阵 (Adjacency Matrix)</h4><p><strong>费曼一句话：</strong> 画一张表格，行和列都是节点。两个节点之间有边就填 1，没有就填 0。就像一张「谁认识谁」的关系表。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 邻接矩阵表示</span></span><br><span class="line">V = <span class="number">5</span></span><br><span class="line">adj_matrix = [[<span class="number">0</span>]*V <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(V)]</span><br><span class="line">edges = [(<span class="number">0</span>,<span class="number">1</span>),(<span class="number">0</span>,<span class="number">2</span>),(<span class="number">1</span>,<span class="number">2</span>),(<span class="number">1</span>,<span class="number">3</span>),(<span class="number">2</span>,<span class="number">4</span>),(<span class="number">3</span>,<span class="number">4</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> u, v <span class="keyword">in</span> edges:</span><br><span class="line">    adj_matrix[u][v] = <span class="number">1</span></span><br><span class="line">    adj_matrix[v][u] = <span class="number">1</span>  <span class="comment"># 无向图，对称</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询: 节点1和节点3之间有边吗？</span></span><br><span class="line"><span class="built_in">print</span>(adj_matrix[<span class="number">1</span>][<span class="number">3</span>])  <span class="comment"># 输出: 1, O(1)时间</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">初始矩阵: 5x5 全0</span><br><span class="line">加边(0,1): matrix[0][1]=1, matrix[1][0]=1</span><br><span class="line">加边(0,2): matrix[0][2]=1, matrix[2][0]=1</span><br><span class="line">...</span><br><span class="line">最终矩阵:</span><br><span class="line">    0  1  2  3  4</span><br><span class="line">0 [ 0, 1, 1, 0, 0 ]</span><br><span class="line">1 [ 1, 0, 1, 1, 0 ]</span><br><span class="line">2 [ 1, 1, 0, 0, 1 ]</span><br><span class="line">3 [ 0, 1, 0, 0, 1 ]</span><br><span class="line">4 [ 0, 0, 1, 1, 0 ]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>什么时候用？</strong></p>
+<ul>
+<li>✅ 需要快速查询「两点之间有没有边」→ O(1)</li>
+<li>✅ 稠密图（边很多，接近 $V^2$）</li>
+<li>❌ 稀疏图浪费空间 → O(V²) 空间，大部分是 0</li>
+</ul>
+<h4 id="1-2-2-邻接表-Adjacency-List"><a href="#1-2-2-邻接表-Adjacency-List" class="headerlink" title="1.2.2 邻接表 (Adjacency List)"></a>1.2.2 邻接表 (Adjacency List)</h4><p><strong>费曼一句话：</strong> 每个人维护一个「好友列表」。想知道某人认识谁，直接翻他的列表就行。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 邻接表表示 (最常用!)</span></span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"></span><br><span class="line">graph = defaultdict(<span class="built_in">list</span>)</span><br><span class="line">edges = [(<span class="number">0</span>,<span class="number">1</span>),(<span class="number">0</span>,<span class="number">2</span>),(<span class="number">1</span>,<span class="number">2</span>),(<span class="number">1</span>,<span class="number">3</span>),(<span class="number">2</span>,<span class="number">4</span>),(<span class="number">3</span>,<span class="number">4</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> u, v <span class="keyword">in</span> edges:</span><br><span class="line">    graph[u].append(v)</span><br><span class="line">    graph[v].append(u)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询: 节点1的所有邻居？</span></span><br><span class="line"><span class="built_in">print</span>(graph[<span class="number">1</span>])  <span class="comment"># 输出: [0, 2, 3], O(degree)时间</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">加边(0,1): graph = {0:[1], 1:[0]}</span><br><span class="line">加边(0,2): graph = {0:[1,2], 1:[0], 2:[0]}</span><br><span class="line">加边(1,2): graph = {0:[1,2], 1:[0,2], 2:[0,1]}</span><br><span class="line">加边(1,3): graph = {0:[1,2], 1:[0,2,3], 2:[0,1], 3:[1]}</span><br><span class="line">加边(2,4): graph = {0:[1,2], 1:[0,2,3], 2:[0,1,4], 3:[1], 4:[2]}</span><br><span class="line">加边(3,4): graph = {0:[1,2], 1:[0,2,3], 2:[0,1,4], 3:[1,4], 4:[2,3]}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>什么时候用？</strong></p>
+<ul>
+<li>✅ 遍历邻居快 → O(degree)</li>
+<li>✅ 空间高效 → O(V+E)</li>
+<li>✅ <strong>90% 的图题都用这个</strong></li>
+<li>❌ 查询特定边是否存在 → O(degree)，不如矩阵快</li>
+</ul>
+<h4 id="1-2-3-边列表-Edge-List"><a href="#1-2-3-边列表-Edge-List" class="headerlink" title="1.2.3 边列表 (Edge List)"></a>1.2.3 边列表 (Edge List)</h4><p><strong>费曼一句话：</strong> 最笨但最直接——把所有关系一条条列出来。就像一份「谁和谁是朋友」的名单。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 边列表表示</span></span><br><span class="line">edges = [(<span class="number">0</span>,<span class="number">1</span>),(<span class="number">0</span>,<span class="number">2</span>),(<span class="number">1</span>,<span class="number">2</span>),(<span class="number">1</span>,<span class="number">3</span>),(<span class="number">2</span>,<span class="number">4</span>),(<span class="number">3</span>,<span class="number">4</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 带权重的边列表 (Kruskal最小生成树常用)</span></span><br><span class="line">weighted_edges = [(<span class="number">0</span>,<span class="number">1</span>,<span class="number">4</span>),(<span class="number">0</span>,<span class="number">2</span>,<span class="number">2</span>),(<span class="number">1</span>,<span class="number">2</span>,<span class="number">1</span>),(<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>),(<span class="number">2</span>,<span class="number">4</span>,<span class="number">3</span>),(<span class="number">3</span>,<span class="number">4</span>,<span class="number">6</span>)]</span><br><span class="line">weighted_edges.sort(key=<span class="keyword">lambda</span> x: x[<span class="number">2</span>])  <span class="comment"># 按权重排序</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>什么时候用？</strong></p>
+<ul>
+<li>✅ Kruskal 最小生成树（需要按权重排序所有边）</li>
+<li>✅ 存储简单，空间 O(E)</li>
+<li>❌ 查边、查邻居都慢 → O(E)</li>
+</ul>
+<h4 id="三种表示法对比总结"><a href="#三种表示法对比总结" class="headerlink" title="三种表示法对比总结"></a>三种表示法对比总结</h4><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>邻接矩阵</th>
+<th>邻接表</th>
+<th>边列表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>空间</td>
+<td>O(V²)</td>
+<td>O(V+E)</td>
+<td>O(E)</td>
+</tr>
+<tr>
+<td>查边</td>
+<td><strong>O(1)</strong></td>
+<td>O(degree)</td>
+<td>O(E)</td>
+</tr>
+<tr>
+<td>遍历邻居</td>
+<td>O(V)</td>
+<td><strong>O(degree)</strong></td>
+<td>O(E)</td>
+</tr>
+<tr>
+<td>加边</td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>稠密图</td>
+<td><strong>通用(首选)</strong></td>
+<td>Kruskal</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>🎯 <strong>结论：刷题默认用邻接表。</strong> 除非题目明确给了矩阵（如岛屿问题的网格），或者需要 Kruskal。</p>
+</blockquote>
+<hr>
+<h3 id="1-3-DFS-深度优先搜索"><a href="#1-3-DFS-深度优先搜索" class="headerlink" title="1.3 DFS 深度优先搜索"></a>1.3 DFS 深度优先搜索</h3><p><strong>费曼一句话：</strong> DFS 就是走迷宫的策略——一条路走到黑，撞墙了再回头换一条。用「栈」记住岔路口，方便回头。</p>
+<h4 id="核心机制"><a href="#核心机制" class="headerlink" title="核心机制"></a>核心机制</h4><p>DFS 的本质是：<strong>优先探索深度方向</strong>。它用栈（递归调用栈或显式栈）来记录「还没探索完的岔路」。</p>
+<p>关键数据结构：</p>
+<ul>
+<li><code>stack</code>：待探索的节点（后进先出）</li>
+<li><code>visited</code>：已经去过的节点（避免重复走）</li>
+</ul>
+<h4 id="递归写法（利用系统调用栈）"><a href="#递归写法（利用系统调用栈）" class="headerlink" title="递归写法（利用系统调用栈）"></a>递归写法（利用系统调用栈）</h4><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">dfs_recursive</span>(<span class="params">graph, node, visited=<span class="literal">None</span></span>):</span><br><span class="line">    <span class="keyword">if</span> visited <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        visited = <span class="built_in">set</span>()</span><br><span class="line">    visited.add(node)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f"访问: <span class="subst">{node}</span>"</span>)</span><br><span class="line">    <span class="keyword">for</span> neighbor <span class="keyword">in</span> graph[node]:</span><br><span class="line">        <span class="keyword">if</span> neighbor <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">            dfs_recursive(graph, neighbor, visited)</span><br><span class="line">    <span class="keyword">return</span> visited</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（递归版）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">调用 dfs(graph, 0)</span><br><span class="line">  visited={0}, 打印"访问: 0"</span><br><span class="line">  邻居: [1, 2]</span><br><span class="line">  ├─ 1 未访问 → 调用 dfs(graph, 1)</span><br><span class="line">  │    visited={0,1}, 打印"访问: 1"</span><br><span class="line">  │    邻居: [0, 2, 3]</span><br><span class="line">  │    ├─ 0 已访问 → 跳过</span><br><span class="line">  │    ├─ 2 未访问 → 调用 dfs(graph, 2)</span><br><span class="line">  │    │    visited={0,1,2}, 打印"访问: 2"</span><br><span class="line">  │    │    邻居: [0, 1, 4]</span><br><span class="line">  │    │    ├─ 0 已访问 → 跳过</span><br><span class="line">  │    │    ├─ 1 已访问 → 跳过</span><br><span class="line">  │    │    └─ 4 未访问 → 调用 dfs(graph, 4)</span><br><span class="line">  │    │         visited={0,1,2,4}, 打印"访问: 4"</span><br><span class="line">  │    │         邻居: [2, 3]</span><br><span class="line">  │    │         ├─ 2 已访问 → 跳过</span><br><span class="line">  │    │         └─ 3 未访问 → 调用 dfs(graph, 3)</span><br><span class="line">  │    │              visited={0,1,2,3,4}, 打印"访问: 3"</span><br><span class="line">  │    │              邻居: [1, 4] → 全部已访问</span><br><span class="line">  │    │              返回 ↩</span><br><span class="line">  │    │         返回 ↩</span><br><span class="line">  │    │    返回 ↩</span><br><span class="line">  │    └─ 3 已访问 → 跳过</span><br><span class="line">  │    返回 ↩</span><br><span class="line">  └─ 2 已访问 → 跳过</span><br><span class="line">  返回 ↩</span><br><span class="line"></span><br><span class="line">最终遍历顺序: 0 → 1 → 2 → 4 → 3</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="迭代写法（显式栈）"><a href="#迭代写法（显式栈）" class="headerlink" title="迭代写法（显式栈）"></a>迭代写法（显式栈）</h4><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">dfs_iterative</span>(<span class="params">graph, start</span>):</span><br><span class="line">    visited = <span class="built_in">set</span>()</span><br><span class="line">    stack = [start]</span><br><span class="line">    order = []</span><br><span class="line">    <span class="keyword">while</span> stack:</span><br><span class="line">        node = stack.pop()</span><br><span class="line">        <span class="keyword">if</span> node <span class="keyword">in</span> visited:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        visited.add(node)</span><br><span class="line">        order.append(node)</span><br><span class="line">        <span class="comment"># 逆序压栈，保证小编号先被弹出</span></span><br><span class="line">        <span class="keyword">for</span> neighbor <span class="keyword">in</span> <span class="built_in">reversed</span>(<span class="built_in">sorted</span>(graph[node])):</span><br><span class="line">            <span class="keyword">if</span> neighbor <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">                stack.append(neighbor)</span><br><span class="line">    <span class="keyword">return</span> order</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="栈的变化过程（逐步图解）"><a href="#栈的变化过程（逐步图解）" class="headerlink" title="栈的变化过程（逐步图解）"></a>栈的变化过程（逐步图解）</h4><p><img src="/images/graph-theory/03_dfs_steps.png" alt="DFS 逐步过程"></p>
+<p><img src="/images/graph-theory/06_stack_vs_queue.png" alt="栈 vs 队列变化"></p>
+<p><strong>迭代版数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">初始: stack=[0], visited={}</span><br><span class="line"></span><br><span class="line">Step1: pop 0 → visited={0}, 压入邻居[2,1]</span><br><span class="line">       stack=[2,1]</span><br><span class="line"></span><br><span class="line">Step2: pop 1 → visited={0,1}, 压入邻居[3,2]</span><br><span class="line">       stack=[2,3,2]</span><br><span class="line"></span><br><span class="line">Step3: pop 2 → visited={0,1,2}, 压入邻居[4]</span><br><span class="line">       stack=[2,3,4]</span><br><span class="line"></span><br><span class="line">Step4: pop 4 → visited={0,1,2,4}, 压入邻居[3]</span><br><span class="line">       stack=[2,3,3]</span><br><span class="line"></span><br><span class="line">Step5: pop 3 → visited={0,1,2,3,4}</span><br><span class="line">       stack=[2,3]</span><br><span class="line"></span><br><span class="line">Step6: pop 3 → 已访问,跳过. pop 2 → 已访问,跳过</span><br><span class="line">       stack=[] → 结束</span><br><span class="line"></span><br><span class="line">遍历顺序: 0 → 1 → 2 → 4 → 3</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>递归 vs 迭代的区别：</strong> 递归版遍历顺序取决于邻居的遍历顺序；迭代版因为栈的 LIFO 特性，需要逆序压栈才能保持相同顺序。两者本质相同，只是栈的管理方式不同。</p>
+</blockquote>
+<h4 id="DFS-的时间-x2F-空间复杂度"><a href="#DFS-的时间-x2F-空间复杂度" class="headerlink" title="DFS 的时间/空间复杂度"></a>DFS 的时间/空间复杂度</h4><ul>
+<li>时间：O(V + E) — 每个节点访问一次，每条边检查一次</li>
+<li>空间：O(V) — visited 集合 + 栈深度（最坏情况是链状图，深度为 V）</li>
+</ul>
+<hr>
+<h3 id="1-4-BFS-广度优先搜索"><a href="#1-4-BFS-广度优先搜索" class="headerlink" title="1.4 BFS 广度优先搜索"></a>1.4 BFS 广度优先搜索</h3><p><strong>费曼一句话：</strong> BFS 就像往池塘里扔石头——水波一圈一圈往外扩。先把离你最近的人全认识了，再去认识朋友的朋友。用「队列」保证先来先服务。</p>
+<h4 id="核心机制-1"><a href="#核心机制-1" class="headerlink" title="核心机制"></a>核心机制</h4><p>BFS 的本质是：<strong>按距离（层数）从近到远探索</strong>。它用队列（先进先出）来保证「先发现的节点先处理」。</p>
+<p>关键数据结构：</p>
+<ul>
+<li><code>queue</code>：待探索的节点（先进先出）</li>
+<li><code>visited</code>：已经入过队的节点（注意：是入队时标记，不是出队时！）</li>
+</ul>
+<h4 id="标准写法"><a href="#标准写法" class="headerlink" title="标准写法"></a>标准写法</h4><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">bfs</span>(<span class="params">graph, start</span>):</span><br><span class="line">    visited = {start}</span><br><span class="line">    queue = deque([start])</span><br><span class="line">    order = []</span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        node = queue.popleft()</span><br><span class="line">        order.append(node)</span><br><span class="line">        <span class="keyword">for</span> neighbor <span class="keyword">in</span> <span class="built_in">sorted</span>(graph[node]):</span><br><span class="line">            <span class="keyword">if</span> neighbor <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">                visited.add(neighbor)  <span class="comment"># 入队时就标记!</span></span><br><span class="line">                queue.append(neighbor)</span><br><span class="line">    <span class="keyword">return</span> order</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>关键细节：visited 在入队时标记，不是出队时！</strong> 如果出队时才标记，同一个节点可能被多次入队，浪费时间和空间。这是新手最常犯的错误。</p>
+</blockquote>
+<h4 id="队列的变化过程（逐步图解）"><a href="#队列的变化过程（逐步图解）" class="headerlink" title="队列的变化过程（逐步图解）"></a>队列的变化过程（逐步图解）</h4><p><img src="/images/graph-theory/04_bfs_steps.png" alt="BFS 逐步过程"></p>
+<p><strong>数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">初始: queue=[0], visited={0}</span><br><span class="line"></span><br><span class="line">Step1: popleft 0 → 处理邻居 [1,2]</span><br><span class="line">       1 未访问 → visited={0,1}, 入队</span><br><span class="line">       2 未访问 → visited={0,1,2}, 入队</span><br><span class="line">       queue=[1,2]                          ← Layer 0 处理完</span><br><span class="line"></span><br><span class="line">Step2: popleft 1 → 处理邻居 [0,2,3]</span><br><span class="line">       0 已访问 → 跳过</span><br><span class="line">       2 已访问 → 跳过</span><br><span class="line">       3 未访问 → visited={0,1,2,3}, 入队</span><br><span class="line">       queue=[2,3]</span><br><span class="line"></span><br><span class="line">Step3: popleft 2 → 处理邻居 [0,1,4]</span><br><span class="line">       0,1 已访问 → 跳过</span><br><span class="line">       4 未访问 → visited={0,1,2,3,4}, 入队</span><br><span class="line">       queue=[3,4]                          ← Layer 1 处理完</span><br><span class="line"></span><br><span class="line">Step4: popleft 3 → 邻居 [1,4] 全已访问</span><br><span class="line">       queue=[4]</span><br><span class="line"></span><br><span class="line">Step5: popleft 4 → 邻居 [2,3] 全已访问</span><br><span class="line">       queue=[] → 结束                      ← Layer 2 处理完</span><br><span class="line"></span><br><span class="line">遍历顺序: 0 → 1 → 2 → 3 → 4</span><br><span class="line">层次:     L0    L1  L1   L2  L2</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="层序遍历的本质"><a href="#层序遍历的本质" class="headerlink" title="层序遍历的本质"></a>层序遍历的本质</h4><p>BFS 天然按层遍历。如果你需要知道「当前是第几层」，只需要在每层开始时记录队列长度：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">bfs_by_layer</span>(<span class="params">graph, start</span>):</span><br><span class="line">    visited = {start}</span><br><span class="line">    queue = deque([start])</span><br><span class="line">    depth = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        layer_size = <span class="built_in">len</span>(queue)  <span class="comment"># 当前层有多少节点</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f"Layer <span class="subst">{depth}</span>: "</span>, end=<span class="string">""</span>)</span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(layer_size):</span><br><span class="line">            node = queue.popleft()</span><br><span class="line">            <span class="built_in">print</span>(node, end=<span class="string">" "</span>)</span><br><span class="line">            <span class="keyword">for</span> nb <span class="keyword">in</span> <span class="built_in">sorted</span>(graph[node]):</span><br><span class="line">                <span class="keyword">if</span> nb <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">                    visited.add(nb)</span><br><span class="line">                    queue.append(nb)</span><br><span class="line">        <span class="built_in">print</span>()</span><br><span class="line">        depth += <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输出:</span><br><span class="line">Layer 0: 0</span><br><span class="line">Layer 1: 1 2</span><br><span class="line">Layer 2: 3 4</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>🎯 <strong>为什么 BFS 能求最短路？</strong> 因为 BFS 按层扩展，第一次到达某个节点时，走的一定是最少的边数。这就是无权图最短路的原理。</p>
+</blockquote>
+<h4 id="BFS-的时间-x2F-空间复杂度"><a href="#BFS-的时间-x2F-空间复杂度" class="headerlink" title="BFS 的时间/空间复杂度"></a>BFS 的时间/空间复杂度</h4><ul>
+<li>时间：O(V + E) — 和 DFS 一样</li>
+<li>空间：O(V) — 最坏情况队列里存了一整层的节点（完全图时接近 V）</li>
+</ul>
+<hr>
+<h3 id="1-5-DFS-vs-BFS-全面对比"><a href="#1-5-DFS-vs-BFS-全面对比" class="headerlink" title="1.5 DFS vs BFS 全面对比"></a>1.5 DFS vs BFS 全面对比</h3><p><img src="/images/graph-theory/05_dfs_vs_bfs_tree.png" alt="DFS vs BFS 遍历树"></p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>DFS</th>
+<th>BFS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据结构</td>
+<td>栈 (LIFO)</td>
+<td>队列 (FIFO)</td>
+</tr>
+<tr>
+<td>探索策略</td>
+<td>一条路走到底</td>
+<td>一层一层扩展</td>
+</tr>
+<tr>
+<td>空间复杂度</td>
+<td>O(h), h=最大深度</td>
+<td>O(w), w=最大宽度</td>
+</tr>
+<tr>
+<td>能求最短路？</td>
+<td>❌ 不能</td>
+<td>✅ 无权图最短路</td>
+</tr>
+<tr>
+<td>适合场景</td>
+<td>连通性、回溯、拓扑排序</td>
+<td>最短路、层序遍历</td>
+</tr>
+<tr>
+<td>类比</td>
+<td>走迷宫（一条路走到黑）</td>
+<td>水波扩散（一圈圈往外）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>🎯 <strong>选择口诀：</strong> 要找最短路 → BFS。要遍历所有路径/判断连通性 → DFS。不确定 → 两个都能用，选你顺手的。</p>
+</blockquote>
+<hr>
+<h3 id="1-6-新手常踩的-5-个坑"><a href="#1-6-新手常踩的-5-个坑" class="headerlink" title="1.6 新手常踩的 5 个坑"></a>1.6 新手常踩的 5 个坑</h3><p><strong>坑1: BFS 的 visited 标记时机</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ❌ 错误: 出队时标记</span></span><br><span class="line"><span class="keyword">while</span> queue:</span><br><span class="line">    node = queue.popleft()</span><br><span class="line">    <span class="keyword">if</span> node <span class="keyword">in</span> visited: <span class="keyword">continue</span>  <span class="comment"># 太晚了! 可能已经入队多次</span></span><br><span class="line">    visited.add(node)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ✅ 正确: 入队时标记</span></span><br><span class="line"><span class="keyword">if</span> neighbor <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">    visited.add(neighbor)  <span class="comment"># 入队前就标记</span></span><br><span class="line">    queue.append(neighbor)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>出队时标记会导致同一节点被多次入队。想象 A 和 B 都连着 C，处理 A 时把 C 入队，处理 B 时又把 C 入队——C 被处理两次。入队时标记就能避免。</p>
+<p><strong>坑2: DFS 递归爆栈</strong></p>
+<p>Python 默认递归深度 1000。如果图是一条链（比如 10000 个节点串成一条线），递归 DFS 直接 <code>RecursionError</code>。</p>
+<p>解决方案：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">sys.setrecursionlimit(<span class="number">200000</span>)  <span class="comment"># 方案1: 加大限制(不推荐)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 方案2: 改用迭代DFS (推荐)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dfs_iterative</span>(<span class="params">graph, start</span>):</span><br><span class="line">    stack, visited = [start], <span class="built_in">set</span>()</span><br><span class="line">    <span class="keyword">while</span> stack:</span><br><span class="line">        node = stack.pop()</span><br><span class="line">        <span class="keyword">if</span> node <span class="keyword">in</span> visited: <span class="keyword">continue</span></span><br><span class="line">        visited.add(node)</span><br><span class="line">        <span class="keyword">for</span> nb <span class="keyword">in</span> graph[node]:</span><br><span class="line">            <span class="keyword">if</span> nb <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">                stack.append(nb)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>坑3: 有向图 vs 无向图建图</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 无向图: 双向加边</span></span><br><span class="line">graph[u].append(v)</span><br><span class="line">graph[v].append(u)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 有向图: 单向加边</span></span><br><span class="line">graph[u].append(v)  <span class="comment"># 只有 u→v</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>题目说「无向」就必须双向加，漏了一个方向会导致遍历不完整。</p>
+<p><strong>坑4: 网格图的边界检查</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 模板: 四方向遍历</span></span><br><span class="line"><span class="keyword">for</span> dx, dy <span class="keyword">in</span> [(<span class="number">0</span>,<span class="number">1</span>),(<span class="number">0</span>,-<span class="number">1</span>),(<span class="number">1</span>,<span class="number">0</span>),(-<span class="number">1</span>,<span class="number">0</span>)]:</span><br><span class="line">    nx, ny = x+dx, y+dy</span><br><span class="line">    <span class="keyword">if</span> <span class="number">0</span> &lt;= nx &lt; m <span class="keyword">and</span> <span class="number">0</span> &lt;= ny &lt; n:  <span class="comment"># 边界检查</span></span><br><span class="line">        <span class="comment"># 处理 (nx, ny)</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>忘记边界检查 → IndexError。建议把方向数组写成常量，减少手误。</p>
+<p><strong>坑5: Dijkstra 忘记跳过过时条目</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d, u = heapq.heappop(heap)</span><br><span class="line"><span class="keyword">if</span> d &gt; dist.get(u, <span class="built_in">float</span>(<span class="string">'inf'</span>)):</span><br><span class="line">    <span class="keyword">continue</span>  <span class="comment"># 这个条目已经过时了，跳过!</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>堆里可能有同一节点的多个条目（因为松弛时 push 新的而不是更新旧的）。不跳过会导致重复处理，虽然结果正确但时间退化。</p>
+<hr>
+<h3 id="1-7-DFS-x2F-BFS-模板速查表"><a href="#1-7-DFS-x2F-BFS-模板速查表" class="headerlink" title="1.7 DFS/BFS 模板速查表"></a>1.7 DFS/BFS 模板速查表</h3><p><strong>DFS 万能模板（迭代版）：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">dfs</span>(<span class="params">graph, start</span>):</span><br><span class="line">    stack, visited = [start], {start}</span><br><span class="line">    <span class="keyword">while</span> stack:</span><br><span class="line">        node = stack.pop()</span><br><span class="line">        <span class="comment"># process(node)</span></span><br><span class="line">        <span class="keyword">for</span> nb <span class="keyword">in</span> graph[node]:</span><br><span class="line">            <span class="keyword">if</span> nb <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">                visited.add(nb)</span><br><span class="line">                stack.append(nb)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>BFS 万能模板（带层数）：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">bfs</span>(<span class="params">graph, start</span>):</span><br><span class="line">    queue, visited = deque([start]), {start}</span><br><span class="line">    depth = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(queue)):</span><br><span class="line">            node = queue.popleft()</span><br><span class="line">            <span class="comment"># process(node, depth)</span></span><br><span class="line">            <span class="keyword">for</span> nb <span class="keyword">in</span> graph[node]:</span><br><span class="line">                <span class="keyword">if</span> nb <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">                    visited.add(nb)</span><br><span class="line">                    queue.append(nb)</span><br><span class="line">        depth += <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>网格 DFS 模板：</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">grid_dfs</span>(<span class="params">grid, i, j, m, n</span>):</span><br><span class="line">    <span class="keyword">if</span> i &lt; <span class="number">0</span> <span class="keyword">or</span> i &gt;= m <span class="keyword">or</span> j &lt; <span class="number">0</span> <span class="keyword">or</span> j &gt;= n <span class="keyword">or</span> grid[i][j] != target:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    grid[i][j] = visited_mark  <span class="comment"># 标记</span></span><br><span class="line">    <span class="keyword">for</span> di, dj <span class="keyword">in</span> [(<span class="number">0</span>,<span class="number">1</span>),(<span class="number">0</span>,-<span class="number">1</span>),(<span class="number">1</span>,<span class="number">0</span>),(-<span class="number">1</span>,<span class="number">0</span>)]:</span><br><span class="line">        grid_dfs(grid, i+di, j+dj, m, n)</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="📝-基础篇小结"><a href="#📝-基础篇小结" class="headerlink" title="📝 基础篇小结"></a>📝 基础篇小结</h2><p>到这里你已经掌握了：</p>
+<ol>
+<li><strong>图的三种存法</strong> — 邻接表是默认选择</li>
+<li><strong>DFS</strong> — 栈驱动，一条路走到黑，递归和迭代两种写法</li>
+<li><strong>BFS</strong> — 队列驱动，一层层扩展，天然求最短路</li>
+</ol>
+<p>这三个是图论的地基。接下来的技巧篇（拓扑排序、连通分量、二分图、最短路）全部建立在 DFS/BFS 之上。</p>
+<hr>
+<h2 id="第二章：技巧篇-—-图的经典应用"><a href="#第二章：技巧篇-—-图的经典应用" class="headerlink" title="第二章：技巧篇 — 图的经典应用"></a>第二章：技巧篇 — 图的经典应用</h2><hr>
+<h3 id="2-1-拓扑排序"><a href="#2-1-拓扑排序" class="headerlink" title="2.1 拓扑排序"></a>2.1 拓扑排序</h3><p><strong>费曼一句话：</strong> 你有一堆课要上，有些课有先修要求。拓扑排序就是帮你排出一个「不违反任何先修要求」的选课顺序。如果排不出来，说明先修关系里有死循环（环）。</p>
+<h4 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h4><p>拓扑排序只对 <strong>有向无环图 (DAG)</strong> 有意义。如果图里有环，就不可能排出合法顺序。</p>
+<p>我们用这个课程依赖图：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0 → 1 → 3 → 4</span><br><span class="line">0 → 2 → 3</span><br><span class="line">    1 → 4</span><br></pre></td></tr></tbody></table></figure>
+<p>含义：上课程 3 之前，必须先上 1 和 2；上 1 之前必须先上 0。</p>
+<h4 id="方法一：Kahn’s-BFS（入度法）"><a href="#方法一：Kahn’s-BFS（入度法）" class="headerlink" title="方法一：Kahn’s BFS（入度法）"></a>方法一：Kahn’s BFS（入度法）</h4><p><strong>核心思想：</strong> 不断找「没有先修要求的课」（入度为 0），上完它，然后把它从依赖关系中删掉。重复直到所有课上完。</p>
+<p><img src="/images/graph-theory/07_kahn_topo.png" alt="Kahn's BFS 拓扑排序"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque, defaultdict</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">topo_sort_kahn</span>(<span class="params">n, edges</span>):</span><br><span class="line">    graph = defaultdict(<span class="built_in">list</span>)</span><br><span class="line">    indegree = [<span class="number">0</span>] * n</span><br><span class="line">    <span class="keyword">for</span> u, v <span class="keyword">in</span> edges:</span><br><span class="line">        graph[u].append(v)</span><br><span class="line">        indegree[v] += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    queue = deque(i <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n) <span class="keyword">if</span> indegree[i] == <span class="number">0</span>)</span><br><span class="line">    result = []</span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        node = queue.popleft()</span><br><span class="line">        result.append(node)</span><br><span class="line">        <span class="keyword">for</span> nb <span class="keyword">in</span> graph[node]:</span><br><span class="line">            indegree[nb] -= <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> indegree[nb] == <span class="number">0</span>:</span><br><span class="line">                queue.append(nb)</span><br><span class="line">    <span class="keyword">return</span> result <span class="keyword">if</span> <span class="built_in">len</span>(result) == n <span class="keyword">else</span> []  <span class="comment"># 空=有环</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">初始入度: [0:0, 1:1, 2:1, 3:2, 4:2]</span><br><span class="line">queue=[0], result=[]</span><br><span class="line"></span><br><span class="line">Step1: pop 0 → result=[0]</span><br><span class="line">  删边 0→1: indegree[1]=0 → 入队</span><br><span class="line">  删边 0→2: indegree[2]=0 → 入队</span><br><span class="line">  queue=[1,2]</span><br><span class="line"></span><br><span class="line">Step2: pop 1 → result=[0,1]</span><br><span class="line">  删边 1→3: indegree[3]=1</span><br><span class="line">  删边 1→4: indegree[4]=1</span><br><span class="line">  queue=[2]</span><br><span class="line"></span><br><span class="line">Step3: pop 2 → result=[0,1,2]</span><br><span class="line">  删边 2→3: indegree[3]=0 → 入队</span><br><span class="line">  queue=[3]</span><br><span class="line"></span><br><span class="line">Step4: pop 3 → result=[0,1,2,3]</span><br><span class="line">  删边 3→4: indegree[4]=0 → 入队</span><br><span class="line">  queue=[4]</span><br><span class="line"></span><br><span class="line">Step5: pop 4 → result=[0,1,2,3,4]</span><br><span class="line">  queue=[] → 结束</span><br><span class="line"></span><br><span class="line">len(result)=5=n → 无环, 合法拓扑序: [0,1,2,3,4]</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="方法二：DFS-后序反转"><a href="#方法二：DFS-后序反转" class="headerlink" title="方法二：DFS 后序反转"></a>方法二：DFS 后序反转</h4><p><strong>核心思想：</strong> DFS 递归到底再回来时，「最后完成的节点」一定是依赖链的起点。把 DFS 的完成顺序反转，就是拓扑序。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">topo_sort_dfs</span>(<span class="params">n, edges</span>):</span><br><span class="line">    graph = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">    <span class="keyword">for</span> u, v <span class="keyword">in</span> edges:</span><br><span class="line">        graph[u].append(v)</span><br><span class="line"></span><br><span class="line">    WHITE, GRAY, BLACK = <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span></span><br><span class="line">    color = [WHITE] * n</span><br><span class="line">    order = []</span><br><span class="line">    has_cycle = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">dfs</span>(<span class="params">u</span>):</span><br><span class="line">        <span class="keyword">nonlocal</span> has_cycle</span><br><span class="line">        color[u] = GRAY  <span class="comment"># 正在处理</span></span><br><span class="line">        <span class="keyword">for</span> v <span class="keyword">in</span> graph[u]:</span><br><span class="line">            <span class="keyword">if</span> color[v] == GRAY:  <span class="comment"># 遇到灰色=环!</span></span><br><span class="line">                has_cycle = <span class="literal">True</span>; <span class="keyword">return</span></span><br><span class="line">            <span class="keyword">if</span> color[v] == WHITE:</span><br><span class="line">                dfs(v)</span><br><span class="line">        color[u] = BLACK  <span class="comment"># 处理完毕</span></span><br><span class="line">        order.append(u)   <span class="comment"># 后序: 完成时记录</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">        <span class="keyword">if</span> color[i] == WHITE:</span><br><span class="line">            dfs(i)</span><br><span class="line">    <span class="keyword">return</span> order[::-<span class="number">1</span>] <span class="keyword">if</span> <span class="keyword">not</span> has_cycle <span class="keyword">else</span> []</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（三色标记法）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">WHITE=未访问  GRAY=正在递归中  BLACK=已完成</span><br><span class="line"></span><br><span class="line">dfs(0): color[0]=GRAY</span><br><span class="line">  → dfs(1): color[1]=GRAY</span><br><span class="line">    → dfs(3): color[3]=GRAY</span><br><span class="line">      → dfs(4): color[4]=GRAY</span><br><span class="line">        邻居都没有 → color[4]=BLACK, order=[4]</span><br><span class="line">      color[3]=BLACK, order=[4,3]</span><br><span class="line">    → dfs(4): 已BLACK,跳过</span><br><span class="line">    color[1]=BLACK, order=[4,3,1]</span><br><span class="line">  → dfs(2): color[2]=GRAY</span><br><span class="line">    → dfs(3): 已BLACK,跳过</span><br><span class="line">    color[2]=BLACK, order=[4,3,1,2]</span><br><span class="line">  color[0]=BLACK, order=[4,3,1,2,0]</span><br><span class="line"></span><br><span class="line">反转 → [0,2,1,3,4] ← 合法拓扑序!</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>🎯 <strong>两种方法怎么选？</strong> Kahn’s BFS 更直观，能直接检测环（result 长度不够就是有环）。DFS 后序法代码更短，适合需要同时做其他事（如求强连通分量）的场景。<strong>刷题推荐 Kahn’s BFS。</strong></p>
+</blockquote>
+<hr>
+<h3 id="2-2-连通分量"><a href="#2-2-连通分量" class="headerlink" title="2.2 连通分量"></a>2.2 连通分量</h3><p><strong>费曼一句话：</strong> 一张图里可能有好几个「朋友圈」，互相之间完全不认识。每个朋友圈就是一个连通分量。找连通分量就是数「有几个独立的圈子」。</p>
+<p><img src="/images/graph-theory/08_connected_components.png" alt="连通分量"></p>
+<h4 id="方法一：DFS-染色"><a href="#方法一：DFS-染色" class="headerlink" title="方法一：DFS 染色"></a>方法一：DFS 染色</h4><p>从每个未访问的节点出发做一次 DFS，能到达的所有节点就是同一个连通分量。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">count_components</span>(<span class="params">n, edges</span>):</span><br><span class="line">    graph = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">    <span class="keyword">for</span> u, v <span class="keyword">in</span> edges:</span><br><span class="line">        graph[u].append(v)</span><br><span class="line">        graph[v].append(u)</span><br><span class="line"></span><br><span class="line">    visited = [<span class="literal">False</span>] * n</span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">dfs</span>(<span class="params">node</span>):</span><br><span class="line">        visited[node] = <span class="literal">True</span></span><br><span class="line">        <span class="keyword">for</span> nb <span class="keyword">in</span> graph[node]:</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> visited[nb]:</span><br><span class="line">                dfs(nb)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> visited[i]:</span><br><span class="line">            dfs(i)       <span class="comment"># 发现一个新的连通分量</span></span><br><span class="line">            count += <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> count</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（图: 0-1-2, 3-4, 5-6-7）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">i=0: 未访问 → dfs(0)→dfs(1)→dfs(2), count=1</span><br><span class="line">i=1: 已访问, 跳过</span><br><span class="line">i=2: 已访问, 跳过</span><br><span class="line">i=3: 未访问 → dfs(3)→dfs(4), count=2</span><br><span class="line">i=4: 已访问, 跳过</span><br><span class="line">i=5: 未访问 → dfs(5)→dfs(6)→dfs(7), count=3</span><br><span class="line">结果: 3个连通分量</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="方法二：并查集-Union-Find"><a href="#方法二：并查集-Union-Find" class="headerlink" title="方法二：并查集 (Union-Find)"></a>方法二：并查集 (Union-Find)</h4><p><strong>费曼一句话：</strong> 每个人头上顶个牌子写着「我的老大是谁」。两个人认识了，就让一个人的老大认另一个人的老大当老大。最后数有几个「终极老大」，就有几个圈子。</p>
+<p><img src="/images/graph-theory/11_union_find_steps.png" alt="并查集 parent 数组变化"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UnionFind</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n</span>):</span><br><span class="line">        self.parent = <span class="built_in">list</span>(<span class="built_in">range</span>(n))</span><br><span class="line">        self.rank = [<span class="number">0</span>] * n</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">find</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="keyword">if</span> self.parent[x] != x:</span><br><span class="line">            self.parent[x] = self.find(self.parent[x])  <span class="comment"># 路径压缩</span></span><br><span class="line">        <span class="keyword">return</span> self.parent[x]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">union</span>(<span class="params">self, x, y</span>):</span><br><span class="line">        px, py = self.find(x), self.find(y)</span><br><span class="line">        <span class="keyword">if</span> px == py: <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> self.rank[px] &lt; self.rank[py]: px, py = py, px</span><br><span class="line">        self.parent[py] = px  <span class="comment"># 按秩合并</span></span><br><span class="line">        <span class="keyword">if</span> self.rank[px] == self.rank[py]: self.rank[px] += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用</span></span><br><span class="line">uf = UnionFind(<span class="number">8</span>)</span><br><span class="line"><span class="keyword">for</span> u, v <span class="keyword">in</span> [(<span class="number">0</span>,<span class="number">1</span>),(<span class="number">1</span>,<span class="number">2</span>),(<span class="number">0</span>,<span class="number">2</span>),(<span class="number">3</span>,<span class="number">4</span>),(<span class="number">5</span>,<span class="number">6</span>),(<span class="number">6</span>,<span class="number">7</span>)]:</span><br><span class="line">    uf.union(u, v)</span><br><span class="line"><span class="comment"># 数连通分量 = 不同根的个数</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(<span class="built_in">set</span>(uf.find(i) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">8</span>))))  <span class="comment"># 输出: 3</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">初始: parent=[0,1,2,3,4,5,6,7] (每人是自己的老大)</span><br><span class="line"></span><br><span class="line">union(0,1): parent=[0,0,2,3,4,5,6,7]  (1的老大→0)</span><br><span class="line">union(1,2): find(1)=0, parent=[0,0,0,3,4,5,6,7]  (2的老大→0)</span><br><span class="line">union(0,2): find(0)=0, find(2)=0, 同根跳过</span><br><span class="line">union(3,4): parent=[0,0,0,3,3,5,6,7]</span><br><span class="line">union(5,6): parent=[0,0,0,3,3,5,5,7]</span><br><span class="line">union(6,7): parent=[0,0,0,3,3,5,5,5]</span><br><span class="line"></span><br><span class="line">根集合: {0, 3, 5} → 3个连通分量</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>🎯 <strong>DFS vs 并查集怎么选？</strong> 静态图（边不会增加）→ DFS 更简单。动态图（边不断加入，需要实时查询连通性）→ 并查集，因为 union/find 接近 O(1)。</p>
+</blockquote>
+<hr>
+<h3 id="2-3-二分图判定（染色法）"><a href="#2-3-二分图判定（染色法）" class="headerlink" title="2.3 二分图判定（染色法）"></a>2.3 二分图判定（染色法）</h3><p><strong>费曼一句话：</strong> 把所有人分成两队，要求每条边连接的两个人必须在不同队。如果能分成功，就是二分图。方法很简单：BFS 一层层染色，红蓝交替，遇到矛盾就不是。</p>
+<p><img src="/images/graph-theory/09_bipartite.png" alt="二分图判定"></p>
+<p><strong>关键定理：</strong> 一个图是二分图 ⟺ 图中不存在奇数长度的环。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">is_bipartite</span>(<span class="params">n, edges</span>):</span><br><span class="line">    graph = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line">    <span class="keyword">for</span> u, v <span class="keyword">in</span> edges:</span><br><span class="line">        graph[u].append(v)</span><br><span class="line">        graph[v].append(u)</span><br><span class="line"></span><br><span class="line">    color = [-<span class="number">1</span>] * n  <span class="comment"># -1=未染色, 0=红, 1=蓝</span></span><br><span class="line">    <span class="keyword">for</span> start <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">        <span class="keyword">if</span> color[start] != -<span class="number">1</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        color[start] = <span class="number">0</span></span><br><span class="line">        queue = deque([start])</span><br><span class="line">        <span class="keyword">while</span> queue:</span><br><span class="line">            node = queue.popleft()</span><br><span class="line">            <span class="keyword">for</span> nb <span class="keyword">in</span> graph[node]:</span><br><span class="line">                <span class="keyword">if</span> color[nb] == -<span class="number">1</span>:</span><br><span class="line">                    color[nb] = <span class="number">1</span> - color[node]  <span class="comment"># 染相反色</span></span><br><span class="line">                    queue.append(nb)</span><br><span class="line">                <span class="keyword">elif</span> color[nb] == color[node]:</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">False</span>  <span class="comment"># 同色相邻=矛盾!</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（二分图: 0-1, 0-3, 2-1, 2-3, 4-1, 4-3）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">start=0: color[0]=0(红), queue=[0]</span><br><span class="line">  pop 0: 邻居 1,3</span><br><span class="line">    color[1]=-1 → 染1(蓝), queue=[1,3]</span><br><span class="line">    color[3]=-1 → 染1(蓝)</span><br><span class="line">  pop 1: 邻居 0,2,4</span><br><span class="line">    color[0]=0 ≠ color[1]=1 → OK</span><br><span class="line">    color[2]=-1 → 染0(红), queue=[3,2,4]</span><br><span class="line">    color[4]=-1 → 染0(红)</span><br><span class="line">  pop 3: 邻居 0,2,4</span><br><span class="line">    color[0]=0 ≠ 1 → OK</span><br><span class="line">    color[2]=0 ≠ 1 → OK</span><br><span class="line">    color[4]=0 ≠ 1 → OK</span><br><span class="line">  pop 2, pop 4: 邻居都已染色且无矛盾</span><br><span class="line">→ 是二分图! 红={0,2,4}, 蓝={1,3}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（非二分图: 0-1, 1-2, 2-0, 三角形）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">start=0: color[0]=0(红)</span><br><span class="line">  pop 0: 邻居 1,2</span><br><span class="line">    color[1]=1(蓝), color[2]=1(蓝)</span><br><span class="line">  pop 1: 邻居 0,2</span><br><span class="line">    color[0]=0 ≠ 1 → OK</span><br><span class="line">    color[2]=1 == color[1]=1 → 矛盾! return False</span><br><span class="line">→ 不是二分图 (三角形=奇数环)</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="2-4-最短路径"><a href="#2-4-最短路径" class="headerlink" title="2.4 最短路径"></a>2.4 最短路径</h3><h4 id="无权图：BFS-直接搞定"><a href="#无权图：BFS-直接搞定" class="headerlink" title="无权图：BFS 直接搞定"></a>无权图：BFS 直接搞定</h4><p><strong>费曼一句话：</strong> 每条边长度都是 1，BFS 天然按层扩展，第一次到达就是最短路。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">shortest_path_bfs</span>(<span class="params">graph, start, end</span>):</span><br><span class="line">    dist = {start: <span class="number">0</span>}</span><br><span class="line">    queue = deque([start])</span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        node = queue.popleft()</span><br><span class="line">        <span class="keyword">if</span> node == end:</span><br><span class="line">            <span class="keyword">return</span> dist[end]</span><br><span class="line">        <span class="keyword">for</span> nb <span class="keyword">in</span> graph[node]:</span><br><span class="line">            <span class="keyword">if</span> nb <span class="keyword">not</span> <span class="keyword">in</span> dist:</span><br><span class="line">                dist[nb] = dist[node] + <span class="number">1</span></span><br><span class="line">                queue.append(nb)</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>  <span class="comment"># 不可达</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="有权图：Dijkstra"><a href="#有权图：Dijkstra" class="headerlink" title="有权图：Dijkstra"></a>有权图：Dijkstra</h4><p><strong>费曼一句话：</strong> 贪心策略——每次从「已知最短距离的候选人」中挑最小的那个，确认它的最短路，然后用它去更新邻居。就像水从源头流出，总是先到最近的地方。</p>
+<p><img src="/images/graph-theory/10_dijkstra_steps.png" alt="Dijkstra 逐步过程"></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dijkstra</span>(<span class="params">graph, start</span>):</span><br><span class="line">    dist = {start: <span class="number">0</span>}</span><br><span class="line">    heap = [(<span class="number">0</span>, start)]</span><br><span class="line">    <span class="keyword">while</span> heap:</span><br><span class="line">        d, u = heapq.heappop(heap)</span><br><span class="line">        <span class="keyword">if</span> d &gt; dist.get(u, <span class="built_in">float</span>(<span class="string">'inf'</span>)):</span><br><span class="line">            <span class="keyword">continue</span>  <span class="comment"># 过时的条目，跳过</span></span><br><span class="line">        <span class="keyword">for</span> v, w <span class="keyword">in</span> graph[u]:</span><br><span class="line">            nd = d + w</span><br><span class="line">            <span class="keyword">if</span> nd &lt; dist.get(v, <span class="built_in">float</span>(<span class="string">'inf'</span>)):</span><br><span class="line">                dist[v] = nd</span><br><span class="line">                heapq.heappush(heap, (nd, v))</span><br><span class="line">    <span class="keyword">return</span> dist</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（图: 0→1:4, 0→2:1, 2→1:2, 1→3:1, 2→4:5, 3→4:3）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">初始: dist={0:0}, heap=[(0,0)]</span><br><span class="line"></span><br><span class="line">pop (0,0): 处理节点0</span><br><span class="line">  → 邻居1: 0+4=4 &lt; inf → dist={0:0,1:4}, push(4,1)</span><br><span class="line">  → 邻居2: 0+1=1 &lt; inf → dist={0:0,1:4,2:1}, push(1,2)</span><br><span class="line">  heap=[(1,2),(4,1)]</span><br><span class="line"></span><br><span class="line">pop (1,2): 处理节点2</span><br><span class="line">  → 邻居1: 1+2=3 &lt; 4 → dist[1]=3, push(3,1)  ← 松弛!</span><br><span class="line">  → 邻居4: 1+5=6 &lt; inf → dist[4]=6, push(6,4)</span><br><span class="line">  heap=[(3,1),(4,1),(6,4)]</span><br><span class="line"></span><br><span class="line">pop (3,1): 处理节点1</span><br><span class="line">  → 邻居3: 3+1=4 &lt; inf → dist[3]=4, push(4,3)</span><br><span class="line">  heap=[(4,1),(4,3),(6,4)]</span><br><span class="line"></span><br><span class="line">pop (4,1): d=4 &gt; dist[1]=3 → 过时条目,跳过!</span><br><span class="line"></span><br><span class="line">pop (4,3): 处理节点3</span><br><span class="line">  → 邻居4: 4+3=7 &gt; dist[4]=6 → 不更新</span><br><span class="line">  heap=[(6,4)]</span><br><span class="line"></span><br><span class="line">pop (6,4): 处理节点4, 无更新</span><br><span class="line">  heap=[] → 结束</span><br><span class="line"></span><br><span class="line">最终: dist = {0:0, 1:3, 2:1, 3:4, 4:6}</span><br><span class="line">最短路径: 0→2→1→3, 0→2→4</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>Dijkstra 不能处理负权边！</strong> 因为贪心假设「已确认的最短距离不会再变小」，负权边会打破这个假设。负权图用 Bellman-Ford。</p>
+</blockquote>
+<blockquote>
+<p>🎯 <strong>复杂度：</strong> 用最小堆实现，时间 O((V+E)logV)，空间 O(V)。</p>
+</blockquote>
+<hr>
+<h2 id="📝-技巧篇小结"><a href="#📝-技巧篇小结" class="headerlink" title="📝 技巧篇小结"></a>📝 技巧篇小结</h2><table>
+<thead>
+<tr>
+<th>技巧</th>
+<th>核心思想</th>
+<th>数据结构</th>
+<th>时间复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>拓扑排序(Kahn)</td>
+<td>不断删入度为0的节点</td>
+<td>队列+入度数组</td>
+<td>O(V+E)</td>
+</tr>
+<tr>
+<td>拓扑排序(DFS)</td>
+<td>后序反转</td>
+<td>递归栈+三色标记</td>
+<td>O(V+E)</td>
+</tr>
+<tr>
+<td>连通分量(DFS)</td>
+<td>从未访问节点出发DFS</td>
+<td>visited数组</td>
+<td>O(V+E)</td>
+</tr>
+<tr>
+<td>连通分量(并查集)</td>
+<td>union边, 数根</td>
+<td>parent数组</td>
+<td>O(Eα(V))≈O(E)</td>
+</tr>
+<tr>
+<td>二分图判定</td>
+<td>BFS染色, 检查矛盾</td>
+<td>color数组+队列</td>
+<td>O(V+E)</td>
+</tr>
+<tr>
+<td>最短路(无权)</td>
+<td>BFS</td>
+<td>队列+dist</td>
+<td>O(V+E)</td>
+</tr>
+<tr>
+<td>最短路(有权)</td>
+<td>Dijkstra贪心</td>
+<td>最小堆+dist</td>
+<td>O((V+E)logV)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="第三章：实战篇-—-LeetCode-真题拆解"><a href="#第三章：实战篇-—-LeetCode-真题拆解" class="headerlink" title="第三章：实战篇 — LeetCode 真题拆解"></a>第三章：实战篇 — LeetCode 真题拆解</h2><hr>
+<h3 id="3-1-LeetCode-200-岛屿数量"><a href="#3-1-LeetCode-200-岛屿数量" class="headerlink" title="3.1 LeetCode 200. 岛屿数量"></a>3.1 LeetCode 200. 岛屿数量</h3><p><strong>题意：</strong> 给一个 <code>m×n</code> 的二维网格，<code>'1'</code> 是陆地，<code>'0'</code> 是水。计算岛屿数量（上下左右相连的陆地算一个岛）。</p>
+<p><strong>费曼一句话：</strong> 这就是求连通分量！每块相连的陆地是一个连通分量。从每个未访问的 <code>'1'</code> 出发做 DFS，把整块岛「淹掉」（标记为已访问），数你淹了几次。</p>
+<p><strong>本质：</strong> 网格就是图，每个格子是节点，上下左右是边。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">numIslands</span>(<span class="params">self, grid</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> grid: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        m, n = <span class="built_in">len</span>(grid), <span class="built_in">len</span>(grid[<span class="number">0</span>])</span><br><span class="line">        count = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">dfs</span>(<span class="params">i, j</span>):</span><br><span class="line">            <span class="keyword">if</span> i &lt; <span class="number">0</span> <span class="keyword">or</span> i &gt;= m <span class="keyword">or</span> j &lt; <span class="number">0</span> <span class="keyword">or</span> j &gt;= n <span class="keyword">or</span> grid[i][j] != <span class="string">'1'</span>:</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            grid[i][j] = <span class="string">'0'</span>  <span class="comment"># 淹掉，避免重复访问</span></span><br><span class="line">            dfs(i+<span class="number">1</span>,j); dfs(i-<span class="number">1</span>,j); dfs(i,j+<span class="number">1</span>); dfs(i,j-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(m):</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">                <span class="keyword">if</span> grid[i][j] == <span class="string">'1'</span>:</span><br><span class="line">                    dfs(i, j)</span><br><span class="line">                    count += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> count</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">输入:</span><br><span class="line">  1 1 0 0 0</span><br><span class="line">  1 1 0 0 0</span><br><span class="line">  0 0 1 0 0</span><br><span class="line">  0 0 0 1 1</span><br><span class="line"></span><br><span class="line">i=0,j=0: grid[0][0]='1' → dfs淹掉整块</span><br><span class="line">  dfs(0,0)→dfs(1,0)→dfs(1,1)→dfs(0,1)  全部变'0'</span><br><span class="line">  count=1</span><br><span class="line"></span><br><span class="line">i=2,j=2: grid[2][2]='1' → dfs淹掉</span><br><span class="line">  count=2</span><br><span class="line"></span><br><span class="line">i=3,j=3: grid[3][3]='1' → dfs(3,3)→dfs(3,4)</span><br><span class="line">  count=3</span><br><span class="line"></span><br><span class="line">结果: 3个岛屿</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>🎯 <strong>核心技巧：</strong> 直接修改原数组当 visited，省空间。如果不能改原数组，用 visited 集合。</p>
+</blockquote>
+<hr>
+<h3 id="3-2-LeetCode-207-x2F-210-课程表（拓扑排序）"><a href="#3-2-LeetCode-207-x2F-210-课程表（拓扑排序）" class="headerlink" title="3.2 LeetCode 207/210. 课程表（拓扑排序）"></a>3.2 LeetCode 207/210. 课程表（拓扑排序）</h3><p><strong>题意：</strong> 207 — 给 n 门课和先修关系，判断能否修完所有课。210 — 返回一个合法的修课顺序。</p>
+<p><strong>费曼一句话：</strong> 先修关系就是有向边，能修完 = 没有环 = 能拓扑排序。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 207. 能否修完</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">canFinish</span>(<span class="params">self, numCourses, prerequisites</span>):</span><br><span class="line">        graph = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(numCourses)]</span><br><span class="line">        indegree = [<span class="number">0</span>] * numCourses</span><br><span class="line">        <span class="keyword">for</span> a, b <span class="keyword">in</span> prerequisites:  <span class="comment"># b→a (先修b才能上a)</span></span><br><span class="line">            graph[b].append(a)</span><br><span class="line">            indegree[a] += <span class="number">1</span></span><br><span class="line">        queue = deque(i <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(numCourses) <span class="keyword">if</span> indegree[i] == <span class="number">0</span>)</span><br><span class="line">        count = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> queue:</span><br><span class="line">            node = queue.popleft()</span><br><span class="line">            count += <span class="number">1</span></span><br><span class="line">            <span class="keyword">for</span> nb <span class="keyword">in</span> graph[node]:</span><br><span class="line">                indegree[nb] -= <span class="number">1</span></span><br><span class="line">                <span class="keyword">if</span> indegree[nb] == <span class="number">0</span>:</span><br><span class="line">                    queue.append(nb)</span><br><span class="line">        <span class="keyword">return</span> count == numCourses</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 210. 返回修课顺序 (只需把count换成result列表)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">findOrder</span>(<span class="params">self, numCourses, prerequisites</span>):</span><br><span class="line">        graph = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(numCourses)]</span><br><span class="line">        indegree = [<span class="number">0</span>] * numCourses</span><br><span class="line">        <span class="keyword">for</span> a, b <span class="keyword">in</span> prerequisites:</span><br><span class="line">            graph[b].append(a)</span><br><span class="line">            indegree[a] += <span class="number">1</span></span><br><span class="line">        queue = deque(i <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(numCourses) <span class="keyword">if</span> indegree[i] == <span class="number">0</span>)</span><br><span class="line">        result = []</span><br><span class="line">        <span class="keyword">while</span> queue:</span><br><span class="line">            node = queue.popleft()</span><br><span class="line">            result.append(node)</span><br><span class="line">            <span class="keyword">for</span> nb <span class="keyword">in</span> graph[node]:</span><br><span class="line">                indegree[nb] -= <span class="number">1</span></span><br><span class="line">                <span class="keyword">if</span> indegree[nb] == <span class="number">0</span>:</span><br><span class="line">                    queue.append(nb)</span><br><span class="line">        <span class="keyword">return</span> result <span class="keyword">if</span> <span class="built_in">len</span>(result) == numCourses <span class="keyword">else</span> []</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（n=4, prereqs=[[1,0],[2,0],[3,1],[3,2]]）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">图: 0→1, 0→2, 1→3, 2→3</span><br><span class="line">indegree: [0,1,1,2]</span><br><span class="line">queue=[0], result=[]</span><br><span class="line"></span><br><span class="line">pop 0 → result=[0], indegree[1]=0→入队, indegree[2]=0→入队</span><br><span class="line">pop 1 → result=[0,1], indegree[3]=1</span><br><span class="line">pop 2 → result=[0,1,2], indegree[3]=0→入队</span><br><span class="line">pop 3 → result=[0,1,2,3]</span><br><span class="line"></span><br><span class="line">len=4=n → 合法! 顺序: [0,1,2,3]</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="3-3-LeetCode-133-克隆图"><a href="#3-3-LeetCode-133-克隆图" class="headerlink" title="3.3 LeetCode 133. 克隆图"></a>3.3 LeetCode 133. 克隆图</h3><p><strong>题意：</strong> 给一个无向连通图的某个节点引用，返回该图的深拷贝。</p>
+<p><strong>费曼一句话：</strong> 遍历原图，每遇到一个节点就「克隆」一份。用哈希表记录「原节点→克隆节点」的映射，避免重复克隆（也就是 visited 的作用）。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">cloneGraph</span>(<span class="params">self, node</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> node: <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        cloned = {node: Node(node.val)}</span><br><span class="line">        queue = deque([node])</span><br><span class="line">        <span class="keyword">while</span> queue:</span><br><span class="line">            curr = queue.popleft()</span><br><span class="line">            <span class="keyword">for</span> nb <span class="keyword">in</span> curr.neighbors:</span><br><span class="line">                <span class="keyword">if</span> nb <span class="keyword">not</span> <span class="keyword">in</span> cloned:</span><br><span class="line">                    cloned[nb] = Node(nb.val)</span><br><span class="line">                    queue.append(nb)</span><br><span class="line">                cloned[curr].neighbors.append(cloned[nb])</span><br><span class="line">        <span class="keyword">return</span> cloned[node]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（图: 1-2, 1-4, 2-3, 3-4）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">cloned={1:Node(1)}, queue=[1]</span><br><span class="line"></span><br><span class="line">pop 1: 邻居 [2,4]</span><br><span class="line">  2 不在cloned → cloned[2]=Node(2), 入队</span><br><span class="line">  4 不在cloned → cloned[4]=Node(4), 入队</span><br><span class="line">  clone[1].neighbors = [clone[2], clone[4]]</span><br><span class="line"></span><br><span class="line">pop 2: 邻居 [1,3]</span><br><span class="line">  1 已在cloned → 跳过创建</span><br><span class="line">  3 不在cloned → cloned[3]=Node(3), 入队</span><br><span class="line">  clone[2].neighbors = [clone[1], clone[3]]</span><br><span class="line"></span><br><span class="line">pop 4: 邻居 [1,3]</span><br><span class="line">  clone[4].neighbors = [clone[1], clone[3]]</span><br><span class="line"></span><br><span class="line">pop 3: 邻居 [2,4]</span><br><span class="line">  clone[3].neighbors = [clone[2], clone[4]]</span><br><span class="line"></span><br><span class="line">返回 cloned[1] → 完整的深拷贝图</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>🎯 <strong>核心技巧：</strong> <code>cloned</code> 字典同时充当 visited 和映射表，一石二鸟。</p>
+</blockquote>
+<hr>
+<h3 id="3-4-LeetCode-785-判断二分图"><a href="#3-4-LeetCode-785-判断二分图" class="headerlink" title="3.4 LeetCode 785. 判断二分图"></a>3.4 LeetCode 785. 判断二分图</h3><p><strong>题意：</strong> 给一个邻接表表示的无向图，判断是否是二分图。</p>
+<p><strong>费曼一句话：</strong> 直接套染色法模板。BFS 红蓝交替染，遇到矛盾就不是。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">isBipartite</span>(<span class="params">self, graph</span>):</span><br><span class="line">        n = <span class="built_in">len</span>(graph)</span><br><span class="line">        color = [-<span class="number">1</span>] * n</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">            <span class="keyword">if</span> color[i] != -<span class="number">1</span>: <span class="keyword">continue</span></span><br><span class="line">            color[i] = <span class="number">0</span></span><br><span class="line">            queue = deque([i])</span><br><span class="line">            <span class="keyword">while</span> queue:</span><br><span class="line">                u = queue.popleft()</span><br><span class="line">                <span class="keyword">for</span> v <span class="keyword">in</span> graph[u]:</span><br><span class="line">                    <span class="keyword">if</span> color[v] == -<span class="number">1</span>:</span><br><span class="line">                        color[v] = <span class="number">1</span> - color[u]</span><br><span class="line">                        queue.append(v)</span><br><span class="line">                    <span class="keyword">elif</span> color[v] == color[u]:</span><br><span class="line">                        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>🎯 <strong>注意：</strong> 图可能不连通，所以外层要遍历所有节点作为起点。</p>
+</blockquote>
+<hr>
+<h3 id="3-5-LeetCode-743-网络延迟时间（Dijkstra）"><a href="#3-5-LeetCode-743-网络延迟时间（Dijkstra）" class="headerlink" title="3.5 LeetCode 743. 网络延迟时间（Dijkstra）"></a>3.5 LeetCode 743. 网络延迟时间（Dijkstra）</h3><p><strong>题意：</strong> n 个节点的有向加权图，从节点 k 发信号，返回所有节点收到信号的最短时间。如果有节点收不到，返回 -1。</p>
+<p><strong>费曼一句话：</strong> 从 k 出发跑 Dijkstra，求到所有节点的最短距离，取最大值就是答案。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">networkDelayTime</span>(<span class="params">self, times, n, k</span>):</span><br><span class="line">        graph = defaultdict(<span class="built_in">list</span>)</span><br><span class="line">        <span class="keyword">for</span> u, v, w <span class="keyword">in</span> times:</span><br><span class="line">            graph[u].append((v, w))</span><br><span class="line">        dist = {}</span><br><span class="line">        heap = [(<span class="number">0</span>, k)]</span><br><span class="line">        <span class="keyword">while</span> heap:</span><br><span class="line">            d, u = heapq.heappop(heap)</span><br><span class="line">            <span class="keyword">if</span> u <span class="keyword">in</span> dist: <span class="keyword">continue</span></span><br><span class="line">            dist[u] = d</span><br><span class="line">            <span class="keyword">for</span> v, w <span class="keyword">in</span> graph[u]:</span><br><span class="line">                <span class="keyword">if</span> v <span class="keyword">not</span> <span class="keyword">in</span> dist:</span><br><span class="line">                    heapq.heappush(heap, (d + w, v))</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">max</span>(dist.values()) <span class="keyword">if</span> <span class="built_in">len</span>(dist) == n <span class="keyword">else</span> -<span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪（times=[[2,1,1],[2,3,1],[3,4,1]], n=4, k=2）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">graph: {2:[(1,1),(3,1)], 3:[(4,1)]}</span><br><span class="line">heap=[(0,2)]</span><br><span class="line"></span><br><span class="line">pop (0,2): dist={2:0}, push (1,1),(1,3)</span><br><span class="line">pop (1,1): dist={2:0,1:1}</span><br><span class="line">pop (1,3): dist={2:0,1:1,3:1}, push (2,4)</span><br><span class="line">pop (2,4): dist={2:0,1:1,3:1,4:2}</span><br><span class="line"></span><br><span class="line">len(dist)=4=n → max(0,1,1,2) = 2</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="3-6-LeetCode-994-腐烂的橘子（多源-BFS）"><a href="#3-6-LeetCode-994-腐烂的橘子（多源-BFS）" class="headerlink" title="3.6 LeetCode 994. 腐烂的橘子（多源 BFS）"></a>3.6 LeetCode 994. 腐烂的橘子（多源 BFS）</h3><p><strong>题意：</strong> 网格中 0=空，1=新鲜橘子，2=腐烂橘子。每分钟腐烂橘子会感染上下左右的新鲜橘子。返回所有橘子腐烂的最短时间，不可能则返回 -1。</p>
+<p><strong>费曼一句话：</strong> 多个腐烂橘子同时开始扩散，就像同时往池塘里扔好几块石头。把所有腐烂橘子一起放进队列作为起点，然后标准 BFS 层序扩展，层数就是时间。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">orangesRotting</span>(<span class="params">self, grid</span>):</span><br><span class="line">        m, n = <span class="built_in">len</span>(grid), <span class="built_in">len</span>(grid[<span class="number">0</span>])</span><br><span class="line">        queue = deque()</span><br><span class="line">        fresh = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(m):</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">                <span class="keyword">if</span> grid[i][j] == <span class="number">2</span>:</span><br><span class="line">                    queue.append((i, j))</span><br><span class="line">                <span class="keyword">elif</span> grid[i][j] == <span class="number">1</span>:</span><br><span class="line">                    fresh += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> fresh == <span class="number">0</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        minutes = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> queue:</span><br><span class="line">            minutes += <span class="number">1</span></span><br><span class="line">            <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(queue)):</span><br><span class="line">                x, y = queue.popleft()</span><br><span class="line">                <span class="keyword">for</span> dx, dy <span class="keyword">in</span> [(<span class="number">1</span>,<span class="number">0</span>),(-<span class="number">1</span>,<span class="number">0</span>),(<span class="number">0</span>,<span class="number">1</span>),(<span class="number">0</span>,-<span class="number">1</span>)]:</span><br><span class="line">                    nx_, ny_ = x+dx, y+dy</span><br><span class="line">                    <span class="keyword">if</span> <span class="number">0</span>&lt;=nx_&lt;m <span class="keyword">and</span> <span class="number">0</span>&lt;=ny_&lt;n <span class="keyword">and</span> grid[nx_][ny_]==<span class="number">1</span>:</span><br><span class="line">                        grid[nx_][ny_] = <span class="number">2</span></span><br><span class="line">                        fresh -= <span class="number">1</span></span><br><span class="line">                        queue.append((nx_, ny_))</span><br><span class="line">            <span class="keyword">if</span> fresh == <span class="number">0</span>: <span class="keyword">return</span> minutes</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>数据流追踪：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">输入:</span><br><span class="line">  2 1 1</span><br><span class="line">  1 1 0</span><br><span class="line">  0 1 1</span><br><span class="line"></span><br><span class="line">初始: queue=[(0,0)], fresh=7</span><br><span class="line"></span><br><span class="line">Minute 1: 扩散(0,0)→感染(0,1),(1,0)</span><br><span class="line">  grid:  2 2 1    fresh=5</span><br><span class="line">         2 1 0</span><br><span class="line">         0 1 1</span><br><span class="line"></span><br><span class="line">Minute 2: 扩散(0,1),(1,0)→感染(0,2),(1,1)</span><br><span class="line">  grid:  2 2 2    fresh=3</span><br><span class="line">         2 2 0</span><br><span class="line">         0 1 1</span><br><span class="line"></span><br><span class="line">Minute 3: 扩散(0,2),(1,1)→感染(2,1)</span><br><span class="line">  grid:  2 2 2    fresh=2</span><br><span class="line">         2 2 0</span><br><span class="line">         0 2 1</span><br><span class="line"></span><br><span class="line">Minute 4: 扩散(2,1)→感染(2,2)</span><br><span class="line">  grid:  2 2 2    fresh=0 → return 4</span><br><span class="line">         2 2 0</span><br><span class="line">         0 2 2</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>🎯 <strong>多源 BFS 的关键：</strong> 把所有源点一起入队，而不是对每个源点分别 BFS。这样时间复杂度还是 O(m×n)。</p>
+</blockquote>
+<hr>
+<h2 id="第四章：Anki-闪记卡片"><a href="#第四章：Anki-闪记卡片" class="headerlink" title="第四章：Anki 闪记卡片"></a>第四章：Anki 闪记卡片</h2><p>以下 15 张卡片可直接导入 Anki（Q/A 格式）。</p>
+<hr>
+<p><strong>Q1:</strong> 图的邻接表和邻接矩阵，刷题默认用哪个？为什么？<br><strong>A1:</strong> 邻接表。空间 O(V+E) 更省，遍历邻居 O(degree) 更快。90% 的图题都用它。</p>
+<hr>
+<p><strong>Q2:</strong> DFS 用什么数据结构？一句话描述它的策略。<br><strong>A2:</strong> 栈（递归调用栈或显式栈）。策略：一条路走到黑，撞墙再回头。</p>
+<hr>
+<p><strong>Q3:</strong> BFS 用什么数据结构？为什么它能求无权图最短路？<br><strong>A3:</strong> 队列（FIFO）。因为 BFS 按层扩展，第一次到达某节点时走的边数一定最少。</p>
+<hr>
+<p><strong>Q4:</strong> BFS 中 visited 应该在入队时标记还是出队时？为什么？<br><strong>A4:</strong> 入队时！出队时标记会导致同一节点被多次入队，浪费时间空间。</p>
+<hr>
+<p><strong>Q5:</strong> 拓扑排序的前提条件是什么？<br><strong>A5:</strong> 图必须是有向无环图（DAG）。有环则无法拓扑排序。</p>
+<hr>
+<p><strong>Q6:</strong> Kahn’s BFS 拓扑排序的核心操作是什么？<br><strong>A6:</strong> 不断找入度为 0 的节点，弹出并删除它的出边，使邻居入度减 1。重复直到队列空。</p>
+<hr>
+<p><strong>Q7:</strong> 如何用 DFS 做拓扑排序？<br><strong>A7:</strong> DFS 后序记录完成顺序，最后反转。用三色标记（白/灰/黑）检测环：遇到灰色节点说明有环。</p>
+<hr>
+<p><strong>Q8:</strong> 什么是连通分量？怎么数？<br><strong>A8:</strong> 图中互相可达的最大节点集合。方法：遍历所有节点，每次从未访问节点出发 DFS/BFS，计数 +1。</p>
+<hr>
+<p><strong>Q9:</strong> 并查集的两个核心优化是什么？<br><strong>A9:</strong> 路径压缩（find 时直接指向根）+ 按秩合并（矮树挂到高树下）。使 union/find 接近 O(1)。</p>
+<hr>
+<p><strong>Q10:</strong> 如何判断一个图是否是二分图？<br><strong>A10:</strong> BFS 染色法：红蓝交替染色，如果相邻节点同色则不是二分图。等价条件：不存在奇数环。</p>
+<hr>
+<p><strong>Q11:</strong> Dijkstra 算法的核心贪心策略是什么？<br><strong>A11:</strong> 每次从未确认的节点中选距离最小的，确认其最短路，然后用它松弛邻居。用最小堆实现。</p>
+<hr>
+<p><strong>Q12:</strong> Dijkstra 为什么不能处理负权边？<br><strong>A12:</strong> 贪心假设「已确认的最短距离不会再变小」，负权边会打破这个假设。负权图用 Bellman-Ford。</p>
+<hr>
+<p><strong>Q13:</strong> LeetCode 200 岛屿数量的本质是什么？<br><strong>A13:</strong> 求网格图的连通分量数。每次从未访问的 ‘1’ 出发 DFS 淹掉整块岛，计数 +1。</p>
+<hr>
+<p><strong>Q14:</strong> 多源 BFS 和普通 BFS 的区别？<br><strong>A14:</strong> 多源 BFS 把所有源点同时入队作为第 0 层，然后正常层序扩展。典型题：994 腐烂的橘子。</p>
+<hr>
+<p><strong>Q15:</strong> DFS 和 BFS 怎么选？<br><strong>A15:</strong> 要最短路 → BFS。要遍历所有路径/连通性/拓扑排序 → DFS。不确定 → 都行，选顺手的。</p>
+<hr>
+<h2 id="第五章：LeetCode-刷题路线图"><a href="#第五章：LeetCode-刷题路线图" class="headerlink" title="第五章：LeetCode 刷题路线图"></a>第五章：LeetCode 刷题路线图</h2><h3 id="阶段一：入门（掌握-DFS-x2F-BFS-模板）"><a href="#阶段一：入门（掌握-DFS-x2F-BFS-模板）" class="headerlink" title="阶段一：入门（掌握 DFS/BFS 模板）"></a>阶段一：入门（掌握 DFS/BFS 模板）</h3><table>
+<thead>
+<tr>
+<th>题号</th>
+<th>题目</th>
+<th>核心技巧</th>
+<th>难度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>200</td>
+<td>岛屿数量</td>
+<td>DFS/BFS 连通分量</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>733</td>
+<td>图像渲染</td>
+<td>Flood Fill (DFS)</td>
+<td>Easy</td>
+</tr>
+<tr>
+<td>695</td>
+<td>岛屿的最大面积</td>
+<td>DFS + 计数</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>994</td>
+<td>腐烂的橘子</td>
+<td>多源 BFS</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>542</td>
+<td>01 矩阵</td>
+<td>多源 BFS 求最短距离</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>133</td>
+<td>克隆图</td>
+<td>BFS + 哈希映射</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3 id="阶段二：进阶（拓扑排序-二分图-并查集）"><a href="#阶段二：进阶（拓扑排序-二分图-并查集）" class="headerlink" title="阶段二：进阶（拓扑排序 + 二分图 + 并查集）"></a>阶段二：进阶（拓扑排序 + 二分图 + 并查集）</h3><table>
+<thead>
+<tr>
+<th>题号</th>
+<th>题目</th>
+<th>核心技巧</th>
+<th>难度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>207</td>
+<td>课程表</td>
+<td>Kahn’s 拓扑排序</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>210</td>
+<td>课程表 II</td>
+<td>拓扑排序输出序列</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>785</td>
+<td>判断二分图</td>
+<td>BFS 染色</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>886</td>
+<td>可能的二分法</td>
+<td>二分图变体</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>547</td>
+<td>省份数量</td>
+<td>并查集/DFS 连通分量</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>684</td>
+<td>冗余连接</td>
+<td>并查集检测环</td>
+<td>Medium</td>
+</tr>
+</tbody></table>
+<h3 id="阶段三：硬核（最短路-综合应用）"><a href="#阶段三：硬核（最短路-综合应用）" class="headerlink" title="阶段三：硬核（最短路 + 综合应用）"></a>阶段三：硬核（最短路 + 综合应用）</h3><table>
+<thead>
+<tr>
+<th>题号</th>
+<th>题目</th>
+<th>核心技巧</th>
+<th>难度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>743</td>
+<td>网络延迟时间</td>
+<td>Dijkstra</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>787</td>
+<td>K 站中转最便宜航班</td>
+<td>Bellman-Ford/BFS</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>1091</td>
+<td>二进制矩阵最短路径</td>
+<td>BFS 8方向</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>127</td>
+<td>单词接龙</td>
+<td>BFS + 状态图</td>
+<td>Hard</td>
+</tr>
+<tr>
+<td>329</td>
+<td>矩阵中的最长递增路径</td>
+<td>DFS + 记忆化</td>
+<td>Hard</td>
+</tr>
+<tr>
+<td>1192</td>
+<td>查找集群内的关键连接</td>
+<td>Tarjan 求桥</td>
+<td>Hard</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="第六章：算法选择决策树"><a href="#第六章：算法选择决策树" class="headerlink" title="第六章：算法选择决策树"></a>第六章：算法选择决策树</h2><p>拿到一道图题，脑子里应该跑这个决策流程：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">题目给了图 →</span><br><span class="line">│</span><br><span class="line">├─ 求最短路？</span><br><span class="line">│   ├─ 无权图 → BFS</span><br><span class="line">│   ├─ 有权图(非负权) → Dijkstra</span><br><span class="line">│   └─ 有负权 → Bellman-Ford</span><br><span class="line">│</span><br><span class="line">├─ 判断能否完成/有无环？</span><br><span class="line">│   └─ 有向图 → 拓扑排序 (Kahn's BFS)</span><br><span class="line">│</span><br><span class="line">├─ 求连通分量/岛屿数量？</span><br><span class="line">│   ├─ 静态图 → DFS</span><br><span class="line">│   └─ 动态加边 → 并查集</span><br><span class="line">│</span><br><span class="line">├─ 判断二分图？</span><br><span class="line">│   └─ BFS 染色法</span><br><span class="line">│</span><br><span class="line">├─ 求所有路径/排列组合？</span><br><span class="line">│   └─ DFS + 回溯</span><br><span class="line">│</span><br><span class="line">└─ 不确定？</span><br><span class="line">    └─ 先试 BFS（如果需要最短/最少），否则 DFS</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>复杂度速查表：</strong></p>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>时间</th>
+<th>空间</th>
+<th>适用条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BFS</td>
+<td>O(V+E)</td>
+<td>O(V)</td>
+<td>无权最短路、层序遍历</td>
+</tr>
+<tr>
+<td>DFS</td>
+<td>O(V+E)</td>
+<td>O(V)</td>
+<td>连通性、回溯、拓扑排序</td>
+</tr>
+<tr>
+<td>Dijkstra(堆)</td>
+<td>O((V+E)logV)</td>
+<td>O(V)</td>
+<td>非负权最短路</td>
+</tr>
+<tr>
+<td>Bellman-Ford</td>
+<td>O(VE)</td>
+<td>O(V)</td>
+<td>有负权、检测负环</td>
+</tr>
+<tr>
+<td>Kahn’s拓扑</td>
+<td>O(V+E)</td>
+<td>O(V)</td>
+<td>DAG排序、环检测</td>
+</tr>
+<tr>
+<td>并查集</td>
+<td>O(Eα(V))</td>
+<td>O(V)</td>
+<td>动态连通性</td>
+</tr>
+<tr>
+<td>Floyd-Warshall</td>
+<td>O(V³)</td>
+<td>O(V²)</td>
+<td>全源最短路(小图)</td>
+</tr>
+</tbody></table>
+<p><strong>面试/竞赛中的选择优先级：</strong></p>
+<ol>
+<li>看到「最短」「最少步数」「最近」→ 先想 BFS</li>
+<li>看到「所有路径」「排列」「组合」→ 先想 DFS + 回溯</li>
+<li>看到「先修课」「依赖关系」「顺序」→ 先想拓扑排序</li>
+<li>看到「分组」「两队」「对立」→ 先想二分图染色</li>
+<li>看到「连通」「岛屿」「省份」→ 先想 DFS 或并查集</li>
+<li>看到「带权最短路」→ Dijkstra（确认无负权）</li>
+</ol>
+<hr>
+<h2 id="总结：图论知识地图"><a href="#总结：图论知识地图" class="headerlink" title="总结：图论知识地图"></a>总结：图论知识地图</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">                    图论与搜索</span><br><span class="line">                       │</span><br><span class="line">          ┌────────────┼────────────┐</span><br><span class="line">          │            │            │</span><br><span class="line">       表示法        遍历算法      经典应用</span><br><span class="line">       │            │            │</span><br><span class="line">  ┌────┼────┐   ┌───┼───┐   ┌───┼────┬────┬────┐</span><br><span class="line">  │    │    │   │       │   │   │    │    │    │</span><br><span class="line">邻接  邻接  边  DFS    BFS  拓扑 连通  二分  最短</span><br><span class="line">矩阵  表   列表 (栈)  (队列) 排序 分量  图   路径</span><br><span class="line">                              │    │    │    │</span><br><span class="line">                          Kahn's DFS  染色 Dijkstra</span><br><span class="line">                          DFS后序 并查集    BFS(无权)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>一句话总结全文：</strong> 图论的核心就两件事——怎么存图（邻接表），怎么遍历图（DFS/BFS）。所有高级应用都是在遍历的基础上加点料。</p>
+<hr>
+<blockquote>
+<p>本文约 9300 字，包含 11 张可视化图解、15 张 Anki 闪记卡片、18 道 LeetCode 刷题路线。<br>如有错误或建议，欢迎指正。</p>
+</blockquote>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/02/23/graph-theory-and-search/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/02/23/graph-theory-and-search/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/02/22/linkedlist-pointer-complete-guide/">链表与指针完全图解：从内存本质到 LeetCode 实战</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9A%E5%9F%BA%E7%A1%80%E7%AF%87-%E2%80%94-%E5%9B%BE%E7%9A%84%E4%B8%96%E7%95%8C%E8%A7%82"><span class="toc-text">第一章：基础篇 — 图的世界观</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E5%9B%BE%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">1.1 图到底是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%9B%BE%E7%9A%84%E4%B8%89%E7%A7%8D%E8%A1%A8%E7%A4%BA%E6%B3%95"><span class="toc-text">1.2 图的三种表示法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-1-%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5-Adjacency-Matrix"><span class="toc-text">1.2.1 邻接矩阵 (Adjacency Matrix)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-2-%E9%82%BB%E6%8E%A5%E8%A1%A8-Adjacency-List"><span class="toc-text">1.2.2 邻接表 (Adjacency List)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-3-%E8%BE%B9%E5%88%97%E8%A1%A8-Edge-List"><span class="toc-text">1.2.3 边列表 (Edge List)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89%E7%A7%8D%E8%A1%A8%E7%A4%BA%E6%B3%95%E5%AF%B9%E6%AF%94%E6%80%BB%E7%BB%93"><span class="toc-text">三种表示法对比总结</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-DFS-%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2"><span class="toc-text">1.3 DFS 深度优先搜索</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%9C%BA%E5%88%B6"><span class="toc-text">核心机制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%92%E5%BD%92%E5%86%99%E6%B3%95%EF%BC%88%E5%88%A9%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E6%A0%88%EF%BC%89"><span class="toc-text">递归写法（利用系统调用栈）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%AD%E4%BB%A3%E5%86%99%E6%B3%95%EF%BC%88%E6%98%BE%E5%BC%8F%E6%A0%88%EF%BC%89"><span class="toc-text">迭代写法（显式栈）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%88%E7%9A%84%E5%8F%98%E5%8C%96%E8%BF%87%E7%A8%8B%EF%BC%88%E9%80%90%E6%AD%A5%E5%9B%BE%E8%A7%A3%EF%BC%89"><span class="toc-text">栈的变化过程（逐步图解）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DFS-%E7%9A%84%E6%97%B6%E9%97%B4-x2F-%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="toc-text">DFS 的时间&#x2F;空间复杂度</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-BFS-%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2"><span class="toc-text">1.4 BFS 广度优先搜索</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%9C%BA%E5%88%B6-1"><span class="toc-text">核心机制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%87%E5%87%86%E5%86%99%E6%B3%95"><span class="toc-text">标准写法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%98%9F%E5%88%97%E7%9A%84%E5%8F%98%E5%8C%96%E8%BF%87%E7%A8%8B%EF%BC%88%E9%80%90%E6%AD%A5%E5%9B%BE%E8%A7%A3%EF%BC%89"><span class="toc-text">队列的变化过程（逐步图解）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-text">层序遍历的本质</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BFS-%E7%9A%84%E6%97%B6%E9%97%B4-x2F-%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="toc-text">BFS 的时间&#x2F;空间复杂度</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-DFS-vs-BFS-%E5%85%A8%E9%9D%A2%E5%AF%B9%E6%AF%94"><span class="toc-text">1.5 DFS vs BFS 全面对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-%E6%96%B0%E6%89%8B%E5%B8%B8%E8%B8%A9%E7%9A%84-5-%E4%B8%AA%E5%9D%91"><span class="toc-text">1.6 新手常踩的 5 个坑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-DFS-x2F-BFS-%E6%A8%A1%E6%9D%BF%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="toc-text">1.7 DFS&#x2F;BFS 模板速查表</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%9D-%E5%9F%BA%E7%A1%80%E7%AF%87%E5%B0%8F%E7%BB%93"><span class="toc-text">📝 基础篇小结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9A%E6%8A%80%E5%B7%A7%E7%AF%87-%E2%80%94-%E5%9B%BE%E7%9A%84%E7%BB%8F%E5%85%B8%E5%BA%94%E7%94%A8"><span class="toc-text">第二章：技巧篇 — 图的经典应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F"><span class="toc-text">2.1 拓扑排序</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%89%8D%E6%8F%90%E6%9D%A1%E4%BB%B6"><span class="toc-text">前提条件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80%EF%BC%9AKahn%E2%80%99s-BFS%EF%BC%88%E5%85%A5%E5%BA%A6%E6%B3%95%EF%BC%89"><span class="toc-text">方法一：Kahn’s BFS（入度法）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C%EF%BC%9ADFS-%E5%90%8E%E5%BA%8F%E5%8F%8D%E8%BD%AC"><span class="toc-text">方法二：DFS 后序反转</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E8%BF%9E%E9%80%9A%E5%88%86%E9%87%8F"><span class="toc-text">2.2 连通分量</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80%EF%BC%9ADFS-%E6%9F%93%E8%89%B2"><span class="toc-text">方法一：DFS 染色</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C%EF%BC%9A%E5%B9%B6%E6%9F%A5%E9%9B%86-Union-Find"><span class="toc-text">方法二：并查集 (Union-Find)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E4%BA%8C%E5%88%86%E5%9B%BE%E5%88%A4%E5%AE%9A%EF%BC%88%E6%9F%93%E8%89%B2%E6%B3%95%EF%BC%89"><span class="toc-text">2.3 二分图判定（染色法）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84"><span class="toc-text">2.4 最短路径</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%A0%E6%9D%83%E5%9B%BE%EF%BC%9ABFS-%E7%9B%B4%E6%8E%A5%E6%90%9E%E5%AE%9A"><span class="toc-text">无权图：BFS 直接搞定</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E6%9D%83%E5%9B%BE%EF%BC%9ADijkstra"><span class="toc-text">有权图：Dijkstra</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%9D-%E6%8A%80%E5%B7%A7%E7%AF%87%E5%B0%8F%E7%BB%93"><span class="toc-text">📝 技巧篇小结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9A%E5%AE%9E%E6%88%98%E7%AF%87-%E2%80%94-LeetCode-%E7%9C%9F%E9%A2%98%E6%8B%86%E8%A7%A3"><span class="toc-text">第三章：实战篇 — LeetCode 真题拆解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-LeetCode-200-%E5%B2%9B%E5%B1%BF%E6%95%B0%E9%87%8F"><span class="toc-text">3.1 LeetCode 200. 岛屿数量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-LeetCode-207-x2F-210-%E8%AF%BE%E7%A8%8B%E8%A1%A8%EF%BC%88%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%EF%BC%89"><span class="toc-text">3.2 LeetCode 207&#x2F;210. 课程表（拓扑排序）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-LeetCode-133-%E5%85%8B%E9%9A%86%E5%9B%BE"><span class="toc-text">3.3 LeetCode 133. 克隆图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-LeetCode-785-%E5%88%A4%E6%96%AD%E4%BA%8C%E5%88%86%E5%9B%BE"><span class="toc-text">3.4 LeetCode 785. 判断二分图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-LeetCode-743-%E7%BD%91%E7%BB%9C%E5%BB%B6%E8%BF%9F%E6%97%B6%E9%97%B4%EF%BC%88Dijkstra%EF%BC%89"><span class="toc-text">3.5 LeetCode 743. 网络延迟时间（Dijkstra）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-LeetCode-994-%E8%85%90%E7%83%82%E7%9A%84%E6%A9%98%E5%AD%90%EF%BC%88%E5%A4%9A%E6%BA%90-BFS%EF%BC%89"><span class="toc-text">3.6 LeetCode 994. 腐烂的橘子（多源 BFS）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E7%AB%A0%EF%BC%9AAnki-%E9%97%AA%E8%AE%B0%E5%8D%A1%E7%89%87"><span class="toc-text">第四章：Anki 闪记卡片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9ALeetCode-%E5%88%B7%E9%A2%98%E8%B7%AF%E7%BA%BF%E5%9B%BE"><span class="toc-text">第五章：LeetCode 刷题路线图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B6%E6%AE%B5%E4%B8%80%EF%BC%9A%E5%85%A5%E9%97%A8%EF%BC%88%E6%8E%8C%E6%8F%A1-DFS-x2F-BFS-%E6%A8%A1%E6%9D%BF%EF%BC%89"><span class="toc-text">阶段一：入门（掌握 DFS&#x2F;BFS 模板）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B6%E6%AE%B5%E4%BA%8C%EF%BC%9A%E8%BF%9B%E9%98%B6%EF%BC%88%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F-%E4%BA%8C%E5%88%86%E5%9B%BE-%E5%B9%B6%E6%9F%A5%E9%9B%86%EF%BC%89"><span class="toc-text">阶段二：进阶（拓扑排序 + 二分图 + 并查集）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B6%E6%AE%B5%E4%B8%89%EF%BC%9A%E7%A1%AC%E6%A0%B8%EF%BC%88%E6%9C%80%E7%9F%AD%E8%B7%AF-%E7%BB%BC%E5%90%88%E5%BA%94%E7%94%A8%EF%BC%89"><span class="toc-text">阶段三：硬核（最短路 + 综合应用）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%85%AD%E7%AB%A0%EF%BC%9A%E7%AE%97%E6%B3%95%E9%80%89%E6%8B%A9%E5%86%B3%E7%AD%96%E6%A0%91"><span class="toc-text">第六章：算法选择决策树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A%E5%9B%BE%E8%AE%BA%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE"><span class="toc-text">总结：图论知识地图</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/02/23/graph-theory-and-search/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

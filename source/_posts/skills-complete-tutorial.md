@@ -1281,20 +1281,4 @@ twine upload dist/*
 
 ---
 
-## 附录：图片说明
-
-本教程包含以下示意图：
-
-1. **01_mcp_architecture.png** - MCP 架构图
-2. **02_communication_flow.png** - 通信流程图
-3. **03_file_structure.png** - 文件结构图
-4. **04_config_structure.png** - 配置文件结构
-5. **05_workflow.png** - 开发工作流程图
-
-所有图片使用 Python matplotlib 生成，源代码见 `generate_diagrams.py`。
-
----
-
-**教程完成时间**: 2026-03-04
-**版本**: v1.0.0
 **作者**: Caius

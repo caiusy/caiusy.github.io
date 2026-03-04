@@ -1297,4 +1297,4 @@ twine upload dist/*
 
 **教程完成时间**: 2026-03-04
 **版本**: v1.0.0
-**作者**: Claude & Caius
+**作者**: Caius

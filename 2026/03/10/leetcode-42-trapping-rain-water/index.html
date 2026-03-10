@@ -1,0 +1,1334 @@
+
+<!DOCTYPE html><html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>接雨水问题 - 完全学习指南 - Caius的日常博客</title>
+
+  
+    <meta name="description" content="🌧️ 接雨水问题 - 完全学习指南 LeetCode 42. Trapping Rain Water (Hard) 一份让小学生都能看懂的算法学习文档   📚 目录 问题理解 拿到题目后的分析步骤 解题思路详解 算法实现与代码 复杂度分析 相似题目总结 通用解题模板 费曼学习卡片 记忆口诀   🎯 问题理解题目描述给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="接雨水问题 - 完全学习指南">
+<meta property="og:url" content="https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/">
+<meta property="og:site_name" content="Caius的日常博客">
+<meta property="og:description" content="🌧️ 接雨水问题 - 完全学习指南 LeetCode 42. Trapping Rain Water (Hard) 一份让小学生都能看懂的算法学习文档   📚 目录 问题理解 拿到题目后的分析步骤 解题思路详解 算法实现与代码 复杂度分析 相似题目总结 通用解题模板 费曼学习卡片 记忆口诀   🎯 问题理解题目描述给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-03-10T06:11:00.000Z">
+<meta property="article:modified_time" content="2026-03-10T14:11:41.959Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="动态规划">
+<meta property="article:tag" content="双指针">
+<meta property="article:tag" content="Hard">
+<meta property="article:tag" content="数组">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="动态规划,双指针,Hard,数组">
+
+  <!-- feed -->
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-03-10T14:11:00+08:00","dateModified":"2026-03-10T22:11:41+08:00","datePublished":"2026-03-10T14:11:00+08:00","description":"","headline":"接雨水问题 - 完全学习指南","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/","keywords":"动态规划, 双指针, Hard, 数组","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius的日常博客</div><div class="sub normal cap">计算机视觉</div><div class="sub hover cap" style="opacity:0"> 大模型初学者</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="博客" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="归档" href="/archives/" style="color:#10B981"><img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="分类" href="/categories/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="标签" href="/tags/" style="color:#EC4899"><img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="Search"></form><div id="search-result"></div><div class="search-no-result">No Results!</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">Recent Update</span></div><div class="widget-body fs14"><a class="item title" href="/2026/03/10/leetcode-42-trapping-rain-water/"><span class="title">接雨水问题 - 完全学习指南</span></a><a class="item title" href="/2026/03/04/skills-complete-tutorial/"><span class="title">Skills 完整开发教程 - 从零开始掌握 MCP Skills 开发</span></a><a class="item title" href="/2026/03/04/LLaVA-Ultimate-Guide/"><span class="title">LLaVA 终极指南：从盲人教授到多模态大模型的数学解剖</span></a><a class="item title" href="/2026/02/23/graph-theory-and-search/"><span class="title">图论与搜索：从零到精通的费曼式完全指南</span></a><a class="item title" href="/2026/02/22/linkedlist-pointer-complete-guide/"><span class="title">链表与指针完全图解：从内存本质到 LeetCode 实战</span></a><a class="item title" href="/2026/02/20/20250220-dynamic-programming-complete-guide/"><span class="title">动态规划完全指南：从入门到精通</span></a><a class="item title" href="/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/"><span class="title">shutil模块</span></a><a class="item title" href="/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">变态跳台阶</span></a><a class="item title" href="/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/"><span class="title">park停车场项目实战</span></a><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">Home</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">Blog</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95/LeetCode/">LeetCode</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">Posted on: <time datetime="2026-03-10T06:11:00.000Z">2026-03-10</time></span><span class="sep updated"></span><span class="text updated">Updated on: <time datetime="2026-03-10T14:11:41.959Z">2026-03-10</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>接雨水问题 - 完全学习指南</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><h1 id="🌧️-接雨水问题-完全学习指南"><a href="#🌧️-接雨水问题-完全学习指南" class="headerlink" title="🌧️ 接雨水问题 - 完全学习指南"></a>🌧️ 接雨水问题 - 完全学习指南</h1><blockquote>
+<p><strong>LeetCode 42. Trapping Rain Water (Hard)</strong></p>
+<p>一份让小学生都能看懂的算法学习文档</p>
+</blockquote>
+<hr>
+<h2 id="📚-目录"><a href="#📚-目录" class="headerlink" title="📚 目录"></a>📚 目录</h2><ol>
+<li><a href="#%E9%97%AE%E9%A2%98%E7%90%86%E8%A7%A3">问题理解</a></li>
+<li><a href="#%E6%8B%BF%E5%88%B0%E9%A2%98%E7%9B%AE%E5%90%8E%E7%9A%84%E5%88%86%E6%9E%90%E6%AD%A5%E9%AA%A4">拿到题目后的分析步骤</a></li>
+<li><a href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%E8%AF%A6%E8%A7%A3">解题思路详解</a></li>
+<li><a href="#%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0%E4%B8%8E%E4%BB%A3%E7%A0%81">算法实现与代码</a></li>
+<li><a href="#%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90">复杂度分析</a></li>
+<li><a href="#%E7%9B%B8%E4%BC%BC%E9%A2%98%E7%9B%AE%E6%80%BB%E7%BB%93">相似题目总结</a></li>
+<li><a href="#%E9%80%9A%E7%94%A8%E8%A7%A3%E9%A2%98%E6%A8%A1%E6%9D%BF">通用解题模板</a></li>
+<li><a href="#%E8%B4%B9%E6%9B%BC%E5%AD%A6%E4%B9%A0%E5%8D%A1%E7%89%87">费曼学习卡片</a></li>
+<li><a href="#%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80">记忆口诀</a></li>
+</ol>
+<hr>
+<h2 id="🎯-问题理解"><a href="#🎯-问题理解" class="headerlink" title="🎯 问题理解"></a>🎯 问题理解</h2><h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。</p>
+<h3 id="用小学生的话说"><a href="#用小学生的话说" class="headerlink" title="用小学生的话说"></a>用小学生的话说</h3><p>想象你有一排高低不同的积木块，下雨了，雨水会积在积木块之间的凹陷处。问题是：<strong>这些凹陷处总共能装多少水？</strong></p>
+<h3 id="示例图解"><a href="#示例图解" class="headerlink" title="示例图解"></a>示例图解</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">输入: height = [0,1,0,2,1,0,1,3,2,1,2,1]</span><br><span class="line"></span><br><span class="line">下雨前的柱子:</span><br><span class="line">    █</span><br><span class="line">█   █ █   █</span><br><span class="line">█ █ █ █ █ ███</span><br><span class="line">█ █ █ █ █ ███</span><br><span class="line">0 1 0 2 1 0 1 3 2 1 2 1</span><br><span class="line"></span><br><span class="line">下雨后(蓝色是水):</span><br><span class="line">    █</span><br><span class="line">█ ≈≈█≈█≈≈≈█</span><br><span class="line">█≈█≈█≈█≈███</span><br><span class="line">█≈█≈█≈█≈███</span><br><span class="line">0 1 0 2 1 0 1 3 2 1 2 1</span><br><span class="line"></span><br><span class="line">答案: 6 (6个单位的水)</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="🔍-拿到题目后的分析步骤"><a href="#🔍-拿到题目后的分析步骤" class="headerlink" title="🔍 拿到题目后的分析步骤"></a>🔍 拿到题目后的分析步骤</h2><h3 id="第一步：理解问题本质"><a href="#第一步：理解问题本质" class="headerlink" title="第一步：理解问题本质"></a>第一步：理解问题本质</h3><p><strong>核心问题：</strong> 每个位置能接多少水？</p>
+<p><strong>关键观察：</strong></p>
+<ul>
+<li>一个位置能接水的前提是：<strong>左右两边都有比它高的柱子</strong></li>
+<li>就像一个杯子，必须两边有壁才能装水</li>
+</ul>
+<h3 id="第二步：找规律"><a href="#第二步：找规律" class="headerlink" title="第二步：找规律"></a>第二步：找规律</h3><p>让我们看位置 i 能接多少水：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">左边最高: left_max    当前位置: height[i]    右边最高: right_max</span><br><span class="line">    |                      |                      |</span><br><span class="line">    ↓                      ↓                      ↓</span><br><span class="line">  █████                   █                    █████</span><br><span class="line">  █████                   █                    █████</span><br><span class="line">  █████                  ███                   █████</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>关键公式：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">位置 i 的接水量 = min(left_max, right_max) - height[i]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>为什么是 min？</strong></p>
+<ul>
+<li>想象一个木桶，水位由最短的那块木板决定</li>
+<li>左边再高，右边矮，水也会从右边流走</li>
+<li>所以取两边的<strong>较小值</strong></li>
+</ul>
+<h3 id="第三步：思考解法"><a href="#第三步：思考解法" class="headerlink" title="第三步：思考解法"></a>第三步：思考解法</h3><p>现在我们知道了公式，问题变成：<strong>如何高效地找到每个位置的 left_max 和 right_max？</strong></p>
+<p>有三种思路：</p>
+<ol>
+<li><strong>暴力法</strong>：对每个位置，向左右扫描找最大值 → O(n²)</li>
+<li><strong>动态规划</strong>：预先计算所有位置的 left_max 和 right_max → O(n)</li>
+<li><strong>双指针</strong>：一次遍历同时维护左右最大值 → O(n)，空间 O(1)</li>
+</ol>
+<hr>
+<h2 id="💡-解题思路详解"><a href="#💡-解题思路详解" class="headerlink" title="💡 解题思路详解"></a>💡 解题思路详解</h2><h3 id="方法一：动态规划（最容易理解）"><a href="#方法一：动态规划（最容易理解）" class="headerlink" title="方法一：动态规划（最容易理解）"></a>方法一：动态规划（最容易理解）</h3><p><strong>核心思想：</strong> 用两个数组提前存好每个位置的左右最大值</p>
+<h4 id="步骤拆解"><a href="#步骤拆解" class="headerlink" title="步骤拆解"></a>步骤拆解</h4><p><strong>步骤1：从左到右扫描，记录每个位置左边的最大值</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">height:    [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]</span><br><span class="line">left_max:  [0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]</span><br><span class="line">           ↑</span><br><span class="line">           第0个位置左边没有柱子，所以是0</span><br><span class="line">                ↑</span><br><span class="line">                第2个位置左边最高是1</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>步骤2：从右到左扫描，记录每个位置右边的最大值</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">height:     [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]</span><br><span class="line">right_max:  [3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 1, 0]</span><br><span class="line">                                              ↑</span><br><span class="line">                                              最后一个位置右边没有柱子</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>步骤3：计算每个位置的接水量</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">位置 i=2:</span><br><span class="line">  left_max[2] = 1</span><br><span class="line">  right_max[2] = 3</span><br><span class="line">  height[2] = 0</span><br><span class="line">  水量 = min(1, 3) - 0 = 1</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="动态规划代码"><a href="#动态规划代码" class="headerlink" title="动态规划代码"></a>动态规划代码</h4><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">trap_dp</span>(<span class="params">height</span>):</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> height:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    n = <span class="built_in">len</span>(height)</span><br><span class="line">    left_max = [<span class="number">0</span>] * n</span><br><span class="line">    right_max = [<span class="number">0</span>] * n</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算left_max</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, n):</span><br><span class="line">        left_max[i] = <span class="built_in">max</span>(left_max[i-<span class="number">1</span>], height[i-<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算right_max</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n-<span class="number">2</span>, -<span class="number">1</span>, -<span class="number">1</span>):</span><br><span class="line">        right_max[i] = <span class="built_in">max</span>(right_max[i+<span class="number">1</span>], height[i+<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算总水量</span></span><br><span class="line">    water = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">        min_height = <span class="built_in">min</span>(left_max[i], right_max[i])</span><br><span class="line">        <span class="keyword">if</span> min_height &gt; height[i]:</span><br><span class="line">            water += min_height - height[i]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> water</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>时间复杂度：</strong> O(n) - 三次遍历<br><strong>空间复杂度：</strong> O(n) - 两个数组</p>
+<hr>
+<h3 id="方法二：双指针（最优解）"><a href="#方法二：双指针（最优解）" class="headerlink" title="方法二：双指针（最优解）"></a>方法二：双指针（最优解）</h3><p><strong>核心思想：</strong> 不需要提前知道所有的最大值，边走边更新</p>
+<h4 id="为什么双指针可行？"><a href="#为什么双指针可行？" class="headerlink" title="为什么双指针可行？"></a>为什么双指针可行？</h4><p>关键洞察：</p>
+<ul>
+<li>如果 <code>height[left] &lt; height[right]</code>，那么左边的水量只取决于 <code>left_max</code></li>
+<li>因为右边肯定有更高的柱子（至少 <code>height[right]</code> 就比左边高）</li>
+<li>反之亦然</li>
+</ul>
+<p><strong>形象比喻：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">想象你站在山谷里：</span><br><span class="line">- 如果左边的山比右边矮，你只需要关心左边的山有多高</span><br><span class="line">- 因为右边的山更高，水不会从右边流走</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="双指针步骤"><a href="#双指针步骤" class="headerlink" title="双指针步骤"></a>双指针步骤</h4><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">初始状态:</span><br><span class="line">left = 0, right = 11</span><br><span class="line">left_max = 0, right_max = 0</span><br><span class="line"></span><br><span class="line">[0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]</span><br><span class="line"> ↑                                ↑</span><br><span class="line">left                            right</span><br><span class="line"></span><br><span class="line">步骤1: height[0]=0 &lt; height[11]=1</span><br><span class="line">  → 处理左边</span><br><span class="line">  → left_max = max(0, 0) = 0</span><br><span class="line">  → 水量 = 0 - 0 = 0</span><br><span class="line">  → left++</span><br><span class="line"></span><br><span class="line">步骤2: height[1]=1 = height[11]=1</span><br><span class="line">  → 处理左边（相等时处理哪边都行）</span><br><span class="line">  → left_max = max(0, 1) = 1</span><br><span class="line">  → 水量 = 1 - 1 = 0</span><br><span class="line">  → left++</span><br><span class="line"></span><br><span class="line">步骤3: height[2]=0 &lt; height[11]=1</span><br><span class="line">  → 处理左边</span><br><span class="line">  → left_max = 1（不变）</span><br><span class="line">  → 水量 = 1 - 0 = 1 ✓</span><br><span class="line">  → left++</span><br><span class="line"></span><br><span class="line">...继续直到 left &gt;= right</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="双指针代码"><a href="#双指针代码" class="headerlink" title="双指针代码"></a>双指针代码</h4><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">trap</span>(<span class="params">height</span>):</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> height:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(height) - <span class="number">1</span></span><br><span class="line">    left_max, right_max = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">    water = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        <span class="keyword">if</span> height[left] &lt; height[right]:</span><br><span class="line">            <span class="comment"># 处理左边</span></span><br><span class="line">            <span class="keyword">if</span> height[left] &gt;= left_max:</span><br><span class="line">                left_max = height[left]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                water += left_max - height[left]</span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 处理右边</span></span><br><span class="line">            <span class="keyword">if</span> height[right] &gt;= right_max:</span><br><span class="line">                right_max = height[right]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                water += right_max - height[right]</span><br><span class="line">            right -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> water</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>时间复杂度：</strong> O(n) - 一次遍历<br><strong>空间复杂度：</strong> O(1) - 只用了几个变量</p>
+<hr>
+<h2 id="⏱️-复杂度分析"><a href="#⏱️-复杂度分析" class="headerlink" title="⏱️ 复杂度分析"></a>⏱️ 复杂度分析</h2><h3 id="三种方法对比"><a href="#三种方法对比" class="headerlink" title="三种方法对比"></a>三种方法对比</h3><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>时间复杂度</th>
+<th>空间复杂度</th>
+<th>难度</th>
+<th>推荐度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>暴力法</td>
+<td>O(n²)</td>
+<td>O(1)</td>
+<td>⭐</td>
+<td>❌ 太慢</td>
+</tr>
+<tr>
+<td>动态规划</td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>⭐⭐⭐</td>
+<td>✅ 易理解</td>
+</tr>
+<tr>
+<td>双指针</td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>⭐⭐⭐⭐</td>
+<td>✅✅ 最优</td>
+</tr>
+</tbody></table>
+<h3 id="为什么双指针是最优解？"><a href="#为什么双指针是最优解？" class="headerlink" title="为什么双指针是最优解？"></a>为什么双指针是最优解？</h3><ol>
+<li><strong>时间最优</strong>：只遍历一次数组</li>
+<li><strong>空间最优</strong>：不需要额外数组</li>
+<li><strong>面试推荐</strong>：展示了对问题的深刻理解</li>
+</ol>
+<hr>
+<h2 id="🎯-相似题目总结"><a href="#🎯-相似题目总结" class="headerlink" title="🎯 相似题目总结"></a>🎯 相似题目总结</h2><h3 id="同类型题目（单调性问题）"><a href="#同类型题目（单调性问题）" class="headerlink" title="同类型题目（单调性问题）"></a>同类型题目（单调性问题）</h3><h4 id="1-LeetCode-11-盛最多水的容器-Medium"><a href="#1-LeetCode-11-盛最多水的容器-Medium" class="headerlink" title="1. LeetCode 11. 盛最多水的容器 (Medium)"></a>1. LeetCode 11. 盛最多水的容器 (Medium)</h4><p><strong>题目：</strong> 给定数组，选两条线，使其与 x 轴构成的容器能容纳最多的水</p>
+<p><strong>相似点：</strong></p>
+<ul>
+<li>都是求水的容量</li>
+<li>都可以用双指针</li>
+</ul>
+<p><strong>不同点：</strong></p>
+<ul>
+<li>11题是选两条线，42题是所有柱子之间</li>
+<li>11题更简单，不需要考虑中间的柱子</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 11题代码</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">maxArea</span>(<span class="params">height</span>):</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(height) - <span class="number">1</span></span><br><span class="line">    max_area = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        area = <span class="built_in">min</span>(height[left], height[right]) * (right - left)</span><br><span class="line">        max_area = <span class="built_in">max</span>(max_area, area)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> height[left] &lt; height[right]:</span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            right -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> max_area</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="2-LeetCode-84-柱状图中最大的矩形-Hard"><a href="#2-LeetCode-84-柱状图中最大的矩形-Hard" class="headerlink" title="2. LeetCode 84. 柱状图中最大的矩形 (Hard)"></a>2. LeetCode 84. 柱状图中最大的矩形 (Hard)</h4><p><strong>题目：</strong> 给定柱状图，找出其中最大的矩形面积</p>
+<p><strong>相似点：</strong></p>
+<ul>
+<li>都是处理柱状图</li>
+<li>都需要找左右边界</li>
+</ul>
+<p><strong>解法：</strong> 单调栈</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">largestRectangleArea</span>(<span class="params">heights</span>):</span><br><span class="line">    stack = []</span><br><span class="line">    max_area = <span class="number">0</span></span><br><span class="line">    heights.append(<span class="number">0</span>)  <span class="comment"># 哨兵</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i, h <span class="keyword">in</span> <span class="built_in">enumerate</span>(heights):</span><br><span class="line">        <span class="keyword">while</span> stack <span class="keyword">and</span> heights[stack[-<span class="number">1</span>]] &gt; h:</span><br><span class="line">            height = heights[stack.pop()]</span><br><span class="line">            width = i <span class="keyword">if</span> <span class="keyword">not</span> stack <span class="keyword">else</span> i - stack[-<span class="number">1</span>] - <span class="number">1</span></span><br><span class="line">            max_area = <span class="built_in">max</span>(max_area, height * width)</span><br><span class="line">        stack.append(i)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> max_area</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="3-LeetCode-407-接雨水-II-Hard"><a href="#3-LeetCode-407-接雨水-II-Hard" class="headerlink" title="3. LeetCode 407. 接雨水 II (Hard)"></a>3. LeetCode 407. 接雨水 II (Hard)</h4><p><strong>题目：</strong> 二维版本的接雨水</p>
+<p><strong>相似点：</strong></p>
+<ul>
+<li>核心思想相同：水位由周围最低的边界决定</li>
+</ul>
+<p><strong>解法：</strong> 优先队列（堆）</p>
+<hr>
+<h2 id="📋-通用解题模板"><a href="#📋-通用解题模板" class="headerlink" title="📋 通用解题模板"></a>📋 通用解题模板</h2><h3 id="双指针模板（适用于单调性问题）"><a href="#双指针模板（适用于单调性问题）" class="headerlink" title="双指针模板（适用于单调性问题）"></a>双指针模板（适用于单调性问题）</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">two_pointer_template</span>(<span class="params">arr</span>):</span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    双指针模板 - 适用于需要从两端向中间收缩的问题</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(arr) - <span class="number">1</span></span><br><span class="line">    left_max, right_max = <span class="number">0</span>, <span class="number">0</span>  <span class="comment"># 维护的状态</span></span><br><span class="line">    result = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> left &lt; right:</span><br><span class="line">        <span class="comment"># 根据条件决定移动哪个指针</span></span><br><span class="line">        <span class="keyword">if</span> arr[left] &lt; arr[right]:</span><br><span class="line">            <span class="comment"># 处理左边</span></span><br><span class="line">            <span class="keyword">if</span> arr[left] &gt;= left_max:</span><br><span class="line">                left_max = arr[left]  <span class="comment"># 更新状态</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                result += left_max - arr[left]  <span class="comment"># 计算结果</span></span><br><span class="line">            left += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 处理右边</span></span><br><span class="line">            <span class="keyword">if</span> arr[right] &gt;= right_max:</span><br><span class="line">                right_max = arr[right]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                result += right_max - arr[right]</span><br><span class="line">            right -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="动态规划模板（适用于需要预处理的问题）"><a href="#动态规划模板（适用于需要预处理的问题）" class="headerlink" title="动态规划模板（适用于需要预处理的问题）"></a>动态规划模板（适用于需要预处理的问题）</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">dp_template</span>(<span class="params">arr</span>):</span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    动态规划模板 - 适用于需要知道左右信息的问题</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    n = <span class="built_in">len</span>(arr)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1. 预处理左边信息</span></span><br><span class="line">    left_info = [<span class="number">0</span>] * n</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, n):</span><br><span class="line">        left_info[i] = <span class="built_in">max</span>(left_info[i-<span class="number">1</span>], arr[i-<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2. 预处理右边信息</span></span><br><span class="line">    right_info = [<span class="number">0</span>] * n</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n-<span class="number">2</span>, -<span class="number">1</span>, -<span class="number">1</span>):</span><br><span class="line">        right_info[i] = <span class="built_in">max</span>(right_info[i+<span class="number">1</span>], arr[i+<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 3. 计算结果</span></span><br><span class="line">    result = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(n):</span><br><span class="line">        min_val = <span class="built_in">min</span>(left_info[i], right_info[i])</span><br><span class="line">        <span class="keyword">if</span> min_val &gt; arr[i]:</span><br><span class="line">            result += min_val - arr[i]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="识别模式的关键"><a href="#识别模式的关键" class="headerlink" title="识别模式的关键"></a>识别模式的关键</h3><p><strong>什么时候用双指针？</strong></p>
+<ul>
+<li>✅ 数组有序或部分有序</li>
+<li>✅ 需要从两端向中间收缩</li>
+<li>✅ 问题有单调性（一边增大，另一边减小）</li>
+</ul>
+<p><strong>什么时候用动态规划？</strong></p>
+<ul>
+<li>✅ 需要知道左边/右边的历史信息</li>
+<li>✅ 子问题有重叠</li>
+<li>✅ 可以通过前面的结果推导后面</li>
+</ul>
+<hr>
+<h2 id="🎓-费曼学习卡片"><a href="#🎓-费曼学习卡片" class="headerlink" title="🎓 费曼学习卡片"></a>🎓 费曼学习卡片</h2><h3 id="卡片1：核心概念"><a href="#卡片1：核心概念" class="headerlink" title="卡片1：核心概念"></a>卡片1：核心概念</h3><p><strong>问题：</strong> 什么决定了一个位置能接多少水？</p>
+<p><strong>答案：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">水量 = min(左边最高, 右边最高) - 当前高度</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>用自己的话解释：</strong><br>想象你站在一个位置，左边有一堵墙，右边也有一堵墙。水能装多高？肯定是由矮的那堵墙决定的！因为水会从矮的那边溢出来。</p>
+<p><strong>举例：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">左墙高度: 5</span><br><span class="line">右墙高度: 3  ← 矮的这个决定水位</span><br><span class="line">当前地面: 1</span><br><span class="line"></span><br><span class="line">水位 = min(5, 3) = 3</span><br><span class="line">水量 = 3 - 1 = 2</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="卡片2：双指针为什么有效？"><a href="#卡片2：双指针为什么有效？" class="headerlink" title="卡片2：双指针为什么有效？"></a>卡片2：双指针为什么有效？</h3><p><strong>问题：</strong> 为什么不需要提前知道所有的最大值？</p>
+<p><strong>答案：</strong><br>因为我们只需要知道”相对关系”：</p>
+<ul>
+<li>如果左边矮，那右边肯定能挡住水（因为右边更高）</li>
+<li>这时只需要关心左边的最大值就够了</li>
+</ul>
+<p><strong>类比：</strong><br>就像两个人比身高，矮的那个不需要知道高的那个具体多高，只需要知道”你比我高”就够了。</p>
+<hr>
+<h3 id="卡片3：边界条件"><a href="#卡片3：边界条件" class="headerlink" title="卡片3：边界条件"></a>卡片3：边界条件</h3><p><strong>问题：</strong> 什么情况下接不到水？</p>
+<p><strong>答案：</strong></p>
+<ol>
+<li>数组为空或只有1-2个元素</li>
+<li>数组单调递增或递减</li>
+<li>当前位置是最高点</li>
+</ol>
+<p><strong>记忆：</strong></p>
+<ul>
+<li>空数组 → 0</li>
+<li>[1,2,3] → 0（一直上坡）</li>
+<li>[3,2,1] → 0（一直下坡）</li>
+</ul>
+<hr>
+<h2 id="🧠-记忆口诀"><a href="#🧠-记忆口诀" class="headerlink" title="🧠 记忆口诀"></a>🧠 记忆口诀</h2><h3 id="口诀1：木桶原理"><a href="#口诀1：木桶原理" class="headerlink" title="口诀1：木桶原理"></a>口诀1：木桶原理</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">接水看两边，</span><br><span class="line">短板定水线。</span><br><span class="line">左右双指针，</span><br><span class="line">一次遍历完。</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="口诀2：双指针移动规则"><a href="#口诀2：双指针移动规则" class="headerlink" title="口诀2：双指针移动规则"></a>口诀2：双指针移动规则</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">左矮移左边，</span><br><span class="line">右矮移右边。</span><br><span class="line">谁矮谁先走，</span><br><span class="line">水量边走边算。</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="口诀3：三步解题法"><a href="#口诀3：三步解题法" class="headerlink" title="口诀3：三步解题法"></a>口诀3：三步解题法</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 找规律：min(左最大, 右最大) - 当前高度</span><br><span class="line">2. 选方法：双指针最优，动态规划易懂</span><br><span class="line">3. 写代码：while left &lt; right，谁矮移谁</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="🎨-可视化记忆图"><a href="#🎨-可视化记忆图" class="headerlink" title="🎨 可视化记忆图"></a>🎨 可视化记忆图</h2><h3 id="图1-算法对比流程图"><a href="#图1-算法对比流程图" class="headerlink" title="图1: 算法对比流程图"></a>图1: 算法对比流程图</h3><p><img src="/leetcode-42-trapping-rain-water/algorithm_comparison.png" alt="算法对比"></p>
+<p>这张图展示了三种算法的演进过程：</p>
+<ul>
+<li><strong>暴力法</strong>: O(n²) - 对每个位置向左右扫描</li>
+<li><strong>动态规划</strong>: O(n) + O(n)空间 - 预处理左右最大值</li>
+<li><strong>双指针</strong>: O(n) + O(1)空间 - 最优解！</li>
+</ul>
+<h3 id="图2-思维导图"><a href="#图2-思维导图" class="headerlink" title="图2: 思维导图"></a>图2: 思维导图</h3><p><img src="/leetcode-42-trapping-rain-water/mind_map.png" alt="思维导图"></p>
+<p>一图掌握接雨水的所有要点：</p>
+<ul>
+<li>问题分析</li>
+<li>核心公式</li>
+<li>三种解法</li>
+<li>双指针技巧</li>
+<li>相似题目</li>
+<li>记忆要点</li>
+<li>复杂度分析</li>
+</ul>
+<h3 id="图3-常见错误对比"><a href="#图3-常见错误对比" class="headerlink" title="图3: 常见错误对比"></a>图3: 常见错误对比</h3><p><img src="/leetcode-42-trapping-rain-water/error_cases.png" alt="错误案例"></p>
+<p>避开这些坑：</p>
+<ul>
+<li>❌ 忘记边界检查 → ✅ 检查空数组和长度</li>
+<li>❌ 指针移动反了 → ✅ 谁矮移谁</li>
+<li>❌ 忘记更新最大值 → ✅ 先更新再计算</li>
+</ul>
+<h3 id="图4-双指针执行过程"><a href="#图4-双指针执行过程" class="headerlink" title="图4: 双指针执行过程"></a>图4: 双指针执行过程</h3><p><img src="/leetcode-42-trapping-rain-water/pointer_execution.png" alt="双指针执行"></p>
+<p>6个关键步骤，看懂双指针如何工作。</p>
+<h3 id="图5-动态演示"><a href="#图5-动态演示" class="headerlink" title="图5: 动态演示"></a>图5: 动态演示</h3><p><img src="/leetcode-42-trapping-rain-water/trapping_rain_water.gif" alt="动态演示"></p>
+<p>动画展示双指针的完整执行过程。</p>
+<h3 id="图6-记忆卡片"><a href="#图6-记忆卡片" class="headerlink" title="图6: 记忆卡片"></a>图6: 记忆卡片</h3><p><img src="/leetcode-42-trapping-rain-water/memory_cards.png" alt="记忆卡片"></p>
+<p>4张精美卡片帮助记忆：</p>
+<ul>
+<li>核心公式</li>
+<li>双指针规则</li>
+<li>复杂度对比</li>
+<li>记忆口诀</li>
+</ul>
+<h3 id="图7-步骤详解"><a href="#图7-步骤详解" class="headerlink" title="图7: 步骤详解"></a>图7: 步骤详解</h3><p><img src="/leetcode-42-trapping-rain-water/step_by_step.png" alt="步骤详解"></p>
+<p>12步完整演示，每一步都清晰可见。</p>
+<hr>
+<h2 id="📝-完整代码实现"><a href="#📝-完整代码实现" class="headerlink" title="📝 完整代码实现"></a>📝 完整代码实现</h2><h3 id="Python实现（推荐）"><a href="#Python实现（推荐）" class="headerlink" title="Python实现（推荐）"></a>Python实现（推荐）</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">trap</span>(<span class="params">self, height: <span class="type">List</span>[<span class="built_in">int</span>]</span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        双指针法 - 最优解</span></span><br><span class="line"><span class="string">        时间: O(n), 空间: O(1)</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> height <span class="keyword">or</span> <span class="built_in">len</span>(height) &lt; <span class="number">3</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        left, right = <span class="number">0</span>, <span class="built_in">len</span>(height) - <span class="number">1</span></span><br><span class="line">        left_max, right_max = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">        water = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> left &lt; right:</span><br><span class="line">            <span class="keyword">if</span> height[left] &lt; height[right]:</span><br><span class="line">                <span class="comment"># 左边矮，处理左边</span></span><br><span class="line">                <span class="keyword">if</span> height[left] &gt;= left_max:</span><br><span class="line">                    left_max = height[left]</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    water += left_max - height[left]</span><br><span class="line">                left += <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 右边矮，处理右边</span></span><br><span class="line">                <span class="keyword">if</span> height[right] &gt;= right_max:</span><br><span class="line">                    right_max = height[right]</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    water += right_max - height[right]</span><br><span class="line">                right -= <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> water</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="Java实现"><a href="#Java实现" class="headerlink" title="Java实现"></a>Java实现</h3><figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">trap</span><span class="params">(<span class="type">int</span>[] height)</span> {</span><br><span class="line">        <span class="keyword">if</span> (height == <span class="literal">null</span> || height.length &lt; <span class="number">3</span>) {</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">left</span> <span class="operator">=</span> <span class="number">0</span>, right = height.length - <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">leftMax</span> <span class="operator">=</span> <span class="number">0</span>, rightMax = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">water</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (left &lt; right) {</span><br><span class="line">            <span class="keyword">if</span> (height[left] &lt; height[right]) {</span><br><span class="line">                <span class="keyword">if</span> (height[left] &gt;= leftMax) {</span><br><span class="line">                    leftMax = height[left];</span><br><span class="line">                } <span class="keyword">else</span> {</span><br><span class="line">                    water += leftMax - height[left];</span><br><span class="line">                }</span><br><span class="line">                left++;</span><br><span class="line">            } <span class="keyword">else</span> {</span><br><span class="line">                <span class="keyword">if</span> (height[right] &gt;= rightMax) {</span><br><span class="line">                    rightMax = height[right];</span><br><span class="line">                } <span class="keyword">else</span> {</span><br><span class="line">                    water += rightMax - height[right];</span><br><span class="line">                }</span><br><span class="line">                right--;</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> water;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="C-实现"><a href="#C-实现" class="headerlink" title="C++实现"></a>C++实现</h3><figure class="highlight cpp"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> {</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">trap</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; height)</span> </span>{</span><br><span class="line">        <span class="keyword">if</span> (height.<span class="built_in">empty</span>() || height.<span class="built_in">size</span>() &lt; <span class="number">3</span>) {</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> left = <span class="number">0</span>, right = height.<span class="built_in">size</span>() - <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> leftMax = <span class="number">0</span>, rightMax = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> water = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (left &lt; right) {</span><br><span class="line">            <span class="keyword">if</span> (height[left] &lt; height[right]) {</span><br><span class="line">                <span class="keyword">if</span> (height[left] &gt;= leftMax) {</span><br><span class="line">                    leftMax = height[left];</span><br><span class="line">                } <span class="keyword">else</span> {</span><br><span class="line">                    water += leftMax - height[left];</span><br><span class="line">                }</span><br><span class="line">                left++;</span><br><span class="line">            } <span class="keyword">else</span> {</span><br><span class="line">                <span class="keyword">if</span> (height[right] &gt;= rightMax) {</span><br><span class="line">                    rightMax = height[right];</span><br><span class="line">                } <span class="keyword">else</span> {</span><br><span class="line">                    water += rightMax - height[right];</span><br><span class="line">                }</span><br><span class="line">                right--;</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> water;</span><br><span class="line">    }</span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="🏋️-练习题目清单"><a href="#🏋️-练习题目清单" class="headerlink" title="🏋️ 练习题目清单"></a>🏋️ 练习题目清单</h2><h3 id="必做题目（掌握核心）"><a href="#必做题目（掌握核心）" class="headerlink" title="必做题目（掌握核心）"></a>必做题目（掌握核心）</h3><ol>
+<li><strong>LeetCode 42. 接雨水</strong> (Hard) ⭐⭐⭐⭐⭐</li>
+</ol>
+<ul>
+<li>本题，必须完全掌握</li>
+</ul>
+<ol start="2">
+<li><strong>LeetCode 11. 盛最多水的容器</strong> (Medium) ⭐⭐⭐⭐</li>
+</ol>
+<ul>
+<li>双指针入门题，比42简单</li>
+</ul>
+<ol start="3">
+<li><strong>LeetCode 84. 柱状图中最大的矩形</strong> (Hard) ⭐⭐⭐⭐</li>
+</ol>
+<ul>
+<li>单调栈经典题</li>
+</ul>
+<h3 id="进阶题目（拓展思维）"><a href="#进阶题目（拓展思维）" class="headerlink" title="进阶题目（拓展思维）"></a>进阶题目（拓展思维）</h3><ol start="4">
+<li><strong>LeetCode 407. 接雨水 II</strong> (Hard) ⭐⭐⭐⭐⭐</li>
+</ol>
+<ul>
+<li>二维版本，用优先队列</li>
+</ul>
+<ol start="5">
+<li><strong>LeetCode 239. 滑动窗口最大值</strong> (Hard) ⭐⭐⭐⭐</li>
+</ol>
+<ul>
+<li>单调队列</li>
+</ul>
+<ol start="6">
+<li><strong>LeetCode 85. 最大矩形</strong> (Hard) ⭐⭐⭐⭐⭐</li>
+</ol>
+<ul>
+<li>结合84题的思想</li>
+</ul>
+<hr>
+<h2 id="🎯-刷题顺序建议"><a href="#🎯-刷题顺序建议" class="headerlink" title="🎯 刷题顺序建议"></a>🎯 刷题顺序建议</h2><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">第1天: LeetCode 11 (盛最多水的容器)</span><br><span class="line">       → 理解双指针基本思想</span><br><span class="line"></span><br><span class="line">第2天: LeetCode 42 (接雨水) - 动态规划版本</span><br><span class="line">       → 理解核心公式</span><br><span class="line"></span><br><span class="line">第3天: LeetCode 42 (接雨水) - 双指针版本</span><br><span class="line">       → 优化空间复杂度</span><br><span class="line"></span><br><span class="line">第4天: LeetCode 84 (柱状图中最大的矩形)</span><br><span class="line">       → 学习单调栈</span><br><span class="line"></span><br><span class="line">第5天: 复习前4题，总结模板</span><br><span class="line"></span><br><span class="line">第6天: LeetCode 407 (接雨水 II)</span><br><span class="line">       → 挑战二维版本</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="💡-常见错误与陷阱"><a href="#💡-常见错误与陷阱" class="headerlink" title="💡 常见错误与陷阱"></a>💡 常见错误与陷阱</h2><h3 id="错误1：忘记边界检查"><a href="#错误1：忘记边界检查" class="headerlink" title="错误1：忘记边界检查"></a>错误1：忘记边界检查</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ❌ 错误</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">trap</span>(<span class="params">height</span>):</span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(height) - <span class="number">1</span></span><br><span class="line">    <span class="comment"># 没有检查空数组！</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ✅ 正确</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">trap</span>(<span class="params">height</span>):</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> height <span class="keyword">or</span> <span class="built_in">len</span>(height) &lt; <span class="number">3</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    left, right = <span class="number">0</span>, <span class="built_in">len</span>(height) - <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="错误2：双指针移动条件写反"><a href="#错误2：双指针移动条件写反" class="headerlink" title="错误2：双指针移动条件写反"></a>错误2：双指针移动条件写反</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ❌ 错误</span></span><br><span class="line"><span class="keyword">if</span> height[left] &lt; height[right]:</span><br><span class="line">    right -= <span class="number">1</span>  <span class="comment"># 应该移动left！</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ✅ 正确</span></span><br><span class="line"><span class="keyword">if</span> height[left] &lt; height[right]:</span><br><span class="line">    left += <span class="number">1</span>  <span class="comment"># 谁矮移谁</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="错误3：忘记更新最大值"><a href="#错误3：忘记更新最大值" class="headerlink" title="错误3：忘记更新最大值"></a>错误3：忘记更新最大值</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ❌ 错误</span></span><br><span class="line"><span class="keyword">if</span> height[left] &lt; height[right]:</span><br><span class="line">    water += left_max - height[left]  <span class="comment"># 没更新left_max！</span></span><br><span class="line">    left += <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ✅ 正确</span></span><br><span class="line"><span class="keyword">if</span> height[left] &lt; height[right]:</span><br><span class="line">    <span class="keyword">if</span> height[left] &gt;= left_max:</span><br><span class="line">        left_max = height[left]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        water += left_max - height[left]</span><br><span class="line">    left += <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="🎓-面试技巧"><a href="#🎓-面试技巧" class="headerlink" title="🎓 面试技巧"></a>🎓 面试技巧</h2><h3 id="如何在面试中展示这道题？"><a href="#如何在面试中展示这道题？" class="headerlink" title="如何在面试中展示这道题？"></a>如何在面试中展示这道题？</h3><p><strong>第1步：确认理解（30秒）</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">"让我确认一下题意：给定柱状图，计算能接多少雨水，对吗？</span><br><span class="line">比如 [0,1,0,2,1,0,1,3,2,1,2,1]，答案是6？"</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>第2步：分析思路（1分钟）</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">"我的思路是：</span><br><span class="line">1. 每个位置的水量 = min(左边最高, 右边最高) - 当前高度</span><br><span class="line">2. 可以用动态规划预处理，也可以用双指针优化</span><br><span class="line">3. 我先说动态规划的思路..."</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>第3步：写代码（3-5分钟）</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">先写动态规划版本（容易理解）</span><br><span class="line">如果时间够，再优化成双指针</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>第4步：测试（1分钟）</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">"让我测试几个case：</span><br><span class="line">- 空数组 → 0</span><br><span class="line">- [3,2,1] → 0（单调递减）</span><br><span class="line">- [0,1,0,2,1,0,1,3,2,1,2,1] → 6"</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>第5步：分析复杂度（30秒）</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">"时间复杂度O(n)，空间复杂度O(n)</span><br><span class="line">如果要优化空间，可以用双指针做到O(1)"</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="📚-知识点总结"><a href="#📚-知识点总结" class="headerlink" title="📚 知识点总结"></a>📚 知识点总结</h2><h3 id="核心知识点"><a href="#核心知识点" class="headerlink" title="核心知识点"></a>核心知识点</h3><table>
+<thead>
+<tr>
+<th>知识点</th>
+<th>重要性</th>
+<th>应用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>双指针</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>数组、字符串、链表</td>
+</tr>
+<tr>
+<td>动态规划</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>优化问题、计数问题</td>
+</tr>
+<tr>
+<td>单调性</td>
+<td>⭐⭐⭐⭐</td>
+<td>最值问题、区间问题</td>
+</tr>
+<tr>
+<td>木桶原理</td>
+<td>⭐⭐⭐</td>
+<td>容量问题、限制问题</td>
+</tr>
+</tbody></table>
+<h3 id="举一反三"><a href="#举一反三" class="headerlink" title="举一反三"></a>举一反三</h3><p><strong>这道题教会我们：</strong></p>
+<ol>
+<li>复杂问题可以分解成简单的子问题</li>
+<li>空间换时间 vs 时间换空间的权衡</li>
+<li>双指针的本质是利用单调性减少搜索空间</li>
+<li>动态规划的本质是避免重复计算</li>
+</ol>
+<hr>
+<h2 id="🎯-5分钟快速复习"><a href="#🎯-5分钟快速复习" class="headerlink" title="🎯 5分钟快速复习"></a>🎯 5分钟快速复习</h2><h3 id="核心公式"><a href="#核心公式" class="headerlink" title="核心公式"></a>核心公式</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">水量 = min(左边最高, 右边最高) - 当前高度</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="双指针代码框架"><a href="#双指针代码框架" class="headerlink" title="双指针代码框架"></a>双指针代码框架</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">left, right = <span class="number">0</span>, <span class="built_in">len</span>(height) - <span class="number">1</span></span><br><span class="line">left_max, right_max = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> left &lt; right:</span><br><span class="line">    <span class="keyword">if</span> height[left] &lt; height[right]:</span><br><span class="line">        <span class="comment"># 处理左边</span></span><br><span class="line">        left_max = <span class="built_in">max</span>(left_max, height[left])</span><br><span class="line">        water += left_max - height[left]</span><br><span class="line">        left += <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># 处理右边</span></span><br><span class="line">        right_max = <span class="built_in">max</span>(right_max, height[right])</span><br><span class="line">        water += right_max - height[right]</span><br><span class="line">        right -= <span class="number">1</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="关键点"><a href="#关键点" class="headerlink" title="关键点"></a>关键点</h3><ul>
+<li>✅ 谁矮移谁</li>
+<li>✅ 边走边更新最大值</li>
+<li>✅ 边走边计算水量</li>
+<li>✅ 时间O(n)，空间O(1)</li>
+</ul>
+<hr>
+<h2 id="🌟-学习检查清单"><a href="#🌟-学习检查清单" class="headerlink" title="🌟 学习检查清单"></a>🌟 学习检查清单</h2><p>完成以下检查，确保你真正掌握了这道题：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 能用自己的话解释为什么用 min(左最大, 右最大)</li>
+<li><input disabled="" type="checkbox"> 能画图演示双指针的移动过程</li>
+<li><input disabled="" type="checkbox"> 能默写出双指针的代码</li>
+<li><input disabled="" type="checkbox"> 能说出时间和空间复杂度</li>
+<li><input disabled="" type="checkbox"> 能举出3个相似的题目</li>
+<li><input disabled="" type="checkbox"> 能在10分钟内独立AC这道题</li>
+<li><input disabled="" type="checkbox"> 能向别人讲清楚这道题的思路</li>
+</ul>
+<hr>
+<h2 id="📖-参考资料"><a href="#📖-参考资料" class="headerlink" title="📖 参考资料"></a>📖 参考资料</h2><ol>
+<li><strong>LeetCode官方题解</strong></li>
+</ol>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode.com/problems/trapping-rain-water/">https://leetcode.com/problems/trapping-rain-water/</a></li>
+</ul>
+<ol start="2">
+<li><strong>可视化工具</strong></li>
+</ol>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://visualgo.net/">https://visualgo.net/</a></li>
+</ul>
+<ol start="3">
+<li><strong>相关文章</strong></li>
+</ol>
+<ul>
+<li>《双指针技巧总结》</li>
+<li>《动态规划入门》</li>
+<li>《单调栈详解》</li>
+</ul>
+<hr>
+<h2 id="🎉-结语"><a href="#🎉-结语" class="headerlink" title="🎉 结语"></a>🎉 结语</h2><p>接雨水是一道经典的Hard题，但掌握了核心思想后，你会发现它其实很优雅：</p>
+<blockquote>
+<p><strong>一个简单的公式 + 一个巧妙的优化 = 完美的解法</strong></p>
+</blockquote>
+<p>记住：</p>
+<ul>
+<li>🧠 理解比记忆更重要</li>
+<li>🎯 画图比空想更有效</li>
+<li>💪 练习比看题解更关键</li>
+</ul>
+<p><strong>现在，去LeetCode上独立完成这道题吧！</strong> 🚀</p>
+<hr>
+<p><em>文档版本: v1.0</em><br><em>最后更新: 2026-03-10</em><br><em>作者: caius</em></p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>Share</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;Copied!&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">Older</div><a href="/2026/03/04/skills-complete-tutorial/">Skills 完整开发教程 - 从零开始掌握 MCP Skills 开发</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">近期发布</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">技术领域</span><a href="/tags/CV/">计算机视觉</a><a href="/tags/tracking/">目标跟踪</a><a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="sitemap-group"><span class="fs15">关于</span><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">On This Page</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%F0%9F%8C%A7%EF%B8%8F-%E6%8E%A5%E9%9B%A8%E6%B0%B4%E9%97%AE%E9%A2%98-%E5%AE%8C%E5%85%A8%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97"><span class="toc-text">🌧️ 接雨水问题 - 完全学习指南</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%9A-%E7%9B%AE%E5%BD%95"><span class="toc-text">📚 目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%AF-%E9%97%AE%E9%A2%98%E7%90%86%E8%A7%A3"><span class="toc-text">🎯 问题理解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E5%B0%8F%E5%AD%A6%E7%94%9F%E7%9A%84%E8%AF%9D%E8%AF%B4"><span class="toc-text">用小学生的话说</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B%E5%9B%BE%E8%A7%A3"><span class="toc-text">示例图解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%94%8D-%E6%8B%BF%E5%88%B0%E9%A2%98%E7%9B%AE%E5%90%8E%E7%9A%84%E5%88%86%E6%9E%90%E6%AD%A5%E9%AA%A4"><span class="toc-text">🔍 拿到题目后的分析步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E7%90%86%E8%A7%A3%E9%97%AE%E9%A2%98%E6%9C%AC%E8%B4%A8"><span class="toc-text">第一步：理解问题本质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E6%89%BE%E8%A7%84%E5%BE%8B"><span class="toc-text">第二步：找规律</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E6%80%9D%E8%80%83%E8%A7%A3%E6%B3%95"><span class="toc-text">第三步：思考解法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%92%A1-%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%E8%AF%A6%E8%A7%A3"><span class="toc-text">💡 解题思路详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80%EF%BC%9A%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%EF%BC%88%E6%9C%80%E5%AE%B9%E6%98%93%E7%90%86%E8%A7%A3%EF%BC%89"><span class="toc-text">方法一：动态规划（最容易理解）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4%E6%8B%86%E8%A7%A3"><span class="toc-text">步骤拆解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E4%BB%A3%E7%A0%81"><span class="toc-text">动态规划代码</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C%EF%BC%9A%E5%8F%8C%E6%8C%87%E9%92%88%EF%BC%88%E6%9C%80%E4%BC%98%E8%A7%A3%EF%BC%89"><span class="toc-text">方法二：双指针（最优解）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%8C%E6%8C%87%E9%92%88%E5%8F%AF%E8%A1%8C%EF%BC%9F"><span class="toc-text">为什么双指针可行？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8C%E6%8C%87%E9%92%88%E6%AD%A5%E9%AA%A4"><span class="toc-text">双指针步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8C%E6%8C%87%E9%92%88%E4%BB%A3%E7%A0%81"><span class="toc-text">双指针代码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%8F%B1%EF%B8%8F-%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="toc-text">⏱️ 复杂度分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E7%A7%8D%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="toc-text">三种方法对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%8C%E6%8C%87%E9%92%88%E6%98%AF%E6%9C%80%E4%BC%98%E8%A7%A3%EF%BC%9F"><span class="toc-text">为什么双指针是最优解？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%AF-%E7%9B%B8%E4%BC%BC%E9%A2%98%E7%9B%AE%E6%80%BB%E7%BB%93"><span class="toc-text">🎯 相似题目总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E7%B1%BB%E5%9E%8B%E9%A2%98%E7%9B%AE%EF%BC%88%E5%8D%95%E8%B0%83%E6%80%A7%E9%97%AE%E9%A2%98%EF%BC%89"><span class="toc-text">同类型题目（单调性问题）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-LeetCode-11-%E7%9B%9B%E6%9C%80%E5%A4%9A%E6%B0%B4%E7%9A%84%E5%AE%B9%E5%99%A8-Medium"><span class="toc-text">1. LeetCode 11. 盛最多水的容器 (Medium)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-LeetCode-84-%E6%9F%B1%E7%8A%B6%E5%9B%BE%E4%B8%AD%E6%9C%80%E5%A4%A7%E7%9A%84%E7%9F%A9%E5%BD%A2-Hard"><span class="toc-text">2. LeetCode 84. 柱状图中最大的矩形 (Hard)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-LeetCode-407-%E6%8E%A5%E9%9B%A8%E6%B0%B4-II-Hard"><span class="toc-text">3. LeetCode 407. 接雨水 II (Hard)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%8B-%E9%80%9A%E7%94%A8%E8%A7%A3%E9%A2%98%E6%A8%A1%E6%9D%BF"><span class="toc-text">📋 通用解题模板</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E6%8C%87%E9%92%88%E6%A8%A1%E6%9D%BF%EF%BC%88%E9%80%82%E7%94%A8%E4%BA%8E%E5%8D%95%E8%B0%83%E6%80%A7%E9%97%AE%E9%A2%98%EF%BC%89"><span class="toc-text">双指针模板（适用于单调性问题）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E6%A8%A1%E6%9D%BF%EF%BC%88%E9%80%82%E7%94%A8%E4%BA%8E%E9%9C%80%E8%A6%81%E9%A2%84%E5%A4%84%E7%90%86%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%89"><span class="toc-text">动态规划模板（适用于需要预处理的问题）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%86%E5%88%AB%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%85%B3%E9%94%AE"><span class="toc-text">识别模式的关键</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%93-%E8%B4%B9%E6%9B%BC%E5%AD%A6%E4%B9%A0%E5%8D%A1%E7%89%87"><span class="toc-text">🎓 费曼学习卡片</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%871%EF%BC%9A%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="toc-text">卡片1：核心概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%872%EF%BC%9A%E5%8F%8C%E6%8C%87%E9%92%88%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%89%E6%95%88%EF%BC%9F"><span class="toc-text">卡片2：双指针为什么有效？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A1%E7%89%873%EF%BC%9A%E8%BE%B9%E7%95%8C%E6%9D%A1%E4%BB%B6"><span class="toc-text">卡片3：边界条件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%A7%A0-%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80"><span class="toc-text">🧠 记忆口诀</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%A3%E8%AF%801%EF%BC%9A%E6%9C%A8%E6%A1%B6%E5%8E%9F%E7%90%86"><span class="toc-text">口诀1：木桶原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%A3%E8%AF%802%EF%BC%9A%E5%8F%8C%E6%8C%87%E9%92%88%E7%A7%BB%E5%8A%A8%E8%A7%84%E5%88%99"><span class="toc-text">口诀2：双指针移动规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%A3%E8%AF%803%EF%BC%9A%E4%B8%89%E6%AD%A5%E8%A7%A3%E9%A2%98%E6%B3%95"><span class="toc-text">口诀3：三步解题法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%A8-%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%B0%E5%BF%86%E5%9B%BE"><span class="toc-text">🎨 可视化记忆图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE1-%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-text">图1: 算法对比流程图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE2-%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE"><span class="toc-text">图2: 思维导图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE3-%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF%E5%AF%B9%E6%AF%94"><span class="toc-text">图3: 常见错误对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE4-%E5%8F%8C%E6%8C%87%E9%92%88%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="toc-text">图4: 双指针执行过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE5-%E5%8A%A8%E6%80%81%E6%BC%94%E7%A4%BA"><span class="toc-text">图5: 动态演示</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE6-%E8%AE%B0%E5%BF%86%E5%8D%A1%E7%89%87"><span class="toc-text">图6: 记忆卡片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE7-%E6%AD%A5%E9%AA%A4%E8%AF%A6%E8%A7%A3"><span class="toc-text">图7: 步骤详解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%9D-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-text">📝 完整代码实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Python%E5%AE%9E%E7%8E%B0%EF%BC%88%E6%8E%A8%E8%8D%90%EF%BC%89"><span class="toc-text">Python实现（推荐）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Java%E5%AE%9E%E7%8E%B0"><span class="toc-text">Java实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#C-%E5%AE%9E%E7%8E%B0"><span class="toc-text">C++实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8F%8B%EF%B8%8F-%E7%BB%83%E4%B9%A0%E9%A2%98%E7%9B%AE%E6%B8%85%E5%8D%95"><span class="toc-text">🏋️ 练习题目清单</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BF%85%E5%81%9A%E9%A2%98%E7%9B%AE%EF%BC%88%E6%8E%8C%E6%8F%A1%E6%A0%B8%E5%BF%83%EF%BC%89"><span class="toc-text">必做题目（掌握核心）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6%E9%A2%98%E7%9B%AE%EF%BC%88%E6%8B%93%E5%B1%95%E6%80%9D%E7%BB%B4%EF%BC%89"><span class="toc-text">进阶题目（拓展思维）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%AF-%E5%88%B7%E9%A2%98%E9%A1%BA%E5%BA%8F%E5%BB%BA%E8%AE%AE"><span class="toc-text">🎯 刷题顺序建议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%92%A1-%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF%E4%B8%8E%E9%99%B7%E9%98%B1"><span class="toc-text">💡 常见错误与陷阱</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF1%EF%BC%9A%E5%BF%98%E8%AE%B0%E8%BE%B9%E7%95%8C%E6%A3%80%E6%9F%A5"><span class="toc-text">错误1：忘记边界检查</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF2%EF%BC%9A%E5%8F%8C%E6%8C%87%E9%92%88%E7%A7%BB%E5%8A%A8%E6%9D%A1%E4%BB%B6%E5%86%99%E5%8F%8D"><span class="toc-text">错误2：双指针移动条件写反</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF3%EF%BC%9A%E5%BF%98%E8%AE%B0%E6%9B%B4%E6%96%B0%E6%9C%80%E5%A4%A7%E5%80%BC"><span class="toc-text">错误3：忘记更新最大值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%93-%E9%9D%A2%E8%AF%95%E6%8A%80%E5%B7%A7"><span class="toc-text">🎓 面试技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%9C%A8%E9%9D%A2%E8%AF%95%E4%B8%AD%E5%B1%95%E7%A4%BA%E8%BF%99%E9%81%93%E9%A2%98%EF%BC%9F"><span class="toc-text">如何在面试中展示这道题？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%9A-%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93"><span class="toc-text">📚 知识点总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-text">核心知识点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89"><span class="toc-text">举一反三</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%AF-5%E5%88%86%E9%92%9F%E5%BF%AB%E9%80%9F%E5%A4%8D%E4%B9%A0"><span class="toc-text">🎯 5分钟快速复习</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%85%AC%E5%BC%8F"><span class="toc-text">核心公式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E6%8C%87%E9%92%88%E4%BB%A3%E7%A0%81%E6%A1%86%E6%9E%B6"><span class="toc-text">双指针代码框架</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E7%82%B9"><span class="toc-text">关键点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8C%9F-%E5%AD%A6%E4%B9%A0%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95"><span class="toc-text">🌟 学习检查清单</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%93%96-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-text">📖 参考资料</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%F0%9F%8E%89-%E7%BB%93%E8%AF%AD"><span class="toc-text">🎉 结语</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>Scroll to Top</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>Join Discussion</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `Just`,
+      min: `minutes ago`,
+      hour: `hours ago`,
+      day: `days ago`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `Switched to Light Mode`,
+      dark: `Switched to Dark Mode`,
+      auto: `Switched to Auto Mode`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

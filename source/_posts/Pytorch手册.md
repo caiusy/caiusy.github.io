@@ -3,8 +3,17 @@ title: Pytorch手册
 date: 2019-08-28 00:00:00
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - Python
+  - 深度学习
+  - PyTorch
+type: note
+note_type: engineering
+difficulty: intermediate
+review_status: reviewing
 ---
 PyTorch 主要提供以下两大特色：
 

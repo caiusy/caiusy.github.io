@@ -3,10 +3,19 @@ title: 🌳 LeetCode 150 - 二叉树专题
 date: 2026-01-18
 updated: 2026-01-18
 categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - LeetCode
+  - 二叉树
 description: LeetCode 面试 150 题之二叉树专题，含遍历图解、递归思维、代码模板
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 # 🌳 二叉树专题 (14题)
 

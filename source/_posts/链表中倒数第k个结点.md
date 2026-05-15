@@ -2,9 +2,18 @@
 title: 链表中倒数第k个结点
 date: 2019-09-10 00:00:00
 categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - 编程
+  - 链表
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 时间限制：1秒 空间限制：32768K 热度指数：829537  
 本题知识点： 链表  

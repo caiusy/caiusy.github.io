@@ -3,8 +3,16 @@ title: 彻底理解 Transformer：Attention Is All You Need
 date: 2026-02-02 14:00:00
 tags:
   - DeepLearning
-categories:
   - 深度学习
+  - 大模型
+  - 多模态
+  - Transformer
+categories:
+  - 多模态大模型
+  - 深度学习
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
 # 彻底理解 Transformer: Attention Is All You Need
 

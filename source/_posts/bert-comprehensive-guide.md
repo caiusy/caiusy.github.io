@@ -3,10 +3,17 @@ title: BERT 完整解析：从论文到 KV Cache
 date: 2026-02-03 15:30:00
 tags:
   - AI
+  - 深度学习
+  - 大模型
+  - 多模态
 categories:
+  - 多模态大模型
   - 深度学习
 top_img: /images/bert_guide/bert_architecture.png
 cover: /images/bert_guide/bert_complete_visualizations.png
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
 # BERT 完整解析：从论文到 KV Cache
 

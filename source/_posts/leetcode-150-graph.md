@@ -3,10 +3,19 @@ title: 🔍 LeetCode 150 - 图论与搜索专题
 date: 2026-01-18
 updated: 2026-01-18
 categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - LeetCode
+  - 图论
 description: LeetCode 面试 150 题之图论与搜索专题，含BFS/DFS图解、代码模板、记忆口诀
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 # 🔍 图论与搜索专题 (8题)
 

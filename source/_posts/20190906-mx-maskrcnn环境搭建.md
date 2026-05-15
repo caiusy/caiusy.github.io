@@ -1,10 +1,21 @@
 ---
 title: mx-maskrcnn环境搭建
 categories:
+  - 深度学习
   - 工具
+  -
+    - 学习笔记
+    - 工程笔记
 date: 2019-09-06 00:00:00
 tags:
   - 工具
+  - 深度学习
+  - Docker
+  - CUDA
+type: note
+note_type: engineering
+difficulty: intermediate
+review_status: reviewing
 ---
 从<https://hub.docker.com/> 选取所需的镜像
 

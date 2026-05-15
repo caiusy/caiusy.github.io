@@ -1,11 +1,20 @@
 ---
 title: RANSAC算法
 categories:
+  - 深度学习
   - 算法
+  -
+    - 学习笔记
+    - 概念笔记
 typora-copy-images-to: ./RANSAC算法
 date: 2023-01-22 16:55:53
 tags:
   - 算法
+  - 深度学习
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 ### RANSAC算法
 

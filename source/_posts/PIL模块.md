@@ -2,9 +2,18 @@
 title: PIL模块
 date: 2019-08-28 00:00:00
 categories:
+  - 工程实践
   - 计算机视觉
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - Python
+  - 计算机视觉
+type: note
+note_type: engineering
+difficulty: beginner
+review_status: reviewing
 ---
 ## 导入
     

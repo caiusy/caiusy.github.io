@@ -3,8 +3,17 @@ title: SSD源码解析
 date: 2019-08-24 00:00:00
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 概念笔记
 tags:
   - PyTorch
+  - 深度学习
+  - Git
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 论文地址: [SSD: Single Shot MultiBox Detector ](https://arxiv.org/pdf/1512.02325.pdf)  
 非官方代码: [pytorch](https://github.com/amdegroot/ssd.pytorch)

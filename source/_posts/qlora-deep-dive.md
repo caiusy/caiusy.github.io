@@ -3,9 +3,19 @@ title: 彻底搞懂 QLoRA：如何用 4-bit 量化技术单卡微调千亿模型
 date: 2026-01-25 15:30:00
 tags:
   - NLP
+  - 深度学习
+  - 大模型
+  - 多模态
+  - LoRA
+  - QLoRA
+  - Fine-tuning
 categories:
+  - 多模态大模型
   - 深度学习
 cover: /images/qlora-math/memory_comparison.png
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
 在上一篇文章中，我们深入探讨了 **LoRA** 的数学原理。今天，我们来聊聊它的进化版——**QLoRA (Quantized LoRA)**。
 

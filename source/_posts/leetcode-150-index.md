@@ -3,10 +3,18 @@ title: 🎯 LeetCode 面试经典 150 题 - 完全攻略
 date: 2026-01-18
 updated: 2026-01-18
 categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - LeetCode
 description: LeetCode 面试经典 150 题完整攻略，包含图解、口诀、代码模板，助你高效刷题拿 Offer！
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 # 🎯 LeetCode 面试经典 150 题 - 完全攻略
 

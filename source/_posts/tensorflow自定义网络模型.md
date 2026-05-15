@@ -3,8 +3,16 @@ title: tensorflow自定义网络模型
 date: 2019-10-17 00:00:00
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 概念笔记
 tags:
   - TensorFlow
+  - 深度学习
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 ## Slim  
   

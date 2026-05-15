@@ -2,9 +2,17 @@
 title: matlab基础
 date: 2020-02-05 00:00:00
 categories:
+  - 工程实践
   - 工具
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - OpenCV
+type: note
+note_type: engineering
+difficulty: beginner
+review_status: reviewing
 ---
     1  
     2  

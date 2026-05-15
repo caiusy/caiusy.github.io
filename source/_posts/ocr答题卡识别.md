@@ -5,6 +5,10 @@ categories:
   - 计算机视觉
 tags:
   - OpenCV
+  - 计算机视觉
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
     1  
     2  

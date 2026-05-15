@@ -2,9 +2,17 @@
 title: Attention机制中SEnet CBAM以及Dual pooling的pytorch实现
 date: 2019-12-27 00:00:00
 categories:
+  - 多模态大模型
   - 深度学习
 tags:
   - PyTorch
+  - 深度学习
+  - 大模型
+  - 多模态
+  - Git
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
 > 本来自己写了，关于SENet的注意力截止，但是在准备写其他注意力机制代码的时候，看到一篇文章总结的很好，所以对此篇文章进行搬运，以供自己查阅，并加上自己的理解。
 

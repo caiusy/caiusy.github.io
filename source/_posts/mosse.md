@@ -5,6 +5,10 @@ categories:
   - 计算机视觉
 tags:
   - Python
+  - 计算机视觉
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
 ## MOSSE
 

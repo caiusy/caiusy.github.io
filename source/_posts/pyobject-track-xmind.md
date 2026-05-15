@@ -5,5 +5,9 @@ categories:
   - 计算机视觉
 tags:
   - 目标跟踪
+  - 计算机视觉
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
 ![](/2019/10/31/pyobject-track-xmind/images/20191031_pyobject-track-xmind_目标跟踪.png)

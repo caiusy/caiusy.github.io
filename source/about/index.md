@@ -1,87 +1,61 @@
 ---
-title: 关于我
+title: About
 date: 2023-01-01
+updated: 2026-05-16
 type: about
 layout: page
+description: Caius Lu — Computer Vision & BEV Perception Engineer。专注路侧感知、BEV 表征、雷达-相机融合与多模态大模型的工程与研究实践。
 ---
 
-## 👋 Hi, I'm Caius Lu
+## About Caius Lu
 
-> 计算机视觉研究者 | 大模型初学者 | AI 探索者 | 技术博主
+我是一名关注 **计算机视觉、BEV 感知与路侧雷视融合** 的算法工程师。
 
----
-
-## 🎯 关于我
-
-我是一名专注于**计算机视觉**和**深度学习**领域的技术研究者。同时我也是一名**大模型(LLM)初学者**，正在积极探索这一前沿领域。
-
-热衷于探索 AI 技术的无限可能，尤其在以下方向有深入研究：
-
-- 🎯 **目标检测与跟踪** - 多相机行人跟踪、ReID
-- 📐 **几何视觉** - 单应性矩阵、相机标定、SLAM
-- 🧠 **深度学习** - 神经网络架构、模型优化
-- 🤖 **大模型 (LLM)** - 参数高效微调 (PEFT/LoRA)、RAG
-- 🚗 **智慧交通** - 交通场景感知与分析
+这个博客不是单纯的学习笔记，而是我对“**视觉感知系统如何从论文走向工程**”的长期记录。
 
 ---
 
-## 🔗 联系方式
+## 我的方向
 
-### GitHub
-[![GitHub](https://img.shields.io/badge/GitHub-caiusy-181717?style=for-the-badge&logo=github)](https://github.com/caiusy)
-
-[**👉 点击访问 GitHub 主页 (github.com/caiusy)**](https://github.com/caiusy)
-
-访问我的 GitHub 主页，查看开源项目和代码。
-
-### 博客
-[![Blog](https://img.shields.io/badge/Blog-caiusy.github.io-6366F1?style=for-the-badge&logo=hexo)](https://caiusy.github.io)
-
-[**👉 点击访问博客首页**](https://caiusy.github.io)
-
-这里记录我的技术笔记和学习心得。
+- **Roadside Perception** — 路侧交通场景下的车辆、行人感知、跟踪与轨迹理解
+- **BEV Representation** — 从图像、多相机、雷达点迹到 BEV 空间的统一表达
+- **Radar-Camera Fusion** — 雷达与相机的标定、匹配、投影、融合评测
+- **Camera Geometry** — 相机模型、单应性矩阵、消失点、图像到 BEV 变换
+- **Multimodal AI** — CLIP、LLaVA、LoRA、QLoRA 等多模态与大模型技术
+- **Engineering Practice** — 感知系统可视化、实验管理、工具链构建
 
 ---
 
-## 📊 GitHub 统计
+## 博客内容结构
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=caiusy&show_icons=true&theme=tokyonight&hide_border=true)
+博客内容主要分为六类：
 
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=caiusy&layout=compact&theme=tokyonight&hide_border=true)
-
----
-
-## 🛠️ 技术栈
-
-**语言**
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![C++](https://img.shields.io/badge/C++-00599C?style=flat-square&logo=cplusplus&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-
-**框架**
-![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)
-![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)
-
-**工具**
-![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black)
+1. **代表项目** — 工程能力的展示窗口（[Projects](/projects/)）
+2. **BEV 与路侧感知** — 长期更新的研究专题（[Roadside BEV](/roadside-bev/)）
+3. **雷达-相机融合** — 标定、匹配、投影、评测（[Fusion](/radar-camera-fusion/)）
+4. **多模态大模型** — Transformer 到 LLaVA 的学习路线（[LLM Map](/llm-reading-map/)）
+5. **工程实践** — Docker、CUDA、PyQt、OpenCV 等工程经验（[Engineering](/engineering/)）
+6. **学习笔记与复习索引** — 长期复习用的知识库（[Notes](/notes/) · [Review](/review/)）
 
 ---
 
-## 📝 博客内容
+## 怎么读这个博客
 
-本博客主要分享以下内容：
-
-1. **论文阅读笔记** - 计算机视觉领域前沿论文解读
-2. **大模型探索** - LLM 核心原理、LoRA 微调实战
-3. **技术教程** - 深度学习、图像处理实践教程
-4. **项目实践** - 真实项目经验分享
-5. **学习心得** - 技术成长路上的思考
+- 想知道我做了什么 → 看 [Projects](/projects/)
+- 想看我研究方向 → 看 [Roadside BEV](/roadside-bev/) 和 [Radar-Camera Fusion](/radar-camera-fusion/)
+- 想跟我一起学大模型 → 看 [LLM Reading Map](/llm-reading-map/)
+- 想找具体知识点 → 用 [Review Index](/review/) 按方向 / 状态 / 难度筛
+- 想看我踩过的工程坑 → 看 [Engineering](/engineering/)
 
 ---
 
-## 📬 留言
+## 联系方式
 
-如果你有任何问题或想法，欢迎在下方留言交流！
+- **GitHub** — [github.com/caiusy](https://github.com/caiusy)
+- **Blog** — [caiusy.github.io](https://caiusy.github.io)
+
+---
+
+## License
+
+博客内容采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 协议；代码片段除非另有说明，按 MIT 协议授权。转载请注明出处与原文链接。

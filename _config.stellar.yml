@@ -41,48 +41,68 @@ structured_data:
 logo:
   avatar: '[{config.avatar}](/about/)' # you can set avatar link in _config.yml or '[https://xxx.png](/about/)'
   title: '[{config.title}](/)' # you can set html tag like: '[<img no-lazy height="32px" src="xxx"/>](/)'
-  subtitle: '计算机视觉 | 大模型初学者' # '文字1 | 文字2' (鼠标放上去会切换到文字2)
+  subtitle: 'CV · BEV Perception | 路侧雷视融合 · 多模态 AI' # 鼠标悬停切换
 
 # 侧边栏主功能导航菜单
 menubar:
   columns: 4 # 一行多少个
-  items: # 可按照自己需求增加，符合以下格式即可
+  items:
     - id: post
       theme: '#6366F1'
-      icon: '<img src="https://api.iconify.design/solar:documents-bold-duotone.svg?color=%236366F1"/>'
-      title: 博客
+      icon: '<img src="https://api.iconify.design/solar:home-bold-duotone.svg?color=%236366F1"/>'
+      title: Home
       url: /
-    - id: archives
+    - id: projects
       theme: '#10B981'
-      icon: '<img src="https://api.iconify.design/solar:archive-bold-duotone.svg?color=%2310B981"/>'
-      title: 归档
-      url: /archives/
-    - id: categories
+      icon: '<img src="https://api.iconify.design/solar:rocket-bold-duotone.svg?color=%2310B981"/>'
+      title: Projects
+      url: /projects/
+    - id: bev
       theme: '#F59E0B'
-      icon: '<img src="https://api.iconify.design/solar:folder-with-files-bold-duotone.svg?color=%23F59E0B"/>'
-      title: 分类
-      url: /categories/
-    - id: tags
+      icon: '<img src="https://api.iconify.design/solar:camera-bold-duotone.svg?color=%23F59E0B"/>'
+      title: BEV
+      url: /roadside-bev/
+    - id: fusion
       theme: '#EC4899'
-      icon: '<img src="https://api.iconify.design/solar:tag-bold-duotone.svg?color=%23EC4899"/>'
-      title: 标签
-      url: /tags/
+      icon: '<img src="https://api.iconify.design/solar:radar-bold-duotone.svg?color=%23EC4899"/>'
+      title: Fusion
+      url: /radar-camera-fusion/
+    - id: llm
+      theme: '#8B5CF6'
+      icon: '<img src="https://api.iconify.design/solar:atom-bold-duotone.svg?color=%238B5CF6"/>'
+      title: LLM
+      url: /llm-reading-map/
+    - id: notes
+      theme: '#0EA5E9'
+      icon: '<img src="https://api.iconify.design/solar:notebook-bookmark-bold-duotone.svg?color=%230EA5E9"/>'
+      title: Notes
+      url: /notes/
+    - id: review
+      theme: '#F43F5E'
+      icon: '<img src="https://api.iconify.design/solar:checklist-minimalistic-bold-duotone.svg?color=%23F43F5E"/>'
+      title: Review
+      url: /review/
+    - id: about
+      theme: '#64748B'
+      icon: '<img src="https://api.iconify.design/solar:user-id-bold-duotone.svg?color=%2364748B"/>'
+      title: About
+      url: /about/
 
 
 ######## Main ########
 # 站点主结构树
 site_tree:
   # -- 列表类页面 -- #
-  # 主页配置
+  # 主页配置 — Hero / Featured Projects / Knowledge Tracks / Learning Notes / Recent
   home:
-    leftbar: welcome, recent
-    rightbar: 
+    leftbar: welcome, featured_projects, knowledge_tracks, learning_notes, recent
+    rightbar:
   # 博客列表页配置
   index_blog:
     base_dir: blog # 只影响自动生成的页面路径
     menu_id: post # 未在 front-matter 中指定 menu_id 时，layout 为 post 的页面默认使用这里配置的 menu_id
     leftbar: welcome, recent # for categories/tags/archives
-    rightbar: 
+    rightbar:
     nav_tabs:  # 近期发布 分类 标签 专栏 归档 and ...
       # '朋友文章': /friends/rss/
   # 博客专栏列表页配置
@@ -193,7 +213,15 @@ article:
   auto_excerpt: 150
   # 分类颜色
   category_color:
-    '计算机视觉': '#6366F1'
+    'BEV感知': '#6366F1'
+    '雷达相机融合': '#EC4899'
+    '计算机视觉': '#10B981'
+    '多模态大模型': '#8B5CF6'
+    '工程实践': '#F59E0B'
+    '算法基础': '#0EA5E9'
+    '学习笔记': '#14B8A6'
+    '实验记录': '#F43F5E'
+    '历史归档': '#64748B'
     '深度学习': '#10B981'
     '目标跟踪': '#F59E0B'
     '探索号': '#f44336'
@@ -346,23 +374,27 @@ footer:
   sitemap:
     - title: 博客
       items:
-        - '[近期发布](/)'
+        - '[最近文章](/)'
         - '[分类](/categories/)'
         - '[标签](/tags/)'
         - '[归档](/archives/)'
-    - title: 技术领域
+    - title: 专题
       items:
-        - '[计算机视觉](/tags/CV/)'
-        - '[目标跟踪](/tags/tracking/)'
-        - '[深度学习](/tags/深度学习/)'
-    - title: 关于
+        - '[Projects](/projects/)'
+        - '[Roadside BEV](/roadside-bev/)'
+        - '[Radar-Camera Fusion](/radar-camera-fusion/)'
+        - '[LLM Reading Map](/llm-reading-map/)'
+        - '[Engineering](/engineering/)'
+    - title: 笔记
       items:
+        - '[Learning Notes](/notes/)'
+        - '[Review Index](/review/)'
         - '[关于我](/about/)'
         - '[GitHub](https://github.com/caiusy)'
   content: | # 支持 Markdown 格式
     本站由 **Caius Lu** 使用 [Stellar](https://github.com/xaoxuu/hexo-theme-stellar) 主题创建
-    © 2023-2026 · 探索 AI 与计算机视觉的无限可能 🚀
-    
+    © 2023-2026 · Computer Vision · BEV Perception · Multimodal AI
+
     <span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span>
   # 主题用户越多，开发者维护和更新的积极性就越高，如果您喜欢本主题，请在适当的位置显示主题信息和仓库链接以表支持。
 

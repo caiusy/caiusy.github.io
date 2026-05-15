@@ -1,11 +1,19 @@
 ---
-title: 单调栈完全指南：从 O(n²) 到 O(n) 的优雅跃迁
+title: 单调栈：从 O(n²) 到 O(n) 的状态压缩思路
 date: 2026-02-19 17:00:00
 tags:
   - 算法
 categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 description: 深度解析单调栈的原理、应用和实战技巧，用费曼学习法帮你彻底理解这个强大的算法工具
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 # 单调栈完全指南：从 O(n²) 到 O(n) 的优雅跃迁
 

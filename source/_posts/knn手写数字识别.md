@@ -2,9 +2,18 @@
 title: knn手写数字识别
 date: 2019-10-20 00:00:00
 categories:
+  - 算法基础
   - 深度学习
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - TensorFlow
+  - 深度学习
+type: note
+note_type: algorithm
+difficulty: beginner
+review_status: reviewing
 ---
 ## K近邻算法
 

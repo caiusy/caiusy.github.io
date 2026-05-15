@@ -2,9 +2,17 @@
 title: python手册
 date: 2019-08-28 00:00:00
 categories:
+  - 工程实践
   - 算法
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - Python
+type: note
+note_type: engineering
+difficulty: beginner
+review_status: reviewing
 ---
 最近在学习查找资料的过程之中，看到了大佬的博客，觉得写得很好，也是我现在所欠缺的，所以下面先对大佬的博客进行复现。以供自己日后复习，查找，完善成自己的东西。  
   

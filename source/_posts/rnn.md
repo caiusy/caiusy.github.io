@@ -3,8 +3,17 @@ title: rnn
 date: 2019-11-17 00:00:00
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 概念笔记
 tags:
   - TensorFlow
+  - 深度学习
+  - Git
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 ### RNN及RNN的几个变体  
   

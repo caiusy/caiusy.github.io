@@ -4,9 +4,14 @@ date: 2026-01-19 00:36:00
 updated: 2026-01-19 00:36:00
 tags:
   - 计算机视觉
+  - BEV
 categories:
+  - BEV感知
   - 计算机视觉
 description: 详细讲解如何将透视图像转换为鸟瞰图，涵盖从基础概念到完整代码实现，适合所有水平的学习者。
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
 > **从输入图像到输出鸟瞰图的完整实现** - 适合所有水平的学习者
 

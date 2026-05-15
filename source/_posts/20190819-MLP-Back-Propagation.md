@@ -2,9 +2,16 @@
 title: 多层感知机的反向传播
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 概念笔记
 date: 2019-08-19 00:00:00
 tags:
   - 深度学习
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 全连接神经网络是形式上最简单的神经网络，反向传播算法是一种常用的训练神经网络的算法，理解全连接神经网络中的反向传播算法是理解其他更加复杂网络中反向传播算法的重要基础。
 

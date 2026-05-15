@@ -3,8 +3,17 @@ title: MobileNetsV2
 date: 2019-08-19 00:00:00
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 论文笔记
 tags:
   - PyTorch
+  - 深度学习
+  - Git
+type: note
+note_type: paper
+difficulty: intermediate
+review_status: reviewing
 ---
 论文地址:[MobileNetV2: Inverted Residuals and Linear Bottlenecks ](https://arxiv.org/pdf/1801.04381.pdf)  
 非官方代码:[pytorch](https://github.com/tonylins/pytorch-mobilenet-v2)

@@ -2,9 +2,16 @@
 title: SpatialSense
 categories:
   - 计算机视觉
+  -
+    - 学习笔记
+    - 论文笔记
 date: 2019-12-27 00:00:00
 tags:
   - 计算机视觉
+type: note
+note_type: paper
+difficulty: intermediate
+review_status: reviewing
 ---
 ## 摘要
 

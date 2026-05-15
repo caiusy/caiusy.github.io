@@ -3,8 +3,17 @@ title: GAN
 date: 2019-11-26 00:00:00
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 概念笔记
 tags:
   - Python
+  - 深度学习
+  - Git
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 ### 对抗生成网络 GAN(Generative Adversarial Nets)
 

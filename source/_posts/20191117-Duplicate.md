@@ -1,10 +1,14 @@
 ---
 title: Duplicate
 categories:
+  - 历史归档
   - 算法
 date: 2019-11-17 00:00:00
 tags:
   - 算法
+type: archive
+difficulty: beginner
+review_status: archived
 ---
 是否存在相同元素，python3用字典的方式解决  
   

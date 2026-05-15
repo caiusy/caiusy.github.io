@@ -1,7 +1,8 @@
 ---
-title: LLaVA 终极指南：从盲人教授到多模态大模型的数学解剖
+title: LLaVA 原理拆解：视觉编码器、投影层与语言模型如何对齐
 date: 2026-03-04 12:53:40
 categories:
+  - 多模态大模型
   - 深度学习
   - 多模态
 tags:
@@ -10,6 +11,12 @@ tags:
   - Vision-Language
   - CLIP
   - LLM
+  - 深度学习
+  - 大模型
+  - 多模态
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
 
 # LLaVA 终极指南：从盲人教授到多模态大模型的数学解剖

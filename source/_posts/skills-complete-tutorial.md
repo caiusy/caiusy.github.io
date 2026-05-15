@@ -2,8 +2,12 @@
 title: Skills 完整开发教程 - 从零开始掌握 MCP Skills 开发
 date: 2026-03-04 21:27:28
 categories:
+  - 工程实践
   - 技术教程
   - AI开发
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - MCP
   - Skills
@@ -13,6 +17,10 @@ tags:
   - 教程
 cover: /images/skills-tutorial/01_mcp_architecture.png
 description: 从零开始掌握 MCP Skills 开发的完整教程，以阿里千问为例，包含核心概念、代码实现、高级优化和发布实战。
+type: note
+note_type: engineering
+difficulty: intermediate
+review_status: reviewing
 ---
 
 # Skills 完整开发教程

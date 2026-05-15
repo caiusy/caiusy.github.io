@@ -2,9 +2,17 @@
 title: xml生成
 date: 2019-09-07 00:00:00
 categories:
+  - 工程实践
   - 工具
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - XML
+type: note
+note_type: engineering
+difficulty: beginner
+review_status: reviewing
 ---
 先创建 root Element, 然后创建 SubElement, 最后将 root 传入 ElementTree(element), 创建 tree, 调用 tree.write() 方法写入文件,创建 XML 类型的数据文件  
 

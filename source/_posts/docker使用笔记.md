@@ -2,9 +2,18 @@
 title: docker使用笔记
 date: 2019-09-06 00:00:00
 categories:
+  - 工程实践
   - C++
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - Docker
+  - CUDA
+type: note
+note_type: engineering
+difficulty: intermediate
+review_status: reviewing
 ---
 ## 0\. 查看需要的Docker列表
 

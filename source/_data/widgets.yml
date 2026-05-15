@@ -1,0 +1,110 @@
+# 用户级 widget 配置 — 与主题默认合并
+# 文档: https://xaoxuu.com/wiki/stellar/
+
+# ─── 首页：Welcome / Hero ─────────────────────────────
+welcome:
+  layout: markdown
+  title: 👋 Hello, I'm Caius
+  content: |
+    **Caius Lu** — Computer Vision & BEV Perception Engineer
+
+    长期关注计算机视觉、**BEV 感知**、路侧雷视融合、**相机几何**与**多模态大模型**。
+
+    这里记录我的工程实践、论文复现、系统设计与学习笔记。
+  linklist:
+    columns: 2
+    items:
+      - title: Projects
+        icon: solar:hashtag-square-bold
+        url: /projects/
+      - title: BEV 与路侧感知
+        icon: solar:hashtag-square-bold
+        url: /roadside-bev/
+      - title: 雷达-相机融合
+        icon: solar:hashtag-square-bold
+        url: /radar-camera-fusion/
+      - title: LLM Reading Map
+        icon: solar:hashtag-square-bold
+        url: /llm-reading-map/
+      - title: Learning Notes
+        icon: solar:hashtag-square-bold
+        url: /notes/
+      - title: Review Index
+        icon: solar:hashtag-square-bold
+        url: /review/
+
+# ─── 首页：Featured Projects ──────────────────────────
+featured_projects:
+  layout: markdown
+  title: 🚀 Featured Projects
+  content: |
+    **Radar-Camera Calibration & Fusion Visualization System**
+    雷达-相机同步加载、点对匹配、单应性求解、标定导出与可视化验证的工程系统。
+
+    **Roadside BEV Perception Notes**
+    路侧多相机、BEV 表征、地面单应性、车辆轨迹与感知评测的专题知识库。
+
+    **GaussianLSS Reproduction & Experiments**
+    GaussianLSS 论文复现、loss 配置、IoU 曲线分析与工程改造记录。
+
+    **Multimodal LLM Reading Map**
+    Transformer → CLIP → LLaVA → MoE → LoRA → QLoRA 的大模型学习路线。
+  linklist:
+    columns: 1
+    items:
+      - title: 查看全部项目 →
+        icon: solar:hashtag-square-bold
+        url: /projects/
+
+# ─── 首页：Knowledge Tracks ───────────────────────────
+knowledge_tracks:
+  layout: markdown
+  title: 🧭 Knowledge Tracks
+  content: |
+    **5 个长期更新的技术专题**
+  linklist:
+    columns: 1
+    items:
+      - title: BEV 与路侧感知
+        icon: solar:hashtag-square-bold
+        url: /roadside-bev/
+      - title: 雷达-相机融合
+        icon: solar:hashtag-square-bold
+        url: /radar-camera-fusion/
+      - title: 多模态大模型
+        icon: solar:hashtag-square-bold
+        url: /llm-reading-map/
+      - title: 工程实践
+        icon: solar:hashtag-square-bold
+        url: /engineering/
+      - title: 算法基础
+        icon: solar:hashtag-square-bold
+        url: /categories/算法基础/
+
+# ─── 首页：Learning Notes ─────────────────────────────
+learning_notes:
+  layout: markdown
+  title: 📚 Learning Notes
+  content: |
+    长期复习用的笔记系统，包含论文精读、概念拆解、工程踩坑、实验记录。
+  linklist:
+    columns: 2
+    items:
+      - title: 概念笔记
+        icon: solar:hashtag-square-bold
+        url: /categories/学习笔记/概念笔记/
+      - title: 论文笔记
+        icon: solar:hashtag-square-bold
+        url: /categories/学习笔记/论文笔记/
+      - title: 工程笔记
+        icon: solar:hashtag-square-bold
+        url: /categories/学习笔记/工程笔记/
+      - title: 实验记录
+        icon: solar:hashtag-square-bold
+        url: /categories/实验记录/
+      - title: 复习索引
+        icon: solar:hashtag-square-bold
+        url: /review/
+      - title: Notes 总入口
+        icon: solar:hashtag-square-bold
+        url: /notes/

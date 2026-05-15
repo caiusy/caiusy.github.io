@@ -1,11 +1,17 @@
 ---
-title: 相机几何完全指南：从世界坐标到图像坐标的完整推导
+title: 相机成像模型：从世界坐标到像素坐标的工程推导
 date: 2026-01-19 22:30:00
 tags:
   - 计算机视觉
+  - 相机几何
+  - 单应性矩阵
 categories:
+  - BEV感知
   - 计算机视觉
 mathjax: true
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
 本文详细推导从3D世界坐标系到2D图像坐标系的完整数学过程，包括相机内外参数、旋转矩阵、单应矩阵的推导与分解，并提供完整的Python可视化代码。
 

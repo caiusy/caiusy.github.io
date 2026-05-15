@@ -1,12 +1,20 @@
 ---
-title: KL散度完全图解教程：从零到精通
+title: KL 散度直觉理解与数学推导
 date: 2026-02-08
 mathjax: true
 toc: true
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 概念笔记
 tags:
   - Python
+  - 深度学习
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 > 🎯 **学习目标**  
 > 假设你完全不懂信息论，本教程将带你从零开始，用最通俗的语言、最生动的例子、最直观的图示，彻底理解 KL 散度的本质。

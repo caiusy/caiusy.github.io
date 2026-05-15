@@ -2,9 +2,14 @@
 title: ocr透视变换
 date: 2019-10-13 00:00:00
 categories:
+  - BEV感知
   - 计算机视觉
 tags:
   - Python
+  - 计算机视觉
+type: deep-dive
+difficulty: intermediate
+review_status: reviewing
 ---
     1  
     2  

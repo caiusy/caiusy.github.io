@@ -2,9 +2,17 @@
 title: Terminal 手册
 date: 2019-09-05 00:00:00
 categories:
+  - 工程实践
   - 其他
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - 编程
+type: note
+note_type: engineering
+difficulty: intermediate
+review_status: reviewing
 ---
 ## 查看磁盘空间
 

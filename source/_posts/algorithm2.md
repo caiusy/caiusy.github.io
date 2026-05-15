@@ -2,9 +2,17 @@
 title: 算法竞赛入门经典第二章
 date: 2019-08-15 00:00:00
 categories:
+  - 算法基础
   - 其他
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - C++
+type: note
+note_type: algorithm
+difficulty: beginner
+review_status: reviewing
 ---
     1  
     2  

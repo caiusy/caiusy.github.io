@@ -2,9 +2,18 @@
 title: DFS_BFS
 date: 2019-11-17 00:00:00
 categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - Python
+  - 图论
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
     1  
     2  

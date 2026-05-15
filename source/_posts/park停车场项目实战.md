@@ -2,9 +2,13 @@
 title: park停车场项目实战
 date: 2019-10-13 00:00:00
 categories:
+  - 历史归档
   - 其他
 tags:
   - 编程
+type: deep-dive
+difficulty: beginner
+review_status: reviewing
 ---
 ## park 类对象
     

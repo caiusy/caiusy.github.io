@@ -3,8 +3,16 @@ title: PCA降维
 date: 2019-09-07 00:00:00
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 概念笔记
 tags:
   - Python
+  - 深度学习
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 PCA（principal Component Analysis），主成分分析法。顾名思义，就是提取出数据中主要的成分，是一种数据压缩方法，常用于去除噪声、数据预处理，也是机器学习中常见的降维方法。  
 ![](/2019/09/07/PCA降维/images/20190907_PCA降维_myplot.png)

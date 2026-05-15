@@ -2,9 +2,17 @@
 title: Python：logging模块
 date: 2019-11-04 00:00:00
 categories:
+  - 工程实践
   - Python
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - Python
+type: note
+note_type: engineering
+difficulty: beginner
+review_status: reviewing
 ---
     1  
     2  

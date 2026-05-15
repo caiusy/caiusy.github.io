@@ -2,9 +2,18 @@
 title: SpatialSense
 date: 2019-12-27 00:00:00
 categories:
+  - 计算机视觉
   - 其他
+  -
+    - 学习笔记
+    - 论文笔记
 tags:
   - OpenCV
+  - 计算机视觉
+type: note
+note_type: paper
+difficulty: intermediate
+review_status: reviewing
 ---
 ## 摘要
 

@@ -2,9 +2,18 @@
 title: MobileNets
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 论文笔记
 date: 2019-08-19 00:00:00
 tags:
   - 深度学习
+  - PyTorch
+  - Git
+type: note
+note_type: paper
+difficulty: intermediate
+review_status: reviewing
 ---
 论文地址:[MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications ](https://arxiv.org/abs/1704.04861)  
 非官方代码:[pytorch/models](https://github.com/marvis/pytorch-mobilenet)  

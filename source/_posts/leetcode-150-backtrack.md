@@ -3,10 +3,18 @@ title: 🔢 LeetCode 150 - 回溯算法专题
 date: 2026-01-18
 updated: 2026-01-18
 categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - LeetCode
 description: LeetCode 面试 150 题之回溯算法专题，含决策树图解、代码模板、记忆口诀
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 # 🔄 回溯算法专题 (7题)
 

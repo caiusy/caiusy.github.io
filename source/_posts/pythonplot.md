@@ -2,9 +2,17 @@
 title: Matplotlib绘制六种可视化图表
 date: 2019-08-24 00:00:00
 categories:
+  - 工程实践
   - Python
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - Python
+type: note
+note_type: engineering
+difficulty: beginner
+review_status: reviewing
 ---
 ## 01 折线图
     

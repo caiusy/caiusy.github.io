@@ -1,13 +1,21 @@
 ---
-title: 动态规划完全指南：从入门到精通
+title: 动态规划：状态设计、转移方程与题型模板
 date: 2026-02-20
-categories: 
+categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - 动态规划
   - DP
   - LeetCode
   - 算法面试
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 
 # 动态规划完全指南：从入门到精通

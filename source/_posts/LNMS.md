@@ -2,9 +2,18 @@
 title: LNMS
 date: 2019-08-16 00:00:00
 categories:
+  - 算法基础
   - 深度学习
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - OpenCV
+  - 深度学习
+type: note
+note_type: algorithm
+difficulty: beginner
+review_status: reviewing
 ---
 ## locality NMS  
   

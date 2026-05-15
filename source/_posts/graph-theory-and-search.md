@@ -1,5 +1,5 @@
 ---
-title: 图论与搜索：从零到精通的费曼式完全指南
+title: 图论与搜索：邻接表、BFS/DFS 与最短路的题型模板
 date: 2026-02-23 06:38:34
 tags:
   - 算法
@@ -8,8 +8,16 @@ tags:
   - BFS
   - LeetCode
 categories:
+  - 算法基础
   - 算法与数据结构
+  -
+    - 学习笔记
+    - 算法笔记
 mathjax: true
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 
 > **费曼说：** "如果你不能把一个概念解释给一个 10 岁小孩听，说明你自己也没真正理解它。"

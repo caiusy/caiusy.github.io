@@ -2,9 +2,18 @@
 title: 广度/宽度优先搜索(BFS)
 date: 2019-08-28 00:00:00
 categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - BFS
+  - 图论
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 ## 前言  
   

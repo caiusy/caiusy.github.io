@@ -3,8 +3,18 @@ title: Pytorch trick
 date: 2019-08-28 00:00:00
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 工程笔记
 tags:
   - Python
+  - 深度学习
+  - PyTorch
+  - CUDA
+type: note
+note_type: engineering
+difficulty: intermediate
+review_status: reviewing
 ---
 目录：   
   

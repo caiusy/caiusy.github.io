@@ -1,10 +1,18 @@
 ---
 title: python_learn
 categories:
+  - 工程实践
   - Python
+  -
+    - 学习笔记
+    - 工程笔记
 date: 2019-11-17 00:00:00
 tags:
   - Python
+type: note
+note_type: engineering
+difficulty: beginner
+review_status: reviewing
 ---
 ## 查找图中两个节点的最小的距离  
   

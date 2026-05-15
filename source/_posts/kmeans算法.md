@@ -3,8 +3,16 @@ title: kmeans算法
 date: 2019-09-07 00:00:00
 categories:
   - 深度学习
+  -
+    - 学习笔记
+    - 概念笔记
 tags:
   - Python
+  - 深度学习
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 * * *  
   

@@ -2,9 +2,17 @@
 title: c++中级教程  STL stack
 date: 2019-07-25 00:00:00
 categories:
+  - 算法基础
   - C++
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - C++
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 ## STL stack
 

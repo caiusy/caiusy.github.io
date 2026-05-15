@@ -5,7 +5,15 @@ date: 2026-01-18 20:04:34
 tags:
   - 工具
 categories:
+  - 工程实践
   - 工具
+  -
+    - 学习笔记
+    - 工程笔记
+type: note
+note_type: engineering
+difficulty: beginner
+review_status: reviewing
 ---
 ## 简介
 

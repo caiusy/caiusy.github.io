@@ -2,9 +2,17 @@
 title: 从csv中读取数据
 date: 2019-09-08 00:00:00
 categories:
+  - 算法基础
   - 其他
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - Python
+type: note
+note_type: algorithm
+difficulty: beginner
+review_status: reviewing
 ---
     1  
     2  

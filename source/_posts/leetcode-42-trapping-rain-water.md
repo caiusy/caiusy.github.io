@@ -2,13 +2,21 @@
 title: 接雨水问题 - 完全学习指南
 date: 2026-03-10 14:11:00
 categories:
+  - 算法基础
   - 算法
   - LeetCode
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - 双指针
   - 动态规划
   - Hard
   - 数组
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 
 # 🌧️ 接雨水问题 - 完全学习指南

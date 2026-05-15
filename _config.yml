@@ -2,14 +2,14 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Caius的日常博客
-subtitle: '计算机视觉 | 大模型初学者'
-description: ''
-keywords:
+title: Caius Lu
+subtitle: 'Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI'
+description: 'Caius Lu 的技术博客与知识库 — 专注路侧 BEV 感知、雷达-相机融合、相机几何与多模态大模型的工程与研究实践。'
+keywords: BEV Perception, Roadside Perception, Radar-Camera Fusion, Camera Geometry, Homography, Multimodal AI, LLaVA, CLIP, LoRA, Computer Vision
 author: Caius Lu
 avatar: /images/avatar.jpg
-language: en
-timezone: ''
+language: zh-CN
+timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
@@ -96,6 +96,31 @@ ignore:
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 theme: stellar
+
+# Sitemap
+sitemap:
+  path:
+    - sitemap.xml
+    - sitemap.txt
+  rel: false
+  tags: true
+  categories: true
+
+# RSS Feed
+feed:
+  enable: true
+  type:
+    - atom
+    - rss2
+  path:
+    - atom.xml
+    - rss2.xml
+  limit: 30
+  hub:
+  content: false
+  content_limit: 140
+  content_limit_delim: ' '
+  order_by: -date
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment.html

@@ -2,9 +2,17 @@
 title: dynamic planning
 date: 2019-11-17 00:00:00
 categories:
+  - 算法基础
   - 算法
+  -
+    - 学习笔记
+    - 算法笔记
 tags:
   - Python
+type: note
+note_type: algorithm
+difficulty: beginner
+review_status: reviewing
 ---
     1  
     2  

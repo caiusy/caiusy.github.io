@@ -8,8 +8,16 @@ tags:
   - LeetCode
   - 算法
 categories:
+  - 算法基础
   - 算法与数据结构
+  -
+    - 学习笔记
+    - 算法笔记
 mathjax: true
+type: note
+note_type: algorithm
+difficulty: intermediate
+review_status: reviewing
 ---
 
 > **费曼说**：如果你不能用简单的语言解释一个东西，说明你还没真正理解它。

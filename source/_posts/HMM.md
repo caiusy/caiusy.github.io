@@ -2,9 +2,18 @@
 title: 隐马尔可夫HMM
 date: 2019-11-28 00:00:00
 categories:
+  - 深度学习
   - 其他
+  -
+    - 学习笔记
+    - 概念笔记
 tags:
   - 编程
+  - 深度学习
+type: note
+note_type: concept
+difficulty: intermediate
+review_status: reviewing
 ---
 #### 马尔科夫模型  
   

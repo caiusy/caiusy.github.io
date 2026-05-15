@@ -1,10 +1,18 @@
 ---
 title: matlab基础
 categories:
+  - 工程实践
   - 其他
+  -
+    - 学习笔记
+    - 工程笔记
 date: 2020-02-05 00:00:00
 tags:
   - MATLAB
+type: note
+note_type: engineering
+difficulty: beginner
+review_status: reviewing
 ---
 ```
     %%

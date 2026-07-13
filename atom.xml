@@ -46,9 +46,9 @@
     <id>https://caiusy.github.io/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/</id>
     <link href="https://caiusy.github.io/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/"/>
     <published>2026-07-13T15:40:00.000Z</published>
-    <summary>以 MiniMind 和 LifeOS-Agent 的真实代码为主线，用一条数学工具调用和四条 rollout，完整解释 schema、router、多轮 observation、张量维度、reward、group advantage、KL、CISPO token loss 与反向传播。</summary>
+    <summary>以 MiniMind 和 LifeOS-Agent 的真实代码为主线，用 tokenizer 实测的一条 361-token 工具轨迹和四条可复算 rollout，完整解释 schema、router、多轮 observation、张量维度、reward、group advantage、KL、CISPO token loss 与反向传播。</summary>
     <title>Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</title>
-    <updated>2026-07-13T15:40:00.000Z</updated>
+    <updated>2026-07-13T15:45:00.000Z</updated>
   </entry>
   <entry>
     <author>
@@ -469,8 +469,8 @@
     </author>
     <category term="工程实践" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
     <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
+    <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
     <category term="工具" scheme="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/"/>
     <id>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</id>
     <link href="https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/"/>
@@ -489,6 +489,22 @@
     </summary>
     <title>如何使用Hexo写博客</title>
     <updated>2026-05-15T17:03:44.272Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
+    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
+    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
+    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/"/>
+    <published>2026-01-17T16:00:00.000Z</published>
+    <summary>LeetCode 面试 150 题之回溯算法专题，含决策树图解、代码模板、记忆口诀</summary>
+    <title>🔢 LeetCode 150 - 回溯算法专题</title>
+    <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>
     <author>
@@ -521,22 +537,6 @@
     <published>2026-01-17T16:00:00.000Z</published>
     <summary>LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀</summary>
     <title>🔢 LeetCode 150 - 二分查找专题</title>
-    <updated>2026-01-17T16:00:00.000Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
-    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/"/>
-    <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之回溯算法专题，含决策树图解、代码模板、记忆口诀</summary>
-    <title>🔢 LeetCode 150 - 回溯算法专题</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>
@@ -599,11 +599,11 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-heap/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-heap/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-index/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-index/"/>
     <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之堆/优先队列专题，含堆结构图解、TopK问题、代码模板</summary>
-    <title>⛰️ LeetCode 150 - 堆/优先队列专题</title>
+    <summary>LeetCode 面试经典 150 题完整攻略，包含图解、口诀、代码模板，助你高效刷题拿 Offer！</summary>
+    <title>🎯 LeetCode 面试经典 150 题 - 完全攻略</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
 </feed>

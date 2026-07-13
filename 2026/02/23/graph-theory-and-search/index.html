@@ -33,15 +33,15 @@
 <meta property="article:author" content="Caius Lu">
 <meta property="article:tag" content="算法">
 <meta property="article:tag" content="图论">
-<meta property="article:tag" content="BFS">
 <meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="BFS">
 <meta property="article:tag" content="DFS">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
   
   
   
-  <meta name="keywords" content="算法,图论,BFS,LeetCode,DFS">
+  <meta name="keywords" content="算法,图论,LeetCode,BFS,DFS">
 
   <!-- feed -->
   
@@ -65,7 +65,7 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-02-23T06:38:34+08:00","dateModified":"2026-05-16T01:03:44+08:00","datePublished":"2026-02-23T06:38:34+08:00","description":"\n费曼说： “如果你不能把一个概念解释给一个 10 岁小孩听，说明你自己也没真正理解它。”\n\n这篇文章用费曼式教学法，带你从「图是什么」一路打通到「LeetCode 实战」。每个概念都有具体例子、可视化图解、完整代码和数据流追踪。不讲废话，直击本质。","headline":"图论与搜索：邻接表、BFS/DFS 与最短路的题型模板","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/02/23/graph-theory-and-search/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/02/23/graph-theory-and-search/","keywords":"算法, 图论, BFS, LeetCode, DFS","image":[]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-02-23T06:38:34+08:00","dateModified":"2026-05-16T01:03:44+08:00","datePublished":"2026-02-23T06:38:34+08:00","description":"\n费曼说： “如果你不能把一个概念解释给一个 10 岁小孩听，说明你自己也没真正理解它。”\n\n这篇文章用费曼式教学法，带你从「图是什么」一路打通到「LeetCode 实战」。每个概念都有具体例子、可视化图解、完整代码和数据流追踪。不讲废话，直击本质。","headline":"图论与搜索：邻接表、BFS/DFS 与最短路的题型模板","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/02/23/graph-theory-and-search/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/02/23/graph-theory-and-search/","keywords":"算法, 图论, LeetCode, BFS, DFS","image":[]}</script>
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
@@ -86,7 +86,7 @@
 
 
 
-<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"><span class="title">LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</span></a><a class="item title" href="/2019/07/26/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/"><span class="title">c++中级教程 顺序容器的定义</span></a><a class="item title" href="/2019/09/07/%E7%9F%A9%E5%BD%A2%E8%A6%86%E7%9B%96/"><span class="title">矩形覆盖</span></a><a class="item title" href="/2019/08/29/%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/"><span class="title">透视变换</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/09/04/%E9%87%87%E5%9D%91%E8%AE%B0%E5%BD%95/"><span class="title">采坑记录</span></a><a class="item title" href="/2019/09/03/%E9%81%8D%E5%8E%86%E6%96%87%E4%BB%B6%E5%A4%B9%E5%9B%BE%E7%89%87/"><span class="title">遍历文件夹图片</span></a><a class="item title" href="/2019/09/10/%E9%93%BE%E8%A1%A8%E4%B8%AD%E5%80%92%E6%95%B0%E7%AC%ACk%E4%B8%AA%E7%BB%93%E7%82%B9/"><span class="title">链表中倒数第k个结点</span></a><a class="item title" href="/2019/07/25/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8-STL-deque-%E7%B1%BB/"><span class="title">c++中级教程(一)</span></a><a class="item title" href="/2019/08/29/%E6%9B%BF%E6%8D%A2%E7%A9%BA%E6%A0%BC/"><span class="title">替换空格</span></a></div></widget>
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/"><span class="title">Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</span></a><a class="item title" href="/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"><span class="title">LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</span></a><a class="item title" href="/2019/07/26/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/"><span class="title">c++中级教程 顺序容器的定义</span></a><a class="item title" href="/2019/09/07/%E7%9F%A9%E5%BD%A2%E8%A6%86%E7%9B%96/"><span class="title">矩形覆盖</span></a><a class="item title" href="/2019/09/03/%E9%81%8D%E5%8E%86%E6%96%87%E4%BB%B6%E5%A4%B9%E5%9B%BE%E7%89%87/"><span class="title">遍历文件夹图片</span></a><a class="item title" href="/2019/09/04/%E9%87%87%E5%9D%91%E8%AE%B0%E5%BD%95/"><span class="title">采坑记录</span></a><a class="item title" href="/2019/08/29/%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/"><span class="title">透视变换</span></a><a class="item title" href="/2019/09/10/%E9%93%BE%E8%A1%A8%E4%B8%AD%E5%80%92%E6%95%B0%E7%AC%ACk%E4%B8%AA%E7%BB%93%E7%82%B9/"><span class="title">链表中倒数第k个结点</span></a><a class="item title" href="/2019/07/25/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8-STL-deque-%E7%B1%BB/"><span class="title">c++中级教程(一)</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a></div></widget>
 </div>
 <footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
 </div></aside><div class="l_main" id="main">

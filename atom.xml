@@ -12,20 +12,39 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-07-13T15:00:00.000Z</updated>
+  <updated>2026-07-13T15:40:00.000Z</updated>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="Agent" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/Agent/"/>
+    <category term="Agent-RL" scheme="https://caiusy.github.io/tags/Agent-RL/"/>
+    <category term="Tool-Calling" scheme="https://caiusy.github.io/tags/Tool-Calling/"/>
+    <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
+    <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
+    <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
+    <category term="CISPO" scheme="https://caiusy.github.io/tags/CISPO/"/>
+    <id>https://caiusy.github.io/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/</id>
+    <link href="https://caiusy.github.io/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/"/>
+    <published>2026-07-13T15:40:00.000Z</published>
+    <summary>以 MiniMind 和 LifeOS-Agent 的真实代码为主线，用一条数学工具调用和四条 rollout，完整解释 schema、router、多轮 observation、张量维度、reward、group advantage、KL、CISPO token loss 与反向传播。</summary>
+    <title>Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</title>
+    <updated>2026-07-13T15:40:00.000Z</updated>
+  </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
     </author>
     <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
-    <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
+    <category term="Agent-RL" scheme="https://caiusy.github.io/tags/Agent-RL/"/>
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
+    <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
+    <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
     <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
     <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
-    <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
-    <category term="Agent-RL" scheme="https://caiusy.github.io/tags/Agent-RL/"/>
     <id>https://caiusy.github.io/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/</id>
     <link href="https://caiusy.github.io/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"/>
     <published>2026-07-13T15:00:00.000Z</published>
@@ -42,8 +61,8 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/categories/LeetCode/"/>
-    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
+    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="Hard" scheme="https://caiusy.github.io/tags/Hard/"/>
     <category term="数组" scheme="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/"/>
     <id>https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/</id>
@@ -111,8 +130,8 @@
     <category term="算法与数据结构" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
     <category term="算法" scheme="https://caiusy.github.io/tags/%E7%AE%97%E6%B3%95/"/>
     <category term="图论" scheme="https://caiusy.github.io/tags/%E5%9B%BE%E8%AE%BA/"/>
-    <category term="BFS" scheme="https://caiusy.github.io/tags/BFS/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
+    <category term="BFS" scheme="https://caiusy.github.io/tags/BFS/"/>
     <category term="DFS" scheme="https://caiusy.github.io/tags/DFS/"/>
     <id>https://caiusy.github.io/2026/02/23/graph-theory-and-search/</id>
     <link href="https://caiusy.github.io/2026/02/23/graph-theory-and-search/"/>
@@ -246,8 +265,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="概念笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>
@@ -461,8 +480,8 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
+    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <id>https://caiusy.github.io/2026/01/18/leetcode-150-array-string/</id>
     <link href="https://caiusy.github.io/2026/01/18/leetcode-150-array-string/"/>
     <published>2026-01-17T16:00:00.000Z</published>
@@ -494,12 +513,13 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
+    <category term="二叉树" scheme="https://caiusy.github.io/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/"/>
     <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀</summary>
-    <title>🔢 LeetCode 150 - 二分查找专题</title>
+    <summary>LeetCode 面试 150 题之二叉树专题，含遍历图解、递归思维、代码模板</summary>
+    <title>🌳 LeetCode 150 - 二叉树专题</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>
@@ -510,13 +530,12 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="二叉树" scheme="https://caiusy.github.io/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/"/>
     <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之二叉树专题，含遍历图解、递归思维、代码模板</summary>
-    <title>🌳 LeetCode 150 - 二叉树专题</title>
+    <summary>LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀</summary>
+    <title>🔢 LeetCode 150 - 二分查找专题</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>
@@ -544,45 +563,12 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="图论" scheme="https://caiusy.github.io/tags/%E5%9B%BE%E8%AE%BA/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-graph/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-graph/"/>
-    <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之图论与搜索专题，含BFS/DFS图解、代码模板、记忆口诀</summary>
-    <title>🔍 LeetCode 150 - 图论与搜索专题</title>
-    <updated>2026-01-17T16:00:00.000Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
-    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
     <id>https://caiusy.github.io/2026/01/18/leetcode-150-heap/</id>
     <link href="https://caiusy.github.io/2026/01/18/leetcode-150-heap/"/>
     <published>2026-01-17T16:00:00.000Z</published>
     <summary>LeetCode 面试 150 题之堆/优先队列专题，含堆结构图解、TopK问题、代码模板</summary>
     <title>⛰️ LeetCode 150 - 堆/优先队列专题</title>
-    <updated>2026-01-17T16:00:00.000Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
-    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-index/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-index/"/>
-    <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试经典 150 题完整攻略，包含图解、口诀、代码模板，助你高效刷题拿 Offer！</summary>
-    <title>🎯 LeetCode 面试经典 150 题 - 完全攻略</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>
@@ -600,6 +586,22 @@
     <published>2026-01-17T16:00:00.000Z</published>
     <summary>LeetCode 面试 150 题之链表专题，含图解、代码模板、记忆口诀</summary>
     <title>🔗 LeetCode 150 - 链表专题</title>
+    <updated>2026-01-17T16:00:00.000Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
+    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
+    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
+    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-index/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-index/"/>
+    <published>2026-01-17T16:00:00.000Z</published>
+    <summary>LeetCode 面试经典 150 题完整攻略，包含图解、口诀、代码模板，助你高效刷题拿 Offer！</summary>
+    <title>🎯 LeetCode 面试经典 150 题 - 完全攻略</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
 </feed>

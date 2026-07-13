@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://caiusy.github.io/2026/07/13/dynamic-programming-from-recursion-to-state-transition/</loc>
+    
+    <lastmod>2026-07-13</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/</loc>
     
     <lastmod>2026-07-13</lastmod>
@@ -38,6 +47,24 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/08/29/%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2019/09/03/%E9%81%8D%E5%8E%86%E6%96%87%E4%BB%B6%E5%A4%B9%E5%9B%BE%E7%89%87/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -48,15 +75,6 @@
   
   <url>
     <loc>https://caiusy.github.io/2019/09/04/%E9%87%87%E5%9D%91%E8%AE%B0%E5%BD%95/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/08/29/%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -83,7 +101,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/</loc>
+    <loc>https://caiusy.github.io/2023/01/22/%E6%99%BA%E6%85%A7%E4%BA%A4%E9%80%9A%E9%A1%B9%E7%9B%AE/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -101,15 +119,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2023/01/22/%E6%99%BA%E6%85%A7%E4%BA%A4%E9%80%9A%E9%A1%B9%E7%9B%AE/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/09/14/%E6%A0%91%E7%9A%84%E5%AD%90%E7%BB%93%E6%9E%84/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -119,7 +128,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2023/01/22/%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E8%A7%86%E8%A7%89SLAM%E5%85%AC%E5%BC%80%E8%AF%BE-%E4%BB%8E%E8%A7%86%E9%A2%91%E6%A0%87%E5%AE%9A%E5%88%B0SLAM/</loc>
+    <loc>https://caiusy.github.io/2019/09/02/%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -128,7 +137,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/02/%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</loc>
+    <loc>https://caiusy.github.io/2023/01/22/%E6%B5%99%E6%B1%9F%E5%A4%A7%E5%AD%A6%E8%A7%86%E8%A7%89SLAM%E5%85%AC%E5%BC%80%E8%AF%BE-%E4%BB%8E%E8%A7%86%E9%A2%91%E6%A0%87%E5%AE%9A%E5%88%B0SLAM/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -155,7 +164,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2023/01/24/%E5%9F%BA%E4%BA%8E%E8%87%AA%E5%AE%9A%E4%BD%8D%E6%99%BA%E8%83%BD%E6%91%84%E5%83%8F%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/</loc>
+    <loc>https://caiusy.github.io/2019/10/13/%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -164,7 +173,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</loc>
+    <loc>https://caiusy.github.io/2023/01/24/%E5%9F%BA%E4%BA%8E%E8%87%AA%E5%AE%9A%E4%BD%8D%E6%99%BA%E8%83%BD%E6%91%84%E5%83%8F%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E7%9B%AE%E6%A0%87%E8%B7%9F%E8%B8%AA/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -200,7 +209,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/10/13/%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/</loc>
+    <loc>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -254,7 +263,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2023/01/22/%E5%8D%95%E5%BA%94%E7%9F%A9%E9%98%B5H%E6%B1%82%E8%A7%A3/</loc>
+    <loc>https://caiusy.github.io/2019/10/14/%E5%9B%BE%E5%83%8F%E5%A2%9E%E5%BC%BA%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -263,7 +272,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/10/14/%E5%9B%BE%E5%83%8F%E5%A2%9E%E5%BC%BA%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/</loc>
+    <loc>https://caiusy.github.io/2023/01/22/%E5%8D%95%E5%BA%94%E7%9F%A9%E9%98%B5H%E6%B1%82%E8%A7%A3/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -308,16 +317,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/27/%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9F%A5%E6%89%BE/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2023/01/26/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/</loc>
+    <loc>https://caiusy.github.io/2019/12/19/%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -335,7 +335,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/12/19/%E4%BA%8C%E5%8F%89%E6%A0%91%E6%89%93%E5%8D%B0/</loc>
+    <loc>https://caiusy.github.io/2023/01/26/%E4%B8%80%E7%A7%8D%E5%9F%BA%E4%BA%8E%E5%8D%95%E5%BA%94%E6%80%A7%E7%9A%84%E5%A4%9A%E7%9B%B8%E6%9C%BA%E8%A1%8C%E4%BA%BA%E8%B7%9F%E8%B8%AA%E7%AE%97%E6%B3%95/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -344,7 +344,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/%E4%BB%8E%E4%B8%8A%E5%BE%80%E4%B8%8B%E6%89%93%E5%8D%B0%E4%BA%8C%E5%8F%89%E6%A0%91/</loc>
+    <loc>https://caiusy.github.io/2019/08/27/%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9F%A5%E6%89%BE/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -362,43 +362,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/skimage%E6%A8%A1%E5%9D%97/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2026/03/04/skills-complete-tutorial/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/09/07/xml%E7%94%9F%E6%88%90/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/08/24/ssd/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/09/07/xml%E8%A7%A3%E6%9E%90/</loc>
+    <loc>https://caiusy.github.io/2019/08/28/%E4%BB%8E%E4%B8%8A%E5%BE%80%E4%B8%8B%E6%89%93%E5%8D%B0%E4%BA%8C%E5%8F%89%E6%A0%91/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -416,7 +380,52 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2019/08/28/skimage%E6%A8%A1%E5%9D%97/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/08/24/ssd/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/09/07/xml%E7%94%9F%E6%88%90/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2026/03/04/skills-complete-tutorial/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2019/10/17/tensorflow%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/09/07/xml%E8%A7%A3%E6%9E%90/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -434,7 +443,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/python%E6%89%8B%E5%86%8C/</loc>
+    <loc>https://caiusy.github.io/2019/10/31/pytorchchch%E2%80%94%E2%80%94-xmind/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -443,7 +452,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/10/31/pytorchchch%E2%80%94%E2%80%94-xmind/</loc>
+    <loc>https://caiusy.github.io/2019/08/28/python%E6%89%8B%E5%86%8C/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -461,7 +470,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/shutil%E6%A8%A1%E5%9D%97/</loc>
+    <loc>https://caiusy.github.io/2019/11/17/rnn/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -470,7 +479,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/11/17/rnn/</loc>
+    <loc>https://caiusy.github.io/2019/08/28/shutil%E6%A8%A1%E5%9D%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -497,33 +506,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2020/02/05/practise-matlab/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/10/31/pyobject-track-xmind/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/10/13/park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/10/13/ocr%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -542,7 +524,34 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2020/02/05/practise-matlab/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/10/31/pyobject-track-xmind/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2019/11/17/python-learn/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/10/13/park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -561,15 +570,6 @@
   
   <url>
     <loc>https://caiusy.github.io/2026/02/19/monotonic-stack-guide/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/09/14/mosse/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -597,6 +597,15 @@
   
   <url>
     <loc>https://caiusy.github.io/2019/10/31/object-dectection-xmind/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/09/14/mosse/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -668,7 +677,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/07/25/firstblog/</loc>
+    <loc>https://caiusy.github.io/2019/08/28/glob%E6%A8%A1%E5%9D%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -686,16 +695,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/glob%E6%A8%A1%E5%9D%97/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2026/01/19/camera-geometry-complete-guide/</loc>
+    <loc>https://caiusy.github.io/2019/07/25/firstblog/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -713,7 +713,25 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2026/01/25/deep-dive-into-lora/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2019/09/05/cmd%E6%89%8B%E5%86%8C/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2026/01/19/camera-geometry-complete-guide/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -731,15 +749,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2026/01/25/deep-dive-into-lora/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/12/27/SpatialSense/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -749,7 +758,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2026/02/02/Transformer-DeepDive/</loc>
+    <loc>https://caiusy.github.io/2019/08/15/algorithm2/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -776,16 +785,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/15/algorithm2/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/08/18/algorithm4/</loc>
+    <loc>https://caiusy.github.io/2026/02/02/Transformer-DeepDive/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -795,6 +795,15 @@
   
   <url>
     <loc>https://caiusy.github.io/2019/08/16/algorithm3/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/08/18/algorithm4/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -813,6 +822,15 @@
   
   <url>
     <loc>https://caiusy.github.io/2019/07/25/STL-stack/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/07/26/STLqueue/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -848,15 +866,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/07/26/STLqueue/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/11/04/Python%EF%BC%9Alogging%E6%A8%A1%E5%9D%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -875,7 +884,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/Pytorch%E6%89%8B%E5%86%8C/</loc>
+    <loc>https://caiusy.github.io/2023/01/22/RANSAC%E7%AE%97%E6%B3%95/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -884,7 +893,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2023/01/22/RANSAC%E7%AE%97%E6%B3%95/</loc>
+    <loc>https://caiusy.github.io/2019/08/28/Pytorch%E6%89%8B%E5%86%8C/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -911,7 +920,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/19/MLP-Back-Propagation/</loc>
+    <loc>https://caiusy.github.io/2019/08/19/MobileNets/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -920,7 +929,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/19/MobileNets/</loc>
+    <loc>https://caiusy.github.io/2019/08/19/MLP-Back-Propagation/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -965,6 +974,15 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2019/11/17/Duplicate/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2019/11/28/HMM/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -975,15 +993,6 @@
   
   <url>
     <loc>https://caiusy.github.io/2019/11/26/GAN/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/11/17/Duplicate/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1037,7 +1046,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/</loc>
+    <loc>https://caiusy.github.io/2019/08/28/BFS/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1055,25 +1064,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/BFS/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/12/26/20191226-ADVERSARIALAL-AUTOAUGMENT/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/12/25/20191225-Scene-Text-Detection/</loc>
+    <loc>https://caiusy.github.io/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1091,7 +1082,25 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/12/27/20191227-SpatialSense/</loc>
+    <loc>https://caiusy.github.io/2020/02/05/20200205-practise-matlab/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/12/25/20191225-Scene-Text-Detection/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/12/26/20191226-ADVERSARIALAL-AUTOAUGMENT/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1109,6 +1118,15 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2019/12/27/20191227-SpatialSense/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2023/01/22/2022%E5%B9%B4%E5%B7%A5%E4%BD%9C%E6%9A%82%E6%97%B6%E6%80%A7%E6%80%BB%E7%BB%93/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1118,34 +1136,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2020/02/05/20200205-practise-matlab/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/11/17/20191117-rnn/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/11/26/20191126-GAN/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/12/24/20191224-Semantic-segmentation-overview/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1172,7 +1163,16 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/11/17/20191117-python-learn/</loc>
+    <loc>https://caiusy.github.io/2019/11/26/20191126-GAN/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/12/24/20191224-Semantic-segmentation-overview/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1182,6 +1182,15 @@
   
   <url>
     <loc>https://caiusy.github.io/2019/11/17/20191117-dynamic/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/11/17/20191117-python-learn/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1217,24 +1226,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/10/20/20191020-knn%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/10/31/20191031-object-dectection-xmind/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/10/31/20191031-attention-mechanism-xmind/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1244,7 +1235,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/10/31/20191031-pytorchchch%E2%80%94%E2%80%94-xmind/</loc>
+    <loc>https://caiusy.github.io/2019/10/20/20191020-knn%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1262,7 +1253,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/11/04/20191104-Python%EF%BC%9Alogging%E6%A8%A1%E5%9D%97/</loc>
+    <loc>https://caiusy.github.io/2019/10/31/20191031-pytorchchch%E2%80%94%E2%80%94-xmind/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1271,7 +1262,16 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/30/20190930-zhongjie/</loc>
+    <loc>https://caiusy.github.io/2019/10/31/20191031-object-dectection-xmind/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/11/04/20191104-Python%EF%BC%9Alogging%E6%A8%A1%E5%9D%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1289,7 +1289,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/</loc>
+    <loc>https://caiusy.github.io/2019/09/30/20190930-zhongjie/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1299,6 +1299,24 @@
   
   <url>
     <loc>https://caiusy.github.io/2019/10/13/20191013-ocr%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/10/13/20191013-park%E5%81%9C%E8%BD%A6%E5%9C%BA%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1325,34 +1343,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/10/13/20191013-%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86-1/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/09/14/20190914-%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%8E%92%E5%BA%8F%E7%9A%84%E9%93%BE%E8%A1%A8/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/09/15/20190915-Sort/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/09/16/20190916-Hungary%E7%AE%97%E6%B3%95/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1370,6 +1361,24 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2019/09/16/20190916-Hungary%E7%AE%97%E6%B3%95/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/09/15/20190915-Sort/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2019/09/10/20190910-%E9%93%BE%E8%A1%A8%E4%B8%AD%E5%80%92%E6%95%B0%E7%AC%ACk%E4%B8%AA%E7%BB%93%E7%82%B9/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1379,7 +1388,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/12/20190912-%E5%9B%9B%E8%BE%B9%E5%BD%A2%E6%8C%89%E7%85%A7%E9%A1%BA%E6%97%B6%E9%92%88%E6%8E%92%E5%BA%8F/</loc>
+    <loc>https://caiusy.github.io/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1388,7 +1397,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/12/20190912-%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/</loc>
+    <loc>https://caiusy.github.io/2019/09/12/20190912-%E5%9B%9B%E8%BE%B9%E5%BD%A2%E6%8C%89%E7%85%A7%E9%A1%BA%E6%97%B6%E9%92%88%E6%8E%92%E5%BA%8F/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1415,15 +1424,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/09/07/20190907-%E7%9F%A9%E5%BD%A2%E8%A6%86%E7%9B%96/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1442,15 +1442,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/09/08/20190908-%E4%BB%8Ecsv%E4%B8%AD%E8%AF%BB%E5%8F%96%E6%95%B0%E6%8D%AE/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1460,7 +1451,34 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2019/09/07/20190907-xml%E8%A7%A3%E6%9E%90/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/09/08/20190908-%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2019/09/06/20190906-docker%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1496,24 +1514,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/06/20190906-%E5%8F%98%E6%80%81%E8%B7%B3%E5%8F%B0%E9%98%B6/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/08/29/20190829-%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/09/03/20190903-%E9%81%8D%E5%8E%86%E6%96%87%E4%BB%B6%E5%A4%B9%E5%9B%BE%E7%89%87/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1532,7 +1532,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</loc>
+    <loc>https://caiusy.github.io/2019/08/29/20190829-%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1541,7 +1541,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/09/04/20190904-%E9%87%87%E5%9D%91%E8%AE%B0%E5%BD%95/</loc>
+    <loc>https://caiusy.github.io/2019/09/02/20190902-%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1568,7 +1568,25 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2019/09/04/20190904-%E9%87%87%E5%9D%91%E8%AE%B0%E5%BD%95/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2019/08/28/20190828-opencv%E6%A8%A1%E5%9D%97/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1586,7 +1604,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/29/20190829-%E6%9B%BF%E6%8D%A2%E7%A9%BA%E6%A0%BC/</loc>
+    <loc>https://caiusy.github.io/2019/08/28/20190828-skimage%E6%A8%A1%E5%9D%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1613,16 +1631,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/20190828-shutil%E6%A8%A1%E5%9D%97/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/08/28/20190828-skimage%E6%A8%A1%E5%9D%97/</loc>
+    <loc>https://caiusy.github.io/2019/08/29/20190829-%E6%9B%BF%E6%8D%A2%E7%A9%BA%E6%A0%BC/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1649,15 +1658,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/20190828-PIL%E6%A8%A1%E5%9D%97/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/08/28/20190828-glob%E6%A8%A1%E5%9D%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1676,15 +1676,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/28/20190828-numpy%E5%AE%9E%E7%8E%B0%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2019/08/28/20190828-logging%E6%A8%A1%E5%9D%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1694,7 +1685,16 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/20/20190820-squeezenet/</loc>
+    <loc>https://caiusy.github.io/2019/08/28/20190828-numpy%E5%AE%9E%E7%8E%B0%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2019/08/28/20190828-PIL%E6%A8%A1%E5%9D%97/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1712,6 +1712,15 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2019/08/20/20190820-squeezenet/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2019/08/24/20190824-pythonplot/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1721,7 +1730,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/26/20190826-%E4%BB%BF%E5%B0%84%E5%8F%98%E6%8D%A2/</loc>
+    <loc>https://caiusy.github.io/2019/08/27/20190827-%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9F%A5%E6%89%BE/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1739,7 +1748,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/27/20190827-%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9F%A5%E6%89%BE/</loc>
+    <loc>https://caiusy.github.io/2019/08/26/20190826-%E4%BB%BF%E5%B0%84%E5%8F%98%E6%8D%A2/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1766,7 +1775,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/15/20190815-algorithm2/</loc>
+    <loc>https://caiusy.github.io/2019/08/14/20190814-algorithm1/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1784,7 +1793,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/08/14/20190814-algorithm1/</loc>
+    <loc>https://caiusy.github.io/2019/08/15/20190815-algorithm2/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1829,7 +1838,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/07/25/20190725-%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8-STL-deque-%E7%B1%BB/</loc>
+    <loc>https://caiusy.github.io/2019/07/25/20190725-firstblog/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1847,16 +1856,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2019/07/25/20190725-firstblog/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2019/07/26/20190726-%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/</loc>
+    <loc>https://caiusy.github.io/2019/07/25/20190725-%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8-STL-deque-%E7%B1%BB/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1874,34 +1874,16 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2019/07/26/20190726-%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/engineering/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/llm-reading-map/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/radar-camera-fusion/</loc>
-    
-    <lastmod>2026-05-15</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/about/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1919,6 +1901,24 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/llm-reading-map/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/about/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/projects/</loc>
     
     <lastmod>2026-05-15</lastmod>
@@ -1928,7 +1928,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/roadside-bev/</loc>
+    <loc>https://caiusy.github.io/radar-camera-fusion/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1938,6 +1938,15 @@
   
   <url>
     <loc>https://caiusy.github.io/review/</loc>
+    
+    <lastmod>2026-05-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/roadside-bev/</loc>
     
     <lastmod>2026-05-15</lastmod>
     
@@ -1982,6 +1991,15 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/</loc>
+    
+    <lastmod>2026-01-17</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/</loc>
     
     <lastmod>2026-01-17</lastmod>
@@ -2000,7 +2018,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/</loc>
+    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-dp/</loc>
     
     <lastmod>2026-01-17</lastmod>
     
@@ -2009,7 +2027,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-dp/</loc>
+    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-graph/</loc>
     
     <lastmod>2026-01-17</lastmod>
     
@@ -2027,15 +2045,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-linked-list/</loc>
-    
-    <lastmod>2026-01-17</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/2026/01/18/leetcode-150-index/</loc>
     
     <lastmod>2026-01-17</lastmod>
@@ -2045,16 +2054,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-sliding-window/</loc>
-    
-    <lastmod>2026-01-17</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-graph/</loc>
+    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-linked-list/</loc>
     
     <lastmod>2026-01-17</lastmod>
     
@@ -2073,6 +2073,15 @@
   
   <url>
     <loc>https://caiusy.github.io/2026/01/18/leetcode-150-two-pointers/</loc>
+    
+    <lastmod>2026-01-17</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/2026/01/18/leetcode-150-sliding-window/</loc>
     
     <lastmod>2026-01-17</lastmod>
     
@@ -2174,13 +2183,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/tags/%E6%8A%80%E6%9C%AF/</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -2189,6 +2191,13 @@
   
   <url>
     <loc>https://caiusy.github.io/tags/%E9%93%BE%E8%A1%A8/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/tags/%E6%8A%80%E6%9C%AF/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2237,14 +2246,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/tags/BEV/</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/tags/%E9%9B%B7%E8%BE%BE%E7%9B%B8%E6%9C%BA%E8%9E%8D%E5%90%88/</loc>
+    <loc>https://caiusy.github.io/tags/MATLAB/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2279,13 +2281,6 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/tags/MATLAB/</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/tags/Deep-Learning/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -2300,7 +2295,28 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/tags/BEV/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/tags/%E9%9B%B7%E8%BE%BE%E7%9B%B8%E6%9C%BA%E8%9E%8D%E5%90%88/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/tags/BFS/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2350,13 +2366,6 @@
   
   <url>
     <loc>https://caiusy.github.io/tags/%E7%BC%96%E7%A8%8B/</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/tags/BFS/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2440,28 +2449,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/tags/%E7%9B%B8%E6%9C%BA%E5%87%A0%E4%BD%95/</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/tags/%E5%8D%95%E5%BA%94%E6%80%A7%E7%9F%A9%E9%98%B5/</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://caiusy.github.io/tags/Attention/</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/tags/AI/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2476,6 +2464,27 @@
   
   <url>
     <loc>https://caiusy.github.io/tags/LoRA/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/tags/%E7%9B%B8%E6%9C%BA%E5%87%A0%E4%BD%95/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/tags/%E5%8D%95%E5%BA%94%E6%80%A7%E7%9F%A9%E9%98%B5/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/tags/AI/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2531,6 +2540,13 @@
   </url>
   
   <url>
+    <loc>https://caiusy.github.io/tags/XML/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://caiusy.github.io/tags/MCP/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -2565,13 +2581,6 @@
     <priority>0.2</priority>
   </url>
   
-  <url>
-    <loc>https://caiusy.github.io/tags/XML/</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
 
   
   <url>
@@ -2583,13 +2592,6 @@
   
   <url>
     <loc>https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2610,7 +2612,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/</loc>
+    <loc>https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2624,14 +2626,14 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
+    <loc>https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/BEV%E6%84%9F%E7%9F%A5/</loc>
+    <loc>https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2645,7 +2647,7 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/%E6%8A%80%E6%9C%AF/</loc>
+    <loc>https://caiusy.github.io/categories/BEV%E6%84%9F%E7%9F%A5/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2666,14 +2668,21 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/</loc>
+    <loc>https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/</loc>
+    <loc>https://caiusy.github.io/categories/%E6%8A%80%E6%9C%AF/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2715,14 +2724,14 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/%E6%8A%80%E6%9C%AF/</loc>
+    <loc>https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/</loc>
+    <loc>https://caiusy.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/%E6%8A%80%E6%9C%AF/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2778,14 +2787,14 @@
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/BEV%E6%84%9F%E7%9F%A5/%E7%AE%97%E6%B3%95/</loc>
+    <loc>https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/</loc>
+    <loc>https://caiusy.github.io/categories/BEV%E6%84%9F%E7%9F%A5/%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -2828,6 +2837,13 @@
   
   <url>
     <loc>https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E5%85%B6%E4%BB%96/</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/LeetCode/</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

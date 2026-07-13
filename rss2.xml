@@ -8,9 +8,25 @@
     </description>
     <language>zh-CN</language>
     <copyright>All rights reserved 2026, Caius Lu</copyright>
-    <lastBuildDate>Fri, 15 May 2026 16:56:29 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 13 Jul 2026 15:00:00 GMT</lastBuildDate>
     <generator>Hexo</generator>
     <atom:link href="https://caiusy.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</title>
+      <link>https://caiusy.github.io/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/</link>
+      <description>基于 MiniMind 与 RTX 3090 Ti 的完整训练实战：真实数据样本、Transformer 张量维度、五类损失函数，以及 Agent RL 多轮工具调用从 rollout、observation mask、reward、advantage 到 CISPO loss 的逐步推导。</description>
+      <author>Caius Lu</author>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
+      <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
+      <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
+      <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
+      <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
+      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
+      <category domain="https://caiusy.github.io/tags/Agent-RL/">Agent-RL</category>
+      <pubDate>Mon, 13 Jul 2026 15:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>接雨水问题 - 完全学习指南</title>
       <link>https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/</link>
@@ -197,8 +213,8 @@
 </blockquote>]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
+      <category domain="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/">概念笔记</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/Python/">Python</category>
@@ -402,6 +418,19 @@
       <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
     </item>
     <item>
+      <title>📈 LeetCode 150 - 动态规划专题</title>
+      <link>https://caiusy.github.io/2026/01/18/leetcode-150-dp/</link>
+      <description>LeetCode 面试 150 题之动态规划专题，含状态转移图解、代码模板、记忆口诀</description>
+      <author>Caius Lu</author>
+      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/">算法基础</category>
+      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/">算法</category>
+      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
+      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
+      <category domain="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">动态规划</category>
+      <category domain="https://caiusy.github.io/tags/LeetCode/">LeetCode</category>
+      <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
+    </item>
+    <item>
       <title>🔍 LeetCode 150 - 图论与搜索专题</title>
       <link>https://caiusy.github.io/2026/01/18/leetcode-150-graph/</link>
       <description>LeetCode 面试 150 题之图论与搜索专题，含BFS/DFS图解、代码模板、记忆口诀</description>
@@ -411,18 +440,6 @@
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
       <category domain="https://caiusy.github.io/tags/%E5%9B%BE%E8%AE%BA/">图论</category>
-      <category domain="https://caiusy.github.io/tags/LeetCode/">LeetCode</category>
-      <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>🎯 LeetCode 面试经典 150 题 - 完全攻略</title>
-      <link>https://caiusy.github.io/2026/01/18/leetcode-150-index/</link>
-      <description>LeetCode 面试经典 150 题完整攻略，包含图解、口诀、代码模板，助你高效刷题拿 Offer！</description>
-      <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/">算法基础</category>
-      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/">算法</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
       <category domain="https://caiusy.github.io/tags/LeetCode/">LeetCode</category>
       <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
     </item>
@@ -439,15 +456,14 @@
       <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
     </item>
     <item>
-      <title>📈 LeetCode 150 - 动态规划专题</title>
-      <link>https://caiusy.github.io/2026/01/18/leetcode-150-dp/</link>
-      <description>LeetCode 面试 150 题之动态规划专题，含状态转移图解、代码模板、记忆口诀</description>
+      <title>🎯 LeetCode 面试经典 150 题 - 完全攻略</title>
+      <link>https://caiusy.github.io/2026/01/18/leetcode-150-index/</link>
+      <description>LeetCode 面试经典 150 题完整攻略，包含图解、口诀、代码模板，助你高效刷题拿 Offer！</description>
       <author>Caius Lu</author>
       <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/">算法基础</category>
       <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/">算法</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
-      <category domain="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">动态规划</category>
       <category domain="https://caiusy.github.io/tags/LeetCode/">LeetCode</category>
       <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
     </item>
@@ -461,18 +477,6 @@
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
       <category domain="https://caiusy.github.io/tags/%E9%93%BE%E8%A1%A8/">链表</category>
-      <category domain="https://caiusy.github.io/tags/LeetCode/">LeetCode</category>
-      <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>🪟 LeetCode 150 - 滑动窗口专题</title>
-      <link>https://caiusy.github.io/2026/01/18/leetcode-150-sliding-window/</link>
-      <description>LeetCode 面试 150 题之滑动窗口专题，含图解、代码模板、记忆口诀</description>
-      <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/">算法基础</category>
-      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/">算法</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
       <category domain="https://caiusy.github.io/tags/LeetCode/">LeetCode</category>
       <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
     </item>

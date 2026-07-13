@@ -12,7 +12,27 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-05-15T16:56:29.486Z</updated>
+  <updated>2026-07-13T15:00:00.000Z</updated>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
+    <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
+    <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
+    <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
+    <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
+    <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
+    <category term="Agent-RL" scheme="https://caiusy.github.io/tags/Agent-RL/"/>
+    <id>https://caiusy.github.io/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/</id>
+    <link href="https://caiusy.github.io/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"/>
+    <published>2026-07-13T15:00:00.000Z</published>
+    <summary>基于 MiniMind 与 RTX 3090 Ti 的完整训练实战：真实数据样本、Transformer 张量维度、五类损失函数，以及 Agent RL 多轮工具调用从 rollout、observation mask、reward、advantage 到 CISPO loss 的逐步推导。</summary>
+    <title>LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</title>
+    <updated>2026-07-13T15:00:00.000Z</updated>
+  </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -33,7 +53,7 @@
       <![CDATA[<h1 id="🌧️-接雨水问题-完全学习指南"><a href="#🌧️-接雨水问题-完全学习指南" class="headerlink" title="🌧️ 接雨水问题 - 完全学习指南"></a>🌧️ 接雨水问题 -]]>
     </summary>
     <title>接雨水问题 - 完全学习指南</title>
-    <updated>2026-05-15T16:56:29.486Z</updated>
+    <updated>2026-05-15T17:03:44.264Z</updated>
   </entry>
   <entry>
     <author>
@@ -55,7 +75,7 @@
     <published>2026-03-04T13:27:28.000Z</published>
     <summary>从零开始掌握 MCP Skills 开发的完整教程，以阿里千问为例，包含核心概念、代码实现、高级优化和发布实战。</summary>
     <title>Skills 完整开发教程 - 从零开始掌握 MCP Skills 开发</title>
-    <updated>2026-05-15T16:56:29.489Z</updated>
+    <updated>2026-05-15T17:03:44.268Z</updated>
   </entry>
   <entry>
     <author>
@@ -79,7 +99,7 @@
       <![CDATA[<h1 id="LLaVA-终极指南：从盲人教授到多模态大模型的数学解剖"><a href="#LLaVA-终极指南：从盲人教授到多模态大模型的数学解剖" class="headerlink" title="LLaVA]]>
     </summary>
     <title>LLaVA 原理拆解：视觉编码器、投影层与语言模型如何对齐</title>
-    <updated>2026-05-15T17:01:28.598Z</updated>
+    <updated>2026-05-15T17:03:44.253Z</updated>
   </entry>
   <entry>
     <author>
@@ -104,7 +124,7 @@
 <p>这篇文章用费曼式教学法，带你从「图是什么」一路打通到「LeetCode 实战」。每个概念都有具体例子、可视化图解、完整代码和数据流追踪。不讲废话，直击本质。</p>]]>
     </summary>
     <title>图论与搜索：邻接表、BFS/DFS 与最短路的题型模板</title>
-    <updated>2026-05-15T17:01:28.598Z</updated>
+    <updated>2026-05-15T17:03:44.261Z</updated>
   </entry>
   <entry>
     <author>
@@ -128,7 +148,7 @@
 </blockquote>]]>
     </summary>
     <title>链表与指针完全图解：从内存本质到 LeetCode 实战</title>
-    <updated>2026-05-15T16:56:29.487Z</updated>
+    <updated>2026-05-15T17:03:44.264Z</updated>
   </entry>
   <entry>
     <author>
@@ -149,7 +169,7 @@
       <![CDATA[<h1 id="动态规划完全指南：从入门到精通"><a href="#动态规划完全指南：从入门到精通" class="headerlink"]]>
     </summary>
     <title>动态规划：状态设计、转移方程与题型模板</title>
-    <updated>2026-05-15T17:01:28.597Z</updated>
+    <updated>2026-05-15T17:03:44.251Z</updated>
   </entry>
   <entry>
     <author>
@@ -165,7 +185,7 @@
     <published>2026-02-19T09:00:00.000Z</published>
     <summary>深度解析单调栈的原理、应用和实战技巧，用费曼学习法帮你彻底理解这个强大的算法工具</summary>
     <title>单调栈：从 O(n²) 到 O(n) 的状态压缩思路</title>
-    <updated>2026-05-15T17:01:28.598Z</updated>
+    <updated>2026-05-15T17:03:44.265Z</updated>
   </entry>
   <entry>
     <author>
@@ -183,7 +203,7 @@
       <![CDATA[<h1 id="双指针（Two-Pointers）—-Feynman-风格教程"><a href="#双指针（Two-Pointers）—-Feynman-风格教程" class="headerlink" title="双指针（Two Pointers）— Feynman]]>
     </summary>
     <title>双指针（Two Pointers）Feynman 风格教程</title>
-    <updated>2026-05-15T16:56:29.480Z</updated>
+    <updated>2026-05-15T17:03:44.251Z</updated>
   </entry>
   <entry>
     <author>
@@ -202,7 +222,7 @@
       <![CDATA[<h1 id="CLIP-Contrastive-Language-Image-Pre-Training-深度解析"><a href="#CLIP-Contrastive-Language-Image-Pre-Training-深度解析" class="headerlink"]]>
     </summary>
     <title>CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用</title>
-    <updated>2026-05-15T16:54:54.462Z</updated>
+    <updated>2026-05-15T17:03:44.251Z</updated>
   </entry>
   <entry>
     <author>
@@ -226,8 +246,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="概念笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>
@@ -248,7 +268,7 @@
 </blockquote>]]>
     </summary>
     <title>KL 散度直觉理解与数学推导</title>
-    <updated>2026-05-15T17:01:28.597Z</updated>
+    <updated>2026-05-15T17:03:44.253Z</updated>
   </entry>
   <entry>
     <author>
@@ -286,7 +306,7 @@
       <![CDATA[<p><strong>摘要</strong>：本文深度解析 OpenAI 的 GPT 系列模型演进之路。从 GPT-1 的预训练+微调范式，到 GPT-2 的零样本尝试，再到 GPT-3 的上下文学习（In-context Learning）与规模法则（Scaling Laws）。文章详细拆解了模型架构、Tensor 维度变化、训练数据流，并配有 13 张可视化图表与通俗易懂的费曼式讲解。</p>]]>
     </summary>
     <title>GPT 系列深度解析：从 GPT-1 到 GPT-3</title>
-    <updated>2026-05-15T16:54:54.461Z</updated>
+    <updated>2026-05-15T17:03:44.251Z</updated>
   </entry>
   <entry>
     <author>
@@ -305,7 +325,7 @@
       <![CDATA[<h1 id="BERT-完整解析：从论文到-KV-Cache"><a href="#BERT-完整解析：从论文到-KV-Cache" class="headerlink" title="BERT 完整解析：从论文到 KV Cache"></a>BERT 完整解析：从论文到]]>
     </summary>
     <title>BERT 完整解析：从论文到 KV Cache</title>
-    <updated>2026-05-15T16:54:54.475Z</updated>
+    <updated>2026-05-15T17:03:44.260Z</updated>
   </entry>
   <entry>
     <author>
@@ -325,7 +345,7 @@
       <![CDATA[<h1 id="彻底理解-Transformer-Attention-Is-All-You-Need"><a href="#彻底理解-Transformer-Attention-Is-All-You-Need" class="headerlink" title="彻底理解]]>
     </summary>
     <title>彻底理解 Transformer：Attention Is All You Need</title>
-    <updated>2026-05-15T16:54:54.473Z</updated>
+    <updated>2026-05-15T17:03:44.259Z</updated>
   </entry>
   <entry>
     <author>
@@ -349,7 +369,7 @@
 <p>本文将基于深度技术问答，带你彻底搞懂 QLoRA 的核心机制。</p>]]>
     </summary>
     <title>彻底搞懂 QLoRA：如何用 4-bit 量化技术单卡微调千亿模型？</title>
-    <updated>2026-05-15T16:54:54.490Z</updated>
+    <updated>2026-05-15T17:03:44.267Z</updated>
   </entry>
   <entry>
     <author>
@@ -371,7 +391,7 @@
 <p>本文将基于我与 AI 的一次深度对话，系统地梳理 LoRA 的核心原理。我们不仅会用直觉去理解它，更会通过 <strong>数学证明</strong> 和 <strong>Python 模拟</strong> ，彻底搞懂为什么它需要除以 $r$ ，以及它在反向传播中是如何工作的。</p>]]>
     </summary>
     <title>深入浅出 LoRA：大模型微调的核心原理、数学证明与实战指南</title>
-    <updated>2026-05-15T16:54:54.476Z</updated>
+    <updated>2026-05-15T17:03:44.260Z</updated>
   </entry>
   <entry>
     <author>
@@ -389,7 +409,7 @@
       <![CDATA[<p>本文详细推导从3D世界坐标系到2D图像坐标系的完整数学过程，包括相机内外参数、旋转矩阵、单应矩阵的推导与分解，并提供完整的Python可视化代码。</p>]]>
     </summary>
     <title>相机成像模型：从世界坐标到像素坐标的工程推导</title>
-    <updated>2026-05-15T17:01:28.598Z</updated>
+    <updated>2026-05-15T17:03:44.260Z</updated>
   </entry>
   <entry>
     <author>
@@ -431,7 +451,7 @@
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>使用 Hexo 写博客非常简单！</p>]]>
     </summary>
     <title>如何使用Hexo写博客</title>
-    <updated>2026-05-15T16:56:29.491Z</updated>
+    <updated>2026-05-15T17:03:44.272Z</updated>
   </entry>
   <entry>
     <author>
@@ -507,13 +527,13 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="图论" scheme="https://caiusy.github.io/tags/%E5%9B%BE%E8%AE%BA/"/>
+    <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-graph/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-graph/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-dp/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-dp/"/>
     <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之图论与搜索专题，含BFS/DFS图解、代码模板、记忆口诀</summary>
-    <title>🔍 LeetCode 150 - 图论与搜索专题</title>
+    <summary>LeetCode 面试 150 题之动态规划专题，含状态转移图解、代码模板、记忆口诀</summary>
+    <title>📈 LeetCode 150 - 动态规划专题</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>
@@ -524,12 +544,13 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
+    <category term="图论" scheme="https://caiusy.github.io/tags/%E5%9B%BE%E8%AE%BA/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-index/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-index/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-graph/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-graph/"/>
     <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试经典 150 题完整攻略，包含图解、口诀、代码模板，助你高效刷题拿 Offer！</summary>
-    <title>🎯 LeetCode 面试经典 150 题 - 完全攻略</title>
+    <summary>LeetCode 面试 150 题之图论与搜索专题，含BFS/DFS图解、代码模板、记忆口诀</summary>
+    <title>🔍 LeetCode 150 - 图论与搜索专题</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>
@@ -556,13 +577,12 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-dp/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-dp/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-index/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-index/"/>
     <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之动态规划专题，含状态转移图解、代码模板、记忆口诀</summary>
-    <title>📈 LeetCode 150 - 动态规划专题</title>
+    <summary>LeetCode 面试经典 150 题完整攻略，包含图解、口诀、代码模板，助你高效刷题拿 Offer！</summary>
+    <title>🎯 LeetCode 面试经典 150 题 - 完全攻略</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>
@@ -580,22 +600,6 @@
     <published>2026-01-17T16:00:00.000Z</published>
     <summary>LeetCode 面试 150 题之链表专题，含图解、代码模板、记忆口诀</summary>
     <title>🔗 LeetCode 150 - 链表专题</title>
-    <updated>2026-01-17T16:00:00.000Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
-    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-sliding-window/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-sliding-window/"/>
-    <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之滑动窗口专题，含图解、代码模板、记忆口诀</summary>
-    <title>🪟 LeetCode 150 - 滑动窗口专题</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
 </feed>

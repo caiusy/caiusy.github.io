@@ -1,0 +1,2836 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导 - Caius Lu</title>
+
+  
+    <meta name="description" content="从张量、概率、梯度和 Transformer 开始，以 17.66 涨停价工具调用为贯穿样例，逐步推导 SFT、DPO、PPO、GRPO、CISPO 与 Agent RL，并落到 MiniMind&#x2F;LifeOS-Agent 的真实数据、张量维度、训练代码、3090 Ti 调参与发布验收。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导">
+<meta property="og:url" content="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="从张量、概率、梯度和 Transformer 开始，以 17.66 涨停价工具调用为贯穿样例，逐步推导 SFT、DPO、PPO、GRPO、CISPO 与 Agent RL，并落到 MiniMind&#x2F;LifeOS-Agent 的真实数据、张量维度、训练代码、3090 Ti 调参与发布验收。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-07-23T12:30:00.000Z">
+<meta property="article:modified_time" content="2026-07-23T12:30:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="Agent-RL">
+<meta property="article:tag" content="Tool-Calling">
+<meta property="article:tag" content="MiniMind">
+<meta property="article:tag" content="LifeOS-Agent">
+<meta property="article:tag" content="GRPO">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="SFT">
+<meta property="article:tag" content="DPO">
+<meta property="article:tag" content="PPO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="Agent-RL,Tool-Calling,MiniMind,LifeOS-Agent,GRPO,Transformer,SFT,DPO,PPO">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-07-23T20:30:00+08:00","dateModified":"2026-07-23T20:30:00+08:00","datePublished":"2026-07-23T20:30:00+08:00","description":"\n这不是一篇只列名词的综述，而是一份可以从第一页连续学习到独立训练的主教材。我们从“标量、向量、概率和梯度是什么”开始，最终把一条多轮工具轨迹算到逐 token policy loss，并给出真实 MiniMind/LifeOS-Agent 代码位置、3090 Ti 训练步骤和面试验收标准。\n全文只有一个主问题：一条用户消息如何经过 tokenizer、Transformer、工具环境和训练目标，最终改变模型参数？\n","headline":"LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/","keywords":"Agent-RL, Tool-Calling, MiniMind, LifeOS-Agent, GRPO, Transformer, SFT, DPO, PPO","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="handbook" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="Home" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:home-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="Projects" href="/projects/" style="color:#10B981"><img src="https://api.iconify.design/solar:rocket-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="BEV" href="/roadside-bev/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:camera-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="Fusion" href="/radar-camera-fusion/" style="color:#EC4899"><img src="https://api.iconify.design/solar:radar-bold-duotone.svg?color=%23EC4899"/></a><a class="nav-item" title="LLM" href="/llm-reading-map/" style="color:#8B5CF6"><img src="https://api.iconify.design/solar:atom-bold-duotone.svg?color=%238B5CF6"/></a><a class="nav-item" title="Notes" href="/notes/" style="color:#0EA5E9"><img src="https://api.iconify.design/solar:notebook-bookmark-bold-duotone.svg?color=%230EA5E9"/></a><a class="nav-item" title="Review" href="/review/" style="color:#F43F5E"><img src="https://api.iconify.design/solar:checklist-minimalistic-bold-duotone.svg?color=%23F43F5E"/></a><a class="nav-item" title="About" href="/about/" style="color:#64748B"><img src="https://api.iconify.design/solar:user-id-bold-duotone.svg?color=%2364748B"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a><a class="item title" href="/2026/07/13/dynamic-programming-from-recursion-to-state-transition/"><span class="title">动态规划完全图解：从重复递归到状态转移</span></a><a class="item title" href="/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/"><span class="title">Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</span></a><a class="item title" href="/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"><span class="title">LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</span></a><a class="item title" href="/2019/07/26/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/"><span class="title">c++中级教程 顺序容器的定义</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/09/03/%E9%81%8D%E5%8E%86%E6%96%87%E4%BB%B6%E5%A4%B9%E5%9B%BE%E7%89%87/"><span class="title">遍历文件夹图片</span></a><a class="item title" href="/2019/09/04/%E9%87%87%E5%9D%91%E8%AE%B0%E5%BD%95/"><span class="title">采坑记录</span></a><a class="item title" href="/2019/09/07/%E7%9F%A9%E5%BD%A2%E8%A6%86%E7%9B%96/"><span class="title">矩形覆盖</span></a><a class="item title" href="/2019/09/10/%E9%93%BE%E8%A1%A8%E4%B8%AD%E5%80%92%E6%95%B0%E7%AC%ACk%E4%B8%AA%E7%BB%93%E7%82%B9/"><span class="title">链表中倒数第k个结点</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/">模型训练</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-07-23T12:30:00.000Z">2026-07-23</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-07-23T12:30:00.000Z">2026-07-23</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><blockquote>
+<p>这不是一篇只列名词的综述，而是一份可以从第一页连续学习到独立训练的主教材。我们从“标量、向量、概率和梯度是什么”开始，最终把一条多轮工具轨迹算到逐 token policy loss，并给出真实 MiniMind/LifeOS-Agent 代码位置、3090 Ti 训练步骤和面试验收标准。</p>
+<p>全文只有一个主问题：<strong>一条用户消息如何经过 tokenizer、Transformer、工具环境和训练目标，最终改变模型参数？</strong></p>
+</blockquote>
+<span id="more"></span>
+
+<p><img src="/images/lifeos-agent-zero-to-mastery/lifeos_training_pipeline.svg" alt="LifeOS-Agent 从数据到训练与评测的完整流水线"></p>
+<blockquote>
+<p>目标：不是“知道几个名词”，而是能够从一条 JSON 数据出发，独立说出它如何变成张量、如何经过 Transformer、如何产生工具调用、如何计算 loss、如何反向传播，以及如何完成训练和验收。</p>
+</blockquote>
+<hr>
+<h2 id="全书路线图"><a href="#全书路线图" class="headerlink" title="全书路线图"></a>全书路线图</h2><p><img src="/images/lifeos-agent-zero-to-mastery/agent_rl_learning_map.svg" alt="从数学基础到 Agent RL 部署的学习地图"></p>
+<p>章节依赖关系：</p>
+<table>
+<thead>
+<tr>
+<th>要掌握的目标</th>
+<th>必须先掌握</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SFT loss</td>
+<td>Token、logits、softmax、causal shift</td>
+</tr>
+<tr>
+<td>DPO loss</td>
+<td>SFT mask、序列 log probability、sigmoid</td>
+</tr>
+<tr>
+<td>PPO</td>
+<td>Policy gradient、value、advantage、importance ratio</td>
+</tr>
+<tr>
+<td>GRPO</td>
+<td>Policy gradient、组均值与标准差</td>
+</tr>
+<tr>
+<td>Agent RL</td>
+<td>Tool Calling 外部循环、GRPO/PPO 风格 token loss</td>
+</tr>
+<tr>
+<td>独立训练</td>
+<td>数据、shape、优化器、日志和独立测试集</td>
+</tr>
+</tbody></table>
+<p>不要跳过依赖：如果还不能解释 $[B,T,H]\to[B,T,V]$，直接背 GRPO 公式不会形成可迁移能力。</p>
+<hr>
+<h2 id="0-怎么使用这份教材"><a href="#0-怎么使用这份教材" class="headerlink" title="0. 怎么使用这份教材"></a>0. 怎么使用这份教材</h2><p>这份教材采用一条固定主线：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户：17.66 涨停价是多少？</span><br><span class="line">候选工具：calculate_math</span><br><span class="line">模型动作：&lt;tool_call&gt;{...}&lt;/tool_call&gt;</span><br><span class="line">环境观察：{"result": 19.43}</span><br><span class="line">模型最终动作：17.66 元的涨停价约为 19.43 元。</span><br></pre></td></tr></tbody></table></figure>
+
+<p>学习时始终追问四件事：</p>
+<ol>
+<li><strong>当前数据是什么类型？</strong> 是字符串、Python dict、token id，还是浮点张量？</li>
+<li><strong>当前张量是什么形状？</strong> 每一维分别代表什么？</li>
+<li><strong>谁在执行？</strong> Router、Tokenizer、Transformer、Parser 还是 Python 工具？</li>
+<li><strong>当前 token 是否计算 loss？</strong> 如果计算，监督信号来自哪里？</li>
+</ol>
+<p>推荐学习三遍：</p>
+<ul>
+<li>第一遍只看数据流和角色边界。</li>
+<li>第二遍手算所有微型数值例子。</li>
+<li>第三遍对照代码，闭卷讲完整流程。</li>
+</ul>
+<hr>
+<h2 id="0-1-数学预备：从标量到梯度"><a href="#0-1-数学预备：从标量到梯度" class="headerlink" title="0.1 数学预备：从标量到梯度"></a>0.1 数学预备：从标量到梯度</h2><p>这一节不是额外的高等数学负担，而是后面所有 shape 和 loss 的语言。</p>
+<h3 id="0-1-1-标量、向量、矩阵、张量"><a href="#0-1-1-标量、向量、矩阵、张量" class="headerlink" title="0.1.1 标量、向量、矩阵、张量"></a>0.1.1 标量、向量、矩阵、张量</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>示例</th>
+<th>shape</th>
+<th>在模型中的例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>标量</td>
+<td>$3.2$</td>
+<td><code>[]</code></td>
+<td>最终 loss、learning rate</td>
+</tr>
+<tr>
+<td>向量</td>
+<td>$[0.2,0.7,0.1]$</td>
+<td><code>[3]</code></td>
+<td>一个位置的概率分布</td>
+</tr>
+<tr>
+<td>矩阵</td>
+<td>$X\in\mathbb R^{T\times H}$</td>
+<td><code>[T,H]</code></td>
+<td>一条序列的 hidden states</td>
+</tr>
+<tr>
+<td>三维张量</td>
+<td>$X\in\mathbb R^{B\times T\times H}$</td>
+<td><code>[B,T,H]</code></td>
+<td>一个 batch 的 hidden states</td>
+</tr>
+<tr>
+<td>四维张量</td>
+<td>$A\in\mathbb R^{B\times N\times T\times T}$</td>
+<td><code>[B,N,T,T]</code></td>
+<td>多头 attention 权重</td>
+</tr>
+</tbody></table>
+<p>“维度”有两个常见含义：</p>
+<ol>
+<li>张量有几根轴，例如 <code>[B,T,H]</code> 是三维张量。</li>
+<li>某根轴的长度，例如 hidden dimension 是 $H=768$。</li>
+</ol>
+<p>面试时要说清是哪一种，避免只说“维度是 3”。</p>
+<h3 id="0-1-2-矩阵乘法为什么改变最后一维"><a href="#0-1-2-矩阵乘法为什么改变最后一维" class="headerlink" title="0.1.2 矩阵乘法为什么改变最后一维"></a>0.1.2 矩阵乘法为什么改变最后一维</h3><p>若：</p>
+
+$$
+X\in\mathbb R^{B\times T\times H},\qquad
+W\in\mathbb R^{H\times V}
+$$
+
+
+<p>最后两维执行矩阵乘法：</p>
+
+$$
+Z=XW\in\mathbb R^{B\times T\times V}
+$$
+
+
+<p>中间的 $H$ 被求和消掉。元素形式：</p>
+
+$$
+Z_{b,t,v}=\sum_{h=1}^{H}X_{b,t,h}W_{h,v}
+$$
+
+
+<p>这正是语言模型头把每个 token 的 768 维表示转换成 6400 个词表 logits 的过程。</p>
+<h3 id="0-1-3-概率、条件概率与期望"><a href="#0-1-3-概率、条件概率与期望" class="headerlink" title="0.1.3 概率、条件概率与期望"></a>0.1.3 概率、条件概率与期望</h3><p>概率满足：</p>
+
+$$
+0\le p(x)\le1,\qquad \sum_xp(x)=1
+$$
+
+
+<p>条件概率：</p>
+
+$$
+p(y\mid x)=\frac{p(x,y)}{p(x)}
+$$
+
+
+<p>期望是按概率加权的平均：</p>
+
+$$
+\mathbb E[X]=\sum_xp(x)x
+$$
+
+
+<p>强化学习目标中的：</p>
+
+$$
+\mathbb E_{\tau\sim\pi_\theta}[R(\tau)]
+$$
+
+
+<p>表示“按当前策略产生轨迹，长期平均能拿到多少 reward”，不是某一条轨迹的分数。</p>
+<h3 id="0-1-4-为什么处处使用-log"><a href="#0-1-4-为什么处处使用-log" class="headerlink" title="0.1.4 为什么处处使用 log"></a>0.1.4 为什么处处使用 log</h3><p>若一条回答的 token 概率是：</p>
+
+$$
+0.1\times0.2\times0.05=0.001
+$$
+
+
+<p>取 log 后乘法变加法：</p>
+
+$$
+\log0.1+\log0.2+\log0.05=\log0.001
+$$
+
+
+<p>优点：</p>
+<ol>
+<li>避免大量小概率连乘下溢。</li>
+<li>序列分数可由 token log probability 求和。</li>
+<li>导数更容易计算。</li>
+</ol>
+<p>几个必须熟悉的值：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">log(1)   = 0</span><br><span class="line">log(0.5) ≈ -0.693</span><br><span class="line">log(0.1) ≈ -2.303</span><br></pre></td></tr></tbody></table></figure>
+
+<p>概率越接近 1，负对数越接近 0；概率越接近 0，负对数越大。</p>
+<h3 id="0-1-5-导数、梯度与链式法则"><a href="#0-1-5-导数、梯度与链式法则" class="headerlink" title="0.1.5 导数、梯度与链式法则"></a>0.1.5 导数、梯度与链式法则</h3><p>导数表示输入变化一点，输出怎样变化：</p>
+
+$$
+f(x)=x^2,\qquad\frac{df}{dx}=2x
+$$
+
+
+<p>模型有大量参数，所有偏导数组成梯度：</p>
+
+$$
+\nabla_\theta\mathcal L
+=\left[
+\frac{\partial\mathcal L}{\partial\theta_1},
+\ldots,
+\frac{\partial\mathcal L}{\partial\theta_n}
+\right]
+$$
+
+
+<p>链式法则把“loss 对 logits 的影响”一路传回每层参数：</p>
+
+$$
+\frac{\partial\mathcal L}{\partial W}
+=\frac{\partial\mathcal L}{\partial Z}
+\frac{\partial Z}{\partial H}
+\frac{\partial H}{\partial W}
+$$
+
+
+<p><code>loss.backward()</code> 就是在计算这条反向链；<code>optimizer.step()</code> 才真正修改参数。</p>
+<hr>
+<h2 id="1-最基础的概念：模型到底在做什么"><a href="#1-最基础的概念：模型到底在做什么" class="headerlink" title="1. 最基础的概念：模型到底在做什么"></a>1. 最基础的概念：模型到底在做什么</h2><h3 id="1-1-大语言模型本质上是“下一个-token-预测器”"><a href="#1-1-大语言模型本质上是“下一个-token-预测器”" class="headerlink" title="1.1 大语言模型本质上是“下一个 token 预测器”"></a>1.1 大语言模型本质上是“下一个 token 预测器”</h3><p>给定 token 序列：</p>
+
+$$
+x_1,x_2,\ldots,x_t
+$$
+
+
+<p>模型估计下一个 token 的条件概率：</p>
+
+$$
+p_\theta(x_{t+1}\mid x_1,\ldots,x_t)
+$$
+
+
+<p>这里：</p>
+<ul>
+<li>$x_t$ 是一个整数 token id。</li>
+<li>$\theta$ 是模型全部可训练参数。</li>
+<li>输出不是一个词，而是词表中每个 token 的概率。</li>
+</ul>
+<p>一句完整回答的概率用链式法则写成：</p>
+
+$$
+p_\theta(x_{1:T})=\prod_{t=1}^{T}p_\theta(x_t\mid x_{\lt t})
+$$
+
+
+<p>因为很多小概率连乘容易数值下溢，训练时使用 log probability：</p>
+
+$$
+\log p_\theta(x_{1:T})=\sum_{t=1}^{T}\log p_\theta(x_t\mid x_{\lt t})
+$$
+
+
+<h3 id="1-2-模型没有内置-Python-执行器"><a href="#1-2-模型没有内置-Python-执行器" class="headerlink" title="1.2 模型没有内置 Python 执行器"></a>1.2 模型没有内置 Python 执行器</h3><p>模型能生成：</p>
+<figure class="highlight xml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tool_call</span>&gt;</span>{"name":"calculate_math","arguments":{"expression":"round(17.66*1.1,2)"}}<span class="tag">&lt;/<span class="name">tool_call</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>但它只是生成了一段文本。真正执行数学表达式的是外部 Python 程序。必须分清：</p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>做什么</th>
+<th>不做什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Router</td>
+<td>从注册工具中筛候选 schema</td>
+<td>不生成答案，不执行工具</td>
+</tr>
+<tr>
+<td>Tokenizer</td>
+<td>文本与 token id 互转</td>
+<td>不理解数学，不选择工具</td>
+</tr>
+<tr>
+<td>LLM</td>
+<td>生成 tool-call 或自然语言 token</td>
+<td>不直接运行 Python</td>
+</tr>
+<tr>
+<td>Parser</td>
+<td>从标签中提取并解析 JSON</td>
+<td>不决定答案是否正确</td>
+</tr>
+<tr>
+<td>Executor</td>
+<td>校验参数并调用 Python handler</td>
+<td>不训练模型</td>
+</tr>
+<tr>
+<td>Agent 外部循环</td>
+<td>串起生成、执行、回填和再生成</td>
+<td>不是 Transformer 的一层</td>
+</tr>
+</tbody></table>
+<h3 id="1-3-三种“记忆”不要混淆"><a href="#1-3-三种“记忆”不要混淆" class="headerlink" title="1.3 三种“记忆”不要混淆"></a>1.3 三种“记忆”不要混淆</h3><ol>
+<li><strong>参数记忆</strong>：训练后写进权重的统计模式，例如工具调用格式。</li>
+<li><strong>上下文记忆</strong>：当前 <code>messages</code> 进入 prompt 后，模型本轮可以读取的信息。</li>
+<li><strong>外部记忆</strong>：Obsidian、数据库或文件，由工具读取，再回填给模型。</li>
+</ol>
+<p>模型不会自动记住上一场已经结束的对话。若信息既不在权重、当前上下文，也不在可访问的外部存储中，模型就不知道它。</p>
+<hr>
+<h2 id="2-从文本到-token：Tokenizer-与-Chat-Template"><a href="#2-从文本到-token：Tokenizer-与-Chat-Template" class="headerlink" title="2. 从文本到 token：Tokenizer 与 Chat Template"></a>2. 从文本到 token：Tokenizer 与 Chat Template</h2><h3 id="2-1-Token-不是汉字，也不一定是完整单词"><a href="#2-1-Token-不是汉字，也不一定是完整单词" class="headerlink" title="2.1 Token 不是汉字，也不一定是完整单词"></a>2.1 Token 不是汉字，也不一定是完整单词</h3><p>Tokenizer 将文本映射为整数序列：</p>
+
+$$
+\text{text}\xrightarrow{\text{tokenizer}}[x_1,x_2,\ldots,x_T]
+$$
+
+
+<p>再把 token id 解码回文本：</p>
+
+$$
+[x_1,x_2,\ldots,x_T]\xrightarrow{\text{decode}}\text{text}
+$$
+
+
+<p><code>T</code> 是 token 数，不是字符数。相同字符长度的两段文本可能有不同 token 数。</p>
+<h3 id="2-2-Messages-是结构化对象，模型实际读取的是渲染后字符串"><a href="#2-2-Messages-是结构化对象，模型实际读取的是渲染后字符串" class="headerlink" title="2.2 Messages 是结构化对象，模型实际读取的是渲染后字符串"></a>2.2 Messages 是结构化对象，模型实际读取的是渲染后字符串</h3><p>Python 中的初始消息：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">messages = [</span><br><span class="line">    {<span class="string">"role"</span>: <span class="string">"system"</span>, <span class="string">"content"</span>: <span class="string">"你是 LifeOS-Agent..."</span>},</span><br><span class="line">    {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"17.66 涨停价是多少？"</span>},</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>工具 schema：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">tools = [{</span><br><span class="line">    <span class="string">"type"</span>: <span class="string">"function"</span>,</span><br><span class="line">    <span class="string">"function"</span>: {</span><br><span class="line">        <span class="string">"name"</span>: <span class="string">"calculate_math"</span>,</span><br><span class="line">        <span class="string">"description"</span>: <span class="string">"计算简单数学表达式"</span>,</span><br><span class="line">        <span class="string">"parameters"</span>: {</span><br><span class="line">            <span class="string">"type"</span>: <span class="string">"object"</span>,</span><br><span class="line">            <span class="string">"properties"</span>: {</span><br><span class="line">                <span class="string">"expression"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>}</span><br><span class="line">            },</span><br><span class="line">            <span class="string">"required"</span>: [<span class="string">"expression"</span>]</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>调用：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">input_text = tokenizer.apply_chat_template(</span><br><span class="line">    messages,</span><br><span class="line">    tools=tools,</span><br><span class="line">    tokenize=<span class="literal">False</span>,</span><br><span class="line">    add_generation_prompt=<span class="literal">True</span>,</span><br><span class="line">    open_thinking=<span class="literal">False</span>,</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Chat template 的作用是把角色、内容、工具 schema 和 assistant 起始标记渲染成模型训练时熟悉的文本协议。之后才执行：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inputs = tokenizer(input_text, return_tensors=<span class="string">"pt"</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>得到：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">input_ids.shape      = [B, T]</span><br><span class="line">attention_mask.shape = [B, T]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>本项目推理时通常 $B=1$。</p>
+<h3 id="2-3-为什么只传候选工具"><a href="#2-3-为什么只传候选工具" class="headerlink" title="2.3 为什么只传候选工具"></a>2.3 为什么只传候选工具</h3><p>本项目先执行：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">candidate_tool_names = select_tool_names(user_input)</span><br><span class="line">tools = get_tools_by_names(candidate_tool_names) <span class="keyword">or</span> <span class="literal">None</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>它有三个意义：</p>
+<ol>
+<li>减少 prompt token 和推理成本。</li>
+<li>减少相似工具之间的误选。</li>
+<li>普通聊天传 <code>tools=None</code>，避免诱导模型无端调用工具。</li>
+</ol>
+<p>Router 是确定性的工程组件。LLM 仍然负责在候选集合中决定“调用哪个、参数是什么、是否调用”。如果训练 Agent RL 时 prompt 没有提供某个工具的 schema，模型无法仅凭工具注册表知道它当前可用。</p>
+<h3 id="2-4-Tokenizer、Template-与模型权重是三件不同的东西"><a href="#2-4-Tokenizer、Template-与模型权重是三件不同的东西" class="headerlink" title="2.4 Tokenizer、Template 与模型权重是三件不同的东西"></a>2.4 Tokenizer、Template 与模型权重是三件不同的东西</h3><p>常见误区是把“Tokenizer 会渲染工具”说成“模型已经会调用工具”。实际上：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Chat template：规定工具 schema 和 role 如何排版</span><br><span class="line">Tokenizer：规定字符串如何切成 token ids</span><br><span class="line">Model weights：决定下一个 token 的概率</span><br></pre></td></tr></tbody></table></figure>
+
+<p>即使 template 能渲染 <code>&lt;tools&gt;</code>，若权重没见过相关模式，模型仍可能不会输出合法 <code>&lt;tool_call&gt;</code>。反过来，即使权重学过某种协议，推理时 template 换成不兼容格式，也会造成分布偏移。</p>
+<p>训练与推理必须保持一致：</p>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>训练</th>
+<th>推理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>system/user/assistant role</td>
+<td>Chat template 渲染</td>
+<td>同一模板渲染</td>
+</tr>
+<tr>
+<td>tools schema</td>
+<td>作为 <code>tools=</code> 传入</td>
+<td>作为 <code>tools=</code> 传入</td>
+</tr>
+<tr>
+<td>tool call</td>
+<td>assistant 监督文本</td>
+<td>模型生成文本</td>
+</tr>
+<tr>
+<td>tool result</td>
+<td>已知 observation</td>
+<td>Python 现场执行后回填</td>
+</tr>
+<tr>
+<td>final answer</td>
+<td>assistant 监督文本</td>
+<td>模型第二轮生成</td>
+</tr>
+</tbody></table>
+<h3 id="2-5-conversations-1-到底删除哪一条"><a href="#2-5-conversations-1-到底删除哪一条" class="headerlink" title="2.5 conversations[:-1] 到底删除哪一条"></a>2.5 <code>conversations[:-1]</code> 到底删除哪一条</h3><p>Agent RL 数据常写成：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">conversations = [</span><br><span class="line">    {<span class="string">"role"</span>: <span class="string">"system"</span>, <span class="string">"content"</span>: <span class="string">"..."</span>, <span class="string">"tools"</span>: <span class="string">"[...]"</span>}, <span class="comment"># 索引 0</span></span><br><span class="line">    {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"17.66 涨停价是多少？"</span>},       <span class="comment"># 索引 1</span></span><br><span class="line">    {<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: <span class="string">""</span>},                    <span class="comment"># 索引 2</span></span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Python 切片：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">messages = conversations[:-<span class="number">1</span>]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>含义是“从开头取到最后一个元素之前”，结果只保留索引 0 和 1：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">messages = [</span><br><span class="line">    {<span class="string">"role"</span>: <span class="string">"system"</span>, <span class="string">"content"</span>: <span class="string">"..."</span>, <span class="string">"tools"</span>: <span class="string">"[...]"</span>},</span><br><span class="line">    {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"17.66 涨停价是多少？"</span>},</span><br><span class="line">]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>被删的是末尾空 assistant 占位，不是 user，也不是工具 schema。原因是 Agent RL 要让 current policy 在线生成 assistant 动作。如果保留空 assistant 再添加 generation prompt，容易产生协议重复。</p>
+<p>MiniMind <code>AgentRLDataset.parse_conversations</code> 同时返回：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> messages[:-<span class="number">1</span>], tools</span><br></pre></td></tr></tbody></table></figure>
+
+<p>而 <code>__getitem__</code> 返回：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="string">"messages"</span>: messages,</span><br><span class="line">    <span class="string">"tools"</span>: tools,</span><br><span class="line">    <span class="string">"gt"</span>: sample[<span class="string">"gt"</span>],</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>三者用途不同：</p>
+<ul>
+<li><code>messages</code>：作为 rollout 初始状态。</li>
+<li><code>tools</code>：渲染 schema，并限制环境可执行工具。</li>
+<li><code>gt</code>：给 reward 检查结果或期望行为，不直接作为 assistant label 喂给模型。</li>
+</ul>
+<p>这与 SFT 的根本区别是：SFT 保留标准 assistant 内容并构造 labels；Agent RL 删除空占位，在线采样动作，再通过 reward 学习。</p>
+<hr>
+<h2 id="3-Transformer-数据流与精确维度"><a href="#3-Transformer-数据流与精确维度" class="headerlink" title="3. Transformer 数据流与精确维度"></a>3. Transformer 数据流与精确维度</h2><p><img src="/images/lifeos-agent-zero-to-mastery/network_tensor_dimensions.svg" alt="MiniMind Transformer 的核心张量维度"></p>
+<h3 id="3-1-本项目教学配置"><a href="#3-1-本项目教学配置" class="headerlink" title="3.1 本项目教学配置"></a>3.1 本项目教学配置</h3><p>本文采用仓库模型配置中的典型参数：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+<th align="right">数值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$B$</td>
+<td>batch size</td>
+<td align="right">例：1 或 4</td>
+</tr>
+<tr>
+<td>$T$</td>
+<td>序列长度</td>
+<td align="right">最大训练长度常用 768</td>
+</tr>
+<tr>
+<td>$H$</td>
+<td>hidden size</td>
+<td align="right">768</td>
+</tr>
+<tr>
+<td>$L$</td>
+<td>Transformer 层数</td>
+<td align="right">8</td>
+</tr>
+<tr>
+<td>$V$</td>
+<td>vocabulary size</td>
+<td align="right">6400</td>
+</tr>
+<tr>
+<td>$N_q$</td>
+<td>query heads</td>
+<td align="right">8</td>
+</tr>
+<tr>
+<td>$N_{kv}$</td>
+<td>key/value heads</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>$D$</td>
+<td>head dimension</td>
+<td align="right">96</td>
+</tr>
+<tr>
+<td>$I$</td>
+<td>MLP intermediate size</td>
+<td align="right">2432</td>
+</tr>
+</tbody></table>
+<p>因为：</p>
+
+$$
+N_qD=8\times96=768=H
+$$
+
+
+<h3 id="3-2-Embedding"><a href="#3-2-Embedding" class="headerlink" title="3.2 Embedding"></a>3.2 Embedding</h3><p>输入 token：</p>
+
+$$
+X_{ids}\in\mathbb{N}^{B\times T}
+$$
+
+
+<p>Embedding 矩阵：</p>
+
+$$
+E\in\mathbb{R}^{V\times H}
+$$
+
+
+<p>查表后：</p>
+
+$$
+X=E[X_{ids}]\in\mathbb{R}^{B\times T\times H}
+$$
+
+
+<p>若 $B=4,T=768,H=768$，则激活张量有：</p>
+
+$$
+4\times768\times768=2,359,296
+$$
+
+
+<p>个元素。FP16 每个元素约 2 字节，仅这个张量约 4.5 MiB；训练还要保存每层中间激活、梯度和优化器状态，所以总显存远大于这一项。</p>
+<h3 id="3-3-Self-Attention"><a href="#3-3-Self-Attention" class="headerlink" title="3.3 Self-Attention"></a>3.3 Self-Attention</h3><p>先做线性投影：</p>
+
+$$
+Q=XW_Q,\quad K=XW_K,\quad V=XW_V
+$$
+
+
+<p>多头拆分后，query 为：</p>
+
+$$
+Q\in\mathbb{R}^{B\times N_q\times T\times D}
+$$
+
+
+<p>GQA 中 key/value 头更少：</p>
+
+$$
+K,V\in\mathbb{R}^{B\times N_{kv}\times T\times D}
+$$
+
+
+<p>注意力分数：</p>
+
+$$
+S=\frac{QK^\top}{\sqrt D}+M
+$$
+
+
+<p>其中：</p>
+
+$$
+S\in\mathbb{R}^{B\times N_q\times T\times T}
+$$
+
+
+<p>$M$ 是 causal mask。未来位置被加上负无穷，因此第 $t$ 个位置只能读取 $1\ldots t$：</p>
+
+$$
+M_{ij}=\begin{cases}
+0,&amp;j\le i\\
+-\infty,&amp;j\gt i
+\end{cases}
+$$
+
+
+<p>Softmax 后得到注意力权重：</p>
+
+$$
+A_{ij}=\frac{e^{S_{ij}}}{\sum_k e^{S_{ik}}}
+$$
+
+
+<p>再聚合 value：</p>
+
+$$
+O=AV
+$$
+
+
+<p>合并多头后回到：</p>
+
+$$
+O\in\mathbb{R}^{B\times T\times H}
+$$
+
+
+<h3 id="3-4-MLP、残差与输出-logits"><a href="#3-4-MLP、残差与输出-logits" class="headerlink" title="3.4 MLP、残差与输出 logits"></a>3.4 MLP、残差与输出 logits</h3><p>每层可简化理解为：</p>
+
+$$
+X'=X+\operatorname{Attention}(\operatorname{Norm}(X))
+$$
+
+
+
+$$
+X''=X'+\operatorname{MLP}(\operatorname{Norm}(X'))
+$$
+
+
+<p>经过 $L=8$ 层后：</p>
+
+$$
+H_L\in\mathbb{R}^{B\times T\times H}
+$$
+
+
+<p>语言模型头映射到词表：</p>
+
+$$
+Z=H_LW_{vocab}^\top
+$$
+
+
+
+$$
+Z\in\mathbb{R}^{B\times T\times V}
+$$
+
+
+<p><code>Z</code> 就是 logits。每个位置有 $V=6400$ 个未经归一化的分数。</p>
+<h3 id="3-5-RMSNorm、RoPE-与-SwiGLU-分别解决什么"><a href="#3-5-RMSNorm、RoPE-与-SwiGLU-分别解决什么" class="headerlink" title="3.5 RMSNorm、RoPE 与 SwiGLU 分别解决什么"></a>3.5 RMSNorm、RoPE 与 SwiGLU 分别解决什么</h3><h4 id="RMSNorm"><a href="#RMSNorm" class="headerlink" title="RMSNorm"></a>RMSNorm</h4><p>对 hidden vector $x\in\mathbb R^H$：</p>
+
+$$
+\operatorname{RMS}(x)
+=\sqrt{\frac1H\sum_{i=1}^Hx_i^2+\epsilon}
+$$
+
+
+
+$$
+\operatorname{RMSNorm}(x)
+=g\odot\frac{x}{\operatorname{RMS}(x)}
+$$
+
+
+<p>它控制激活尺度，帮助深层训练稳定。$g\in\mathbb R^H$ 是可学习缩放参数。</p>
+<h4 id="RoPE"><a href="#RoPE" class="headerlink" title="RoPE"></a>RoPE</h4><p>Attention 本身不知道 token 顺序。RoPE 根据位置旋转 query/key 的二维分量，使点积同时携带相对位置信息。对某一对分量可写为：</p>
+
+$$
+\begin{bmatrix}x'_{2i}\\x'_{2i+1}\end{bmatrix}
+=
+\begin{bmatrix}
+\cos(m\omega_i)&amp;-\sin(m\omega_i)\\
+\sin(m\omega_i)&amp;\cos(m\omega_i)
+\end{bmatrix}
+\begin{bmatrix}x_{2i}\\x_{2i+1}\end{bmatrix}
+$$
+
+
+<p>$m$ 是 token 位置。RoPE 不改变 shape，只改变 Q/K 数值。</p>
+<h4 id="SwiGLU"><a href="#SwiGLU" class="headerlink" title="SwiGLU"></a>SwiGLU</h4><p>现代 MLP 常使用门控结构：</p>
+
+$$
+\operatorname{SwiGLU}(x)
+=\operatorname{SiLU}(xW_g)\odot(xW_u)W_d
+$$
+
+
+<p>典型中间形状：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x                 [B,T,H]</span><br><span class="line">xW_g, xW_u        [B,T,I]</span><br><span class="line">element-wise gate [B,T,I]</span><br><span class="line">project down      [B,T,H]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Attention 负责 token 间信息混合，MLP 负责每个 token 位置内部的非线性特征变换。</p>
+<hr>
+<h2 id="4-Softmax、交叉熵与反向传播"><a href="#4-Softmax、交叉熵与反向传播" class="headerlink" title="4. Softmax、交叉熵与反向传播"></a>4. Softmax、交叉熵与反向传播</h2><h3 id="4-1-从-logits-到概率"><a href="#4-1-从-logits-到概率" class="headerlink" title="4.1 从 logits 到概率"></a>4.1 从 logits 到概率</h3><p>设某个位置只有三个候选 token，logits 为：</p>
+
+$$
+z=[2,1,0]
+$$
+
+
+<p>Softmax：</p>
+
+$$
+p_i=\frac{e^{z_i}}{\sum_j e^{z_j}}
+$$
+
+
+<p>因为 $e^2\approx7.389,e^1\approx2.718,e^0=1$，所以：</p>
+
+$$
+p\approx[0.665,0.245,0.090]
+$$
+
+
+<h3 id="4-2-交叉熵"><a href="#4-2-交叉熵" class="headerlink" title="4.2 交叉熵"></a>4.2 交叉熵</h3><p>如果正确 token 是第二个，one-hot label 为：</p>
+
+$$
+y=[0,1,0]
+$$
+
+
+<p>交叉熵：</p>
+
+$$
+\mathcal{L}_{CE}=-\sum_i y_i\log p_i=-\log(0.245)\approx1.407
+$$
+
+
+<p>模型越相信正确 token，loss 越低。</p>
+<h3 id="4-3-为什么梯度是-p-y"><a href="#4-3-为什么梯度是-p-y" class="headerlink" title="4.3 为什么梯度是 $p-y$"></a>4.3 为什么梯度是 $p-y$</h3><p>Softmax 与交叉熵合并后，对 logit $z_k$ 的梯度为：</p>
+
+$$
+\frac{\partial\mathcal L}{\partial z_k}=p_k-y_k
+$$
+
+
+<p>因此：</p>
+<ul>
+<li>正确类别：$p_k-1\lt 0$，梯度下降会提高正确 logit。</li>
+<li>错误类别：$p_k-0\gt 0$，梯度下降会降低错误 logit。</li>
+</ul>
+<p>这条公式是理解“训练如何改变下一个 token 概率”的核心。</p>
+<h3 id="4-4-Causal-LM-shift"><a href="#4-4-Causal-LM-shift" class="headerlink" title="4.4 Causal LM shift"></a>4.4 Causal LM shift</h3><p>输入：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[BOS, 我, 要, 调用, 工具, EOS]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>位置关系：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入位置      BOS   我    要    调用   工具</span><br><span class="line">监督目标       我    要   调用   工具   EOS</span><br></pre></td></tr></tbody></table></figure>
+
+<p>代码层面的 shape：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">logits        [B, T, V]</span><br><span class="line">shift_logits  [B, T-1, V]</span><br><span class="line">labels        [B, T]</span><br><span class="line">shift_labels  [B, T-1]</span><br><span class="line">loss          scalar</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="4-5-从一个-batch-到一次参数更新"><a href="#4-5-从一个-batch-到一次参数更新" class="headerlink" title="4.5 从一个 batch 到一次参数更新"></a>4.5 从一个 batch 到一次参数更新</h3><p>一次 SFT step 的顺序：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">optimizer.zero_grad()</span><br><span class="line">res = model(input_ids, labels=labels)</span><br><span class="line">loss = res.loss / accumulation_steps</span><br><span class="line">loss.backward()</span><br><span class="line">clip_grad_norm_(model.parameters(), grad_clip)</span><br><span class="line">optimizer.step()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>更精确地说：</p>
+<ol>
+<li>Forward 计算 logits 与 loss。</li>
+<li>Backward 计算每个参数的 gradient。</li>
+<li>Gradient clipping 限制梯度范数，防止异常大步。</li>
+<li>Optimizer 根据梯度和历史状态更新参数。</li>
+<li>清空梯度，准备下一步。</li>
+</ol>
+<h3 id="4-6-SGD-与-AdamW"><a href="#4-6-SGD-与-AdamW" class="headerlink" title="4.6 SGD 与 AdamW"></a>4.6 SGD 与 AdamW</h3><p>最简单的梯度下降：</p>
+
+$$
+\theta_{t+1}=\theta_t-\eta g_t
+$$
+
+
+<p>其中 $g_t=\nabla_\theta\mathcal L_t$，$\eta$ 是 learning rate。</p>
+<p>Adam 维护梯度的一阶、二阶动量：</p>
+
+$$
+m_t=\beta_1m_{t-1}+(1-\beta_1)g_t
+$$
+
+
+
+$$
+v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2
+$$
+
+
+<p>偏差修正：</p>
+
+$$
+\hat m_t=\frac{m_t}{1-\beta_1^t},\qquad
+\hat v_t=\frac{v_t}{1-\beta_2^t}
+$$
+
+
+<p>AdamW 更新：</p>
+
+$$
+\theta_{t+1}
+=\theta_t
+-\eta\frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon}
+-\eta\lambda\theta_t
+$$
+
+
+<p>最后一项是 decoupled weight decay。Learning rate 太大会破坏已有能力，太小则目标模式学不动；epoch 不是越多越好，重复小数据很容易过拟合。</p>
+<h3 id="4-7-梯度累积为什么要除以步数"><a href="#4-7-梯度累积为什么要除以步数" class="headerlink" title="4.7 梯度累积为什么要除以步数"></a>4.7 梯度累积为什么要除以步数</h3><p>若累积 $K$ 个 micro batches，希望得到它们平均 loss 的梯度：</p>
+
+$$
+\mathcal L_{avg}=\frac1K\sum_{k=1}^{K}\mathcal L_k
+$$
+
+
+<p>所以每个 micro step 执行：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">loss = loss / accumulation_steps</span><br><span class="line">loss.backward()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>累积到第 $K$ 步再 <code>optimizer.step()</code>。如果不除以 $K$，梯度规模相当于扩大 $K$ 倍，等效学习率也会变化。</p>
+<hr>
+<h2 id="5-SFT：用标准答案教模型输出格式和内容"><a href="#5-SFT：用标准答案教模型输出格式和内容" class="headerlink" title="5. SFT：用标准答案教模型输出格式和内容"></a>5. SFT：用标准答案教模型输出格式和内容</h2><h3 id="5-1-典型-Tool-Calling-SFT-样本"><a href="#5-1-典型-Tool-Calling-SFT-样本" class="headerlink" title="5.1 典型 Tool Calling SFT 样本"></a>5.1 典型 Tool Calling SFT 样本</h3><figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"conversations"</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"system"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"你是 LifeOS-Agent"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"user"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"17.66 涨停价是多少？"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"assistant"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"&lt;tool_call&gt;{\"name\":\"calculate_math\",\"arguments\":{\"expression\":\"round(17.66*1.1,2)\"}}&lt;/tool_call&gt;"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"tool"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"{\"result\":19.43}"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"assistant"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"17.66 元的涨停价约为 19.43 元。"</span><span class="punctuation">}</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>工具 schema 还必须进入训练 prompt，否则模型看不到工具描述与参数约束。</p>
+<h3 id="5-2-SFT-mask"><a href="#5-2-SFT-mask" class="headerlink" title="5.2 SFT mask"></a>5.2 SFT mask</h3><p>假设渲染后 token 分为：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[system][user][assistant tool_call][tool result][assistant final]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>常见监督策略：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">system             mask=0</span><br><span class="line">user               mask=0</span><br><span class="line">assistant toolcall mask=1</span><br><span class="line">tool observation   mask=0</span><br><span class="line">assistant final    mask=1</span><br></pre></td></tr></tbody></table></figure>
+
+<p>用 $m_t\in{0,1}$ 表示监督 mask：</p>
+
+$$
+\mathcal L_{SFT}
+=-
+\frac{1}{\sum_t m_t}
+\sum_t m_t\log p_\theta(y_t\mid x_{\lt t})
+$$
+
+
+<p>所以 <code>&lt;tool_call&gt;</code>、工具名和 JSON 参数都是 assistant 生成的 token，通常参与 SFT loss。工具返回值是外部环境提供的条件，不应伪装成模型动作。</p>
+<h3 id="5-3-SFT-学到了什么"><a href="#5-3-SFT-学到了什么" class="headerlink" title="5.3 SFT 学到了什么"></a>5.3 SFT 学到了什么</h3><ul>
+<li>标签格式：<code>&lt;tool_call&gt;...&lt;/tool_call&gt;</code>。</li>
+<li>工具名与参数键。</li>
+<li>哪类问题通常需要工具。</li>
+<li>看到 <code>role=tool</code> 后如何组织最终回答。</li>
+</ul>
+<p>SFT 不保证自由探索，也不保证模型永远选对工具。它主要是模仿训练数据中的标准行为。</p>
+<h3 id="5-4-为什么少量身份数据会快速生效"><a href="#5-4-为什么少量身份数据会快速生效" class="headerlink" title="5.4 为什么少量身份数据会快速生效"></a>5.4 为什么少量身份数据会快速生效</h3><p>“你叫 LifeOS-Agent”是低熵、重复且局部的映射。少量高重复样本就能明显提高相关 token 的概率。但这不等于泛化：改一种问法、增加上下文或换领域后可能失效。稳定能力需要覆盖表达多样性、负样本和真实分布。</p>
+<h3 id="5-5-MiniMind-SFTDataset-逐行数据流"><a href="#5-5-MiniMind-SFTDataset-逐行数据流" class="headerlink" title="5.5 MiniMind SFTDataset 逐行数据流"></a>5.5 MiniMind <code>SFTDataset</code> 逐行数据流</h3><p>仓库实现可压缩为：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">JSONL 一行</span><br><span class="line">-&gt; sample['conversations']</span><br><span class="line">-&gt; pre_processing_chat</span><br><span class="line">-&gt; 解析 system.tools / assistant.tool_calls</span><br><span class="line">-&gt; apply_chat_template(add_generation_prompt=False)</span><br><span class="line">-&gt; prompt string</span><br><span class="line">-&gt; tokenizer(prompt).input_ids</span><br><span class="line">-&gt; 截断到 max_length</span><br><span class="line">-&gt; pad 到固定长度</span><br><span class="line">-&gt; generate_labels</span><br><span class="line">-&gt; input_ids [T], labels [T]</span><br><span class="line">-&gt; DataLoader 堆成 [B,T]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>generate_labels</code> 先创建：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">labels = [-<span class="number">100</span>] * <span class="built_in">len</span>(input_ids)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>再定位每段 assistant 起止 token，只把 assistant 区间复制为真实 label。PyTorch CrossEntropy 默认忽略 <code>label=-100</code> 的位置。</p>
+<p>一个微型例子：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">位置             0       1       2       3       4       5</span><br><span class="line">内容          system   user   asst_bos   工具名   参数   asst_eos</span><br><span class="line">input_ids       11      22       33       44      55      66</span><br><span class="line">labels         -100    -100     -100       44      55      66</span><br></pre></td></tr></tbody></table></figure>
+
+<p>再经过 causal shift 后，位置 2 的 logit 预测位置 3 的 token 44，位置 3 预测 55，位置 4 预测 66。要区分：</p>
+<ul>
+<li><code>labels=-100</code> 是监督 mask。</li>
+<li>causal attention mask 是禁止看未来。</li>
+<li>padding mask 是禁止关注补齐位置。</li>
+</ul>
+<p>它们解决三个不同问题。</p>
+<h3 id="5-6-截断如何悄悄破坏工具样本"><a href="#5-6-截断如何悄悄破坏工具样本" class="headerlink" title="5.6 截断如何悄悄破坏工具样本"></a>5.6 截断如何悄悄破坏工具样本</h3><p>如果一条完整多轮样本长度是 900，但 <code>max_seq_len=768</code>，尾部 132 个 token 会消失。可能出现：</p>
+<ol>
+<li>保留 tool call，却删掉 tool result 和 final answer。</li>
+<li>JSON 参数被截断，形成不闭合标签。</li>
+<li>最终回答监督比例下降。</li>
+</ol>
+<p>所以训练前不仅要数 JSONL 行数，还要统计 token length 的 p50、p90、p95、max 和截断比例。</p>
+<hr>
+<h2 id="6-DPO：从-chosen-x2F-rejected-学习偏好"><a href="#6-DPO：从-chosen-x2F-rejected-学习偏好" class="headerlink" title="6. DPO：从 chosen/rejected 学习偏好"></a>6. DPO：从 chosen/rejected 学习偏好</h2><h3 id="6-1-数据结构"><a href="#6-1-数据结构" class="headerlink" title="6.1 数据结构"></a>6.1 数据结构</h3><p>同一个 prompt 有一个偏好答案和一个拒绝答案：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"prompt"</span><span class="punctuation">:</span> <span class="string">"17.66 涨停价是多少？"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"chosen"</span><span class="punctuation">:</span> <span class="string">"&lt;tool_call&gt;{正确工具和参数}&lt;/tool_call&gt;"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"rejected"</span><span class="punctuation">:</span> <span class="string">"大约是 20 元，不需要计算。"</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="6-2-序列-log-probability"><a href="#6-2-序列-log-probability" class="headerlink" title="6.2 序列 log probability"></a>6.2 序列 log probability</h3><p>对回答 $y=(y_1,\ldots,y_T)$：</p>
+
+$$
+\log\pi_\theta(y\mid x)
+=\sum_{t=1}^{T}\log\pi_\theta(y_t\mid x,y_{\lt t})
+$$
+
+
+<p>定义当前策略对 chosen/rejected 的差：</p>
+
+$$
+\Delta_\theta
+=\log\pi_\theta(y^+\mid x)-\log\pi_\theta(y^-\mid x)
+$$
+
+
+<p>冻结 reference model 的对应差：</p>
+
+$$
+\Delta_{ref}
+=\log\pi_{ref}(y^+\mid x)-\log\pi_{ref}(y^-\mid x)
+$$
+
+
+<p>DPO loss：</p>
+
+$$
+\mathcal L_{DPO}
+=-\log\sigma\left(\beta(\Delta_\theta-\Delta_{ref})\right)
+$$
+
+
+<h3 id="6-3-直觉"><a href="#6-3-直觉" class="headerlink" title="6.3 直觉"></a>6.3 直觉</h3><ul>
+<li>如果当前模型比 reference 更偏爱 chosen，括号变大，loss 变小。</li>
+<li>如果当前模型更偏爱 rejected，loss 变大。</li>
+<li>$\beta$ 控制偏好优化相对 reference 的强度。</li>
+<li>reference 提供锚点，避免模型仅通过整体提高所有回答概率来“作弊”。</li>
+</ul>
+<h3 id="6-4-SFT-与-DPO-根本区别"><a href="#6-4-SFT-与-DPO-根本区别" class="headerlink" title="6.4 SFT 与 DPO 根本区别"></a>6.4 SFT 与 DPO 根本区别</h3><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>数据</th>
+<th>问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SFT</td>
+<td>prompt + 标准 assistant token</td>
+<td>“标准答案是什么？”</td>
+</tr>
+<tr>
+<td>DPO</td>
+<td>prompt + chosen + rejected</td>
+<td>“两条答案哪条更好？”</td>
+</tr>
+</tbody></table>
+<p>DPO 通常建立在已经会基本格式的 SFT 模型上。让一个从未学过工具协议的模型只靠少量偏好对，从零稳定学会 XML/JSON 工具格式，并不可靠。</p>
+<h3 id="6-5-DPO-数值算例：从四个序列分数到-loss"><a href="#6-5-DPO-数值算例：从四个序列分数到-loss" class="headerlink" title="6.5 DPO 数值算例：从四个序列分数到 loss"></a>6.5 DPO 数值算例：从四个序列分数到 loss</h3><p>假设当前策略：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">log pi_theta(chosen|x)   = -2.0</span><br><span class="line">log pi_theta(rejected|x) = -3.0</span><br></pre></td></tr></tbody></table></figure>
+
+<p>所以：</p>
+
+$$
+\Delta_\theta=-2-(-3)=1.0
+$$
+
+
+<p>Reference：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">log pi_ref(chosen|x)   = -2.4</span><br><span class="line">log pi_ref(rejected|x) = -2.8</span><br></pre></td></tr></tbody></table></figure>
+
+<p>所以：</p>
+
+$$
+\Delta_{ref}=-2.4-(-2.8)=0.4
+$$
+
+
+<p>取 $\beta=0.1$：</p>
+
+$$
+z=\beta(\Delta_\theta-\Delta_{ref})
+=0.1(1.0-0.4)=0.06
+$$
+
+
+
+$$
+\sigma(0.06)\approx0.515
+$$
+
+
+
+$$
+\mathcal L_{DPO}=-\log0.515\approx0.663
+$$
+
+
+<p>若模型开始更偏爱 rejected，$\Delta_\theta$ 会下降，$z$ 下降，sigmoid 下降，loss 上升。反向传播因此推动 chosen 相对概率提高。</p>
+<p>长度陷阱：序列 log probability 是 token logp 之和，长回答天然可能更负。具体实现是否按 token 平均会影响长度偏好，阅读代码时必须确认 reduction，而不能只背 DPO 公式。</p>
+<hr>
+<h2 id="7-从最大化-Reward-到-Policy-Gradient"><a href="#7-从最大化-Reward-到-Policy-Gradient" class="headerlink" title="7. 从最大化 Reward 到 Policy Gradient"></a>7. 从最大化 Reward 到 Policy Gradient</h2><h3 id="7-1-目标函数"><a href="#7-1-目标函数" class="headerlink" title="7.1 目标函数"></a>7.1 目标函数</h3><p>策略 $\pi_\theta$ 生成动作序列 $\tau$，环境返回奖励 $R(\tau)$：</p>
+
+$$
+J(\theta)=\mathbb E_{\tau\sim\pi_\theta}[R(\tau)]
+$$
+
+
+<p>使用 log-derivative trick：</p>
+
+$$
+\nabla_\theta\pi_\theta(\tau)
+=\pi_\theta(\tau)\nabla_\theta\log\pi_\theta(\tau)
+$$
+
+
+<p>得到 REINFORCE：</p>
+
+$$
+\nabla_\theta J
+=\mathbb E\left[R(\tau)\nabla_\theta\log\pi_\theta(\tau)\right]
+$$
+
+
+<p>直觉：</p>
+<ul>
+<li>高奖励轨迹：提高产生这些动作 token 的概率。</li>
+<li>低奖励轨迹：降低产生这些动作 token 的概率。</li>
+</ul>
+<h3 id="7-2-Baseline-与-Advantage"><a href="#7-2-Baseline-与-Advantage" class="headerlink" title="7.2 Baseline 与 Advantage"></a>7.2 Baseline 与 Advantage</h3><p>直接使用 reward 方差很大，因此减去不依赖当前动作的 baseline：</p>
+
+$$
+A_t=R_t-b(s_t)
+$$
+
+
+<p>若 $A_t\gt 0$，动作比预期好；若 $A_t\lt 0$，动作比预期差。</p>
+<hr>
+<h2 id="8-PPO：Actor、Critic、GAE-与-Clip"><a href="#8-PPO：Actor、Critic、GAE-与-Clip" class="headerlink" title="8. PPO：Actor、Critic、GAE 与 Clip"></a>8. PPO：Actor、Critic、GAE 与 Clip</h2><h3 id="8-1-PPO-中的模型角色"><a href="#8-1-PPO-中的模型角色" class="headerlink" title="8.1 PPO 中的模型角色"></a>8.1 PPO 中的模型角色</h3><ul>
+<li>Actor/current policy：正在训练的语言模型。</li>
+<li>Old policy：产生本批 rollout 的行为策略快照。</li>
+<li>Critic/value model：预测状态价值 $V(s_t)$。</li>
+<li>Reference policy：约束模型不要偏离基础语言能力太远。</li>
+<li>Reward model 或规则：为回答评分。</li>
+</ul>
+<h3 id="8-2-TD-error-与-GAE"><a href="#8-2-TD-error-与-GAE" class="headerlink" title="8.2 TD error 与 GAE"></a>8.2 TD error 与 GAE</h3><p>一步 TD error：</p>
+
+$$
+\delta_t=r_t+\gamma V(s_{t+1})-V(s_t)
+$$
+
+
+<p>GAE：</p>
+
+$$
+\hat A_t
+=\delta_t+(\gamma\lambda)\delta_{t+1}
++(\gamma\lambda)^2\delta_{t+2}+\cdots
+$$
+
+
+<p>$\gamma$ 控制未来奖励折扣，$\lambda$ 控制偏差与方差权衡。</p>
+<h3 id="8-3-Importance-ratio"><a href="#8-3-Importance-ratio" class="headerlink" title="8.3 Importance ratio"></a>8.3 Importance ratio</h3><p>Rollout 来自 old policy，但更新的是 current policy：</p>
+
+$$
+r_t(\theta)
+=\frac{\pi_\theta(a_t\mid s_t)}{\pi_{old}(a_t\mid s_t)}
+=\exp(\log\pi_\theta-\log\pi_{old})
+$$
+
+
+<h3 id="8-4-PPO-clipped-objective"><a href="#8-4-PPO-clipped-objective" class="headerlink" title="8.4 PPO clipped objective"></a>8.4 PPO clipped objective</h3>
+$$
+L^{clip}_t
+=\min\left(
+r_t\hat A_t,
+\operatorname{clip}(r_t,1-\epsilon,1+\epsilon)\hat A_t
+\right)
+$$
+
+
+<p>训练最小化其负值。Clip 防止一次更新把策略推得过远。</p>
+<p>Critic loss 可写为：</p>
+
+$$
+\mathcal L_V=(V_\phi(s_t)-\hat R_t)^2
+$$
+
+
+<p>PPO 的代价是系统复杂：既要训练 actor，又要训练 critic，还要维护 old/reference 与 rollout。</p>
+<h3 id="8-5-PPO-单-token-数值算例"><a href="#8-5-PPO-单-token-数值算例" class="headerlink" title="8.5 PPO 单 token 数值算例"></a>8.5 PPO 单 token 数值算例</h3><p>假设某 token：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">old probability     = 0.20</span><br><span class="line">current probability = 0.26</span><br><span class="line">advantage           = +2.0</span><br><span class="line">epsilon             = 0.20</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Ratio：</p>
+
+$$
+r=0.26/0.20=1.30
+$$
+
+
+<p>允许上界是 $1+\epsilon=1.20$：</p>
+
+$$
+rA=1.30\times2=2.60
+$$
+
+
+
+$$
+\operatorname{clip}(r,0.8,1.2)A=1.2\times2=2.40
+$$
+
+
+<p>取最小值 2.40，说明即使 current 已大幅提高该好动作概率，收益也被截住，避免继续激进更新。</p>
+<p>若 $A=-2$，正负号会改变 min 的含义：策略不能通过把坏动作概率一次降得极低来获得无限收益。理解 PPO clip 时必须分别代入正、负 advantage，不能只看曲线。</p>
+<h3 id="8-6-GAE-三步手算"><a href="#8-6-GAE-三步手算" class="headerlink" title="8.6 GAE 三步手算"></a>8.6 GAE 三步手算</h3><p>设：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">gamma  = 0.9</span><br><span class="line">lambda = 0.8</span><br><span class="line">delta0 = 1.0</span><br><span class="line">delta1 = 0.5</span><br><span class="line">delta2 = -0.2</span><br></pre></td></tr></tbody></table></figure>
+
+<p>则：</p>
+
+$$
+\hat A_0
+=1.0+(0.9\times0.8)0.5+(0.9\times0.8)^2(-0.2)
+$$
+
+
+
+$$
+=1.0+0.36-0.10368=1.25632
+$$
+
+
+<p>它把后续 TD error 按 $(\gamma\lambda)^k$ 衰减后传回当前动作。</p>
+<hr>
+<h2 id="9-GRPO：用同组相对成绩替代-Critic"><a href="#9-GRPO：用同组相对成绩替代-Critic" class="headerlink" title="9. GRPO：用同组相对成绩替代 Critic"></a>9. GRPO：用同组相对成绩替代 Critic</h2><h3 id="9-1-同题生成一组回答"><a href="#9-1-同题生成一组回答" class="headerlink" title="9.1 同题生成一组回答"></a>9.1 同题生成一组回答</h3><p>对同一个问题生成 $G=4$ 条轨迹，奖励假设为：</p>
+
+$$
+R=[3,1,-1,-3]
+$$
+
+
+<p>组均值：</p>
+
+$$
+\mu=\frac{3+1-1-3}{4}=0
+$$
+
+
+<p>若采用总体标准差：</p>
+
+$$
+\sigma
+=\sqrt{\frac{(3-0)^2+(1-0)^2+(-1-0)^2+(-3-0)^2}{4}}
+=\sqrt5
+$$
+
+
+<p>标准化 advantage：</p>
+
+$$
+A_i=\frac{R_i-\mu}{\sigma+\varepsilon}
+$$
+
+
+<p>约为：</p>
+
+$$
+A=[1.342,0.447,-0.447,-1.342]
+$$
+
+
+<p>同一问题内部直接比较，省去单独训练 critic。</p>
+<h3 id="9-2-GRPO-仍然计算-token-loss"><a href="#9-2-GRPO-仍然计算-token-loss" class="headerlink" title="9.2 GRPO 仍然计算 token loss"></a>9.2 GRPO 仍然计算 token loss</h3><p>“没有 critic”不等于“不计算 loss”。轨迹 advantage 会作用到该轨迹的有效动作 token：</p>
+
+$$
+\mathcal L_{policy}
+=-\frac{1}{|\mathcal A|}
+\sum_{t\in\mathcal A}
+\operatorname{clip}(r_t,1-\epsilon,1+\epsilon)A
+$$
+
+
+<p>其中 $\mathcal A$ 是模型生成的 action-token 位置集合。</p>
+<hr>
+<h2 id="10-Tool-Calling-外部循环完整数据流"><a href="#10-Tool-Calling-外部循环完整数据流" class="headerlink" title="10. Tool Calling 外部循环完整数据流"></a>10. Tool Calling 外部循环完整数据流</h2><p><img src="/images/lifeos-agent-zero-to-mastery/agent_rl_multiturn_dataflow.svg" alt="LifeOS-Agent 多轮 Tool Calling 数据流"></p>
+<h3 id="10-1-第一轮"><a href="#10-1-第一轮" class="headerlink" title="10.1 第一轮"></a>10.1 第一轮</h3><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">user_input: str</span><br><span class="line">    ↓ router</span><br><span class="line">candidate_tool_names: list[str]</span><br><span class="line">    ↓ schema lookup</span><br><span class="line">tools: list[dict] | None</span><br><span class="line">    ↓ apply_chat_template</span><br><span class="line">input_text: str</span><br><span class="line">    ↓ tokenizer</span><br><span class="line">input_ids: LongTensor [1,T1]</span><br><span class="line">    ↓ model.generate</span><br><span class="line">generated_ids: LongTensor [1,T1+K1]</span><br><span class="line">    ↓ slice + decode</span><br><span class="line">response: str</span><br></pre></td></tr></tbody></table></figure>
+
+<p>模型第一轮输出：</p>
+<figure class="highlight xml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tool_call</span>&gt;</span>{"name":"calculate_math","arguments":{"expression":"round(17.66*1.1,2)"}}<span class="tag">&lt;/<span class="name">tool_call</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="10-2-Parser-与-Executor"><a href="#10-2-Parser-与-Executor" class="headerlink" title="10.2 Parser 与 Executor"></a>10.2 Parser 与 Executor</h3><p>Parser 使用标签定位 JSON，再执行 <code>json.loads</code>：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">str -&gt; dict</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Executor 的边界检查：</p>
+<ol>
+<li>工具名是否注册。</li>
+<li><code>arguments</code> 是 dict、JSON string、<code>None</code> 还是非法类型。</li>
+<li>JSON 能否解析。</li>
+<li>handler 执行是否异常。</li>
+<li>数学表达式是否只包含 AST 白名单节点。</li>
+</ol>
+<p>执行结果：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{<span class="string">"result"</span>: <span class="number">19.43</span>}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="10-3-回填与第二轮"><a href="#10-3-回填与第二轮" class="headerlink" title="10.3 回填与第二轮"></a>10.3 回填与第二轮</h3><p>第一轮模型文本作为 assistant message 保留：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">messages.append({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: response})</span><br></pre></td></tr></tbody></table></figure>
+
+<p>工具结果以 tool role 回填：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">messages.append({</span><br><span class="line">    <span class="string">"role"</span>: <span class="string">"tool"</span>,</span><br><span class="line">    <span class="string">"content"</span>: json.dumps(result, ensure_ascii=<span class="literal">False</span>),</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
+
+<p>此时 <code>messages</code> 从 2 条变为 4 条。第二次重新执行 chat template 和 tokenizer：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[system][user][assistant tool_call][tool result][assistant generation prompt]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>模型据此生成最终回答。工具结果不是偷偷写进模型权重，而是作为本轮上下文被 attention 读取。</p>
+<h3 id="10-4-最大轮数"><a href="#10-4-最大轮数" class="headerlink" title="10.4 最大轮数"></a>10.4 最大轮数</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> turn <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, args.max_turns + <span class="number">1</span>):</span><br></pre></td></tr></tbody></table></figure>
+
+<p>最多三轮是安全边界，不代表必须调用三次。模型一旦不再输出 <code>&lt;tool_call&gt;</code>，外部循环就把该文本作为最终回答；持续调用工具则在上限停止，避免死循环。</p>
+<hr>
+<h2 id="11-Agent-RL：把工具环境放进在线-Rollout"><a href="#11-Agent-RL：把工具环境放进在线-Rollout" class="headerlink" title="11. Agent RL：把工具环境放进在线 Rollout"></a>11. Agent RL：把工具环境放进在线 Rollout</h2><p><img src="/images/lifeos-agent-zero-to-mastery/agent_rl_reward_to_loss.svg" alt="Agent RL 从 Reward 到逐 Token Loss"></p>
+<h3 id="11-1-状态、动作、观察与轨迹"><a href="#11-1-状态、动作、观察与轨迹" class="headerlink" title="11.1 状态、动作、观察与轨迹"></a>11.1 状态、动作、观察与轨迹</h3><p>对 Agent：</p>
+<ul>
+<li>状态 $s_t$：当前 prompt 和完整消息历史。</li>
+<li>动作 $a_t$：模型生成的 token，包括 tool-call 和 final answer。</li>
+<li>环境：parser、executor 和外部数据源。</li>
+<li>观察 $o_t$：<code>role=tool</code> 返回结果。</li>
+<li>轨迹 $\tau$：多轮状态、动作、观察的完整序列。</li>
+</ul>
+<p>一条轨迹：</p>
+
+$$
+\tau=(s_0,a_0,o_0,s_1,a_1)
+$$
+
+
+<p>对应：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">s0: system + tools + user</span><br><span class="line">a0: &lt;tool_call&gt;...&lt;/tool_call&gt;</span><br><span class="line">o0: {"result":19.43}</span><br><span class="line">s1: s0 + a0 + o0</span><br><span class="line">a1: 最终自然语言回答</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="11-2-Action-mask"><a href="#11-2-Action-mask" class="headerlink" title="11.2 Action mask"></a>11.2 Action mask</h3><p>将多轮内容打包成一条序列后，可概念性标记：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">prompt/system/user       action_mask=0</span><br><span class="line">assistant tool_call      action_mask=1</span><br><span class="line">tool observation         action_mask=0</span><br><span class="line">assistant final answer   action_mask=1</span><br><span class="line">padding                   action_mask=0</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因此 tool-call 每个有效 token 都参与策略 loss，而 tool result 不参与。观察仍会进入模型输入，影响后续 final-answer token 的条件概率。</p>
+<h3 id="11-3-Reward-不是-loss"><a href="#11-3-Reward-不是-loss" class="headerlink" title="11.3 Reward 不是 loss"></a>11.3 Reward 不是 loss</h3><p>Reward 是环境对整条轨迹的评价，例如：</p>
+
+$$
+R=R_{format}+R_{name}+R_{args}+R_{result}+R_{final}-P_{invalid}
+$$
+
+
+<p>可能检查：</p>
+<ul>
+<li><code>&lt;tool_call&gt;</code> 标签是否完整。</li>
+<li>工具名是否在候选 schema 中。</li>
+<li>参数是否满足 JSON schema。</li>
+<li>调用次数是否合理。</li>
+<li>最终回答是否使用真实工具结果。</li>
+<li>是否泄露思维、重复或出现非法工具。</li>
+</ul>
+<p>Reward 本身通常不可微。训练先把 reward 转成 advantage，再乘到可微的 token log probability 上。</p>
+<h3 id="11-4-本项目-v1-的奖励漏洞"><a href="#11-4-本项目-v1-的奖励漏洞" class="headerlink" title="11.4 本项目 v1 的奖励漏洞"></a>11.4 本项目 v1 的奖励漏洞</h3><p>旧逻辑中，需要工具却没有有效调用的轨迹，仍可能获得长度、思考格式或 reward-model 奖励。结果是 reward 看似上升，但严格工具调用变成 <code>0/3</code>。</p>
+<p>修复后的硬约束：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">标签不闭合                       -&gt; reward = -3</span><br><span class="line">需要工具但没有 tool call         -&gt; reward = -3</span><br><span class="line">调用候选集合之外的工具           -&gt; reward = -3</span><br><span class="line">参数校验失败                     -&gt; reward = -3</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这说明训练指标必须和任务验收同时看，不能用平均 reward 替代工具成功率。</p>
+<h3 id="11-5-从轨迹-reward-到逐-token-loss"><a href="#11-5-从轨迹-reward-到逐-token-loss" class="headerlink" title="11.5 从轨迹 reward 到逐 token loss"></a>11.5 从轨迹 reward 到逐 token loss</h3><p>同题生成 $G$ 条轨迹，得到每条轨迹 advantage $A_i$。轨迹 $i$ 的所有有效 action token 共享轨迹级信号，但每个 token 有自己的 probability ratio：</p>
+
+$$
+r_{i,t}=\exp\left(
+\log\pi_\theta(a_{i,t}\mid s_{i,t})
+-\log\pi_{old}(a_{i,t}\mid s_{i,t})
+\right)
+$$
+
+
+<p>加入 reference KL：</p>
+
+$$
+D_{KL}(\pi_\theta\|\pi_{ref})
+\approx
+\frac{\pi_{ref}}{\pi_\theta}
+-\log\frac{\pi_{ref}}{\pi_\theta}-1
+$$
+
+
+<p>一个简化的 CISPO/GRPO 风格 token objective 可表示为：</p>
+
+$$
+\ell_{i,t}
+=-
+\left[
+\operatorname{clip}(r_{i,t},1-\epsilon,1+\epsilon)A_i
+-\beta D_{KL,i,t}
+\right]
+$$
+
+
+<p>只对 action mask 为 1 的位置求平均：</p>
+
+$$
+\mathcal L_i
+=\frac{\sum_t m_{i,t}\ell_{i,t}}
+{\sum_t m_{i,t}}
+$$
+
+
+<p>再对有效轨迹或 batch 求平均：</p>
+
+$$
+\mathcal L
+=\frac1N\sum_{i=1}^{N}\mathcal L_i
+$$
+
+
+<p>最后：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scalar loss</span><br><span class="line">-&gt; autograd backward</span><br><span class="line">-&gt; 每个参数的 gradient</span><br><span class="line">-&gt; optimizer.step</span><br><span class="line">-&gt; 更新 current policy</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Old policy 与 reference policy 在这一更新步骤中不接收梯度。</p>
+<h3 id="11-6-为什么-Agent-RL-慢"><a href="#11-6-为什么-Agent-RL-慢" class="headerlink" title="11.6 为什么 Agent RL 慢"></a>11.6 为什么 Agent RL 慢</h3><p>普通 SFT 对一个 batch 通常做一次训练前向和一次反向。Agent RL 还需要：</p>
+<ol>
+<li>每个 prompt 生成 $G$ 条候选。</li>
+<li>每条候选可能执行多轮生成。</li>
+<li>CPU/Python 工具和 parser 介入。</li>
+<li>current、old、reference 计算 token log probability。</li>
+<li>动态 padding、mask、reward 和组内统计。</li>
+<li>最后才进行反向传播。</li>
+</ol>
+<p>因此“只有 380 条数据”也可能耗时很久，因为计算量取决于实际生成 token 和 rollout 次数，而不仅是 JSONL 行数。</p>
+<h3 id="11-7-一条-Agent-RL-样本在代码中的精确对象变化"><a href="#11-7-一条-Agent-RL-样本在代码中的精确对象变化" class="headerlink" title="11.7 一条 Agent RL 样本在代码中的精确对象变化"></a>11.7 一条 Agent RL 样本在代码中的精确对象变化</h3><p>磁盘数据：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"conversations"</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"system"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"..."</span><span class="punctuation">,</span><span class="attr">"tools"</span><span class="punctuation">:</span><span class="string">"[...]"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"user"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"17.66 涨停价是多少？"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"assistant"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">""</span><span class="punctuation">}</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"gt"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"19.43"</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>Dataset 返回：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">messages: list[dict]，最后空 assistant 已删除</span><br><span class="line">tools:    list[dict]，候选 schema</span><br><span class="line">gt:       list，reward 验证目标</span><br></pre></td></tr></tbody></table></figure>
+
+<p>假设一个 batch 有 $B=2$ 个 prompt，每题生成 $G=4$ 条：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">原始问题数                 B = 2</span><br><span class="line">rollout 轨迹数              N = B*G = 8</span><br><span class="line">每条轨迹长度               Li，各不相同</span><br><span class="line">动态 padding 后最大长度     Lmax</span><br><span class="line">input_ids                  [8,Lmax]</span><br><span class="line">full_mask                  [8,Lmax]</span><br><span class="line">response/action mask       [8,Lmax]</span><br><span class="line">logits                     [8,Lmax,V]</span><br><span class="line">shifted logits             [8,Lmax-1,V]</span><br><span class="line">per_token_logps            [8,Lmax-1]</span><br><span class="line">completion_mask            [8,Lmax-1]</span><br><span class="line">rewards                    [8]</span><br><span class="line">grouped_rewards            [2,4]</span><br><span class="line">advantages                 [8]</span><br><span class="line">per_token_loss             [8,Lmax-1]</span><br><span class="line">policy_loss                scalar</span><br></pre></td></tr></tbody></table></figure>
+
+<p>关键代码对应：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">logits = res.logits[:, :-<span class="number">1</span>, :]</span><br><span class="line">per_token_logps = F.log_softmax(logits, dim=-<span class="number">1</span>).gather(</span><br><span class="line">    <span class="number">2</span>, input_ids[:, <span class="number">1</span>:].unsqueeze(-<span class="number">1</span>)</span><br><span class="line">).squeeze(-<span class="number">1</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>gather</code> 不是保留 6400 个词的概率，而是在每个位置取“实际生成 token”的 log probability：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[N,L-1,V] gather actual token ids -&gt; [N,L-1]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>组内统计：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">grouped_rewards = rewards.view(-<span class="number">1</span>, G)  <span class="comment"># [B,G]</span></span><br><span class="line">mean_r = grouped_rewards.mean(dim=<span class="number">1</span>)</span><br><span class="line">std_r = grouped_rewards.std(dim=<span class="number">1</span>, unbiased=<span class="literal">False</span>)</span><br><span class="line">advantages = (rewards - repeated_mean) / (repeated_std + <span class="number">1e-4</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>最后先按每条轨迹的有效 action token 平均，再对轨迹平均：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">token_counts = completion_mask.<span class="built_in">sum</span>(dim=<span class="number">1</span>)        <span class="comment"># [N]</span></span><br><span class="line">sequence_loss = (per_token_loss * completion_mask).<span class="built_in">sum</span>(<span class="number">1</span>) / token_counts</span><br><span class="line">policy_loss = sequence_loss[valid_rows].mean()   <span class="comment"># scalar</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>这样可以避免长轨迹仅因为 token 多就在 batch loss 中占据不成比例的权重。</p>
+<h3 id="11-8-CISPO-与标准-PPO-x2F-GRPO-clip-的代码差异"><a href="#11-8-CISPO-与标准-PPO-x2F-GRPO-clip-的代码差异" class="headerlink" title="11.8 CISPO 与标准 PPO/GRPO clip 的代码差异"></a>11.8 CISPO 与标准 PPO/GRPO clip 的代码差异</h3><p>本项目 Agent RL 支持两种分支。标准 GRPO 风格：</p>
+
+$$
+\ell=-\left[\min(rA,\operatorname{clip}(r,1-\epsilon,1+\epsilon)A)-\beta KL\right]
+$$
+
+
+<p>CISPO 分支对 ratio 做上界截断并 <code>detach</code>：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">clamped_ratio = torch.clamp(ratio, <span class="built_in">max</span>=epsilon_high).detach()</span><br><span class="line">per_token_loss = -(</span><br><span class="line">    clamped_ratio * advantage * per_token_logps</span><br><span class="line">    - beta * per_token_kl</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>detach()</code> 表示 clamped ratio 在反向时被当作常数权重；梯度主要通过 <code>per_token_logps</code> 传播。不能把文档中的统一简化式当成每个实现完全相同，最终必须以训练脚本代码为准。</p>
+<h3 id="11-9-延迟奖励与信用分配限制"><a href="#11-9-延迟奖励与信用分配限制" class="headerlink" title="11.9 延迟奖励与信用分配限制"></a>11.9 延迟奖励与信用分配限制</h3><p>若整条轨迹只得到一个最终 reward，那么 tool-call 和 final-answer token 共享同一个轨迹 advantage。这是粗粒度信用分配：</p>
+<ul>
+<li>最终答案正确，早期调用大概率被共同奖励。</li>
+<li>最终答案错误，可能连正确的工具选择也一起受罚。</li>
+</ul>
+<p>可改进方向包括步骤级 reward、过程验证器、工具调用局部 reward，但会增加奖励设计复杂度和被钻空子的机会。v0.1 应先保证轨迹级 reward 与严格测试一致。</p>
+<hr>
+<h2 id="12-五种训练方法统一对照"><a href="#12-五种训练方法统一对照" class="headerlink" title="12. 五种训练方法统一对照"></a>12. 五种训练方法统一对照</h2><p><img src="/images/lifeos-agent-zero-to-mastery/five_stage_training_overview.svg" alt="SFT、DPO、PPO、GRPO 与 Agent RL 的目标对照"></p>
+<p><img src="/images/lifeos-agent-zero-to-mastery/loss_computation_comparison.svg" alt="五种训练方法的 Loss 计算差异"></p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>典型数据</th>
+<th>在线生成</th>
+<th>监督信号</th>
+<th>是否有 Critic</th>
+<th>核心 loss</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SFT</td>
+<td>prompt + 标准回答</td>
+<td>否</td>
+<td>标准 token</td>
+<td>否</td>
+<td>Cross Entropy</td>
+</tr>
+<tr>
+<td>DPO</td>
+<td>prompt + chosen/rejected</td>
+<td>否</td>
+<td>人类/规则偏好</td>
+<td>否</td>
+<td>Pairwise preference</td>
+</tr>
+<tr>
+<td>PPO</td>
+<td>prompt</td>
+<td>是</td>
+<td>Reward</td>
+<td>是</td>
+<td>Clipped policy + value</td>
+</tr>
+<tr>
+<td>GRPO</td>
+<td>prompt，每题多条 rollout</td>
+<td>是</td>
+<td>组内相对 reward</td>
+<td>否</td>
+<td>Group-relative policy</td>
+</tr>
+<tr>
+<td>Agent RL</td>
+<td>prompt + tools + 环境</td>
+<td>是，多轮</td>
+<td>轨迹 reward</td>
+<td>取决于算法</td>
+<td>多轮 action-token policy loss</td>
+</tr>
+</tbody></table>
+<p>共同点：最终都通过一个标量 loss 反向传播，改变模型参数，从而改变 token 概率。</p>
+<p>不同点：监督信号从哪里来，以及哪些 token 被纳入优化。</p>
+<hr>
+<h2 id="13-独立训练必须掌握的工程闭环"><a href="#13-独立训练必须掌握的工程闭环" class="headerlink" title="13. 独立训练必须掌握的工程闭环"></a>13. 独立训练必须掌握的工程闭环</h2><h3 id="13-1-训练前必须回答-12-个问题"><a href="#13-1-训练前必须回答-12-个问题" class="headerlink" title="13.1 训练前必须回答 12 个问题"></a>13.1 训练前必须回答 12 个问题</h3><ol>
+<li>要改善的具体能力是什么？</li>
+<li>用 SFT、DPO 还是 RL，为什么？</li>
+<li>起始 checkpoint 是哪个？</li>
+<li>数据 schema 是什么？</li>
+<li>train/validation/test 是否隔离？</li>
+<li>样本数与 token 长度分布是什么？</li>
+<li><code>max_seq_len</code> 会截断什么？</li>
+<li>micro batch 与 gradient accumulation 是多少？</li>
+<li>learning rate 和 epoch 为什么这样选？</li>
+<li>输出路径是否会覆盖 production？</li>
+<li>记录哪些指标？</li>
+<li>什么条件停止、回滚或拒绝发布？</li>
+</ol>
+<h3 id="13-2-Effective-batch-size"><a href="#13-2-Effective-batch-size" class="headerlink" title="13.2 Effective batch size"></a>13.2 Effective batch size</h3><p>若单卡训练：</p>
+
+$$
+B_{effective}=B_{micro}\times N_{accumulation}
+$$
+
+
+<p>多卡时：</p>
+
+$$
+B_{effective}
+=B_{micro}\times N_{accumulation}\times N_{gpu}
+$$
+
+
+<p>梯度累积降低单步显存，但不会让总计算免费消失。</p>
+<h3 id="13-3-不能只看-loss"><a href="#13-3-不能只看-loss" class="headerlink" title="13.3 不能只看 loss"></a>13.3 不能只看 loss</h3><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>训练指标</th>
+<th>必须搭配的任务指标</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SFT</td>
+<td>CE loss</td>
+<td>格式正确率、工具成功率、普通聊天保持率</td>
+</tr>
+<tr>
+<td>DPO</td>
+<td>DPO loss、margin</td>
+<td>chosen 胜率、能力回归</td>
+</tr>
+<tr>
+<td>PPO/GRPO</td>
+<td>reward、KL、clip fraction</td>
+<td>独立测试集正确率、输出多样性</td>
+</tr>
+<tr>
+<td>Agent RL</td>
+<td>reward、KL、长度</td>
+<td>tool-call、参数、执行、grounding、no-tool</td>
+</tr>
+</tbody></table>
+<h3 id="13-4-本项目发布闸门"><a href="#13-4-本项目发布闸门" class="headerlink" title="13.4 本项目发布闸门"></a>13.4 本项目发布闸门</h3><p>至少分别验证：</p>
+<ol>
+<li>Search 问题调用 <code>search_fake_obsidian</code>。</li>
+<li>Task 问题调用 <code>list_today_tasks</code>。</li>
+<li>Math 问题调用 <code>calculate_math</code> 并得到 19.43。</li>
+<li>普通聊天不传 tools、不误调用。</li>
+<li>最终回答引用真实工具结果，而不是自己编造。</li>
+<li>对照旧 checkpoint 没有明显回归。</li>
+</ol>
+<p>当前 Agent RL v2 虽然严格调用达到 <code>3/3</code>，但原始最终 grounding 曾为 <code>2/3</code>，因此没有自动替换生产权重。这是正确的工程决策：训练完成不等于可以部署。</p>
+<h3 id="13-5-3090-Ti-独立训练的安全步骤"><a href="#13-5-3090-Ti-独立训练的安全步骤" class="headerlink" title="13.5 3090 Ti 独立训练的安全步骤"></a>13.5 3090 Ti 独立训练的安全步骤</h3><p>训练不是从复制一条命令开始，而是按以下顺序：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1. 冻结目标：只改善一个可测能力</span><br><span class="line">2. 校验 JSONL schema 和样本分布</span><br><span class="line">3. 固定 baseline checkpoint 的测试结果</span><br><span class="line">4. 使用新输出名，禁止覆盖 production</span><br><span class="line">5. 先跑 1～5 step smoke test</span><br><span class="line">6. 检查显存、shape、loss/reward、生成文本</span><br><span class="line">7. 再启动完整训练</span><br><span class="line">8. 保存日志、参数、git commit、数据 hash</span><br><span class="line">9. 用固定 test set 对比 baseline/new</span><br><span class="line">10. 达到发布闸门后手工切换 production symlink</span><br></pre></td></tr></tbody></table></figure>
+
+<p>显存不足时建议调整顺序：</p>
+<ol>
+<li>降低 <code>batch_size</code>。</li>
+<li>增加 <code>accumulation_steps</code> 保持 effective batch。</li>
+<li>降低 <code>max_seq_len</code> 或 RL 的 <code>max_total_len/max_gen_len</code>，但先检查截断风险。</li>
+<li>RL 降低 <code>num_generations</code>，但组内统计质量也会下降。</li>
+<li>开启混合精度、gradient checkpointing 或更高效 rollout engine。</li>
+<li>最后才考虑缩小模型。</li>
+</ol>
+<h3 id="13-6-日志故障诊断树"><a href="#13-6-日志故障诊断树" class="headerlink" title="13.6 日志故障诊断树"></a>13.6 日志故障诊断树</h3><h4 id="Loss-变成-NaN"><a href="#Loss-变成-NaN" class="headerlink" title="Loss 变成 NaN"></a>Loss 变成 NaN</h4><p>依次检查：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">数据是否有空 action mask</span><br><span class="line">-&gt; learning rate 是否过高</span><br><span class="line">-&gt; FP16 是否溢出</span><br><span class="line">-&gt; reward/advantage 是否异常大</span><br><span class="line">-&gt; denominator 是否为 0</span><br><span class="line">-&gt; gradient norm 是否爆炸</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="Reward-上升、工具成功率下降"><a href="#Reward-上升、工具成功率下降" class="headerlink" title="Reward 上升、工具成功率下降"></a>Reward 上升、工具成功率下降</h4><p>依次检查：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">打印真实 rollout</span><br><span class="line">-&gt; 统计合法 XML/JSON 比例</span><br><span class="line">-&gt; 统计候选外工具名</span><br><span class="line">-&gt; 分解 reward 各项</span><br><span class="line">-&gt; 检查无调用是否仍能拿正奖励</span><br><span class="line">-&gt; 检查长度或 RM 是否压过工具奖励</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="Loss-降得很快、测试不提升"><a href="#Loss-降得很快、测试不提升" class="headerlink" title="Loss 降得很快、测试不提升"></a>Loss 降得很快、测试不提升</h4><p>可能是：</p>
+<ul>
+<li>训练集重复过高，模型背句式。</li>
+<li>测试问法与训练问法差异太大。</li>
+<li>labels 大多是低价值固定文本。</li>
+<li>训练数据泄漏进测试集。</li>
+<li>只改善了格式，没有改善 grounding。</li>
+</ul>
+<h4 id="模型会调用工具，但最终答案不用结果"><a href="#模型会调用工具，但最终答案不用结果" class="headerlink" title="模型会调用工具，但最终答案不用结果"></a>模型会调用工具，但最终答案不用结果</h4><p>要分别测试：</p>
+<ol>
+<li>Tool result 是否真的回填。</li>
+<li>第二轮 prompt 是否包含 <code>role=tool</code>。</li>
+<li>tool observation 是否被长度截断。</li>
+<li>SFT 是否包含足够的“工具后二轮回答”。</li>
+<li>Reward 是否单独验证 final grounding。</li>
+</ol>
+<h3 id="13-7-Checkpoint、Resume-与-Production-的区别"><a href="#13-7-Checkpoint、Resume-与-Production-的区别" class="headerlink" title="13.7 Checkpoint、Resume 与 Production 的区别"></a>13.7 Checkpoint、Resume 与 Production 的区别</h3><ul>
+<li><strong>Weight file</strong>：模型参数，适合推理。</li>
+<li><strong>Training checkpoint</strong>：通常还包含 optimizer、scheduler、scaler、epoch、step，用于准确续训。</li>
+<li><strong>Production alias/symlink</strong>：部署选择，不是新的模型文件。</li>
+</ul>
+<p>只加载 weight 再训练，不等同于严格 resume，因为 optimizer 动量和 scheduler 进度可能丢失。面试中说“从某权重继续微调”与“断点续训”必须区分。</p>
+<hr>
+<h2 id="14-高频面试问题与合格回答骨架"><a href="#14-高频面试问题与合格回答骨架" class="headerlink" title="14. 高频面试问题与合格回答骨架"></a>14. 高频面试问题与合格回答骨架</h2><h3 id="14-1-“Tool-Calling-是模型执行工具吗？”"><a href="#14-1-“Tool-Calling-是模型执行工具吗？”" class="headerlink" title="14.1 “Tool Calling 是模型执行工具吗？”"></a>14.1 “Tool Calling 是模型执行工具吗？”</h3><p>不是。模型生成结构化 action 文本，外部 parser 将其解析为对象，executor 校验后执行 Python 工具，再以 <code>role=tool</code> 把 observation 回填。模型只负责 token generation。</p>
+<h3 id="14-2-“工具选择是谁做的？”"><a href="#14-2-“工具选择是谁做的？”" class="headerlink" title="14.2 “工具选择是谁做的？”"></a>14.2 “工具选择是谁做的？”</h3><p>两层选择。Router 根据用户输入筛候选 schema，控制哪些工具进入 prompt；LLM 在候选集合内判断是否调用、调用哪个以及参数是什么。Executor 最后再次做安全校验。</p>
+<h3 id="14-3-“Tool-call-token-是否计算-loss？”"><a href="#14-3-“Tool-call-token-是否计算-loss？”" class="headerlink" title="14.3 “Tool-call token 是否计算 loss？”"></a>14.3 “Tool-call token 是否计算 loss？”</h3><p>SFT 中，如果 tool call 位于 assistant label 区域，它参与交叉熵；Agent RL 中，它是策略生成的 action token，位于 response/action mask 内，参与策略 loss。<code>role=tool</code> 是环境 observation，通常不参与策略 loss。</p>
+<h3 id="14-4-“GRPO-与-PPO-最大区别是什么？”"><a href="#14-4-“GRPO-与-PPO-最大区别是什么？”" class="headerlink" title="14.4 “GRPO 与 PPO 最大区别是什么？”"></a>14.4 “GRPO 与 PPO 最大区别是什么？”</h3><p>PPO 用 critic/value function 估计 advantage；GRPO 对同一 prompt 采样一组回答，用组内 reward 标准化得到相对 advantage，通常不需要单独 critic。二者仍都要用生成 token 的 log probability 更新策略，并约束策略变化。</p>
+<h3 id="14-5-“Reward-上升为什么模型可能更差？”"><a href="#14-5-“Reward-上升为什么模型可能更差？”" class="headerlink" title="14.5 “Reward 上升为什么模型可能更差？”"></a>14.5 “Reward 上升为什么模型可能更差？”</h3><p>模型可能利用奖励漏洞，例如输出长文本获得长度奖励，却没有合法工具调用。Reward 只是代理目标。必须同时查看严格格式、工具执行、最终 grounding 和 no-tool 回归测试。</p>
+<h3 id="14-6-“Agent-RL-能从零学会写-Python-函数吗？”"><a href="#14-6-“Agent-RL-能从零学会写-Python-函数吗？”" class="headerlink" title="14.6 “Agent RL 能从零学会写 Python 函数吗？”"></a>14.6 “Agent RL 能从零学会写 Python 函数吗？”</h3><p>通常不能把它理解为自动创造并注册可执行函数。模型可以探索生成字符串，但环境只能执行预先注册、可验证的工具。工具协议和基本格式通常先通过预训练/SFT 建立；Agent RL 更适合优化何时调用、选择哪个、参数如何填写以及多轮策略。</p>
+<hr>
+<h2 id="15-最终闭卷复述模板"><a href="#15-最终闭卷复述模板" class="headerlink" title="15. 最终闭卷复述模板"></a>15. 最终闭卷复述模板</h2><p>如果能不看文档完成下面这段话，并回答每一步的 shape，就达到了本项目的核心掌握标准：</p>
+<blockquote>
+<p>用户问题先进入 Python router，router 只筛选候选工具 schema。<code>apply_chat_template</code> 把 system、user、候选 tools 和 assistant generation prompt 渲染成字符串；Tokenizer 把字符串变成 <code>[B,T]</code> 的 token ids。Transformer 经 embedding、8 层 attention/MLP 后输出 <code>[B,T,V]</code> logits，并自回归生成 <code>&lt;tool_call&gt;</code> action token。Parser 将 XML 包裹的 JSON 字符串变成 dict，Executor 校验工具名与参数并执行 Python，结果作为 <code>role=tool</code> observation 追加到 messages。第二轮重新 template 和 tokenize，模型读取 observation 生成最终回答。SFT 用 assistant token 的交叉熵教会格式；DPO用 chosen/rejected 的相对概率教偏好；PPO 用 critic 和 GAE；GRPO 用同组 reward 标准化 advantage；Agent RL 把多轮工具环境放进 rollout，对 tool-call 与 final-answer action token 计算策略 loss，对 tool observation 做 mask。最终 scalar loss 反向传播更新 current policy，训练后必须用独立测试集验证工具、参数、grounding 和 no-tool 能力，而不能只看 loss 或 reward。</p>
+</blockquote>
+<hr>
+<h2 id="16-主教材与项目文件映射"><a href="#16-主教材与项目文件映射" class="headerlink" title="16. 主教材与项目文件映射"></a>16. 主教材与项目文件映射</h2><table>
+<thead>
+<tr>
+<th>学习主题</th>
+<th>对应文件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Agent 外部循环</td>
+<td><code>lifeos_agent/main.py</code></td>
+</tr>
+<tr>
+<td>候选工具路由</td>
+<td><code>lifeos_agent/router.py</code></td>
+</tr>
+<tr>
+<td>Schema、参数校验与执行</td>
+<td><code>lifeos_agent/tools.py</code></td>
+</tr>
+<tr>
+<td>SFT/DPO/PPO/GRPO/Agent RL 深入数据示例</td>
+<td><code>docs/TRAINING_METHODS_COMPLETE_GUIDE.md</code></td>
+</tr>
+<tr>
+<td>Agent RL 361-token 完整 trace</td>
+<td><code>docs/AGENT_RL_COMPLETE_GUIDE.md</code></td>
+</tr>
+<tr>
+<td>更完整数学证明</td>
+<td><code>MATHEMATICAL_DERIVATIONS.md</code></td>
+</tr>
+<tr>
+<td>真实远程训练指标和故障复盘</td>
+<td><code>docs/REMOTE_AGENT_RL_TRAINING_REPORT_2026-07-15.md</code></td>
+</tr>
+<tr>
+<td>7 天验收任务</td>
+<td><code>docs/7_DAY_MASTERY_PLAN.md</code></td>
+</tr>
+<tr>
+<td>固定评测集</td>
+<td><code>eval/lifeos_eval.jsonl</code></td>
+</tr>
+</tbody></table>
+<h2 id="17-掌握检查题"><a href="#17-掌握检查题" class="headerlink" title="17. 掌握检查题"></a>17. 掌握检查题</h2><p>不看答案完成以下题目：</p>
+<ol>
+<li>写出 <code>[B,T] -&gt; [B,T,H] -&gt; [B,T,V]</code> 的完整过程。</li>
+<li>手算 logits <code>[2,1,0]</code> 且 label 为第二类时的交叉熵。</li>
+<li>解释 causal mask 与 SFT label mask 的区别。</li>
+<li>为什么 schema 不进入 prompt，模型就不知道当前注册工具？</li>
+<li>为什么 router 不能替代 LLM 的参数生成？</li>
+<li>为什么 tool observation 进入 attention，却不进入 policy loss？</li>
+<li>从链式法则解释序列 log probability 为什么是 token log probability 之和。</li>
+<li>写出 DPO loss 并解释 reference model 和 $\beta$。</li>
+<li>从 $J(\theta)$ 推到 REINFORCE 的梯度形式。</li>
+<li>写出 TD error 和 GAE，并解释 $\gamma$、$\lambda$。</li>
+<li>写出 PPO ratio，说明 clip 对正负 advantage 的影响。</li>
+<li>手算 reward <code>[3,1,-1,-3]</code> 的 GRPO advantage。</li>
+<li>一条 Agent 轨迹有哪些 action token 和 observation token？</li>
+<li>Reward 为什么不能直接 <code>backward()</code>？</li>
+<li>为什么训练 reward 上升却可能严格工具调用率下降？</li>
+<li>3090 Ti 出现 OOM 时，应按什么顺序调整参数？</li>
+<li>为什么不应该让新 checkpoint 自动覆盖 production？</li>
+<li>用三分钟完整讲解本项目端到端数据流。</li>
+</ol>
+<p>建议判定：</p>
+<ul>
+<li>15～18 题正确且能追问：核心熟练。</li>
+<li>11～14 题正确：理解但不稳定，需要闭卷重做。</li>
+<li>10 题及以下：仍处于阅读记忆阶段，应回到单一样本和手算。</li>
+</ul>
+<hr>
+<h2 id="18-一次完整训练-Step-的统一伪代码"><a href="#18-一次完整训练-Step-的统一伪代码" class="headerlink" title="18. 一次完整训练 Step 的统一伪代码"></a>18. 一次完整训练 Step 的统一伪代码</h2><h3 id="18-1-SFT"><a href="#18-1-SFT" class="headerlink" title="18.1 SFT"></a>18.1 SFT</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> input_ids, labels <span class="keyword">in</span> loader:                   <span class="comment"># [B,T], [B,T]</span></span><br><span class="line">    output = model(input_ids, labels=labels)</span><br><span class="line">    loss = output.loss / accumulation_steps        <span class="comment"># scalar</span></span><br><span class="line">    loss.backward()</span><br><span class="line">    <span class="keyword">if</span> ready_to_update:</span><br><span class="line">        clip_grad_norm_(model.parameters(), <span class="number">1.0</span>)</span><br><span class="line">        optimizer.step()</span><br><span class="line">        optimizer.zero_grad()</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="18-2-DPO"><a href="#18-2-DPO" class="headerlink" title="18.2 DPO"></a>18.2 DPO</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">chosen_logp  = sequence_logp(policy, chosen, chosen_mask)      <span class="comment"># [B]</span></span><br><span class="line">rejected_logp = sequence_logp(policy, rejected, rejected_mask) <span class="comment"># [B]</span></span><br><span class="line"><span class="keyword">with</span> no_grad:</span><br><span class="line">    ref_chosen_logp = sequence_logp(reference, chosen, chosen_mask)</span><br><span class="line">    ref_rejected_logp = sequence_logp(reference, rejected, rejected_mask)</span><br><span class="line"></span><br><span class="line">policy_margin = chosen_logp - rejected_logp</span><br><span class="line">ref_margin = ref_chosen_logp - ref_rejected_logp</span><br><span class="line">loss = -logsigmoid(beta * (policy_margin - ref_margin)).mean()</span><br><span class="line">loss.backward()</span><br><span class="line">optimizer.step()</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="18-3-PPO"><a href="#18-3-PPO" class="headerlink" title="18.3 PPO"></a>18.3 PPO</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">responses = old_policy.generate(prompts)</span><br><span class="line">rewards = reward_model(prompts, responses)</span><br><span class="line">values = critic(prompts, responses)</span><br><span class="line">advantages, returns = gae(rewards, values)</span><br><span class="line"></span><br><span class="line">ratio = exp(current_logp - old_logp)</span><br><span class="line">actor_loss = -minimum(ratio * advantages, clipped_ratio * advantages)</span><br><span class="line">critic_loss = mse(current_values, returns)</span><br><span class="line">total_loss = actor_loss + value_coef * critic_loss + beta * kl</span><br><span class="line">total_loss.backward()</span><br><span class="line">optimizer.step()</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="18-4-GRPO-x2F-Agent-RL"><a href="#18-4-GRPO-x2F-Agent-RL" class="headerlink" title="18.4 GRPO / Agent RL"></a>18.4 GRPO / Agent RL</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">trajectories = []</span><br><span class="line"><span class="keyword">for</span> prompt <span class="keyword">in</span> prompts:</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(G):</span><br><span class="line">        trajectory = rollout_with_optional_tools(prompt, max_turns=<span class="number">3</span>)</span><br><span class="line">        trajectories.append(trajectory)</span><br><span class="line"></span><br><span class="line">rewards = verify_trajectories(trajectories)          <span class="comment"># [B*G]</span></span><br><span class="line">advantages = normalize_within_each_prompt(rewards)   <span class="comment"># [B*G]</span></span><br><span class="line">input_ids, action_mask = pack_and_pad(trajectories)  <span class="comment"># [B*G,L]</span></span><br><span class="line"></span><br><span class="line">current_logp = token_logp(policy, input_ids)          <span class="comment"># [B*G,L-1]</span></span><br><span class="line">old_logp = stored_rollout_logp                         <span class="comment"># [B*G,L-1]</span></span><br><span class="line">ref_logp = token_logp(reference, input_ids)            <span class="comment"># [B*G,L-1]</span></span><br><span class="line"></span><br><span class="line">token_loss = policy_objective(current_logp, old_logp, ref_logp, advantages)</span><br><span class="line">loss = masked_sequence_then_batch_mean(token_loss, action_mask)</span><br><span class="line">loss.backward()</span><br><span class="line">optimizer.step()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这四段伪代码必须能够闭卷写出。它们展示了所有训练方法的共同骨架：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">构造监督信号</span><br><span class="line">-&gt; 计算 token probability</span><br><span class="line">-&gt; 汇总为 scalar loss</span><br><span class="line">-&gt; backward</span><br><span class="line">-&gt; optimizer step</span><br></pre></td></tr></tbody></table></figure>
+
+<p>区别只在“监督信号怎么来”和“哪些 token 参与”。</p>
+<hr>
+<h2 id="19-一条-Agent-RL-轨迹从文本到-Loss-的总算例"><a href="#19-一条-Agent-RL-轨迹从文本到-Loss-的总算例" class="headerlink" title="19. 一条 Agent RL 轨迹从文本到 Loss 的总算例"></a>19. 一条 Agent RL 轨迹从文本到 Loss 的总算例</h2><p><img src="/images/lifeos-agent-zero-to-mastery/agent_rl_end_to_end_trace.svg" alt="一条 Agent RL 工具轨迹的端到端 Trace"></p>
+<p>这一节把前面所有概念合并，不引入新名词。</p>
+<h3 id="19-1-初始数据"><a href="#19-1-初始数据" class="headerlink" title="19.1 初始数据"></a>19.1 初始数据</h3><p>用户：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">17.66 涨停价是多少？</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Router 返回：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">"calculate_math"</span>]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Schema lookup 返回一个工具定义。Chat template 生成第一轮 prompt，假设 tokenizer 后：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">prompt_ids 长度 P = 120</span><br><span class="line">input_ids.shape = [1,120]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="19-2-第一轮动作"><a href="#19-2-第一轮动作" class="headerlink" title="19.2 第一轮动作"></a>19.2 第一轮动作</h3><p>模型自回归生成：</p>
+<figure class="highlight xml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tool_call</span>&gt;</span>{"name":"calculate_math","arguments":{"expression":"round(17.66*1.1,2)"}}<span class="tag">&lt;/<span class="name">tool_call</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>假设共 $K_1=35$ 个 token：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">generated_ids.shape = [1,155]</span><br><span class="line">response_ids.shape  = [1,35]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这 35 个 token 全部是模型动作；在 Agent RL 打包后，它们的 action mask 为 1。</p>
+<h3 id="19-3-环境观察"><a href="#19-3-环境观察" class="headerlink" title="19.3 环境观察"></a>19.3 环境观察</h3><p>Parser：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">    <span class="string">"name"</span>: <span class="string">"calculate_math"</span>,</span><br><span class="line">    <span class="string">"arguments"</span>: {<span class="string">"expression"</span>: <span class="string">"round(17.66*1.1,2)"</span>},</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Executor：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{<span class="string">"result"</span>: <span class="number">19.43</span>}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>假设 tool message 渲染后是 12 个 token。这 12 个 token 会进入第二轮上下文，但 action mask 为 0。</p>
+<h3 id="19-4-第二轮动作"><a href="#19-4-第二轮动作" class="headerlink" title="19.4 第二轮动作"></a>19.4 第二轮动作</h3><p>第二轮 prompt 概念长度：</p>
+
+$$
+P_2=P+K_1+K_{tool}+K_{role}
+$$
+
+
+<p>其中 $K_{role}$ 包含 assistant/tool 的协议标记。模型生成：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">17.66 元的涨停价约为 19.43 元。</span><br></pre></td></tr></tbody></table></figure>
+
+<p>假设是 $K_2=14$ 个 action token。</p>
+<p>不考虑协议边界 token 的简化 action 数：</p>
+
+$$
+K_{action}=K_1+K_2=35+14=49
+$$
+
+
+<h3 id="19-5-同题四条轨迹"><a href="#19-5-同题四条轨迹" class="headerlink" title="19.5 同题四条轨迹"></a>19.5 同题四条轨迹</h3><p>训练不会只生成这一条，假设四条 rollout：</p>
+<table>
+<thead>
+<tr>
+<th>轨迹</th>
+<th>行为</th>
+<th align="right">Reward</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>正确调用、参数正确、回答包含 19.43</td>
+<td align="right">3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>工具正确，但最终回答表达不完整</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>没调用工具，直接猜答案</td>
+<td align="right">-1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>非法标签或错误工具名</td>
+<td align="right">-3</td>
+</tr>
+</tbody></table>
+<p>前面已经算得：</p>
+
+$$
+\mu=0,\qquad\sigma=\sqrt5\approx2.236
+$$
+
+
+
+$$
+A_1\approx1.342,\quad
+A_2\approx0.447,\quad
+A_3\approx-0.447,\quad
+A_4\approx-1.342
+$$
+
+
+<h3 id="19-6-轨迹-1-某个工具名-token-的概率"><a href="#19-6-轨迹-1-某个工具名-token-的概率" class="headerlink" title="19.6 轨迹 1 某个工具名 token 的概率"></a>19.6 轨迹 1 某个工具名 token 的概率</h3><p>选择 <code>calculate_math</code> 中的一个实际 token，假设：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">old_logp     = -0.50</span><br><span class="line">current_logp = -0.40</span><br><span class="line">ref_logp     = -0.45</span><br><span class="line">advantage    = +1.342</span><br><span class="line">beta         = 0.10</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="Ratio"><a href="#Ratio" class="headerlink" title="Ratio"></a>Ratio</h4>
+$$
+r=\exp(-0.40-(-0.50))=e^{0.10}\approx1.1052
+$$
+
+
+<p>说明 current policy 给这个 token 的概率相对 rollout 时提高了约 10.5%。</p>
+<h4 id="KL-近似项"><a href="#KL-近似项" class="headerlink" title="KL 近似项"></a>KL 近似项</h4><p>代码使用：</p>
+
+$$
+d=\log\pi_{ref}-\log\pi_\theta=-0.45-(-0.40)=-0.05
+$$
+
+
+
+$$
+KL_{token}=e^d-d-1
+$$
+
+
+
+$$
+=e^{-0.05}+0.05-1
+\approx0.95123+0.05-1
+\approx0.00123
+$$
+
+
+<p>它是非负且在两策略接近时很小。</p>
+<h4 id="CISPO-token-loss"><a href="#CISPO-token-loss" class="headerlink" title="CISPO token loss"></a>CISPO token loss</h4><p>假设 ratio 未超过 <code>epsilon_high</code>：</p>
+
+$$
+c=\operatorname{clamp}(r,\text{max}=\epsilon_{high})\approx1.1052
+$$
+
+
+
+$$
+\ell
+=-\left[cA\log\pi_\theta-\beta KL_{token}\right]
+$$
+
+
+<p>代入：</p>
+
+$$
+\ell
+=-\left[1.1052\times1.342\times(-0.40)-0.1\times0.00123\right]
+$$
+
+
+
+$$
+\ell\approx0.5935
+$$
+
+
+<p>不要根据“这个 token loss 是正数”判断更新方向。看导数：由于 $c$ 和 $A$ 在该分支被当成权重，$A\gt 0$ 时最小化 loss 会提高这个实际 token 的 log probability。</p>
+<p>如果轨迹 4 的 $A\lt 0$，梯度方向相反，会降低其非法 action token 再次出现的概率。</p>
+<h3 id="19-7-从-49-个-token-到一个轨迹-loss"><a href="#19-7-从-49-个-token-到一个轨迹-loss" class="headerlink" title="19.7 从 49 个 token 到一个轨迹 loss"></a>19.7 从 49 个 token 到一个轨迹 loss</h3><p>假设轨迹 1 有 49 个有效 action token：</p>
+
+$$
+\mathcal L_1
+=\frac{\ell_1+\ell_2+\cdots+\ell_{49}}{49}
+$$
+
+
+<p>Tool observation 的 12 个 token 因 mask 为 0，不进入分子，也不进入 token count。</p>
+<p>四条轨迹分别求平均，再求 batch 平均：</p>
+
+$$
+\mathcal L
+=\frac{\mathcal L_1+\mathcal L_2+\mathcal L_3+\mathcal L_4}{4}
+$$
+
+
+<p>得到 scalar，执行：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">loss.backward()</span><br><span class="line">optimizer.step()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>参数更新后，下次遇到相似 prompt，正确工具格式和参数 token 的概率倾向上升，非法轨迹 token 的概率倾向下降。</p>
+<h3 id="19-8-这条算例的证据边界"><a href="#19-8-这条算例的证据边界" class="headerlink" title="19.8 这条算例的证据边界"></a>19.8 这条算例的证据边界</h3><ul>
+<li><code>35/12/14</code> token 是便于手算的示意长度；真实长度必须由具体 tokenizer 打印。</li>
+<li>Reward <code>3/1/-1/-3</code> 是教学轨迹组；真实值由训练脚本 reward 代码计算。</li>
+<li>Shape、mask、group normalization、ratio 和 KL 形式对应当前 MiniMind Agent RL 实现。</li>
+<li>实际训练要以日志、debug rollout 和独立测试结果为准。</li>
+</ul>
+<hr>
+<h2 id="20-术语表：必须能用自己的话解释"><a href="#20-术语表：必须能用自己的话解释" class="headerlink" title="20. 术语表：必须能用自己的话解释"></a>20. 术语表：必须能用自己的话解释</h2><table>
+<thead>
+<tr>
+<th>术语</th>
+<th>精确定义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Token</td>
+<td>Tokenizer 词表中的离散单元，用整数 id 表示</td>
+</tr>
+<tr>
+<td>Vocabulary</td>
+<td>全部 token 的集合，大小记为 $V$</td>
+</tr>
+<tr>
+<td>Embedding</td>
+<td>把 token id 查表映射到 $H$ 维连续向量</td>
+</tr>
+<tr>
+<td>Hidden state</td>
+<td>Transformer 某层对每个 token 的内部表示</td>
+</tr>
+<tr>
+<td>Logit</td>
+<td>Softmax 前的未归一化词表分数</td>
+</tr>
+<tr>
+<td>Probability</td>
+<td>Softmax 后归一化到和为 1 的数值</td>
+</tr>
+<tr>
+<td>Log probability</td>
+<td>概率的自然对数，序列中可相加</td>
+</tr>
+<tr>
+<td>Label</td>
+<td>期望模型在对应位置预测的 token id</td>
+</tr>
+<tr>
+<td>Mask</td>
+<td>控制哪些位置可见或参与 loss 的 0/1 标记</td>
+</tr>
+<tr>
+<td>Causal mask</td>
+<td>禁止 token 读取未来位置</td>
+</tr>
+<tr>
+<td>Padding mask</td>
+<td>忽略为对齐长度而补的 pad token</td>
+</tr>
+<tr>
+<td>Loss mask</td>
+<td>只让指定 token 参与训练目标</td>
+</tr>
+<tr>
+<td>Cross Entropy</td>
+<td>标准 token 的负 log probability</td>
+</tr>
+<tr>
+<td>Gradient</td>
+<td>Loss 对参数的偏导数组合</td>
+</tr>
+<tr>
+<td>Optimizer</td>
+<td>根据梯度更新参数的算法，如 AdamW</td>
+</tr>
+<tr>
+<td>Checkpoint</td>
+<td>训练状态快照，可能含模型、优化器和 scheduler</td>
+</tr>
+<tr>
+<td>SFT</td>
+<td>用标准 assistant token 做监督微调</td>
+</tr>
+<tr>
+<td>DPO</td>
+<td>用 chosen/rejected 相对偏好优化策略</td>
+</tr>
+<tr>
+<td>Policy</td>
+<td>给定状态时对下一动作 token 的概率分布</td>
+</tr>
+<tr>
+<td>State</td>
+<td>Agent 当前可见的消息历史和环境信息</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>模型实际生成的 token 序列</td>
+</tr>
+<tr>
+<td>Observation</td>
+<td>外部环境返回并进入下一轮上下文的信息</td>
+</tr>
+<tr>
+<td>Trajectory</td>
+<td>多轮 state、action、observation 的完整过程</td>
+</tr>
+<tr>
+<td>Reward</td>
+<td>环境对轨迹质量的标量评分</td>
+</tr>
+<tr>
+<td>Value</td>
+<td>Critic 对状态未来回报的预测</td>
+</tr>
+<tr>
+<td>Advantage</td>
+<td>某动作相对基准表现好多少</td>
+</tr>
+<tr>
+<td>Old policy</td>
+<td>产生本批 rollout 的策略快照</td>
+</tr>
+<tr>
+<td>Reference policy</td>
+<td>冻结的能力锚点，用于 KL 约束</td>
+</tr>
+<tr>
+<td>Importance ratio</td>
+<td>Current 与 old 对同一动作的概率比</td>
+</tr>
+<tr>
+<td>KL divergence</td>
+<td>衡量 current 与 reference 分布偏离程度</td>
+</tr>
+<tr>
+<td>PPO</td>
+<td>使用 critic、GAE 和 clipped objective 的策略优化</td>
+</tr>
+<tr>
+<td>GRPO</td>
+<td>用同题组内 reward 标准化构造 advantage 的策略优化</td>
+</tr>
+<tr>
+<td>CISPO</td>
+<td>当前实现使用的一种 importance-sampling policy objective</td>
+</tr>
+<tr>
+<td>Router</td>
+<td>在模型前筛选候选工具 schema 的工程组件</td>
+</tr>
+<tr>
+<td>Parser</td>
+<td>把模型工具调用文本解析为结构化对象</td>
+</tr>
+<tr>
+<td>Executor</td>
+<td>校验并执行已注册工具的外部程序</td>
+</tr>
+<tr>
+<td>Grounding</td>
+<td>最终回答忠实使用工具结果或证据</td>
+</tr>
+<tr>
+<td>Reward hacking</td>
+<td>模型利用评分漏洞得高分，却没有完成真实目标</td>
+</tr>
+</tbody></table>
+<p>真正掌握的标准不是能认出这些词，而是能把任意一个词放回完整数据流，并说出它的输入、输出、shape、是否可训练以及失败时如何观察。</p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>分享文章</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;复制成功&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/07/13/dynamic-programming-from-recursion-to-state-transition/">动态规划完全图解：从重复递归到状态转移</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A8%E4%B9%A6%E8%B7%AF%E7%BA%BF%E5%9B%BE"><span class="toc-text">全书路线图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0-%E6%80%8E%E4%B9%88%E4%BD%BF%E7%94%A8%E8%BF%99%E4%BB%BD%E6%95%99%E6%9D%90"><span class="toc-text">0. 怎么使用这份教材</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0-1-%E6%95%B0%E5%AD%A6%E9%A2%84%E5%A4%87%EF%BC%9A%E4%BB%8E%E6%A0%87%E9%87%8F%E5%88%B0%E6%A2%AF%E5%BA%A6"><span class="toc-text">0.1 数学预备：从标量到梯度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#0-1-1-%E6%A0%87%E9%87%8F%E3%80%81%E5%90%91%E9%87%8F%E3%80%81%E7%9F%A9%E9%98%B5%E3%80%81%E5%BC%A0%E9%87%8F"><span class="toc-text">0.1.1 标量、向量、矩阵、张量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0-1-2-%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95%E4%B8%BA%E4%BB%80%E4%B9%88%E6%94%B9%E5%8F%98%E6%9C%80%E5%90%8E%E4%B8%80%E7%BB%B4"><span class="toc-text">0.1.2 矩阵乘法为什么改变最后一维</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0-1-3-%E6%A6%82%E7%8E%87%E3%80%81%E6%9D%A1%E4%BB%B6%E6%A6%82%E7%8E%87%E4%B8%8E%E6%9C%9F%E6%9C%9B"><span class="toc-text">0.1.3 概率、条件概率与期望</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0-1-4-%E4%B8%BA%E4%BB%80%E4%B9%88%E5%A4%84%E5%A4%84%E4%BD%BF%E7%94%A8-log"><span class="toc-text">0.1.4 为什么处处使用 log</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#0-1-5-%E5%AF%BC%E6%95%B0%E3%80%81%E6%A2%AF%E5%BA%A6%E4%B8%8E%E9%93%BE%E5%BC%8F%E6%B3%95%E5%88%99"><span class="toc-text">0.1.5 导数、梯度与链式法则</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%9C%80%E5%9F%BA%E7%A1%80%E7%9A%84%E6%A6%82%E5%BF%B5%EF%BC%9A%E6%A8%A1%E5%9E%8B%E5%88%B0%E5%BA%95%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-text">1. 最基础的概念：模型到底在做什么</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E5%A4%A7%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E6%9C%AC%E8%B4%A8%E4%B8%8A%E6%98%AF%E2%80%9C%E4%B8%8B%E4%B8%80%E4%B8%AA-token-%E9%A2%84%E6%B5%8B%E5%99%A8%E2%80%9D"><span class="toc-text">1.1 大语言模型本质上是“下一个 token 预测器”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E6%A8%A1%E5%9E%8B%E6%B2%A1%E6%9C%89%E5%86%85%E7%BD%AE-Python-%E6%89%A7%E8%A1%8C%E5%99%A8"><span class="toc-text">1.2 模型没有内置 Python 执行器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E4%B8%89%E7%A7%8D%E2%80%9C%E8%AE%B0%E5%BF%86%E2%80%9D%E4%B8%8D%E8%A6%81%E6%B7%B7%E6%B7%86"><span class="toc-text">1.3 三种“记忆”不要混淆</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BB%8E%E6%96%87%E6%9C%AC%E5%88%B0-token%EF%BC%9ATokenizer-%E4%B8%8E-Chat-Template"><span class="toc-text">2. 从文本到 token：Tokenizer 与 Chat Template</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Token-%E4%B8%8D%E6%98%AF%E6%B1%89%E5%AD%97%EF%BC%8C%E4%B9%9F%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%98%AF%E5%AE%8C%E6%95%B4%E5%8D%95%E8%AF%8D"><span class="toc-text">2.1 Token 不是汉字，也不一定是完整单词</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Messages-%E6%98%AF%E7%BB%93%E6%9E%84%E5%8C%96%E5%AF%B9%E8%B1%A1%EF%BC%8C%E6%A8%A1%E5%9E%8B%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%E7%9A%84%E6%98%AF%E6%B8%B2%E6%9F%93%E5%90%8E%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-text">2.2 Messages 是结构化对象，模型实际读取的是渲染后字符串</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AA%E4%BC%A0%E5%80%99%E9%80%89%E5%B7%A5%E5%85%B7"><span class="toc-text">2.3 为什么只传候选工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-Tokenizer%E3%80%81Template-%E4%B8%8E%E6%A8%A1%E5%9E%8B%E6%9D%83%E9%87%8D%E6%98%AF%E4%B8%89%E4%BB%B6%E4%B8%8D%E5%90%8C%E7%9A%84%E4%B8%9C%E8%A5%BF"><span class="toc-text">2.4 Tokenizer、Template 与模型权重是三件不同的东西</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-conversations-1-%E5%88%B0%E5%BA%95%E5%88%A0%E9%99%A4%E5%93%AA%E4%B8%80%E6%9D%A1"><span class="toc-text">2.5 conversations[:-1] 到底删除哪一条</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Transformer-%E6%95%B0%E6%8D%AE%E6%B5%81%E4%B8%8E%E7%B2%BE%E7%A1%AE%E7%BB%B4%E5%BA%A6"><span class="toc-text">3. Transformer 数据流与精确维度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E6%9C%AC%E9%A1%B9%E7%9B%AE%E6%95%99%E5%AD%A6%E9%85%8D%E7%BD%AE"><span class="toc-text">3.1 本项目教学配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-Embedding"><span class="toc-text">3.2 Embedding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-Self-Attention"><span class="toc-text">3.3 Self-Attention</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-MLP%E3%80%81%E6%AE%8B%E5%B7%AE%E4%B8%8E%E8%BE%93%E5%87%BA-logits"><span class="toc-text">3.4 MLP、残差与输出 logits</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-RMSNorm%E3%80%81RoPE-%E4%B8%8E-SwiGLU-%E5%88%86%E5%88%AB%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88"><span class="toc-text">3.5 RMSNorm、RoPE 与 SwiGLU 分别解决什么</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RMSNorm"><span class="toc-text">RMSNorm</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RoPE"><span class="toc-text">RoPE</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SwiGLU"><span class="toc-text">SwiGLU</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Softmax%E3%80%81%E4%BA%A4%E5%8F%89%E7%86%B5%E4%B8%8E%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="toc-text">4. Softmax、交叉熵与反向传播</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E4%BB%8E-logits-%E5%88%B0%E6%A6%82%E7%8E%87"><span class="toc-text">4.1 从 logits 到概率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E4%BA%A4%E5%8F%89%E7%86%B5"><span class="toc-text">4.2 交叉熵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%A2%AF%E5%BA%A6%E6%98%AF-p-y"><span class="toc-text">4.3 为什么梯度是 $p-y$</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-Causal-LM-shift"><span class="toc-text">4.4 Causal LM shift</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-%E4%BB%8E%E4%B8%80%E4%B8%AA-batch-%E5%88%B0%E4%B8%80%E6%AC%A1%E5%8F%82%E6%95%B0%E6%9B%B4%E6%96%B0"><span class="toc-text">4.5 从一个 batch 到一次参数更新</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-6-SGD-%E4%B8%8E-AdamW"><span class="toc-text">4.6 SGD 与 AdamW</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-7-%E6%A2%AF%E5%BA%A6%E7%B4%AF%E7%A7%AF%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%99%A4%E4%BB%A5%E6%AD%A5%E6%95%B0"><span class="toc-text">4.7 梯度累积为什么要除以步数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-SFT%EF%BC%9A%E7%94%A8%E6%A0%87%E5%87%86%E7%AD%94%E6%A1%88%E6%95%99%E6%A8%A1%E5%9E%8B%E8%BE%93%E5%87%BA%E6%A0%BC%E5%BC%8F%E5%92%8C%E5%86%85%E5%AE%B9"><span class="toc-text">5. SFT：用标准答案教模型输出格式和内容</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%85%B8%E5%9E%8B-Tool-Calling-SFT-%E6%A0%B7%E6%9C%AC"><span class="toc-text">5.1 典型 Tool Calling SFT 样本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-SFT-mask"><span class="toc-text">5.2 SFT mask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-SFT-%E5%AD%A6%E5%88%B0%E4%BA%86%E4%BB%80%E4%B9%88"><span class="toc-text">5.3 SFT 学到了什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E4%B8%BA%E4%BB%80%E4%B9%88%E5%B0%91%E9%87%8F%E8%BA%AB%E4%BB%BD%E6%95%B0%E6%8D%AE%E4%BC%9A%E5%BF%AB%E9%80%9F%E7%94%9F%E6%95%88"><span class="toc-text">5.4 为什么少量身份数据会快速生效</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-MiniMind-SFTDataset-%E9%80%90%E8%A1%8C%E6%95%B0%E6%8D%AE%E6%B5%81"><span class="toc-text">5.5 MiniMind SFTDataset 逐行数据流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-6-%E6%88%AA%E6%96%AD%E5%A6%82%E4%BD%95%E6%82%84%E6%82%84%E7%A0%B4%E5%9D%8F%E5%B7%A5%E5%85%B7%E6%A0%B7%E6%9C%AC"><span class="toc-text">5.6 截断如何悄悄破坏工具样本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-DPO%EF%BC%9A%E4%BB%8E-chosen-x2F-rejected-%E5%AD%A6%E4%B9%A0%E5%81%8F%E5%A5%BD"><span class="toc-text">6. DPO：从 chosen&#x2F;rejected 学习偏好</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="toc-text">6.1 数据结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%BA%8F%E5%88%97-log-probability"><span class="toc-text">6.2 序列 log probability</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E7%9B%B4%E8%A7%89"><span class="toc-text">6.3 直觉</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-SFT-%E4%B8%8E-DPO-%E6%A0%B9%E6%9C%AC%E5%8C%BA%E5%88%AB"><span class="toc-text">6.4 SFT 与 DPO 根本区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-5-DPO-%E6%95%B0%E5%80%BC%E7%AE%97%E4%BE%8B%EF%BC%9A%E4%BB%8E%E5%9B%9B%E4%B8%AA%E5%BA%8F%E5%88%97%E5%88%86%E6%95%B0%E5%88%B0-loss"><span class="toc-text">6.5 DPO 数值算例：从四个序列分数到 loss</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E4%BB%8E%E6%9C%80%E5%A4%A7%E5%8C%96-Reward-%E5%88%B0-Policy-Gradient"><span class="toc-text">7. 从最大化 Reward 到 Policy Gradient</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0"><span class="toc-text">7.1 目标函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-Baseline-%E4%B8%8E-Advantage"><span class="toc-text">7.2 Baseline 与 Advantage</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-PPO%EF%BC%9AActor%E3%80%81Critic%E3%80%81GAE-%E4%B8%8E-Clip"><span class="toc-text">8. PPO：Actor、Critic、GAE 与 Clip</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-PPO-%E4%B8%AD%E7%9A%84%E6%A8%A1%E5%9E%8B%E8%A7%92%E8%89%B2"><span class="toc-text">8.1 PPO 中的模型角色</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-TD-error-%E4%B8%8E-GAE"><span class="toc-text">8.2 TD error 与 GAE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-Importance-ratio"><span class="toc-text">8.3 Importance ratio</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-4-PPO-clipped-objective"><span class="toc-text">8.4 PPO clipped objective</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-5-PPO-%E5%8D%95-token-%E6%95%B0%E5%80%BC%E7%AE%97%E4%BE%8B"><span class="toc-text">8.5 PPO 单 token 数值算例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-6-GAE-%E4%B8%89%E6%AD%A5%E6%89%8B%E7%AE%97"><span class="toc-text">8.6 GAE 三步手算</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-GRPO%EF%BC%9A%E7%94%A8%E5%90%8C%E7%BB%84%E7%9B%B8%E5%AF%B9%E6%88%90%E7%BB%A9%E6%9B%BF%E4%BB%A3-Critic"><span class="toc-text">9. GRPO：用同组相对成绩替代 Critic</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-1-%E5%90%8C%E9%A2%98%E7%94%9F%E6%88%90%E4%B8%80%E7%BB%84%E5%9B%9E%E7%AD%94"><span class="toc-text">9.1 同题生成一组回答</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-GRPO-%E4%BB%8D%E7%84%B6%E8%AE%A1%E7%AE%97-token-loss"><span class="toc-text">9.2 GRPO 仍然计算 token loss</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-Tool-Calling-%E5%A4%96%E9%83%A8%E5%BE%AA%E7%8E%AF%E5%AE%8C%E6%95%B4%E6%95%B0%E6%8D%AE%E6%B5%81"><span class="toc-text">10. Tool Calling 外部循环完整数据流</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-%E7%AC%AC%E4%B8%80%E8%BD%AE"><span class="toc-text">10.1 第一轮</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-Parser-%E4%B8%8E-Executor"><span class="toc-text">10.2 Parser 与 Executor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-3-%E5%9B%9E%E5%A1%AB%E4%B8%8E%E7%AC%AC%E4%BA%8C%E8%BD%AE"><span class="toc-text">10.3 回填与第二轮</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-4-%E6%9C%80%E5%A4%A7%E8%BD%AE%E6%95%B0"><span class="toc-text">10.4 最大轮数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-Agent-RL%EF%BC%9A%E6%8A%8A%E5%B7%A5%E5%85%B7%E7%8E%AF%E5%A2%83%E6%94%BE%E8%BF%9B%E5%9C%A8%E7%BA%BF-Rollout"><span class="toc-text">11. Agent RL：把工具环境放进在线 Rollout</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-1-%E7%8A%B6%E6%80%81%E3%80%81%E5%8A%A8%E4%BD%9C%E3%80%81%E8%A7%82%E5%AF%9F%E4%B8%8E%E8%BD%A8%E8%BF%B9"><span class="toc-text">11.1 状态、动作、观察与轨迹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-2-Action-mask"><span class="toc-text">11.2 Action mask</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-3-Reward-%E4%B8%8D%E6%98%AF-loss"><span class="toc-text">11.3 Reward 不是 loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-4-%E6%9C%AC%E9%A1%B9%E7%9B%AE-v1-%E7%9A%84%E5%A5%96%E5%8A%B1%E6%BC%8F%E6%B4%9E"><span class="toc-text">11.4 本项目 v1 的奖励漏洞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-5-%E4%BB%8E%E8%BD%A8%E8%BF%B9-reward-%E5%88%B0%E9%80%90-token-loss"><span class="toc-text">11.5 从轨迹 reward 到逐 token loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-6-%E4%B8%BA%E4%BB%80%E4%B9%88-Agent-RL-%E6%85%A2"><span class="toc-text">11.6 为什么 Agent RL 慢</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-7-%E4%B8%80%E6%9D%A1-Agent-RL-%E6%A0%B7%E6%9C%AC%E5%9C%A8%E4%BB%A3%E7%A0%81%E4%B8%AD%E7%9A%84%E7%B2%BE%E7%A1%AE%E5%AF%B9%E8%B1%A1%E5%8F%98%E5%8C%96"><span class="toc-text">11.7 一条 Agent RL 样本在代码中的精确对象变化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-8-CISPO-%E4%B8%8E%E6%A0%87%E5%87%86-PPO-x2F-GRPO-clip-%E7%9A%84%E4%BB%A3%E7%A0%81%E5%B7%AE%E5%BC%82"><span class="toc-text">11.8 CISPO 与标准 PPO&#x2F;GRPO clip 的代码差异</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-9-%E5%BB%B6%E8%BF%9F%E5%A5%96%E5%8A%B1%E4%B8%8E%E4%BF%A1%E7%94%A8%E5%88%86%E9%85%8D%E9%99%90%E5%88%B6"><span class="toc-text">11.9 延迟奖励与信用分配限制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-%E4%BA%94%E7%A7%8D%E8%AE%AD%E7%BB%83%E6%96%B9%E6%B3%95%E7%BB%9F%E4%B8%80%E5%AF%B9%E7%85%A7"><span class="toc-text">12. 五种训练方法统一对照</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-%E7%8B%AC%E7%AB%8B%E8%AE%AD%E7%BB%83%E5%BF%85%E9%A1%BB%E6%8E%8C%E6%8F%A1%E7%9A%84%E5%B7%A5%E7%A8%8B%E9%97%AD%E7%8E%AF"><span class="toc-text">13. 独立训练必须掌握的工程闭环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#13-1-%E8%AE%AD%E7%BB%83%E5%89%8D%E5%BF%85%E9%A1%BB%E5%9B%9E%E7%AD%94-12-%E4%B8%AA%E9%97%AE%E9%A2%98"><span class="toc-text">13.1 训练前必须回答 12 个问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-2-Effective-batch-size"><span class="toc-text">13.2 Effective batch size</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-3-%E4%B8%8D%E8%83%BD%E5%8F%AA%E7%9C%8B-loss"><span class="toc-text">13.3 不能只看 loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-4-%E6%9C%AC%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E9%97%B8%E9%97%A8"><span class="toc-text">13.4 本项目发布闸门</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-5-3090-Ti-%E7%8B%AC%E7%AB%8B%E8%AE%AD%E7%BB%83%E7%9A%84%E5%AE%89%E5%85%A8%E6%AD%A5%E9%AA%A4"><span class="toc-text">13.5 3090 Ti 独立训练的安全步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-6-%E6%97%A5%E5%BF%97%E6%95%85%E9%9A%9C%E8%AF%8A%E6%96%AD%E6%A0%91"><span class="toc-text">13.6 日志故障诊断树</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Loss-%E5%8F%98%E6%88%90-NaN"><span class="toc-text">Loss 变成 NaN</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Reward-%E4%B8%8A%E5%8D%87%E3%80%81%E5%B7%A5%E5%85%B7%E6%88%90%E5%8A%9F%E7%8E%87%E4%B8%8B%E9%99%8D"><span class="toc-text">Reward 上升、工具成功率下降</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Loss-%E9%99%8D%E5%BE%97%E5%BE%88%E5%BF%AB%E3%80%81%E6%B5%8B%E8%AF%95%E4%B8%8D%E6%8F%90%E5%8D%87"><span class="toc-text">Loss 降得很快、测试不提升</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E4%BC%9A%E8%B0%83%E7%94%A8%E5%B7%A5%E5%85%B7%EF%BC%8C%E4%BD%86%E6%9C%80%E7%BB%88%E7%AD%94%E6%A1%88%E4%B8%8D%E7%94%A8%E7%BB%93%E6%9E%9C"><span class="toc-text">模型会调用工具，但最终答案不用结果</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-7-Checkpoint%E3%80%81Resume-%E4%B8%8E-Production-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">13.7 Checkpoint、Resume 与 Production 的区别</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-%E9%AB%98%E9%A2%91%E9%9D%A2%E8%AF%95%E9%97%AE%E9%A2%98%E4%B8%8E%E5%90%88%E6%A0%BC%E5%9B%9E%E7%AD%94%E9%AA%A8%E6%9E%B6"><span class="toc-text">14. 高频面试问题与合格回答骨架</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#14-1-%E2%80%9CTool-Calling-%E6%98%AF%E6%A8%A1%E5%9E%8B%E6%89%A7%E8%A1%8C%E5%B7%A5%E5%85%B7%E5%90%97%EF%BC%9F%E2%80%9D"><span class="toc-text">14.1 “Tool Calling 是模型执行工具吗？”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#14-2-%E2%80%9C%E5%B7%A5%E5%85%B7%E9%80%89%E6%8B%A9%E6%98%AF%E8%B0%81%E5%81%9A%E7%9A%84%EF%BC%9F%E2%80%9D"><span class="toc-text">14.2 “工具选择是谁做的？”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#14-3-%E2%80%9CTool-call-token-%E6%98%AF%E5%90%A6%E8%AE%A1%E7%AE%97-loss%EF%BC%9F%E2%80%9D"><span class="toc-text">14.3 “Tool-call token 是否计算 loss？”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#14-4-%E2%80%9CGRPO-%E4%B8%8E-PPO-%E6%9C%80%E5%A4%A7%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E2%80%9D"><span class="toc-text">14.4 “GRPO 与 PPO 最大区别是什么？”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#14-5-%E2%80%9CReward-%E4%B8%8A%E5%8D%87%E4%B8%BA%E4%BB%80%E4%B9%88%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%83%BD%E6%9B%B4%E5%B7%AE%EF%BC%9F%E2%80%9D"><span class="toc-text">14.5 “Reward 上升为什么模型可能更差？”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#14-6-%E2%80%9CAgent-RL-%E8%83%BD%E4%BB%8E%E9%9B%B6%E5%AD%A6%E4%BC%9A%E5%86%99-Python-%E5%87%BD%E6%95%B0%E5%90%97%EF%BC%9F%E2%80%9D"><span class="toc-text">14.6 “Agent RL 能从零学会写 Python 函数吗？”</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-%E6%9C%80%E7%BB%88%E9%97%AD%E5%8D%B7%E5%A4%8D%E8%BF%B0%E6%A8%A1%E6%9D%BF"><span class="toc-text">15. 最终闭卷复述模板</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#16-%E4%B8%BB%E6%95%99%E6%9D%90%E4%B8%8E%E9%A1%B9%E7%9B%AE%E6%96%87%E4%BB%B6%E6%98%A0%E5%B0%84"><span class="toc-text">16. 主教材与项目文件映射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-%E6%8E%8C%E6%8F%A1%E6%A3%80%E6%9F%A5%E9%A2%98"><span class="toc-text">17. 掌握检查题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#18-%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E8%AE%AD%E7%BB%83-Step-%E7%9A%84%E7%BB%9F%E4%B8%80%E4%BC%AA%E4%BB%A3%E7%A0%81"><span class="toc-text">18. 一次完整训练 Step 的统一伪代码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#18-1-SFT"><span class="toc-text">18.1 SFT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#18-2-DPO"><span class="toc-text">18.2 DPO</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#18-3-PPO"><span class="toc-text">18.3 PPO</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#18-4-GRPO-x2F-Agent-RL"><span class="toc-text">18.4 GRPO &#x2F; Agent RL</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-%E4%B8%80%E6%9D%A1-Agent-RL-%E8%BD%A8%E8%BF%B9%E4%BB%8E%E6%96%87%E6%9C%AC%E5%88%B0-Loss-%E7%9A%84%E6%80%BB%E7%AE%97%E4%BE%8B"><span class="toc-text">19. 一条 Agent RL 轨迹从文本到 Loss 的总算例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#19-1-%E5%88%9D%E5%A7%8B%E6%95%B0%E6%8D%AE"><span class="toc-text">19.1 初始数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#19-2-%E7%AC%AC%E4%B8%80%E8%BD%AE%E5%8A%A8%E4%BD%9C"><span class="toc-text">19.2 第一轮动作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#19-3-%E7%8E%AF%E5%A2%83%E8%A7%82%E5%AF%9F"><span class="toc-text">19.3 环境观察</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#19-4-%E7%AC%AC%E4%BA%8C%E8%BD%AE%E5%8A%A8%E4%BD%9C"><span class="toc-text">19.4 第二轮动作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#19-5-%E5%90%8C%E9%A2%98%E5%9B%9B%E6%9D%A1%E8%BD%A8%E8%BF%B9"><span class="toc-text">19.5 同题四条轨迹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#19-6-%E8%BD%A8%E8%BF%B9-1-%E6%9F%90%E4%B8%AA%E5%B7%A5%E5%85%B7%E5%90%8D-token-%E7%9A%84%E6%A6%82%E7%8E%87"><span class="toc-text">19.6 轨迹 1 某个工具名 token 的概率</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Ratio"><span class="toc-text">Ratio</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#KL-%E8%BF%91%E4%BC%BC%E9%A1%B9"><span class="toc-text">KL 近似项</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CISPO-token-loss"><span class="toc-text">CISPO token loss</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#19-7-%E4%BB%8E-49-%E4%B8%AA-token-%E5%88%B0%E4%B8%80%E4%B8%AA%E8%BD%A8%E8%BF%B9-loss"><span class="toc-text">19.7 从 49 个 token 到一个轨迹 loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#19-8-%E8%BF%99%E6%9D%A1%E7%AE%97%E4%BE%8B%E7%9A%84%E8%AF%81%E6%8D%AE%E8%BE%B9%E7%95%8C"><span class="toc-text">19.8 这条算例的证据边界</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#20-%E6%9C%AF%E8%AF%AD%E8%A1%A8%EF%BC%9A%E5%BF%85%E9%A1%BB%E8%83%BD%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E8%AF%9D%E8%A7%A3%E9%87%8A"><span class="toc-text">20. 术语表：必须能用自己的话解释</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

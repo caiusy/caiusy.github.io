@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">PPO 中 Actor、Critic、Reward Model 与 Reference Model 的角色</title>
+  <desc id="desc">四个角色围绕同一条 rollout 轨迹协作，Actor 与 Critic 可训练，Reward 与 Reference 冻结。</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#17304c" stroke-width="1"/></pattern>
+    <marker id="arr" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M0 0L11 5.5L0 11Z" fill="context-stroke"/></marker>
+    <style>.title{font:700 42px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#f3f8ff}.sub{font:400 20px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#9db3cb}.h{font:700 29px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#f3f8ff}.tag{font:700 16px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}.t{font:500 19px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#c0d4e8}.mono{font:500 17px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#9db3cb}.line{fill:none;stroke-width:4;marker-end:url(#arr)}</style>
+  </defs>
+  <rect width="1600" height="900" fill="#081526"/><rect width="1600" height="900" fill="url(#grid)" opacity=".55"/>
+  <text x="80" y="80" class="title">PPO 的四个角色：谁生成、谁估值、谁评分、谁约束？</text>
+  <text x="80" y="118" class="sub">不要把 Critic 当 Reward Model，也不要把 Reference 当 old policy</text>
+
+  <g transform="translate(90 180)"><rect width="570" height="230" rx="22" fill="#0d2138" stroke="#42d3ff" stroke-width="3"/>
+    <text x="28" y="52" class="h">Actor · 策略模型</text><rect x="420" y="22" width="120" height="34" rx="17" fill="#123c54"/><text x="450" y="45" class="tag" fill="#42d3ff">可训练</text>
+    <text x="28" y="98" class="t">职责：根据前文选择下一个 token</text><text x="28" y="137" class="mono">logits [B,L,6400] → logps [B,R]</text>
+    <text x="28" y="182" class="t" fill="#42d3ff">输出 rollout，并接受 clipped policy loss</text>
+  </g>
+  <g transform="translate(940 180)"><rect width="570" height="230" rx="22" fill="#0d2138" stroke="#58e0b5" stroke-width="3"/>
+    <text x="28" y="52" class="h">Critic · 价值模型</text><rect x="420" y="22" width="120" height="34" rx="17" fill="#173e39"/><text x="450" y="45" class="tag" fill="#58e0b5">可训练</text>
+    <text x="28" y="98" class="t">职责：预测当前状态未来总回报</text><text x="28" y="137" class="mono">value_head → values [B,R]</text>
+    <text x="28" y="182" class="t" fill="#58e0b5">returns 是目标，不负责选择 token</text>
+  </g>
+  <g transform="translate(90 545)"><rect width="570" height="230" rx="22" fill="#0d2138" stroke="#ffbe55" stroke-width="3"/>
+    <text x="28" y="52" class="h">Reward Model · 评分器</text><rect x="420" y="22" width="120" height="34" rx="17" fill="#47371f"/><text x="460" y="45" class="tag" fill="#ffbe55">冻结</text>
+    <text x="28" y="98" class="t">职责：回答完成后给整条轨迹打分</text><text x="28" y="137" class="mono">rule reward + RM score → reward [B]</text>
+    <text x="28" y="182" class="t" fill="#ffbe55">不是逐 token value，也不参与 GAE 前向</text>
+  </g>
+  <g transform="translate(940 545)"><rect width="570" height="230" rx="22" fill="#0d2138" stroke="#a88bff" stroke-width="3"/>
+    <text x="28" y="52" class="h">Reference · 参考策略</text><rect x="420" y="22" width="120" height="34" rx="17" fill="#342a4f"/><text x="460" y="45" class="tag" fill="#a88bff">冻结</text>
+    <text x="28" y="98" class="t">职责：提供稳定的语言行为锚点</text><text x="28" y="137" class="mono">ref_logps [B,R] → KL penalty</text>
+    <text x="28" y="182" class="t" fill="#a88bff">防止 Actor 为追 reward 跑偏</text>
+  </g>
+
+  <g transform="translate(585 405)"><rect width="430" height="130" rx="65" fill="#122b46" stroke="#f3f8ff" stroke-width="2"/>
+    <text x="74" y="50" class="h">同一条 Rollout 轨迹</text><text x="88" y="88" class="mono">prompt + completion [B,P+R]</text>
+  </g>
+  <path class="line" d="M660 330C760 340 770 370 790 405" stroke="#42d3ff"/><path class="line" d="M940 330C850 340 835 370 820 405" stroke="#58e0b5"/>
+  <path class="line" d="M660 650C760 620 775 560 795 535" stroke="#ffbe55"/><path class="line" d="M940 650C850 620 835 560 815 535" stroke="#a88bff"/>
+  <rect x="520" y="808" width="560" height="54" rx="27" fill="#251b30" stroke="#ff6f7d"/>
+  <text x="575" y="843" class="t" fill="#ff6f7d">old policy = rollout 时保存的 old_logps ≠ Reference</text>
+</svg>

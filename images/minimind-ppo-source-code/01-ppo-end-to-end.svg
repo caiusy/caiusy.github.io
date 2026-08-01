@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">MiniMind PPO 从 JSONL 到 Total Loss 的完整数据流</title>
+  <desc id="desc">展示真实样本经过 prompt、rollout、reward、Critic、GAE 和 PPO loss 的张量维度变化。</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#17304c" stroke-width="1"/></pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#42d3ff"/></marker>
+    <style>
+      .title{font:700 42px -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;fill:#f3f8ff}.sub{font:400 20px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#9db3cb}.h{font:700 23px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#f3f8ff}.t{font:500 17px ui-monospace,SFMono-Regular,Menlo,"PingFang SC",monospace;fill:#bcd0e5}.small{font:500 15px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#8fa9c2}.box{fill:#0d2138;stroke:#2f5879;stroke-width:2}.arrow{fill:none;stroke:#42d3ff;stroke-width:4;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#081526"/><rect width="1600" height="900" fill="url(#grid)" opacity=".55"/>
+  <text x="80" y="80" class="title">一条 JSONL，如何走到 PPO Total Loss？</text>
+  <text x="80" y="118" class="sub">MiniMind 真实样本：B=1 · P=561 · R=106 · L=667 · H=768 · V=6400</text>
+
+  <g transform="translate(70 190)">
+    <rect class="box" width="210" height="170" rx="18" stroke="#42d3ff"/>
+    <text x="24" y="42" class="h">① JSONL</text><text x="24" y="78" class="t">conversations</text>
+    <text x="24" y="108" class="small">末尾空 assistant</text><text x="24" y="136" class="small">conversations[:-1]</text>
+  </g>
+  <path class="arrow" d="M290 275H350"/>
+  <g transform="translate(365 190)">
+    <rect class="box" width="220" height="170" rx="18" stroke="#42d3ff"/>
+    <text x="24" y="42" class="h">② Prompt</text><text x="24" y="78" class="t">tokenizer + pad</text>
+    <text x="24" y="112" class="t" fill="#42d3ff">[1, 561]</text><text x="24" y="140" class="small">完整多轮历史</text>
+  </g>
+  <path class="arrow" d="M595 275H655"/>
+  <g transform="translate(670 165)">
+    <rect class="box" width="280" height="220" rx="18" stroke="#42d3ff"/>
+    <text x="24" y="44" class="h">③ Actor Rollout</text>
+    <text x="24" y="82" class="t">output_ids</text><text x="180" y="82" class="t" fill="#42d3ff">[1,667]</text>
+    <text x="24" y="118" class="t">completion</text><text x="180" y="118" class="t" fill="#42d3ff">[1,106]</text>
+    <text x="24" y="154" class="t">old_logps</text><text x="180" y="154" class="t" fill="#42d3ff">[1,106]</text>
+    <text x="24" y="190" class="small">无梯度 · 含首个 EOS</text>
+  </g>
+
+  <path class="arrow" d="M960 230H1025"/>
+  <g transform="translate(1040 150)">
+    <rect class="box" width="230" height="160" rx="18" stroke="#ffbe55"/>
+    <text x="22" y="42" class="h">④ Reward</text><text x="22" y="80" class="t">规则 + RM</text>
+    <text x="22" y="114" class="t" fill="#ffbe55">rewards [1]</text><text x="22" y="140" class="small">规则部分 = 1.75</text>
+  </g>
+  <path class="arrow" d="M960 330H1025" stroke="#58e0b5"/>
+  <g transform="translate(1040 330)">
+    <rect class="box" width="230" height="145" rx="18" stroke="#58e0b5"/>
+    <text x="22" y="42" class="h">⑤ Old Critic</text><text x="22" y="82" class="t" fill="#58e0b5">values [1,106]</text>
+    <text x="22" y="114" class="small">一次并行前向</text>
+  </g>
+
+  <path class="arrow" d="M1270 230H1300V490H1130V510" stroke="#ffbe55"/>
+  <path class="arrow" d="M1155 475V510" stroke="#58e0b5"/>
+  <g transform="translate(1040 515)">
+    <rect class="box" width="400" height="190" rx="18" stroke="#ff6f7d"/>
+    <text x="24" y="44" class="h">⑥ TD + GAE</text>
+    <text x="24" y="82" class="t">token_rewards</text><text x="220" y="82" class="t" fill="#ffbe55">[1,106]</text>
+    <text x="24" y="118" class="t">advantages</text><text x="220" y="118" class="t" fill="#ff6f7d">[1,106]</text>
+    <text x="24" y="154" class="t">returns</text><text x="220" y="154" class="t" fill="#58e0b5">[1,106]</text>
+  </g>
+  <path class="arrow" d="M1030 610H940"/>
+  <g transform="translate(600 515)">
+    <rect class="box" width="320" height="190" rx="18" stroke="#a88bff"/>
+    <text x="22" y="44" class="h">⑦ PPO Update</text>
+    <text x="22" y="82" class="t">Actor clipped loss</text>
+    <text x="22" y="116" class="t">Reference KL</text>
+    <text x="22" y="150" class="t">Critic value loss</text>
+  </g>
+  <path class="arrow" d="M590 610H500"/>
+  <g transform="translate(140 535)">
+    <rect width="340" height="150" rx="24" fill="#251b30" stroke="#ff6f7d" stroke-width="3" filter="url(#glow)"/>
+    <text x="30" y="55" class="h">⑧ Total Loss</text><text x="30" y="103" class="t" fill="#ff6f7d">scalar [] → backward()</text>
+  </g>
+  <text x="80" y="820" class="sub">关键：序列对象保持 [B,R] 到逐 token loss；只有经过 response mask 聚合后才变成标量。</text>
+</svg>

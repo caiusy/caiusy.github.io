@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">GAE 如何把终局奖励分配给更早 token</title>
+  <desc id="desc">三 token 手算展示 TD residual、GAE advantages 和 returns。</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#17304c" stroke-width="1"/></pattern>
+    <marker id="back" markerWidth="13" markerHeight="13" refX="11" refY="6.5" orient="auto"><path d="M13 0L0 6.5L13 13Z" fill="#ff6f7d"/></marker>
+    <style>.title{font:700 42px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#f3f8ff}.sub{font:400 20px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#9db3cb}.h{font:700 25px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#f3f8ff}.t{font:500 19px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#bfd2e6}.mono{font:600 19px ui-monospace,SFMono-Regular,Menlo,"PingFang SC",monospace;fill:#f3f8ff}.small{font:500 16px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#91a9c0}</style>
+  </defs>
+  <rect width="1600" height="900" fill="#081526"/><rect width="1600" height="900" fill="url(#grid)" opacity=".55"/>
+  <text x="80" y="80" class="title">GAE：把最后得到的奖励，分给更早做出的 token 决策</text>
+  <text x="80" y="118" class="sub">三 token 手算 · γ=1.0 · λ=0.95 · 从后向前只是 O(BR) Tensor 递推</text>
+
+  <g transform="translate(160 190)"><rect width="340" height="230" rx="24" fill="#0d2138" stroke="#42d3ff" stroke-width="3"/>
+    <text x="28" y="48" class="h">token t0</text><text x="28" y="90" class="mono">reward = 0.0</text><text x="28" y="128" class="mono">V0 = 0.2</text>
+    <text x="28" y="172" class="mono" fill="#42d3ff">delta0 = 0.1</text><text x="28" y="208" class="small">最早的生成决策</text>
+  </g>
+  <g transform="translate(630 190)"><rect width="340" height="230" rx="24" fill="#0d2138" stroke="#42d3ff" stroke-width="3"/>
+    <text x="28" y="48" class="h">token t1</text><text x="28" y="90" class="mono">reward = 0.0</text><text x="28" y="128" class="mono">V1 = 0.3</text>
+    <text x="28" y="172" class="mono" fill="#42d3ff">delta1 = 0.1</text><text x="28" y="208" class="small">中间生成决策</text>
+  </g>
+  <g transform="translate(1100 190)"><rect width="340" height="230" rx="24" fill="#2b271d" stroke="#ffbe55" stroke-width="3"/>
+    <text x="28" y="48" class="h">token t2 · terminal</text><text x="28" y="90" class="mono" fill="#ffbe55">reward = 1.0</text><text x="28" y="128" class="mono">V2 = 0.4</text>
+    <text x="28" y="172" class="mono" fill="#ffbe55">delta2 = 0.6</text><text x="28" y="208" class="small">next value = 0</text>
+  </g>
+
+  <path d="M1110 455C970 520 875 520 820 455" fill="none" stroke="#ff6f7d" stroke-width="5" marker-end="url(#back)"/>
+  <text x="900" y="505" class="mono" fill="#ff6f7d">× gamma·lambda = 0.95</text>
+  <path d="M640 455C500 520 405 520 350 455" fill="none" stroke="#ff6f7d" stroke-width="5" marker-end="url(#back)"/>
+  <text x="430" y="505" class="mono" fill="#ff6f7d">× gamma·lambda = 0.95</text>
+
+  <g transform="translate(125 560)"><rect width="420" height="175" rx="20" fill="#12283d" stroke="#42d3ff" stroke-width="2"/>
+    <text x="24" y="43" class="h">TD residual</text><text x="24" y="82" class="mono">delta_t = r_t + gamma·V_next − V_t</text>
+    <text x="24" y="126" class="t">一步目标 − Critic 原预测</text><text x="24" y="154" class="small">delta &gt; 0：原来低估了状态</text>
+  </g>
+  <g transform="translate(590 560)"><rect width="420" height="175" rx="20" fill="#2a1d30" stroke="#ff6f7d" stroke-width="2"/>
+    <text x="24" y="43" class="h">GAE advantage</text><text x="24" y="82" class="mono">A_t = delta_t + gamma·lambda·A_next</text>
+    <text x="24" y="122" class="mono" fill="#ff6f7d">[0.7365, 0.6700, 0.6000]</text><text x="24" y="152" class="small">标准化后作为 Actor 权重</text>
+  </g>
+  <g transform="translate(1055 560)"><rect width="420" height="175" rx="20" fill="#17302d" stroke="#58e0b5" stroke-width="2"/>
+    <text x="24" y="43" class="h">Returns · Critic 目标</text><text x="24" y="82" class="mono">Return_t = A_t(raw) + V_t</text>
+    <text x="24" y="122" class="mono" fill="#58e0b5">[0.9365, 0.9700, 1.0000]</text><text x="24" y="152" class="small">这是 Critic label</text>
+  </g>
+  <text x="170" y="820" class="sub">终局 reward 没有凭空复制：它通过 TD residual 与 γλ 衰减，完成逐 token 信用分配。</text>
+</svg>

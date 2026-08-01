@@ -1,0 +1,1528 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss - Caius Lu</title>
+
+  
+    <meta name="description" content="从 MiniMind 的真实 RLAIFDataset 样本出发，逐步追踪 prompt、rollout、old log probabilities、Actor-Critic、terminal reward、TD residual、GAE、returns，以及 PPO clipped actor&#x2F;critic loss 的来源、维度与代码位置。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss">
+<meta property="og:url" content="https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="从 MiniMind 的真实 RLAIFDataset 样本出发，逐步追踪 prompt、rollout、old log probabilities、Actor-Critic、terminal reward、TD residual、GAE、returns，以及 PPO clipped actor&#x2F;critic loss 的来源、维度与代码位置。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-08-01T15:19:00.000Z">
+<meta property="article:modified_time" content="2026-08-01T15:19:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="MiniMind">
+<meta property="article:tag" content="PPO">
+<meta property="article:tag" content="RLHF">
+<meta property="article:tag" content="Actor-Critic">
+<meta property="article:tag" content="GAE">
+<meta property="article:tag" content="RLAIF">
+<meta property="article:tag" content="LLM-Alignment">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="MiniMind,PPO,RLHF,Actor-Critic,GAE,RLAIF,LLM-Alignment">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-08-01T23:19:00+08:00","dateModified":"2026-08-01T23:19:00+08:00","datePublished":"2026-08-01T23:19:00+08:00","description":"PPO 最难的地方，往往不是把公式背下来，而是回答这些看似简单的问题：\nprompt 到底包含什么？output_ids 和 completion_ids 有什么区别？old_logp 从哪来？Critic 的 label 是 advantage 还是 returns？终局只有一个 reward，为什么最后每个 token 都能获得学习信号？\n这篇文章不从抽象强化学习符号开始，而是沿着 MiniMind 的真实 PPO 代码走一遍：拿一条 rlaif.jsonl 样本，追踪它如何变成 [1,561] 的 prompt，如何生成 [1,106] 的 completion，最后如何汇入一个标量 total loss。","headline":"MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/","keywords":"MiniMind, PPO, RLHF, Actor-Critic, GAE, RLAIF, LLM-Alignment","thumbnailUrl":"/images/minimind-ppo-source-code/01-ppo-end-to-end.svg","image":1}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="deep-dive" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="Home" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:home-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="Projects" href="/projects/" style="color:#10B981"><img src="https://api.iconify.design/solar:rocket-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="BEV" href="/roadside-bev/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:camera-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="Fusion" href="/radar-camera-fusion/" style="color:#EC4899"><img src="https://api.iconify.design/solar:radar-bold-duotone.svg?color=%23EC4899"/></a><a class="nav-item" title="LLM" href="/llm-reading-map/" style="color:#8B5CF6"><img src="https://api.iconify.design/solar:atom-bold-duotone.svg?color=%238B5CF6"/></a><a class="nav-item" title="Notes" href="/notes/" style="color:#0EA5E9"><img src="https://api.iconify.design/solar:notebook-bookmark-bold-duotone.svg?color=%230EA5E9"/></a><a class="nav-item" title="Review" href="/review/" style="color:#F43F5E"><img src="https://api.iconify.design/solar:checklist-minimalistic-bold-duotone.svg?color=%23F43F5E"/></a><a class="nav-item" title="About" href="/about/" style="color:#64748B"><img src="https://api.iconify.design/solar:user-id-bold-duotone.svg?color=%2364748B"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/08/01/minimind-ppo-from-rollout-to-loss/"><span class="title">MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss</span></a><a class="item title" href="/2026/08/01/yolov10-vehicle-pose-compression/"><span class="title">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</span></a><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a><a class="item title" href="/2026/07/13/dynamic-programming-from-recursion-to-state-transition/"><span class="title">动态规划完全图解：从重复递归到状态转移</span></a><a class="item title" href="/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/"><span class="title">Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</span></a><a class="item title" href="/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"><span class="title">LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</span></a><a class="item title" href="/2019/07/26/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/"><span class="title">c++中级教程 顺序容器的定义</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/29/%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/"><span class="title">透视变换</span></a><a class="item title" href="/2019/09/07/%E7%9F%A9%E5%BD%A2%E8%A6%86%E7%9B%96/"><span class="title">矩形覆盖</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-08-01T15:19:00.000Z">2026-08-01</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-08-01T15:19:00.000Z">2026-08-01</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><p>PPO 最难的地方，往往不是把公式背下来，而是回答这些看似简单的问题：</p>
+<p><code>prompt</code> 到底包含什么？<code>output_ids</code> 和 <code>completion_ids</code> 有什么区别？<code>old_logp</code> 从哪来？Critic 的 label 是 advantage 还是 returns？终局只有一个 reward，为什么最后每个 token 都能获得学习信号？</p>
+<p>这篇文章不从抽象强化学习符号开始，而是沿着 MiniMind 的真实 PPO 代码走一遍：拿一条 <code>rlaif.jsonl</code> 样本，追踪它如何变成 <code>[1,561]</code> 的 prompt，如何生成 <code>[1,106]</code> 的 completion，最后如何汇入一个标量 total loss。</p>
+<span id="more"></span>
+
+<p><img src="/images/minimind-ppo-source-code/01-ppo-end-to-end.svg" alt="MiniMind PPO 从 JSONL、rollout、reward、GAE 到 total loss 的完整数据流"></p>
+<h2 id="先给出全局结论"><a href="#先给出全局结论" class="headerlink" title="先给出全局结论"></a>先给出全局结论</h2><p>MiniMind PPO 的主链可以压缩为一句话：</p>
+<blockquote>
+<p>Actor 对完整 prompt 在线生成 completion，并保存每个生成 token 的 old log probability；Reward 给整条回答打分，Critic 估计每个生成状态的未来回报；TD 与 GAE 将终局结果分配给每个 token，得到教 Actor 的 advantages 和教 Critic 的 returns；最后用 policy clip、Reference KL 与 value clip 限制更新幅度。</p>
+</blockquote>
+<p>本文使用的真实 rollout 维度是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">B = 1      batch size</span><br><span class="line">P = 561    padding 后的 prompt 宽度</span><br><span class="line">R = 106    completion 宽度</span><br><span class="line">L = 667    完整序列宽度，L = P + R</span><br><span class="line">H = 768    hidden size</span><br><span class="line">V = 6400   vocabulary size</span><br></pre></td></tr></tbody></table></figure>
+
+<p>主张量链如下：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">prompt_ids                    [1, 561]</span><br><span class="line">output_ids                    [1, 667]</span><br><span class="line">completion_ids                [1, 106]</span><br><span class="line">old_logps / old_values        [1, 106]</span><br><span class="line">token_rewards                 [1, 106]</span><br><span class="line">advantages / returns          [1, 106]</span><br><span class="line">actor/value token losses      [1, 106]</span><br><span class="line">total loss                    []</span><br></pre></td></tr></tbody></table></figure>
+
+<p>注意：<code>P</code> 与 <code>R</code> 是 batch Tensor 的宽度。batch 大于 1 时，每条样本的真实有效长度可以不同，padding 后才共享同一个宽度。</p>
+<h2 id="1-数据集：为什么是-conversations-1"><a href="#1-数据集：为什么是-conversations-1" class="headerlink" title="1. 数据集：为什么是 conversations[:-1]"></a>1. 数据集：为什么是 <code>conversations[:-1]</code></h2><p>MiniMind 的 <code>RLAIFDataset</code> 读取 JSONL：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">RLAIFDataset</span>(<span class="title class_ inherited__">Dataset</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, jsonl_path, tokenizer, max_length=<span class="number">1024</span>,</span></span><br><span class="line"><span class="params">                 thinking_ratio=<span class="number">0.5</span></span>):</span><br><span class="line">        self.tokenizer = tokenizer</span><br><span class="line">        self.thinking_ratio = thinking_ratio</span><br><span class="line">        self.samples = load_dataset(</span><br><span class="line">            <span class="string">"json"</span>, data_files=jsonl_path, split=<span class="string">"train"</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">create_chat_prompt</span>(<span class="params">self, conversations</span>):</span><br><span class="line">        conversations = pre_processing_chat(conversations)</span><br><span class="line">        use_thinking = random.random() &lt; self.thinking_ratio</span><br><span class="line">        <span class="keyword">return</span> self.tokenizer.apply_chat_template(</span><br><span class="line">            conversations[:-<span class="number">1</span>],</span><br><span class="line">            tokenize=<span class="literal">False</span>,</span><br><span class="line">            open_thinking=use_thinking,</span><br><span class="line">            add_generation_prompt=<span class="literal">True</span>,</span><br><span class="line">        )</span><br></pre></td></tr></tbody></table></figure>
+
+<p>真实第 0 条样本共有 6 条消息，末尾是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">assistant：这些智能家居产品需要哪些前提条件才能够使用？</span><br><span class="line">user：请回答这个问题。</span><br><span class="line">assistant：""</span><br></pre></td></tr></tbody></table></figure>
+
+<p>最后一条空 assistant 只是占位符。<code>conversations[:-1]</code> 删除它，再通过 <code>add_generation_prompt=True</code> 把生成起点放到 prompt 尾部。</p>
+<p>这一步决定了训练范式：</p>
+<ul>
+<li>如果直接把现成 assistant 答案当监督标签，接近 SFT。</li>
+<li>PPO 要让当前 Actor 在线生成新回答，再根据 reward 更新策略。</li>
+</ul>
+<h3 id="Prompt-不是最后一句用户问题"><a href="#Prompt-不是最后一句用户问题" class="headerlink" title="Prompt 不是最后一句用户问题"></a>Prompt 不是最后一句用户问题</h3><p>这里的 prompt 是前 5 条历史消息经 chat template 渲染后的完整字符串，包括多轮 user/assistant 对话、角色标记，以及新的 assistant 生成起点。</p>
+<p>固定随机种子 42、<code>thinking_ratio=0.9</code> 时，真实结果是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">prompt 字符数          991</span><br><span class="line">input_ids              [1, 561]</span><br><span class="line">attention_mask         [1, 561]</span><br><span class="line">有效 prompt token      561</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因此，“prompt 是什么”与“最后一个 user message 是什么”是两个问题。最后一句用户消息只是完整 prompt 的最后一部分。</p>
+<h3 id="数据增强发生在哪里"><a href="#数据增强发生在哪里" class="headerlink" title="数据增强发生在哪里"></a>数据增强发生在哪里</h3><p>这条数据路径有两类随机变化：</p>
+<ol>
+<li>首条消息不是 system 时，预处理约有 20% 概率补一个中英文 system prompt。</li>
+<li><code>thinking_ratio</code> 控制是否使用 open-thinking generation prompt；本文配置为 0.9。</li>
+</ol>
+<p>源码中虽然还有 <code>post_processing_chat()</code>，但它没有被这条 <code>RLAIFDataset</code> 路径调用，不能把其中的规则算到 PPO 数据增强里。</p>
+<h3 id="Batch-padding-的维度"><a href="#Batch-padding-的维度" class="headerlink" title="Batch padding 的维度"></a>Batch padding 的维度</h3><p>真实样本 0 和 1 的 prompt 长度分别是 561 与 470。组成 <code>B=2</code> 的 batch 并左填充后：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">input_ids              [2, 561]</span><br><span class="line">attention_mask         [2, 561]</span><br><span class="line">sample 0               [真实 token × 561]</span><br><span class="line">sample 1               [PAD × 91] [真实 token × 470]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>input_ids</code> 存 token ID，<code>attention_mask</code> 用 1 标记有效 token、0 标记 padding。</p>
+<h2 id="2-Actor、Critic、Reward、Reference-到底是谁"><a href="#2-Actor、Critic、Reward、Reference-到底是谁" class="headerlink" title="2. Actor、Critic、Reward、Reference 到底是谁"></a>2. Actor、Critic、Reward、Reference 到底是谁</h2><p>PPO 同时出现多个模型，很容易把职责混在一起。</p>
+<p><img src="/images/minimind-ppo-source-code/02-actor-critic-roles.svg" alt="PPO 中 Actor、Critic、Reward Model 与 Reference Model 的角色分工"></p>
+<h3 id="Actor：负责选择下一个-token"><a href="#Actor：负责选择下一个-token" class="headerlink" title="Actor：负责选择下一个 token"></a>Actor：负责选择下一个 token</h3><p>Actor 就是正在训练的因果语言模型策略。给定当前前缀状态，它输出词表 logits，再经 softmax 得到下一个 token 的条件概率。</p>
+
+$$
+\pi_{\theta}(a_t\mid s_t)
+=
+P_{\theta}(\text{next token}=a_t\mid\text{prefix}=s_t)
+$$
+
+
+<p>MiniMind 的词表大小为 6400，因此完整 Actor logits 为：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hidden states           [B, L, 768]</span><br><span class="line">Actor logits            [B, L, 6400]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="Critic：不选-token，只估计未来回报"><a href="#Critic：不选-token，只估计未来回报" class="headerlink" title="Critic：不选 token，只估计未来回报"></a>Critic：不选 token，只估计未来回报</h3><p>MiniMind 的 Critic 继承同类 Transformer 主干，并新增一个 value head：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CriticModel</span>(<span class="title class_ inherited__">MiniMindForCausalLM</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, params</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__(params)</span><br><span class="line">        self.value_head = nn.Linear(params.hidden_size, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, input_ids=<span class="literal">None</span>, attention_mask=<span class="literal">None</span>, **kwargs</span>):</span><br><span class="line">        outputs = self.model(</span><br><span class="line">            input_ids=input_ids,</span><br><span class="line">            attention_mask=attention_mask,</span><br><span class="line">            **kwargs,</span><br><span class="line">        )</span><br><span class="line">        hidden_states = self.model.norm(outputs[<span class="number">0</span>])</span><br><span class="line">        values = self.value_head(hidden_states).squeeze(-<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></tbody></table></figure>
+
+<p>继承来的 LM head 没有被物理删除，但 Critic forward 使用新增的 <code>value_head</code>，每个位置只输出一个 value：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hidden states           [B, L, 768]</span><br><span class="line">value_head output       [B, L, 1]</span><br><span class="line">squeeze                 [B, L]</span><br><span class="line">response values         [B, R]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="Reward-Model：回答完成后给整条轨迹评分"><a href="#Reward-Model：回答完成后给整条轨迹评分" class="headerlink" title="Reward Model：回答完成后给整条轨迹评分"></a>Reward Model：回答完成后给整条轨迹评分</h3><p>Reward Model 与 Critic 不是同一个模型。</p>
+<ul>
+<li>Reward 在回答结束后输出整条回答的分数 <code>rewards [B]</code>。</li>
+<li>Critic 在每个生成状态输出价值预测 <code>values [B,R]</code>。</li>
+</ul>
+<p>MiniMind 还叠加了长度、thinking 格式与重复惩罚。若回答包含 <code>&lt;/think&gt;</code>，规则奖励检查较完整的 response，而 Reward Model 只接收 prompt 加 <code>&lt;/think&gt;</code> 后的 answer。两者的评分对象并不完全相同。</p>
+<h3 id="Reference-Model：防止策略为追-reward-跑偏"><a href="#Reference-Model：防止策略为追-reward-跑偏" class="headerlink" title="Reference Model：防止策略为追 reward 跑偏"></a>Reference Model：防止策略为追 reward 跑偏</h3><p>Reference 是冻结的稳定策略，输出 <code>ref_logps [B,R]</code>，用于 KL penalty。它不是 old policy。</p>
+<p>本实现没有长期维护另一套 old Actor。所谓 old policy，是 rollout 时保存下来的 <code>old_logps</code>；Reference 则是独立的冻结模型。</p>
+<h2 id="3-Rollout：prompt、output、completion-如何对齐"><a href="#3-Rollout：prompt、output、completion-如何对齐" class="headerlink" title="3. Rollout：prompt、output、completion 如何对齐"></a>3. Rollout：prompt、output、completion 如何对齐</h2><p>Torch rollout 的核心操作是：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">output_ids = model.generate(</span><br><span class="line">    input_ids=prompt_ids,</span><br><span class="line">    attention_mask=attention_mask,</span><br><span class="line">    max_new_tokens=max_new_tokens,</span><br><span class="line">    do_sample=<span class="literal">True</span>,</span><br><span class="line">    temperature=<span class="number">0.8</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">prompt_len = prompt_ids.size(<span class="number">1</span>)</span><br><span class="line">completion_ids = output_ids[:, prompt_len:]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>真实结果：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">prompt_ids             [1, 561]</span><br><span class="line">output_ids             [1, 667]</span><br><span class="line">completion_ids         [1, 106]</span><br><span class="line">old_logps              [1, 106]</span><br><span class="line">completion_mask        [1, 106]</span><br><span class="line">EOS                    completion[105]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>最重要的关系不是 Tensor 数值相加，而是沿序列维拼接：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">output_ids = concat(prompt_ids, completion_ids, dim=sequence)</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="old-logp-是怎样得到的"><a href="#old-logp-是怎样得到的" class="headerlink" title="old logp 是怎样得到的"></a>old logp 是怎样得到的</h3><p>每个生成位置原本有 6400 个候选概率。代码对完整 <code>output_ids</code> 再做 Actor forward，然后只 gather 实际生成 token 的 log probability：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">logits = model(input_ids).logits[:, :-<span class="number">1</span>, :]</span><br><span class="line">log_probs = logits.log_softmax(dim=-<span class="number">1</span>)</span><br><span class="line">selected_logps = gather(log_probs, generated_token_ids)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>维度变化：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">response logits         [B, R, V]</span><br><span class="line">generated token ids     [B, R]</span><br><span class="line">selected old logps      [B, R]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>对数概率越接近 0，原概率越大；越负，原概率越小。使用 log probability 可以把概率乘除转成加减，并提高数值稳定性。</p>
+<h3 id="为什么位置要右移一位"><a href="#为什么位置要右移一位" class="headerlink" title="为什么位置要右移一位"></a>为什么位置要右移一位</h3><p>自回归模型的 <code>logits[t]</code> 预测 <code>token[t+1]</code>。</p>
+<p>真实样本中：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">completion 位于完整序列       561 ... 666</span><br><span class="line">用于预测它的 logits/value     560 ... 665</span><br></pre></td></tr></tbody></table></figure>
+
+<p>所以：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">logits[560] 预测 completion[0]</span><br><span class="line">value[560]  表示生成 completion[0] 前的状态价值</span><br></pre></td></tr></tbody></table></figure>
+
+<p>本样本最后生成 token 恰好是 EOS，因此最后一个选中 logits 预测 EOS；如果生成因达到长度上限而停止，这条结论并不成立。</p>
+<h3 id="response-mask-是否包含-EOS"><a href="#response-mask-是否包含-EOS" class="headerlink" title="response mask 是否包含 EOS"></a>response mask 是否包含 EOS</h3><p>最终 policy/value mask 保留到第一个 EOS 为止，并且包含这个 EOS；EOS 之后与 padding 位置为 0。</p>
+<p>Torch rollout 当前先返回全 1 的 <code>completion_mask</code>，PPO 主循环随后结合 EOS 和 padding 构造真正用于 GAE 与 loss 的 <code>resp_policy_mask</code> / <code>resp_value_mask</code>。</p>
+<h3 id="一个值得保留的实现差异"><a href="#一个值得保留的实现差异" class="headerlink" title="一个值得保留的实现差异"></a>一个值得保留的实现差异</h3><p><code>generate()</code> 使用 <code>temperature=0.8</code> 采样，但保存 old logp 时对未温度化 logits 做 <code>log_softmax</code>。严格来说，保存的 old logp 不是温度化采样分布的精确 log probability，后续 ratio 也就不是生成分布与 current policy 的完全精确 importance ratio。</p>
+<p>这不影响我们读懂数据流，但在讨论“严格 on-policy”语义时不能忽略。</p>
+<h2 id="4-Reward：一个分数如何放进-106-个-token"><a href="#4-Reward：一个分数如何放进-106-个-token" class="headerlink" title="4. Reward：一个分数如何放进 106 个 token"></a>4. Reward：一个分数如何放进 106 个 token</h2><p>MiniMind 的完整终局 reward 为：</p>
+
+$$
+R_{\mathrm{final}}
+=
+R_{\mathrm{length}}
++R_{\mathrm{think}}
++R_{\mathrm{format}}
+-R_{\mathrm{repeat}}
++R_{\mathrm{RM}}
+$$
+
+
+<p>本文真实 rollout 的规则部分：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">回答长度合格           +0.50</span><br><span class="line">thinking 长度合格      +1.00</span><br><span class="line">think 格式合格         +0.25</span><br><span class="line">重复惩罚               -0.00</span><br><span class="line">规则奖励合计            1.75</span><br></pre></td></tr></tbody></table></figure>
+
+<p>再加上 Reward Model score，得到 <code>rewards [B]</code>。</p>
+<p>但 GAE 工作在逐 token 维度 <code>[B,R]</code>。代码先创建全 0 Tensor，再把整条 reward 放到最后有效 token：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">token_rewards = torch.zeros_like(old_resp_logp)</span><br><span class="line">last_idx = resp_lengths - <span class="number">1</span></span><br><span class="line">token_rewards[batch_index, last_idx] += rewards</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因此真实 shape 是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rewards                 [1]</span><br><span class="line">token_rewards           [1, 106]</span><br><span class="line">token_rewards           [0, 0, ..., 0, final_reward]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这一步必须记牢：<code>token_rewards</code> 不是 GAE 的输出，而是 GAE 的输入。</p>
+<h2 id="5-TD-residual：Critic-这一步到底估错了多少"><a href="#5-TD-residual：Critic-这一步到底估错了多少" class="headerlink" title="5. TD residual：Critic 这一步到底估错了多少"></a>5. TD residual：Critic 这一步到底估错了多少</h2><p>Bellman 一步目标是“当前 reward 加下一状态的折扣价值”：</p>
+
+$$
+\mathrm{TDTarget}_t
+=
+r_t+\gamma V_{\mathrm{old}}(s_{t+1})
+$$
+
+
+<p>用它减去 Critic 原预测，得到 TD residual：</p>
+
+$$
+\delta_t
+=
+r_t
++\gamma V_{\mathrm{old}}(s_{t+1})
+-V_{\mathrm{old}}(s_t)
+$$
+
+
+<p>各项来源：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>含义</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$r_t$</td>
+<td>当前 token reward</td>
+<td><code>token_rewards [B,R]</code></td>
+</tr>
+<tr>
+<td>$V_{\mathrm{old}}(s_t)$</td>
+<td>当前状态旧价值预测</td>
+<td>old Critic forward</td>
+</tr>
+<tr>
+<td>$V_{\mathrm{old}}(s_{t+1})$</td>
+<td>下一状态旧价值预测</td>
+<td>同一次 forward 的下一位置</td>
+</tr>
+<tr>
+<td>$\gamma$</td>
+<td>未来折扣</td>
+<td>本项目为 1.0</td>
+</tr>
+<tr>
+<td>$\delta_t$</td>
+<td>一步目标与旧预测的差</td>
+<td>GAE 的原料</td>
+</tr>
+</tbody></table>
+<p>直觉上：</p>
+<ul>
+<li><code>delta</code> 为正：看到下一状态后，发现 Critic 原来低估了当前状态。</li>
+<li><code>delta</code> 为负：Critic 原来高估了当前状态。</li>
+<li>终止位置没有下一状态，本实现令 next value 为 0。</li>
+</ul>
+<p>TD residual 来自 Bellman/时序差分框架，不是 PPO 发明的。</p>
+<h2 id="6-GAE：把终局结果传给更早-token"><a href="#6-GAE：把终局结果传给更早-token" class="headerlink" title="6. GAE：把终局结果传给更早 token"></a>6. GAE：把终局结果传给更早 token</h2><p>语言模型通常到回答结束才拿到 reward，但前面每个 token 都参与了这次结果。GAE 的作用就是信用分配。</p>
+<p><img src="/images/minimind-ppo-source-code/03-gae-credit-assignment.svg" alt="三 token 例子中 TD residual、GAE advantage 与 returns 的反向递推"></p>
+<p>GAE 的递推形式：</p>
+
+$$
+A_t
+=
+\delta_t
++\gamma\lambda A_{t+1}
+$$
+
+
+<p>展开后：</p>
+
+$$
+A_t
+=
+\delta_t
++(\gamma\lambda)\delta_{t+1}
++(\gamma\lambda)^2\delta_{t+2}
++\cdots
+$$
+
+
+<p><code>lambda</code> 控制未来 TD residual 向前传播多远：</p>
+<ul>
+<li><code>lambda=0</code>：只看当前一步，更依赖 Critic，方差低但偏差可能更高。</li>
+<li><code>lambda</code> 接近 1：终局信息传得更远，更接近完整回报，但方差可能更高。</li>
+<li>MiniMind 使用 <code>lambda=0.95</code>。</li>
+</ul>
+<h3 id="三-token-手算"><a href="#三-token-手算" class="headerlink" title="三 token 手算"></a>三 token 手算</h3><p>假设：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">token_rewards = [0.0, 0.0, 1.0]</span><br><span class="line">old_values    = [0.2, 0.3, 0.4]</span><br><span class="line">gamma         = 1.0</span><br><span class="line">lambda        = 0.95</span><br></pre></td></tr></tbody></table></figure>
+
+<p>从后向前：</p>
+
+$$
+\delta_2=1.0-0.4=0.6,
+\qquad
+A_2=0.6
+$$
+
+
+
+$$
+\delta_1=0+0.4-0.3=0.1,
+\qquad
+A_1=0.1+0.95\times0.6=0.67
+$$
+
+
+
+$$
+\delta_0=0+0.3-0.2=0.1,
+\qquad
+A_0=0.1+0.95\times0.67=0.7365
+$$
+
+
+<p>所以：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">raw_advantages = [0.7365, 0.6700, 0.6000]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Returns 由 raw advantages 与 old values 构造：</p>
+
+$$
+\mathrm{Return}_t
+=
+A_t^{\mathrm{raw}}
++V_{\mathrm{old},t}
+$$
+
+
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">returns = [0.9365, 0.9700, 1.0000]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>现在可以精确回答“label 是什么”：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">raw advantages          用来构造 returns</span><br><span class="line">normalized advantages   Actor loss 的逐 token 权重</span><br><span class="line">returns                 Critic 的训练目标，也就是 Critic label</span><br><span class="line">current values          Critic 当前预测</span><br></pre></td></tr></tbody></table></figure>
+
+<p>代码先计算 <code>returns = raw_advantages + old_values</code>，之后才标准化 advantages，因此 returns 不会受到 advantage 标准化影响。</p>
+<h3 id="从后向前会不会很慢"><a href="#从后向前会不会很慢" class="headerlink" title="从后向前会不会很慢"></a>从后向前会不会很慢</h3><p>不会。Critic 先对完整 <code>[B,P+R]</code> 序列做一次并行 forward，得到所有位置的 value。GAE 只是对已有 <code>[B,R]</code> Tensor 做一次复杂度为 <code>O(BR)</code> 的反向循环。</p>
+<p>它既不是逐 token 重跑 Critic，也不是神经网络的 <code>loss.backward()</code>。PPO 的主要计算仍在自回归生成和 Transformer 前向/反向。</p>
+<h2 id="7-PPO-Loss：三道安全闸"><a href="#7-PPO-Loss：三道安全闸" class="headerlink" title="7. PPO Loss：三道安全闸"></a>7. PPO Loss：三道安全闸</h2><p>PPO 的 loss 不是单独一个公式。MiniMind 的核心组成是 Actor clipped loss、Reference KL penalty 和 Critic clipped value loss；启用 MoE 时还会增加 auxiliary loss。</p>
+<p><img src="/images/minimind-ppo-source-code/04-ppo-losses.svg" alt="Actor clipped loss、Reference KL 和 Critic value loss 的输入、系数与约束对象"></p>
+<h3 id="7-1-Actor-clipped-loss"><a href="#7-1-Actor-clipped-loss" class="headerlink" title="7.1 Actor clipped loss"></a>7.1 Actor clipped loss</h3><p>当前策略与 old policy 对同一生成 token 的概率比：</p>
+
+$$
+\mathrm{ratio}_t
+=
+\exp\left(
+\log p_{\mathrm{current},t}
+-\log p_{\mathrm{old},t}
+\right)
+$$
+
+
+<p>注意：ratio 是 <code>[B,R]</code>，每个有效 token 一个，不是整条回答只有一个。</p>
+<p>本项目 <code>clip_epsilon=0.2</code>：</p>
+
+$$
+\mathrm{ratio}^{\mathrm{clip}}_t
+=
+\operatorname{clip}(\mathrm{ratio}_t,0.8,1.2)
+$$
+
+
+<p>逐 token Actor loss：</p>
+
+$$
+L_{\mathrm{actor},t}
+=
+\max\left(
+-A_t\,\mathrm{ratio}_t,
+-A_t\,\mathrm{ratio}^{\mathrm{clip}}_t
+\right)
+$$
+
+
+<p>正 advantage 会推动 token 概率上升，负 advantage 会推动它下降；clip 让一次更新不要走太远。</p>
+<h3 id="7-2-Reference-KL-penalty"><a href="#7-2-Reference-KL-penalty" class="headerlink" title="7.2 Reference KL penalty"></a>7.2 Reference KL penalty</h3><p>令：</p>
+
+$$
+d_t
+=
+\log p_{\mathrm{ref},t}
+-\log p_{\mathrm{current},t}
+$$
+
+
+<p>MiniMind 使用的逐 token KL 形式为：</p>
+
+$$
+L_{\mathrm{KL}}
+=
+\operatorname{masked\ mean}_t
+\left(
+\exp(d_t)-d_t-1
+\right)
+$$
+
+
+<p><code>kl_coef=0.02</code>。它不直接判断答案好坏，而是约束 Actor 不要偏离冻结 Reference 太远。</p>
+<h3 id="7-3-Critic-clipped-value-loss"><a href="#7-3-Critic-clipped-value-loss" class="headerlink" title="7.3 Critic clipped value loss"></a>7.3 Critic clipped value loss</h3><p>Critic 的目标是 returns。先计算当前 value 的普通平方误差：</p>
+
+$$
+E_{1,t}
+=
+\left(
+V_{\mathrm{current},t}
+-\mathrm{Return}_t
+\right)^2
+$$
+
+
+<p>再把当前 value 限制在 old value 附近：</p>
+
+$$
+V_{\mathrm{clip},t}
+=
+\operatorname{clip}
+\left(
+V_{\mathrm{current},t},
+V_{\mathrm{old},t}-0.2,
+V_{\mathrm{old},t}+0.2
+\right)
+$$
+
+
+
+$$
+E_{2,t}
+=
+\left(
+V_{\mathrm{clip},t}
+-\mathrm{Return}_t
+\right)^2
+$$
+
+
+<p>逐 token value loss：</p>
+
+$$
+L_{\mathrm{value},t}
+=
+\frac{1}{2}
+\max(E_{1,t},E_{2,t})
+$$
+
+
+<p>它一边拟合 returns，一边惩罚 value 相对 old prediction 一次跳太远。</p>
+<h3 id="7-4-Total-loss"><a href="#7-4-Total-loss" class="headerlink" title="7.4 Total loss"></a>7.4 Total loss</h3><p>远程实际配置：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">clip_epsilon       0.2</span><br><span class="line">cliprange_value    0.2</span><br><span class="line">kl_coef            0.02</span><br><span class="line">vf_coef            0.5</span><br><span class="line">use_moe            0</span><br></pre></td></tr></tbody></table></figure>
+
+
+$$
+L_{\mathrm{total}}
+=
+L_{\mathrm{actor}}
++0.02L_{\mathrm{KL}}
++0.5L_{\mathrm{value}}
++L_{\mathrm{MoE\ aux}}
+$$
+
+
+<p>所有 token loss 都先乘 response mask，再除以有效 token 数，从 <code>[B,R]</code> 聚合成标量 <code>[]</code>，最后执行 <code>backward()</code>。</p>
+<p><code>reward</code>、<code>token_rewards</code>、<code>advantages</code> 和 <code>returns</code> 是评分、输入、权重或目标，不是额外 loss。<code>approx_kl</code> 与 <code>clipfrac</code> 是监控/early-stop 指标，也不是 loss。</p>
+<h2 id="8-一张变量总账"><a href="#8-一张变量总账" class="headerlink" title="8. 一张变量总账"></a>8. 一张变量总账</h2><table>
+<thead>
+<tr>
+<th>变量</th>
+<th>来源</th>
+<th align="right">Shape</th>
+<th>是否有梯度</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>prompts</code></td>
+<td>RLAIFDataset</td>
+<td align="right"><code>list[str]</code></td>
+<td>否</td>
+<td>tokenizer 输入</td>
+</tr>
+<tr>
+<td><code>input_ids</code></td>
+<td>tokenizer</td>
+<td align="right"><code>[B,P]</code></td>
+<td>否</td>
+<td>rollout 输入</td>
+</tr>
+<tr>
+<td><code>output_ids</code></td>
+<td>Actor generate</td>
+<td align="right"><code>[B,P+R]</code></td>
+<td>否</td>
+<td>完整轨迹</td>
+</tr>
+<tr>
+<td><code>completion_ids</code></td>
+<td>output 切片</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>新生成 token</td>
+</tr>
+<tr>
+<td><code>old_logps</code></td>
+<td>rollout Actor</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>ratio 基准</td>
+</tr>
+<tr>
+<td><code>response_mask</code></td>
+<td>EOS + padding</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>过滤无效 token</td>
+</tr>
+<tr>
+<td><code>rewards</code></td>
+<td>规则 + RM</td>
+<td align="right"><code>[B]</code></td>
+<td>否</td>
+<td>整条回答评分</td>
+</tr>
+<tr>
+<td><code>old_values</code></td>
+<td>rollout Critic</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>GAE 与 value clip</td>
+</tr>
+<tr>
+<td><code>token_rewards</code></td>
+<td>terminal scatter</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>GAE 输入</td>
+</tr>
+<tr>
+<td><code>advantages</code></td>
+<td>GAE + 标准化</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>Actor loss 权重</td>
+</tr>
+<tr>
+<td><code>returns</code></td>
+<td>raw advantage + old value</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>Critic label</td>
+</tr>
+<tr>
+<td><code>current_logps</code></td>
+<td>current Actor</td>
+<td align="right"><code>[B,R]</code></td>
+<td>是</td>
+<td>Actor loss</td>
+</tr>
+<tr>
+<td><code>current_values</code></td>
+<td>current Critic</td>
+<td align="right"><code>[B,R]</code></td>
+<td>是</td>
+<td>value loss</td>
+</tr>
+<tr>
+<td><code>policy_loss</code></td>
+<td>Actor clip + KL</td>
+<td align="right"><code>[]</code></td>
+<td>是</td>
+<td>更新 Actor</td>
+</tr>
+<tr>
+<td><code>value_loss</code></td>
+<td>clipped value error</td>
+<td align="right"><code>[]</code></td>
+<td>是</td>
+<td>更新 Critic</td>
+</tr>
+<tr>
+<td><code>total_loss</code></td>
+<td>所有项加权</td>
+<td align="right"><code>[]</code></td>
+<td>是</td>
+<td>backward</td>
+</tr>
+</tbody></table>
+<h2 id="9-最容易混淆的十件事"><a href="#9-最容易混淆的十件事" class="headerlink" title="9. 最容易混淆的十件事"></a>9. 最容易混淆的十件事</h2><table>
+<thead>
+<tr>
+<th>误解</th>
+<th>正确结论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Prompt 只是最后一句用户问题</td>
+<td>Prompt 是 chat template 渲染后的完整多轮历史</td>
+</tr>
+<tr>
+<td>output 与 completion 相同</td>
+<td>output 是 prompt + completion；completion 只是新生成部分</td>
+</tr>
+<tr>
+<td>Actor 是另一个神秘网络</td>
+<td>Actor 就是负责生成 token 的因果语言模型</td>
+</tr>
+<tr>
+<td>Critic 与 Reward Model 相同</td>
+<td>Reward 评整条；Critic 逐状态估未来回报</td>
+</tr>
+<tr>
+<td>old policy 就是 Reference</td>
+<td>old policy 由 rollout old logps 表示；Reference 是独立冻结模型</td>
+</tr>
+<tr>
+<td>token_rewards 是 GAE 输出</td>
+<td>token_rewards 在 GAE 之前构造，是 GAE 输入</td>
+</tr>
+<tr>
+<td>advantages 是 Critic label</td>
+<td>标准化 advantages 教 Actor；returns 教 Critic</td>
+</tr>
+<tr>
+<td>代码变量 <code>labels</code> 是 Critic label</td>
+<td>它是 gather logp 用的右移 token IDs</td>
+</tr>
+<tr>
+<td>ratio 每条回答一个</td>
+<td>ratio 是 <code>[B,R]</code>，每 token 一个</td>
+</tr>
+<tr>
+<td>GAE 倒推会逐 token 跑 Critic</td>
+<td>Critic 一次并行 forward；GAE 只是 Tensor 递推</td>
+</tr>
+</tbody></table>
+<h2 id="10-推荐的源码阅读顺序"><a href="#10-推荐的源码阅读顺序" class="headerlink" title="10. 推荐的源码阅读顺序"></a>10. 推荐的源码阅读顺序</h2><p>不要从训练脚本第一行机械读到底。按对象追踪：</p>
+<ol>
+<li><code>dataset/lm_dataset.py:195-224</code>：<code>RLAIFDataset</code>、<code>conversations[:-1]</code>、chat template。</li>
+<li><code>trainer/rollout_engine.py:39-47</code>：先看 <code>RolloutResult</code> 输入输出合同。</li>
+<li><code>trainer/rollout_engine.py:71-92</code>：<code>generate()</code>、completion 切片与 decode。</li>
+<li><code>trainer/rollout_engine.py:24-36</code>：逐 token old logp 的 gather。</li>
+<li><code>trainer/train_ppo.py:84-101</code>：tokenizer、rollout 与 reward 接入。</li>
+<li><code>trainer/train_ppo.py:117-128</code>：右移、位置对齐、EOS 与 response mask。</li>
+<li><code>trainer/train_ppo.py:36-49,130-151</code>：Critic、token reward、GAE、returns。</li>
+<li><code>trainer/train_ppo.py:171-203</code>：current Actor/Critic 与三类 loss。</li>
+<li><code>trainer/train_ppo.py:208-214</code>：total loss 与 backward。</li>
+</ol>
+<p>第一次调试建议先使用只读数据流脚本，观察对象与 shape，不要直接进入包含 <code>optimizer.step()</code> 和 checkpoint 保存的完整训练入口。</p>
+<h2 id="最后总结"><a href="#最后总结" class="headerlink" title="最后总结"></a>最后总结</h2><p>PPO 可以看成两个学习问题共享同一条 rollout：</p>
+<ul>
+<li>Actor 学“哪些 token 决策值得增加或降低概率”，权重是 normalized advantages。</li>
+<li>Critic 学“当前状态未来能拿多少回报”，目标是 returns。</li>
+</ul>
+<p>终局 reward 先放到最后有效 token，TD residual 衡量 Critic 的一步预测误差，GAE 再把后续误差按 <code>gamma × lambda</code> 衰减传回更早位置。</p>
+<p>最终，Actor clip 限制策略突变，Reference KL 防止语言行为跑偏，Critic value clip 限制估值突变。所有逐 token 量保持 <code>[B,R]</code>，直到 response mask 聚合后才变成一个可执行 <code>backward()</code> 的标量 loss。</p>
+<p>如果只记一条链，请记住：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">JSONL → prompt → rollout → old logps / old values</span><br><span class="line">      → terminal reward → token_rewards</span><br><span class="line">      → TD residual → GAE</span><br><span class="line">      → advantages 教 Actor</span><br><span class="line">      → returns 教 Critic</span><br><span class="line">      → clipped losses → total loss</span><br></pre></td></tr></tbody></table></figure>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>分享文章</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;复制成功&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/08/01/yolov10-vehicle-pose-compression/">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E7%BB%99%E5%87%BA%E5%85%A8%E5%B1%80%E7%BB%93%E8%AE%BA"><span class="toc-text">先给出全局结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%95%B0%E6%8D%AE%E9%9B%86%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-conversations-1"><span class="toc-text">1. 数据集：为什么是 conversations[:-1]</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Prompt-%E4%B8%8D%E6%98%AF%E6%9C%80%E5%90%8E%E4%B8%80%E5%8F%A5%E7%94%A8%E6%88%B7%E9%97%AE%E9%A2%98"><span class="toc-text">Prompt 不是最后一句用户问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E9%87%8C"><span class="toc-text">数据增强发生在哪里</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Batch-padding-%E7%9A%84%E7%BB%B4%E5%BA%A6"><span class="toc-text">Batch padding 的维度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Actor%E3%80%81Critic%E3%80%81Reward%E3%80%81Reference-%E5%88%B0%E5%BA%95%E6%98%AF%E8%B0%81"><span class="toc-text">2. Actor、Critic、Reward、Reference 到底是谁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Actor%EF%BC%9A%E8%B4%9F%E8%B4%A3%E9%80%89%E6%8B%A9%E4%B8%8B%E4%B8%80%E4%B8%AA-token"><span class="toc-text">Actor：负责选择下一个 token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Critic%EF%BC%9A%E4%B8%8D%E9%80%89-token%EF%BC%8C%E5%8F%AA%E4%BC%B0%E8%AE%A1%E6%9C%AA%E6%9D%A5%E5%9B%9E%E6%8A%A5"><span class="toc-text">Critic：不选 token，只估计未来回报</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reward-Model%EF%BC%9A%E5%9B%9E%E7%AD%94%E5%AE%8C%E6%88%90%E5%90%8E%E7%BB%99%E6%95%B4%E6%9D%A1%E8%BD%A8%E8%BF%B9%E8%AF%84%E5%88%86"><span class="toc-text">Reward Model：回答完成后给整条轨迹评分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reference-Model%EF%BC%9A%E9%98%B2%E6%AD%A2%E7%AD%96%E7%95%A5%E4%B8%BA%E8%BF%BD-reward-%E8%B7%91%E5%81%8F"><span class="toc-text">Reference Model：防止策略为追 reward 跑偏</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Rollout%EF%BC%9Aprompt%E3%80%81output%E3%80%81completion-%E5%A6%82%E4%BD%95%E5%AF%B9%E9%BD%90"><span class="toc-text">3. Rollout：prompt、output、completion 如何对齐</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#old-logp-%E6%98%AF%E6%80%8E%E6%A0%B7%E5%BE%97%E5%88%B0%E7%9A%84"><span class="toc-text">old logp 是怎样得到的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%8D%E7%BD%AE%E8%A6%81%E5%8F%B3%E7%A7%BB%E4%B8%80%E4%BD%8D"><span class="toc-text">为什么位置要右移一位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#response-mask-%E6%98%AF%E5%90%A6%E5%8C%85%E5%90%AB-EOS"><span class="toc-text">response mask 是否包含 EOS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E5%80%BC%E5%BE%97%E4%BF%9D%E7%95%99%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%B7%AE%E5%BC%82"><span class="toc-text">一个值得保留的实现差异</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Reward%EF%BC%9A%E4%B8%80%E4%B8%AA%E5%88%86%E6%95%B0%E5%A6%82%E4%BD%95%E6%94%BE%E8%BF%9B-106-%E4%B8%AA-token"><span class="toc-text">4. Reward：一个分数如何放进 106 个 token</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-TD-residual%EF%BC%9ACritic-%E8%BF%99%E4%B8%80%E6%AD%A5%E5%88%B0%E5%BA%95%E4%BC%B0%E9%94%99%E4%BA%86%E5%A4%9A%E5%B0%91"><span class="toc-text">5. TD residual：Critic 这一步到底估错了多少</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-GAE%EF%BC%9A%E6%8A%8A%E7%BB%88%E5%B1%80%E7%BB%93%E6%9E%9C%E4%BC%A0%E7%BB%99%E6%9B%B4%E6%97%A9-token"><span class="toc-text">6. GAE：把终局结果传给更早 token</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89-token-%E6%89%8B%E7%AE%97"><span class="toc-text">三 token 手算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E5%90%8E%E5%90%91%E5%89%8D%E4%BC%9A%E4%B8%8D%E4%BC%9A%E5%BE%88%E6%85%A2"><span class="toc-text">从后向前会不会很慢</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-PPO-Loss%EF%BC%9A%E4%B8%89%E9%81%93%E5%AE%89%E5%85%A8%E9%97%B8"><span class="toc-text">7. PPO Loss：三道安全闸</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-Actor-clipped-loss"><span class="toc-text">7.1 Actor clipped loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-Reference-KL-penalty"><span class="toc-text">7.2 Reference KL penalty</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-Critic-clipped-value-loss"><span class="toc-text">7.3 Critic clipped value loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-4-Total-loss"><span class="toc-text">7.4 Total loss</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E4%B8%80%E5%BC%A0%E5%8F%98%E9%87%8F%E6%80%BB%E8%B4%A6"><span class="toc-text">8. 一张变量总账</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E6%9C%80%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%9A%84%E5%8D%81%E4%BB%B6%E4%BA%8B"><span class="toc-text">9. 最容易混淆的十件事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E6%8E%A8%E8%8D%90%E7%9A%84%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E9%A1%BA%E5%BA%8F"><span class="toc-text">10. 推荐的源码阅读顺序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E6%80%BB%E7%BB%93"><span class="toc-text">最后总结</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

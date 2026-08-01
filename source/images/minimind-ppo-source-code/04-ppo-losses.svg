@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">PPO 三类核心 Loss 对比</title>
+  <desc id="desc">Actor clipped loss、Reference KL penalty 和 Critic clipped value loss 汇入 total loss。</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#17304c" stroke-width="1"/></pattern>
+    <marker id="arr" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#ff6f7d"/></marker>
+    <style>.title{font:700 42px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#f3f8ff}.sub{font:400 20px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#9db3cb}.h{font:700 26px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#f3f8ff}.t{font:500 18px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#c0d4e8}.mono{font:600 17px ui-monospace,SFMono-Regular,Menlo,"PingFang SC",monospace;fill:#f3f8ff}.pill{font:700 15px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}</style>
+  </defs>
+  <rect width="1600" height="900" fill="#081526"/><rect width="1600" height="900" fill="url(#grid)" opacity=".55"/>
+  <text x="80" y="80" class="title">PPO 的 Loss 不是一个公式，而是三道安全闸</text>
+  <text x="80" y="118" class="sub">所有分支先在 [B,R] 上逐 token 计算，经 response mask 聚合后才得到标量</text>
+
+  <g transform="translate(70 180)"><rect width="455" height="470" rx="24" fill="#0d2138" stroke="#42d3ff" stroke-width="3"/>
+    <text x="26" y="50" class="h">① Actor Clipped Loss</text><rect x="315" y="20" width="112" height="34" rx="17" fill="#123c54"/><text x="342" y="43" class="pill" fill="#42d3ff">更新 Actor</text>
+    <text x="26" y="100" class="t">输入</text><text x="26" y="134" class="mono">advantages / current_logps</text><text x="26" y="163" class="mono">old_logps  [B,R]</text>
+    <line x1="26" y1="190" x2="429" y2="190" stroke="#284c69"/>
+    <text x="26" y="232" class="mono">ratio = exp(logp_cur − logp_old)</text><text x="26" y="270" class="mono" fill="#42d3ff">clip range = [0.8, 1.2]</text>
+    <text x="26" y="322" class="t">正优势：提高 token 概率</text><text x="26" y="356" class="t">负优势：降低 token 概率</text>
+    <text x="26" y="412" class="t" fill="#42d3ff">安全闸：策略一次别跳太远</text>
+  </g>
+  <g transform="translate(572 180)"><rect width="455" height="470" rx="24" fill="#171c38" stroke="#a88bff" stroke-width="3"/>
+    <text x="26" y="50" class="h">② Reference KL</text><rect x="315" y="20" width="112" height="34" rx="17" fill="#342a4f"/><text x="342" y="43" class="pill" fill="#a88bff">约束 Actor</text>
+    <text x="26" y="100" class="t">输入</text><text x="26" y="134" class="mono">current_logps / ref_logps</text><text x="26" y="163" class="mono">[B,R]</text>
+    <line x1="26" y1="190" x2="429" y2="190" stroke="#4a3f6b"/>
+    <text x="26" y="232" class="mono">d = logp_ref − logp_cur</text><text x="26" y="270" class="mono">exp(d) − d − 1</text><text x="26" y="308" class="mono" fill="#a88bff">β = 0.02</text>
+    <text x="26" y="360" class="t">Reference 冻结，不参与更新</text>
+    <text x="26" y="412" class="t" fill="#a88bff">安全闸：别为追 reward 跑偏</text>
+  </g>
+  <g transform="translate(1075 180)"><rect width="455" height="470" rx="24" fill="#102b2c" stroke="#58e0b5" stroke-width="3"/>
+    <text x="26" y="50" class="h">③ Critic Value Loss</text><rect x="315" y="20" width="112" height="34" rx="17" fill="#173e39"/><text x="334" y="43" class="pill" fill="#58e0b5">更新 Critic</text>
+    <text x="26" y="100" class="t">输入</text><text x="26" y="134" class="mono">current / old values</text><text x="26" y="163" class="mono">returns  [B,R]</text>
+    <line x1="26" y1="190" x2="429" y2="190" stroke="#295354"/>
+    <text x="26" y="232" class="mono">target = returns</text><text x="26" y="270" class="mono" fill="#58e0b5">value clip = old ± 0.2</text><text x="26" y="308" class="mono">0.5 × max(E₁, E₂)</text>
+    <text x="26" y="360" class="t">拟合价值目标，同时限制突变</text>
+    <text x="26" y="412" class="t" fill="#58e0b5">安全闸：估值一次别跳太远</text>
+  </g>
+  <path d="M300 665V715H800" fill="none" stroke="#ff6f7d" stroke-width="4" marker-end="url(#arr)"/><path d="M800 665V715" fill="none" stroke="#ff6f7d" stroke-width="4" marker-end="url(#arr)"/><path d="M1300 665V715H820" fill="none" stroke="#ff6f7d" stroke-width="4" marker-end="url(#arr)"/>
+  <g transform="translate(330 735)"><rect width="940" height="105" rx="28" fill="#2b1c2c" stroke="#ff6f7d" stroke-width="3"/>
+    <text x="45" y="45" class="h">Total Loss · scalar []</text><text x="45" y="78" class="mono" fill="#ff6f7d">L_total = L_actor + 0.02 L_KL + 0.5 L_value + L_MoE_aux</text>
+    <text x="760" y="45" class="t">本次 MoE = 0</text>
+  </g>
+</svg>

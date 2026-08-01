@@ -12,7 +12,27 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-07-23T12:30:00.000Z</updated>
+  <updated>2026-08-01T10:30:00.000Z</updated>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="计算机视觉" scheme="https://caiusy.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
+    <category term="工程实践" scheme="https://caiusy.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
+    <category term="PyTorch" scheme="https://caiusy.github.io/tags/PyTorch/"/>
+    <category term="YOLOv10" scheme="https://caiusy.github.io/tags/YOLOv10/"/>
+    <category term="Vehicle-Pose" scheme="https://caiusy.github.io/tags/Vehicle-Pose/"/>
+    <category term="车辆关键点" scheme="https://caiusy.github.io/tags/%E8%BD%A6%E8%BE%86%E5%85%B3%E9%94%AE%E7%82%B9/"/>
+    <category term="CarFusion" scheme="https://caiusy.github.io/tags/CarFusion/"/>
+    <category term="模型压缩" scheme="https://caiusy.github.io/tags/%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9/"/>
+    <category term="知识蒸馏" scheme="https://caiusy.github.io/tags/%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F/"/>
+    <id>https://caiusy.github.io/2026/08/01/yolov10-vehicle-pose-compression/</id>
+    <link href="https://caiusy.github.io/2026/08/01/yolov10-vehicle-pose-compression/"/>
+    <published>2026-08-01T10:30:00.000Z</published>
+    <summary>从 CarFusion 数据、14 关键点双分支训练，到 FastHead、结构化剪枝、知识蒸馏与 P5-Zero 三门禁验收：复盘一个约 4M 参数车辆姿态模型为什么难压缩，以及最终如何取得 14.83% 的真实 FP16 加速。</summary>
+    <title>从 YOLOv10 到车辆关键点部署：一个 4M 参数小模型的压缩实战</title>
+    <updated>2026-08-01T10:30:00.000Z</updated>
+  </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -101,8 +121,8 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/categories/LeetCode/"/>
-    <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
     <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
+    <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
     <category term="Hard" scheme="https://caiusy.github.io/tags/Hard/"/>
     <category term="数组" scheme="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/"/>
     <id>https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/</id>
@@ -305,8 +325,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="概念笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>
@@ -491,8 +511,8 @@
     </author>
     <category term="工程实践" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
     <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
+    <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
     <category term="工具" scheme="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/"/>
     <id>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</id>
     <link href="https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/"/>
@@ -520,41 +540,8 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/"/>
-    <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀</summary>
-    <title>🔢 LeetCode 150 - 二分查找专题</title>
-    <updated>2026-01-17T16:00:00.000Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
-    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="二叉树" scheme="https://caiusy.github.io/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/"/>
-    <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之二叉树专题，含遍历图解、递归思维、代码模板</summary>
-    <title>🌳 LeetCode 150 - 二叉树专题</title>
-    <updated>2026-01-17T16:00:00.000Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
-    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
     <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
+    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
     <id>https://caiusy.github.io/2026/01/18/leetcode-150-array-string/</id>
     <link href="https://caiusy.github.io/2026/01/18/leetcode-150-array-string/"/>
     <published>2026-01-17T16:00:00.000Z</published>
@@ -586,6 +573,23 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
+    <category term="二叉树" scheme="https://caiusy.github.io/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/"/>
+    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-binary-tree/"/>
+    <published>2026-01-17T16:00:00.000Z</published>
+    <summary>LeetCode 面试 150 题之二叉树专题，含遍历图解、递归思维、代码模板</summary>
+    <title>🌳 LeetCode 150 - 二叉树专题</title>
+    <updated>2026-01-17T16:00:00.000Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
+    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
+    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
     <id>https://caiusy.github.io/2026/01/18/leetcode-150-dp/</id>
@@ -603,13 +607,12 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="图论" scheme="https://caiusy.github.io/tags/%E5%9B%BE%E8%AE%BA/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-graph/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-graph/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/"/>
     <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之图论与搜索专题，含BFS/DFS图解、代码模板、记忆口诀</summary>
-    <title>🔍 LeetCode 150 - 图论与搜索专题</title>
+    <summary>LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀</summary>
+    <title>🔢 LeetCode 150 - 二分查找专题</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
 </feed>

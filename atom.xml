@@ -12,7 +12,7 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-08-01T10:30:00.000Z</updated>
+  <updated>2026-08-01T13:10:00.000Z</updated>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -29,9 +29,9 @@
     <id>https://caiusy.github.io/2026/08/01/yolov10-vehicle-pose-compression/</id>
     <link href="https://caiusy.github.io/2026/08/01/yolov10-vehicle-pose-compression/"/>
     <published>2026-08-01T10:30:00.000Z</published>
-    <summary>从 CarFusion 数据、14 关键点双分支训练，到 FastHead、结构化剪枝、知识蒸馏与 P5-Zero 三门禁验收：复盘一个约 4M 参数车辆姿态模型为什么难压缩，以及最终如何取得 14.83% 的真实 FP16 加速。</summary>
-    <title>从 YOLOv10 到车辆关键点部署：一个 4M 参数小模型的压缩实战</title>
-    <updated>2026-08-01T10:30:00.000Z</updated>
+    <summary>我在 YOLOv10 车辆关键点项目里连续尝试 FastHead、RepC3、通道剪枝、稀疏训练和知识蒸馏。参数少了不一定更快，训练也救不了错误的执行图。最后真正通过速度、精度和显存门禁的，是只动低分辨率 P5 路径的 P5-Zero。</summary>
+    <title>一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</title>
+    <updated>2026-08-01T13:10:00.000Z</updated>
   </entry>
   <entry>
     <author>
@@ -121,8 +121,8 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/categories/LeetCode/"/>
-    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
+    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="Hard" scheme="https://caiusy.github.io/tags/Hard/"/>
     <category term="数组" scheme="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/"/>
     <id>https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/</id>
@@ -325,8 +325,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="概念笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>
@@ -540,23 +540,6 @@
     <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-array-string/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-array-string/"/>
-    <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之数组与字符串专题，含图解、代码模板、记忆口诀</summary>
-    <title>📚 LeetCode 150 - 数组与字符串专题</title>
-    <updated>2026-01-17T16:00:00.000Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
-    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
     <id>https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/</id>
     <link href="https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/"/>
@@ -580,6 +563,23 @@
     <published>2026-01-17T16:00:00.000Z</published>
     <summary>LeetCode 面试 150 题之二叉树专题，含遍历图解、递归思维、代码模板</summary>
     <title>🌳 LeetCode 150 - 二叉树专题</title>
+    <updated>2026-01-17T16:00:00.000Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
+    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
+    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
+    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
+    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-array-string/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-array-string/"/>
+    <published>2026-01-17T16:00:00.000Z</published>
+    <summary>LeetCode 面试 150 题之数组与字符串专题，含图解、代码模板、记忆口诀</summary>
+    <title>📚 LeetCode 150 - 数组与字符串专题</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>

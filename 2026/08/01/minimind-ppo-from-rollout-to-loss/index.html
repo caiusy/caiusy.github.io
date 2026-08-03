@@ -17,33 +17,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
   <meta name="theme-color" content="#f9fafb">
-  <title>MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss - Caius Lu</title>
+  <title>MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程 - Caius Lu</title>
 
   
-    <meta name="description" content="从 MiniMind 的真实 RLAIFDataset 样本出发，逐步追踪 prompt、rollout、old log probabilities、Actor-Critic、terminal reward、TD residual、GAE、returns，以及 PPO clipped actor&#x2F;critic loss 的来源、维度与代码位置。">
+    <meta name="description" content="基于远程 WSL 与真实 MiniMind checkpoint，从 991 字符 prompt、561 个 token、106 token rollout 出发，完整追踪 Reward、Critic、GAE、Reference、Old&#x2F;Current&#x2F;New policy、PPO 两次更新与 RTX 3090 Ti GPU 数据流。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss">
+<meta property="og:title" content="MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程">
 <meta property="og:url" content="https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/">
 <meta property="og:site_name" content="Caius Lu">
-<meta property="og:description" content="从 MiniMind 的真实 RLAIFDataset 样本出发，逐步追踪 prompt、rollout、old log probabilities、Actor-Critic、terminal reward、TD residual、GAE、returns，以及 PPO clipped actor&#x2F;critic loss 的来源、维度与代码位置。">
+<meta property="og:description" content="基于远程 WSL 与真实 MiniMind checkpoint，从 991 字符 prompt、561 个 token、106 token rollout 出发，完整追踪 Reward、Critic、GAE、Reference、Old&#x2F;Current&#x2F;New policy、PPO 两次更新与 RTX 3090 Ti GPU 数据流。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2026-08-01T15:19:00.000Z">
-<meta property="article:modified_time" content="2026-08-01T15:19:00.000Z">
+<meta property="article:modified_time" content="2026-08-03T13:30:00.000Z">
 <meta property="article:author" content="Caius Lu">
 <meta property="article:tag" content="MiniMind">
 <meta property="article:tag" content="PPO">
 <meta property="article:tag" content="RLHF">
+<meta property="article:tag" content="Reference-Model">
+<meta property="article:tag" content="GPU">
+<meta property="article:tag" content="LLM-Alignment">
 <meta property="article:tag" content="Actor-Critic">
 <meta property="article:tag" content="GAE">
-<meta property="article:tag" content="RLAIF">
-<meta property="article:tag" content="LLM-Alignment">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
   
   
   
-  <meta name="keywords" content="MiniMind,PPO,RLHF,Actor-Critic,GAE,RLAIF,LLM-Alignment">
+  <meta name="keywords" content="MiniMind,PPO,RLHF,Reference-Model,GPU,LLM-Alignment,Actor-Critic,GAE">
 
   <!-- feed -->
   
@@ -67,7 +68,7 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-08-01T23:19:00+08:00","dateModified":"2026-08-01T23:19:00+08:00","datePublished":"2026-08-01T23:19:00+08:00","description":"PPO 最难的地方，往往不是把公式背下来，而是回答这些看似简单的问题：\nprompt 到底包含什么？output_ids 和 completion_ids 有什么区别？old_logp 从哪来？Critic 的 label 是 advantage 还是 returns？终局只有一个 reward，为什么最后每个 token 都能获得学习信号？\n这篇文章不从抽象强化学习符号开始，而是沿着 MiniMind 的真实 PPO 代码走一遍：拿一条 rlaif.jsonl 样本，追踪它如何变成 [1,561] 的 prompt，如何生成 [1,106] 的 completion，最后如何汇入一个标量 total loss。","headline":"MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/","keywords":"MiniMind, PPO, RLHF, Actor-Critic, GAE, RLAIF, LLM-Alignment","thumbnailUrl":"/images/minimind-ppo-source-code/01-ppo-end-to-end.svg","image":1}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-08-01T23:19:00+08:00","dateModified":"2026-08-03T21:30:00+08:00","datePublished":"2026-08-01T23:19:00+08:00","description":"这是一篇不省略中间步骤的 PPO 长文：从真实输入文字开始，保留原始 token、shape、Reward Model 输入输出、Critic value、TD/GAE、Reference、Old/Current/New policy、两次 optimizer update 与 GPU 路径的全部细节。正文完整收录原始笔记，只增加发布导航与配图。","headline":"MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/","keywords":"MiniMind, PPO, RLHF, Reference-Model, GPU, LLM-Alignment, Actor-Critic, GAE","thumbnailUrl":"/images/minimind-ppo-real-complete/01-ppo-full-pipeline.svg","image":1}</script>
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
@@ -88,7 +89,7 @@
 
 
 
-<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/08/01/minimind-ppo-from-rollout-to-loss/"><span class="title">MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss</span></a><a class="item title" href="/2026/08/01/yolov10-vehicle-pose-compression/"><span class="title">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</span></a><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a><a class="item title" href="/2026/07/13/dynamic-programming-from-recursion-to-state-transition/"><span class="title">动态规划完全图解：从重复递归到状态转移</span></a><a class="item title" href="/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/"><span class="title">Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</span></a><a class="item title" href="/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"><span class="title">LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</span></a><a class="item title" href="/2019/07/26/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/"><span class="title">c++中级教程 顺序容器的定义</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/29/%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/"><span class="title">透视变换</span></a><a class="item title" href="/2019/09/07/%E7%9F%A9%E5%BD%A2%E8%A6%86%E7%9B%96/"><span class="title">矩形覆盖</span></a></div></widget>
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"><span class="title">MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/minimind-ppo-from-rollout-to-loss/"><span class="title">MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/yolov10-vehicle-pose-compression/"><span class="title">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</span></a><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a><a class="item title" href="/2026/07/13/dynamic-programming-from-recursion-to-state-transition/"><span class="title">动态规划完全图解：从重复递归到状态转移</span></a><a class="item title" href="/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/"><span class="title">Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</span></a><a class="item title" href="/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"><span class="title">LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</span></a><a class="item title" href="/2019/07/26/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/"><span class="title">c++中级教程 顺序容器的定义</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/29/%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/"><span class="title">透视变换</span></a></div></widget>
 </div>
 <footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
 </div></aside><div class="l_main" id="main">
@@ -101,599 +102,1466 @@
   <div class="content">
     <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-08-01T15:19:00.000Z">2026-08-01</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-08-01T15:19:00.000Z">2026-08-01</time></span></div></div></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-08-01T15:19:00.000Z">2026-08-01</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-08-03T13:30:00.000Z">2026-08-03</time></span></div></div></div>
     
     <div class="bottom only-title">
       
       <div class="text-area">
-        <h1 class="text title"><span>MiniMind PPO 源码拆解：一条 JSONL 如何走到 GAE 与 Clipped Loss</span></h1>
+        <h1 class="text title"><span>MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</span></h1>
         
       </div>
     </div>
     
   </div>
-  </div><article class="md-text content slide-up"><p>PPO 最难的地方，往往不是把公式背下来，而是回答这些看似简单的问题：</p>
-<p><code>prompt</code> 到底包含什么？<code>output_ids</code> 和 <code>completion_ids</code> 有什么区别？<code>old_logp</code> 从哪来？Critic 的 label 是 advantage 还是 returns？终局只有一个 reward，为什么最后每个 token 都能获得学习信号？</p>
-<p>这篇文章不从抽象强化学习符号开始，而是沿着 MiniMind 的真实 PPO 代码走一遍：拿一条 <code>rlaif.jsonl</code> 样本，追踪它如何变成 <code>[1,561]</code> 的 prompt，如何生成 <code>[1,106]</code> 的 completion，最后如何汇入一个标量 total loss。</p>
+  </div><article class="md-text content slide-up"><p>这是一篇不省略中间步骤的 PPO 长文：从真实输入文字开始，保留原始 token、shape、Reward Model 输入输出、Critic value、TD/GAE、Reference、Old/Current/New policy、两次 optimizer update 与 GPU 路径的全部细节。正文完整收录原始笔记，只增加发布导航与配图。</p>
 <span id="more"></span>
 
-<p><img src="/images/minimind-ppo-source-code/01-ppo-end-to-end.svg" alt="MiniMind PPO 从 JSONL、rollout、reward、GAE 到 total loss 的完整数据流"></p>
-<h2 id="先给出全局结论"><a href="#先给出全局结论" class="headerlink" title="先给出全局结论"></a>先给出全局结论</h2><p>MiniMind PPO 的主链可以压缩为一句话：</p>
-<blockquote>
-<p>Actor 对完整 prompt 在线生成 completion，并保存每个生成 token 的 old log probability；Reward 给整条回答打分，Critic 估计每个生成状态的未来回报；TD 与 GAE 将终局结果分配给每个 token，得到教 Actor 的 advantages 和教 Critic 的 returns；最后用 policy clip、Reference KL 与 value clip 限制更新幅度。</p>
+<!-- ORIGINAL_NOTE_BEGIN: source content preserved; publication additions are image lines and MathJax wrappers -->
+<h1 id="MiniMind-PPO：真实输入、Token、Reward、Critic、GAE、Loss-与-GPU-全流程"><a href="#MiniMind-PPO：真实输入、Token、Reward、Critic、GAE、Loss-与-GPU-全流程" class="headerlink" title="MiniMind PPO：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程"></a>MiniMind PPO：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</h1><blockquote>
+<p>本文只讲 PPO。所有具体数值来自远程 WSL <code>wsl-dev</code>、MiniMind commit <code>4497610</code>、固定 <code>sample_index=0, seed=42</code> 的真实只读 forward。没有执行 backward、optimizer.step 或保存权重。</p>
 </blockquote>
-<p>本文使用的真实 rollout 维度是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">B = 1      batch size</span><br><span class="line">P = 561    padding 后的 prompt 宽度</span><br><span class="line">R = 106    completion 宽度</span><br><span class="line">L = 667    完整序列宽度，L = P + R</span><br><span class="line">H = 768    hidden size</span><br><span class="line">V = 6400   vocabulary size</span><br></pre></td></tr></tbody></table></figure>
-
-<p>主张量链如下：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">prompt_ids                    [1, 561]</span><br><span class="line">output_ids                    [1, 667]</span><br><span class="line">completion_ids                [1, 106]</span><br><span class="line">old_logps / old_values        [1, 106]</span><br><span class="line">token_rewards                 [1, 106]</span><br><span class="line">advantages / returns          [1, 106]</span><br><span class="line">actor/value token losses      [1, 106]</span><br><span class="line">total loss                    []</span><br></pre></td></tr></tbody></table></figure>
-
-<p>注意：<code>P</code> 与 <code>R</code> 是 batch Tensor 的宽度。batch 大于 1 时，每条样本的真实有效长度可以不同，padding 后才共享同一个宽度。</p>
-<h2 id="1-数据集：为什么是-conversations-1"><a href="#1-数据集：为什么是-conversations-1" class="headerlink" title="1. 数据集：为什么是 conversations[:-1]"></a>1. 数据集：为什么是 <code>conversations[:-1]</code></h2><p>MiniMind 的 <code>RLAIFDataset</code> 读取 JSONL：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">RLAIFDataset</span>(<span class="title class_ inherited__">Dataset</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, jsonl_path, tokenizer, max_length=<span class="number">1024</span>,</span></span><br><span class="line"><span class="params">                 thinking_ratio=<span class="number">0.5</span></span>):</span><br><span class="line">        self.tokenizer = tokenizer</span><br><span class="line">        self.thinking_ratio = thinking_ratio</span><br><span class="line">        self.samples = load_dataset(</span><br><span class="line">            <span class="string">"json"</span>, data_files=jsonl_path, split=<span class="string">"train"</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">create_chat_prompt</span>(<span class="params">self, conversations</span>):</span><br><span class="line">        conversations = pre_processing_chat(conversations)</span><br><span class="line">        use_thinking = random.random() &lt; self.thinking_ratio</span><br><span class="line">        <span class="keyword">return</span> self.tokenizer.apply_chat_template(</span><br><span class="line">            conversations[:-<span class="number">1</span>],</span><br><span class="line">            tokenize=<span class="literal">False</span>,</span><br><span class="line">            open_thinking=use_thinking,</span><br><span class="line">            add_generation_prompt=<span class="literal">True</span>,</span><br><span class="line">        )</span><br></pre></td></tr></tbody></table></figure>
-
-<p>真实第 0 条样本共有 6 条消息，末尾是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">assistant：这些智能家居产品需要哪些前提条件才能够使用？</span><br><span class="line">user：请回答这个问题。</span><br><span class="line">assistant：""</span><br></pre></td></tr></tbody></table></figure>
-
-<p>最后一条空 assistant 只是占位符。<code>conversations[:-1]</code> 删除它，再通过 <code>add_generation_prompt=True</code> 把生成起点放到 prompt 尾部。</p>
-<p>这一步决定了训练范式：</p>
-<ul>
-<li>如果直接把现成 assistant 答案当监督标签，接近 SFT。</li>
-<li>PPO 要让当前 Actor 在线生成新回答，再根据 reward 更新策略。</li>
-</ul>
-<h3 id="Prompt-不是最后一句用户问题"><a href="#Prompt-不是最后一句用户问题" class="headerlink" title="Prompt 不是最后一句用户问题"></a>Prompt 不是最后一句用户问题</h3><p>这里的 prompt 是前 5 条历史消息经 chat template 渲染后的完整字符串，包括多轮 user/assistant 对话、角色标记，以及新的 assistant 生成起点。</p>
-<p>固定随机种子 42、<code>thinking_ratio=0.9</code> 时，真实结果是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">prompt 字符数          991</span><br><span class="line">input_ids              [1, 561]</span><br><span class="line">attention_mask         [1, 561]</span><br><span class="line">有效 prompt token      561</span><br></pre></td></tr></tbody></table></figure>
-
-<p>因此，“prompt 是什么”与“最后一个 user message 是什么”是两个问题。最后一句用户消息只是完整 prompt 的最后一部分。</p>
-<h3 id="数据增强发生在哪里"><a href="#数据增强发生在哪里" class="headerlink" title="数据增强发生在哪里"></a>数据增强发生在哪里</h3><p>这条数据路径有两类随机变化：</p>
+<h2 id="阅读目标"><a href="#阅读目标" class="headerlink" title="阅读目标"></a>阅读目标</h2><p>本文以一条真实输入为主线，逐步展示：原始文字 → chat template → token ID → Actor 输出 → Reward 输入输出 → Critic value → TD/GAE → Actor/Critic loss → scalar loss。每个变量都说明来源、shape、数值和梯度状态。</p>
+<h2 id="1-真实环境与证据边界"><a href="#1-真实环境与证据边界" class="headerlink" title="1. 真实环境与证据边界"></a>1. 真实环境与证据边界</h2><h3 id="1-1-远程环境"><a href="#1-1-远程环境" class="headerlink" title="1.1 远程环境"></a>1.1 远程环境</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>真实值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>远程主机</td>
+<td><code>wsl-dev</code> / <code>caius-PC</code></td>
+</tr>
+<tr>
+<td>MiniMind 路径</td>
+<td><code>/home/caius/minimind</code></td>
+</tr>
+<tr>
+<td>MiniMind commit</td>
+<td><code>4497610</code></td>
+</tr>
+<tr>
+<td>GPU</td>
+<td>NVIDIA GeForce RTX 3090 Ti</td>
+</tr>
+<tr>
+<td>GPU 总显存</td>
+<td>24,564 MiB</td>
+</tr>
+<tr>
+<td>驱动</td>
+<td>560.94</td>
+</tr>
+<tr>
+<td>PyTorch</td>
+<td><code>2.6.0+cu124</code></td>
+</tr>
+<tr>
+<td>PyTorch CUDA</td>
+<td>12.4</td>
+</tr>
+<tr>
+<td>RLAIF 数据</td>
+<td><code>/home/caius/datasets/minimind_dataset/rlaif.jsonl</code></td>
+</tr>
+<tr>
+<td>数据行数</td>
+<td>19,502</td>
+</tr>
+<tr>
+<td>Reward Model</td>
+<td><code>/home/caius/internlm2-1_8b-reward</code></td>
+</tr>
+<tr>
+<td>PPO 权重</td>
+<td><code>out/lifeos_agent_ppo_v1_768.pth</code></td>
+</tr>
+<tr>
+<td>GRPO 权重</td>
+<td><code>out/lifeos_agent_grpo_v1_768.pth</code></td>
+</tr>
+<tr>
+<td>Reference 起点</td>
+<td><code>out/lifeos_agent_dpo_v1_768.pth</code></td>
+</tr>
+</tbody></table>
+<h3 id="1-2-三类数字必须分开"><a href="#1-2-三类数字必须分开" class="headerlink" title="1.2 三类数字必须分开"></a>1.2 三类数字必须分开</h3><p>本文会遇到三类数字：</p>
 <ol>
-<li>首条消息不是 system 时，预处理约有 20% 概率补一个中英文 system prompt。</li>
-<li><code>thinking_ratio</code> 控制是否使用 open-thinking generation prompt；本文配置为 0.9。</li>
+<li><strong>真实数据值</strong>：JSONL 内容、prompt 长度、真实生成文本。</li>
+<li><strong>真实 forward 值</strong>：logp、value、Reward Model score、advantage、KL、loss、PyTorch 显存。</li>
+<li><strong>历史训练日志值</strong>：训练 step、平均 reward、平均长度、耗时和最终 checkpoint。</li>
 </ol>
-<p>源码中虽然还有 <code>post_processing_chat()</code>，但它没有被这条 <code>RLAIFDataset</code> 路径调用，不能把其中的规则算到 PPO 数据增强里。</p>
-<h3 id="Batch-padding-的维度"><a href="#Batch-padding-的维度" class="headerlink" title="Batch padding 的维度"></a>Batch padding 的维度</h3><p>真实样本 0 和 1 的 prompt 长度分别是 561 与 470。组成 <code>B=2</code> 的 batch 并左填充后：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">input_ids              [2, 561]</span><br><span class="line">attention_mask         [2, 561]</span><br><span class="line">sample 0               [真实 token × 561]</span><br><span class="line">sample 1               [PAD × 91] [真实 token × 470]</span><br></pre></td></tr></tbody></table></figure>
-
-<p><code>input_ids</code> 存 token ID，<code>attention_mask</code> 用 1 标记有效 token、0 标记 padding。</p>
-<h2 id="2-Actor、Critic、Reward、Reference-到底是谁"><a href="#2-Actor、Critic、Reward、Reference-到底是谁" class="headerlink" title="2. Actor、Critic、Reward、Reference 到底是谁"></a>2. Actor、Critic、Reward、Reference 到底是谁</h2><p>PPO 同时出现多个模型，很容易把职责混在一起。</p>
-<p><img src="/images/minimind-ppo-source-code/02-actor-critic-roles.svg" alt="PPO 中 Actor、Critic、Reward Model 与 Reference Model 的角色分工"></p>
-<h3 id="Actor：负责选择下一个-token"><a href="#Actor：负责选择下一个-token" class="headerlink" title="Actor：负责选择下一个 token"></a>Actor：负责选择下一个 token</h3><p>Actor 就是正在训练的因果语言模型策略。给定当前前缀状态，它输出词表 logits，再经 softmax 得到下一个 token 的条件概率。</p>
-
-$$
-\pi_{\theta}(a_t\mid s_t)
-=
-P_{\theta}(\text{next token}=a_t\mid\text{prefix}=s_t)
-$$
-
-
-<p>MiniMind 的词表大小为 6400，因此完整 Actor logits 为：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hidden states           [B, L, 768]</span><br><span class="line">Actor logits            [B, L, 6400]</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="Critic：不选-token，只估计未来回报"><a href="#Critic：不选-token，只估计未来回报" class="headerlink" title="Critic：不选 token，只估计未来回报"></a>Critic：不选 token，只估计未来回报</h3><p>MiniMind 的 Critic 继承同类 Transformer 主干，并新增一个 value head：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CriticModel</span>(<span class="title class_ inherited__">MiniMindForCausalLM</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, params</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__(params)</span><br><span class="line">        self.value_head = nn.Linear(params.hidden_size, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, input_ids=<span class="literal">None</span>, attention_mask=<span class="literal">None</span>, **kwargs</span>):</span><br><span class="line">        outputs = self.model(</span><br><span class="line">            input_ids=input_ids,</span><br><span class="line">            attention_mask=attention_mask,</span><br><span class="line">            **kwargs,</span><br><span class="line">        )</span><br><span class="line">        hidden_states = self.model.norm(outputs[<span class="number">0</span>])</span><br><span class="line">        values = self.value_head(hidden_states).squeeze(-<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> values</span><br></pre></td></tr></tbody></table></figure>
-
-<p>继承来的 LM head 没有被物理删除，但 Critic forward 使用新增的 <code>value_head</code>，每个位置只输出一个 value：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hidden states           [B, L, 768]</span><br><span class="line">value_head output       [B, L, 1]</span><br><span class="line">squeeze                 [B, L]</span><br><span class="line">response values         [B, R]</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="Reward-Model：回答完成后给整条轨迹评分"><a href="#Reward-Model：回答完成后给整条轨迹评分" class="headerlink" title="Reward Model：回答完成后给整条轨迹评分"></a>Reward Model：回答完成后给整条轨迹评分</h3><p>Reward Model 与 Critic 不是同一个模型。</p>
+<p>真实 forward 是“固定 checkpoint 在当前环境中的一次可复算观察”，不等同于历史训练中的某一步；历史日志只有聚合指标，不能从中反推出当时每个 token 的 logp。</p>
+<h2 id="2-符号、shape-与类型总表"><a href="#2-符号、shape-与类型总表" class="headerlink" title="2. 符号、shape 与类型总表"></a>2. 符号、shape 与类型总表</h2><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+<th align="right">本文真实值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>B</code></td>
+<td>原始 prompt batch size</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td><code>G</code></td>
+<td>每个 prompt 的生成数</td>
+<td align="right">PPO 为 1；历史 GRPO 为 4</td>
+</tr>
+<tr>
+<td><code>P</code></td>
+<td>padding 后的 prompt tensor 宽度</td>
+<td align="right">561</td>
+</tr>
+<tr>
+<td><code>R</code></td>
+<td>completion tensor 宽度</td>
+<td align="right">PPO 106；GRPO 256</td>
+</tr>
+<tr>
+<td><code>L</code></td>
+<td>完整序列宽度，<code>P+R</code></td>
+<td align="right">PPO 667；GRPO 817</td>
+</tr>
+<tr>
+<td><code>H</code></td>
+<td>hidden size</td>
+<td align="right">768</td>
+</tr>
+<tr>
+<td><code>V</code></td>
+<td>vocabulary size</td>
+<td align="right">6,400</td>
+</tr>
+<tr>
+<td><code>i</code></td>
+<td>rollout / 候选回答索引</td>
+<td align="right"><code>0...B×G-1</code></td>
+</tr>
+<tr>
+<td><code>t</code></td>
+<td>completion token 位置</td>
+<td align="right"><code>0...R-1</code></td>
+</tr>
+<tr>
+<td><code>m_{i,t}</code></td>
+<td>completion 有效位置 mask</td>
+<td align="right">0 或 1</td>
+</tr>
+<tr>
+<td><code>R_i</code></td>
+<td>第 i 条完整回答的终局 reward</td>
+<td align="right">scalar</td>
+</tr>
+<tr>
+<td><code>A_i</code></td>
+<td>GRPO 第 i 条回答的组相对 advantage</td>
+<td align="right">scalar</td>
+</tr>
+<tr>
+<td><code>A_{i,t}</code></td>
+<td>PPO 第 i 条回答第 t 个位置的 GAE advantage</td>
+<td align="right">scalar</td>
+</tr>
+</tbody></table>
+<p>需要特别区分：</p>
 <ul>
-<li>Reward 在回答结束后输出整条回答的分数 <code>rewards [B]</code>。</li>
-<li>Critic 在每个生成状态输出价值预测 <code>values [B,R]</code>。</li>
+<li><code>R</code> 在 shape 中表示 response width，不表示 reward。</li>
+<li><code>R_i</code> 才表示第 i 条回答的 reward。</li>
+<li>tensor width 是 padding 后的统一宽度，不一定等于每条回答的有效 token 数。</li>
 </ul>
-<p>MiniMind 还叠加了长度、thinking 格式与重复惩罚。若回答包含 <code>&lt;/think&gt;</code>，规则奖励检查较完整的 response，而 Reward Model 只接收 prompt 加 <code>&lt;/think&gt;</code> 后的 answer。两者的评分对象并不完全相同。</p>
-<h3 id="Reference-Model：防止策略为追-reward-跑偏"><a href="#Reference-Model：防止策略为追-reward-跑偏" class="headerlink" title="Reference Model：防止策略为追 reward 跑偏"></a>Reference Model：防止策略为追 reward 跑偏</h3><p>Reference 是冻结的稳定策略，输出 <code>ref_logps [B,R]</code>，用于 KL penalty。它不是 old policy。</p>
-<p>本实现没有长期维护另一套 old Actor。所谓 old policy，是 rollout 时保存下来的 <code>old_logps</code>；Reference 则是独立的冻结模型。</p>
-<h2 id="3-Rollout：prompt、output、completion-如何对齐"><a href="#3-Rollout：prompt、output、completion-如何对齐" class="headerlink" title="3. Rollout：prompt、output、completion 如何对齐"></a>3. Rollout：prompt、output、completion 如何对齐</h2><p>Torch rollout 的核心操作是：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">output_ids = model.generate(</span><br><span class="line">    input_ids=prompt_ids,</span><br><span class="line">    attention_mask=attention_mask,</span><br><span class="line">    max_new_tokens=max_new_tokens,</span><br><span class="line">    do_sample=<span class="literal">True</span>,</span><br><span class="line">    temperature=<span class="number">0.8</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">prompt_len = prompt_ids.size(<span class="number">1</span>)</span><br><span class="line">completion_ids = output_ids[:, prompt_len:]</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="3-贯穿全文的真实样本"><a href="#3-贯穿全文的真实样本" class="headerlink" title="3. 贯穿全文的真实样本"></a>3. 贯穿全文的真实样本</h2><p><img src="/images/minimind-ppo-real-complete/01-ppo-full-pipeline.svg" alt="PPO 真实样本端到端链路"></p>
+<p>远程 <code>rlaif.jsonl</code> 第 0 行共有 6 条消息：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">user：给出张明（销售经理）和刘琳（智能家居研发工程师）的角色信息。</span><br><span class="line"></span><br><span class="line">assistant：两人进行长对话，其中明确提到：</span><br><span class="line">1. 使用前需要稳定 Wi-Fi；</span><br><span class="line">2. 提供详细说明书，包含安装和使用步骤；</span><br><span class="line">3. 有数据加密、防火墙、实时安全更新；</span><br><span class="line">4. 有在线客服和售后服务。</span><br><span class="line"></span><br><span class="line">user：基于以上对话提出一个问题。</span><br><span class="line">assistant：这些智能家居产品需要哪些前提条件才能够使用？</span><br><span class="line">user：请回答这个问题。</span><br><span class="line">assistant：""</span><br></pre></td></tr></tbody></table></figure>
 
-<p>真实结果：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">prompt_ids             [1, 561]</span><br><span class="line">output_ids             [1, 667]</span><br><span class="line">completion_ids         [1, 106]</span><br><span class="line">old_logps              [1, 106]</span><br><span class="line">completion_mask        [1, 106]</span><br><span class="line">EOS                    completion[105]</span><br></pre></td></tr></tbody></table></figure>
+<p>这道题的直接答案至少应包括：</p>
+<ul>
+<li>客户需要稳定的 Wi-Fi 网络；</li>
+<li>应阅读说明书，并按说明完成安装、连接和使用。</li>
+</ul>
+<p>安全措施与售后虽然在上下文中出现，但不是“使用前提”的主要答案。</p>
+<h2 id="3-1-一次真实-PPO-样本从输入跑到输出"><a href="#3-1-一次真实-PPO-样本从输入跑到输出" class="headerlink" title="3.1 一次真实 PPO 样本从输入跑到输出"></a>3.1 一次真实 PPO 样本从输入跑到输出</h2><p>这一节先不抽象。下面只追踪 <code>sample_index=0</code>、<code>seed=42</code> 这一条真实轨迹。</p>
+<h3 id="步骤-0：JSONL-中原始输入是什么"><a href="#步骤-0：JSONL-中原始输入是什么" class="headerlink" title="步骤 0：JSONL 中原始输入是什么"></a>步骤 0：JSONL 中原始输入是什么</h3><p>原始 <code>conversations</code> 的 6 条消息如下。第二条 assistant 很长，但它不是标签，而是当前问题所依赖的历史上下文：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">  <span class="punctuation">{</span></span><br><span class="line">    <span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"user"</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"基于以下角色信息完成一段对话\n张明（30岁），一位IT公司的销售经理。外表干练，擅长沟通。最近他需要协助生产部门促销一批新的智能家居产品，但是他对于这些新产品的技术方面并不够熟悉。\n刘琳（25岁），一名来自生产部门的研发工程师。外表看起来有些内向，但实则是一名技术精湛的工程师。最近生产的智能家居产品是她和她的团队开发的。"</span></span><br><span class="line">  <span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span></span><br><span class="line">    <span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"assistant"</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"张明：嗨，刘琳，我听说智能家居产品已经进入了我们公司，我真的很想能够了解一下这些产品的技术方面，以便于在销售中向客户传递正确的信息。\n刘琳：嗨，张明，很高兴为您介绍。这些智能家居产品基于物联网技术开发，并且已经通过了一系列的测试，具有很高的品质保证，其中包括智能插座、智能门锁等产品，您想了解哪些方面？\n张明：首先，我想知道产品的使用前提是什么，例如，在产品安装之前客户需要做哪些准备，以及在使用产品时需要注意哪些事项？\n刘琳：客户使用产品之前需要保证有一个稳定的Wi-Fi网络，因为产品只能够通过Wi-Fi网络进行连接和控制。此外，我们提供了一份详细的使用说明书，其中包含了如何安装和使用产品的所有步骤。\n张明：我也想问一下产品的安全性能如何，客户的隐私是否会被泄露？\n刘琳：我们的产品具有完善的安全措施，可以保证客户的隐私不会泄露。这些措施包括数据加密技术、防火墙以及实时的安全更新等。\n张明：听起来很不错，但是我想问一下，如果客户在使用产品时遇到问题，我们应该如何解决？\n刘琳：我们提供了在线客服服务以及售后服务，如果客户在使用过程中遇到问题，可以随时和我们取得联系，我们会在第一时间为客户解决问题。\n张明：感谢您对我的解答，我对这些产品有了更全面的了解，并且可以更好地向客户介绍这些产品了。\n刘琳：没关系，很高兴能够为您提供帮助。"</span></span><br><span class="line">  <span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"user"</span><span class="punctuation">,</span> <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"基于以上对话提出一个问题。"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"assistant"</span><span class="punctuation">,</span> <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"这些智能家居产品需要哪些前提条件才能够使用？"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"user"</span><span class="punctuation">,</span> <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"请回答这个问题。"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"assistant"</span><span class="punctuation">,</span> <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">""</span><span class="punctuation">}</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>最重要的关系不是 Tensor 数值相加，而是沿序列维拼接：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">output_ids = concat(prompt_ids, completion_ids, dim=sequence)</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="步骤-1：-1-后剩下什么"><a href="#步骤-1：-1-后剩下什么" class="headerlink" title="步骤 1：[:-1] 后剩下什么"></a>步骤 1：<code>[:-1]</code> 后剩下什么</h3><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">before = 6 条</span><br><span class="line">after  = 5 条</span><br><span class="line">删除   = {"role":"assistant","content":""}</span><br><span class="line">保留角色顺序 = [user, assistant, user, assistant, user]</span><br></pre></td></tr></tbody></table></figure>
 
-<h3 id="old-logp-是怎样得到的"><a href="#old-logp-是怎样得到的" class="headerlink" title="old logp 是怎样得到的"></a>old logp 是怎样得到的</h3><p>每个生成位置原本有 6400 个候选概率。代码对完整 <code>output_ids</code> 再做 Actor forward，然后只 gather 实际生成 token 的 log probability：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">logits = model(input_ids).logits[:, :-<span class="number">1</span>, :]</span><br><span class="line">log_probs = logits.log_softmax(dim=-<span class="number">1</span>)</span><br><span class="line">selected_logps = gather(log_probs, generated_token_ids)</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="步骤-2：真正交给-Tokenizer-的文字是什么"><a href="#步骤-2：真正交给-Tokenizer-的文字是什么" class="headerlink" title="步骤 2：真正交给 Tokenizer 的文字是什么"></a>步骤 2：真正交给 Tokenizer 的文字是什么</h3><p>固定 seed 42 后，本次 <code>open_thinking=True</code>。Chat template 输出 991 个字符。下面是实际 prompt，不是示意文本：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;|im_start|&gt;user</span><br><span class="line">基于以下角色信息完成一段对话</span><br><span class="line">张明（30岁），一位IT公司的销售经理。外表干练，擅长沟通。最近他需要协助生产部门促销一批新的智能家居产品，但是他对于这些新产品的技术方面并不够熟悉。</span><br><span class="line">刘琳（25岁），一名来自生产部门的研发工程师。外表看起来有些内向，但实则是一名技术精湛的工程师。最近生产的智能家居产品是她和她的团队开发的。&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;assistant</span><br><span class="line">&lt;think&gt;</span><br><span class="line"></span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">张明：嗨，刘琳，我听说智能家居产品已经进入了我们公司，我真的很想能够了解一下这些产品的技术方面，以便于在销售中向客户传递正确的信息。</span><br><span class="line">刘琳：嗨，张明，很高兴为您介绍。这些智能家居产品基于物联网技术开发，并且已经通过了一系列的测试，具有很高的品质保证，其中包括智能插座、智能门锁等产品，您想了解哪些方面？</span><br><span class="line">张明：首先，我想知道产品的使用前提是什么，例如，在产品安装之前客户需要做哪些准备，以及在使用产品时需要注意哪些事项？</span><br><span class="line">刘琳：客户使用产品之前需要保证有一个稳定的Wi-Fi网络，因为产品只能够通过Wi-Fi网络进行连接和控制。此外，我们提供了一份详细的使用说明书，其中包含了如何安装和使用产品的所有步骤。</span><br><span class="line">张明：我也想问一下产品的安全性能如何，客户的隐私是否会被泄露？</span><br><span class="line">刘琳：我们的产品具有完善的安全措施，可以保证客户的隐私不会泄露。这些措施包括数据加密技术、防火墙以及实时的安全更新等。</span><br><span class="line">张明：听起来很不错，但是我想问一下，如果客户在使用产品时遇到问题，我们应该如何解决？</span><br><span class="line">刘琳：我们提供了在线客服服务以及售后服务，如果客户在使用过程中遇到问题，可以随时和我们取得联系，我们会在第一时间为客户解决问题。</span><br><span class="line">张明：感谢您对我的解答，我对这些产品有了更全面的了解，并且可以更好地向客户介绍这些产品了。</span><br><span class="line">刘琳：没关系，很高兴能够为您提供帮助。&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;user</span><br><span class="line">基于以上对话提出一个问题。&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;assistant</span><br><span class="line">&lt;think&gt;</span><br><span class="line"></span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">这些智能家居产品需要哪些前提条件才能够使用？&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;user</span><br><span class="line">请回答这个问题。&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;assistant</span><br><span class="line">&lt;think&gt;</span><br></pre></td></tr></tbody></table></figure>
 
-<p>维度变化：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">response logits         [B, R, V]</span><br><span class="line">generated token ids     [B, R]</span><br><span class="line">selected old logps      [B, R]</span><br></pre></td></tr></tbody></table></figure>
+<p>注意最后停在 <code>&lt;think&gt;\n</code>，这正是 Actor 开始续写的位置。</p>
+<h3 id="步骤-3：具体切成了什么-token"><a href="#步骤-3：具体切成了什么-token" class="headerlink" title="步骤 3：具体切成了什么 token"></a>步骤 3：具体切成了什么 token</h3><p>Tokenizer 输出：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">input_ids.dtype      = torch.int64</span><br><span class="line">input_ids.shape      = [1,561]</span><br><span class="line">attention_mask.shape = [1,561]</span><br><span class="line">valid tokens         = 561</span><br></pre></td></tr></tbody></table></figure>
 
-<p>对数概率越接近 0，原概率越大；越负，原概率越小。使用 log probability 可以把概率乘除转成加减，并提高数值稳定性。</p>
-<h3 id="为什么位置要右移一位"><a href="#为什么位置要右移一位" class="headerlink" title="为什么位置要右移一位"></a>为什么位置要右移一位</h3><p>自回归模型的 <code>logits[t]</code> 预测 <code>token[t+1]</code>。</p>
-<p>真实样本中：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">completion 位于完整序列       561 ... 666</span><br><span class="line">用于预测它的 logits/value     560 ... 665</span><br></pre></td></tr></tbody></table></figure>
+<p>开头 20 个真实 token：</p>
+<table>
+<thead>
+<tr>
+<th align="right">index</th>
+<th align="right">token id</th>
+<th>decode 后文本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0</td>
+<td align="right">1</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td align="right">832</td>
+<td><code>us</code></td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">311</td>
+<td><code>er</code></td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td align="right">2061</td>
+<td><code>基于</code></td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td align="right">850</td>
+<td><code>以下</code></td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="right">2351</td>
+<td><code>角色</code></td>
+</tr>
+<tr>
+<td align="right">7</td>
+<td align="right">839</td>
+<td><code>信息</code></td>
+</tr>
+<tr>
+<td align="right">8</td>
+<td align="right">1996</td>
+<td><code>完成</code></td>
+</tr>
+<tr>
+<td align="right">9</td>
+<td align="right">3875</td>
+<td><code>一段</code></td>
+</tr>
+<tr>
+<td align="right">10</td>
+<td align="right">3109</td>
+<td><code>对话</code></td>
+</tr>
+<tr>
+<td align="right">11</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">12</td>
+<td align="right">2370</td>
+<td><code>张</code></td>
+</tr>
+<tr>
+<td align="right">13</td>
+<td align="right">851</td>
+<td><code>明</code></td>
+</tr>
+<tr>
+<td align="right">14</td>
+<td align="right">555</td>
+<td><code>（</code></td>
+</tr>
+<tr>
+<td align="right">15</td>
+<td align="right">2921</td>
+<td><code>30</code></td>
+</tr>
+<tr>
+<td align="right">16</td>
+<td align="right">4744</td>
+<td><code>岁</code></td>
+</tr>
+<tr>
+<td align="right">17</td>
+<td align="right">2097</td>
+<td><code>），</code></td>
+</tr>
+<tr>
+<td align="right">18</td>
+<td align="right">5752</td>
+<td><code>一位</code></td>
+</tr>
+<tr>
+<td align="right">19</td>
+<td align="right">6103</td>
+<td><code>IT</code></td>
+</tr>
+</tbody></table>
+<p>末尾 30 个真实 token：</p>
+<table>
+<thead>
+<tr>
+<th align="right">index</th>
+<th align="right">token id</th>
+<th>decode 后文本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">531</td>
+<td align="right">5949</td>
+<td><code>家居</code></td>
+</tr>
+<tr>
+<td align="right">532</td>
+<td align="right">1306</td>
+<td><code>产品</code></td>
+</tr>
+<tr>
+<td align="right">533</td>
+<td align="right">630</td>
+<td><code>需要</code></td>
+</tr>
+<tr>
+<td align="right">534</td>
+<td align="right">2489</td>
+<td><code>哪些</code></td>
+</tr>
+<tr>
+<td align="right">535</td>
+<td align="right">938</td>
+<td><code>前</code></td>
+</tr>
+<tr>
+<td align="right">536</td>
+<td align="right">454</td>
+<td><code>提</code></td>
+</tr>
+<tr>
+<td align="right">537</td>
+<td align="right">2041</td>
+<td><code>条件</code></td>
+</tr>
+<tr>
+<td align="right">538</td>
+<td align="right">2478</td>
+<td><code>才</code></td>
+</tr>
+<tr>
+<td align="right">539</td>
+<td align="right">934</td>
+<td><code>能够</code></td>
+</tr>
+<tr>
+<td align="right">540</td>
+<td align="right">533</td>
+<td><code>使用</code></td>
+</tr>
+<tr>
+<td align="right">541</td>
+<td align="right">776</td>
+<td><code>？</code></td>
+</tr>
+<tr>
+<td align="right">542</td>
+<td align="right">2</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">543</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">544</td>
+<td align="right">1</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">545</td>
+<td align="right">832</td>
+<td><code>us</code></td>
+</tr>
+<tr>
+<td align="right">546</td>
+<td align="right">311</td>
+<td><code>er</code></td>
+</tr>
+<tr>
+<td align="right">547</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">548</td>
+<td align="right">960</td>
+<td><code>请</code></td>
+</tr>
+<tr>
+<td align="right">549</td>
+<td align="right">3854</td>
+<td><code>回答</code></td>
+</tr>
+<tr>
+<td align="right">550</td>
+<td align="right">4582</td>
+<td><code>这个问题</code></td>
+</tr>
+<tr>
+<td align="right">551</td>
+<td align="right">302</td>
+<td><code>。</code></td>
+</tr>
+<tr>
+<td align="right">552</td>
+<td align="right">2</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">553</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">554</td>
+<td align="right">1</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">555</td>
+<td align="right">1388</td>
+<td><code>ass</code></td>
+</tr>
+<tr>
+<td align="right">556</td>
+<td align="right">570</td>
+<td><code>ist</code></td>
+</tr>
+<tr>
+<td align="right">557</td>
+<td align="right">811</td>
+<td><code>ant</code></td>
+</tr>
+<tr>
+<td align="right">558</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">559</td>
+<td align="right">25</td>
+<td><code>&lt;think&gt;</code></td>
+</tr>
+<tr>
+<td align="right">560</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+</tbody></table>
+<p>这解释了为什么人眼看到一个单词，Tokenizer 不一定只产生一个 token。例如 <code>user</code> 被切成 <code>us + er</code>，<code>assistant</code> 被切成 <code>ass + ist + ant</code>，“前提条件”被切成 <code>前 + 提 + 条件</code>。</p>
+<h3 id="步骤-4：Actor-的实际输入和输出"><a href="#步骤-4：Actor-的实际输入和输出" class="headerlink" title="步骤 4：Actor 的实际输入和输出"></a>步骤 4：Actor 的实际输入和输出</h3><p>Actor 输入：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">input_ids      [1,561]</span><br><span class="line">attention_mask [1,561]</span><br></pre></td></tr></tbody></table></figure>
 
-<p>所以：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">logits[560] 预测 completion[0]</span><br><span class="line">value[560]  表示生成 completion[0] 前的状态价值</span><br></pre></td></tr></tbody></table></figure>
+<p>Actor 自回归生成 106 个 token：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">completion_ids [1,106]</span><br><span class="line">output_ids     [1,667] = [1,561] prompt + [1,106] completion</span><br></pre></td></tr></tbody></table></figure>
 
-<p>本样本最后生成 token 恰好是 EOS，因此最后一个选中 logits 预测 EOS；如果生成因达到长度上限而停止，这条结论并不成立。</p>
-<h3 id="response-mask-是否包含-EOS"><a href="#response-mask-是否包含-EOS" class="headerlink" title="response mask 是否包含 EOS"></a>response mask 是否包含 EOS</h3><p>最终 policy/value mask 保留到第一个 EOS 为止，并且包含这个 EOS；EOS 之后与 padding 位置为 0。</p>
-<p>Torch rollout 当前先返回全 1 的 <code>completion_mask</code>，PPO 主循环随后结合 EOS 和 padding 构造真正用于 GAE 与 loss 的 <code>resp_policy_mask</code> / <code>resp_value_mask</code>。</p>
-<h3 id="一个值得保留的实现差异"><a href="#一个值得保留的实现差异" class="headerlink" title="一个值得保留的实现差异"></a>一个值得保留的实现差异</h3><p><code>generate()</code> 使用 <code>temperature=0.8</code> 采样，但保存 old logp 时对未温度化 logits 做 <code>log_softmax</code>。严格来说，保存的 old logp 不是温度化采样分布的精确 log probability，后续 ratio 也就不是生成分布与 current policy 的完全精确 importance ratio。</p>
-<p>这不影响我们读懂数据流，但在讨论“严格 on-policy”语义时不能忽略。</p>
-<h2 id="4-Reward：一个分数如何放进-106-个-token"><a href="#4-Reward：一个分数如何放进-106-个-token" class="headerlink" title="4. Reward：一个分数如何放进 106 个 token"></a>4. Reward：一个分数如何放进 106 个 token</h2><p>MiniMind 的完整终局 reward 为：</p>
+<p>实际生成全文：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">今天用户想知道如何在保证高效的同时，确保产品不被滥用，同时保护用户隐私和数据安全。需要平衡技术细节和用户隐私保护，确保用户在使用过程中不被滥用。</span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">在保证高效的同时，需确保产品不被滥用，同时保护用户数据的安全与隐私，确保技术发展不被滥用。需要通过技术手段和用户隐私保护的平衡，确保产品不被滥用，同时保障用户数据的安全与隐私。</span><br></pre></td></tr></tbody></table></figure>
+
+<p>completion 的真实头尾 token：</p>
+<table>
+<thead>
+<tr>
+<th align="right">t</th>
+<th align="right">token id</th>
+<th>token</th>
+<th align="right">old probability</th>
+<th align="right">old logp</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0</td>
+<td align="right">5640</td>
+<td>今天</td>
+<td align="right">0.951236</td>
+<td align="right">-0.049993</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td align="right">863</td>
+<td>用户</td>
+<td align="right">0.039483</td>
+<td align="right">-3.231891</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">1125</td>
+<td>想</td>
+<td align="right">0.331798</td>
+<td align="right">-1.103230</td>
+</tr>
+<tr>
+<td align="right">103</td>
+<td align="right">2457</td>
+<td>隐私</td>
+<td align="right">0.625183</td>
+<td align="right">-0.469710</td>
+</tr>
+<tr>
+<td align="right">104</td>
+<td align="right">302</td>
+<td>。</td>
+<td align="right">0.872882</td>
+<td align="right">-0.135955</td>
+</tr>
+<tr>
+<td align="right">105</td>
+<td align="right">2</td>
+<td>`&lt;</td>
+<td align="right">im_end</td>
+<td align="right">&gt;`</td>
+</tr>
+</tbody></table>
+<h3 id="步骤-5：Reward-的实际输入和输出"><a href="#步骤-5：Reward-的实际输入和输出" class="headerlink" title="步骤 5：Reward 的实际输入和输出"></a>步骤 5：Reward 的实际输入和输出</h3><p>规则奖励输入是上面的完整 response，包括 thinking 和 answer。</p>
+<p>Reward Model 的输入不是整段 response 原样，而是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">messages = 前面 5 条 prompt messages</span><br><span class="line"></span><br><span class="line">answer =</span><br><span class="line">在保证高效的同时，需确保产品不被滥用，同时保护用户数据的安全与隐私，</span><br><span class="line">确保技术发展不被滥用。需要通过技术手段和用户隐私保护的平衡，</span><br><span class="line">确保产品不被滥用，同时保障用户数据的安全与隐私。</span><br></pre></td></tr></tbody></table></figure>
+
+<p>也就是先按 <code>&lt;/think&gt;</code> 切分，只把其后的 answer 交给 RM。</p>
+<p><code>LMForRewardModel.get_score()</code> 随后把前 4 条历史消息压成 <code>history_text</code>，把最后一个 user 问题写成“我的新问题”，再构造两条 RM 对话：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">RM eval_messages[0].role = user</span><br><span class="line">RM eval_messages[0].content =</span><br><span class="line">  user: &lt;最初角色信息&gt;</span><br><span class="line">  assistant: &lt;完整张明/刘琳历史对话&gt;</span><br><span class="line">  user: 基于以上对话提出一个问题。</span><br><span class="line">  assistant: 这些智能家居产品需要哪些前提条件才能够使用？</span><br><span class="line">  以上是对话历史。我的新问题是：</span><br><span class="line">  请回答这个问题。</span><br><span class="line"></span><br><span class="line">RM eval_messages[1].role = assistant</span><br><span class="line">RM eval_messages[1].content = &lt;上面切出的 answer&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>InternLM2 Reward Model 使用自己的 tokenizer，不是 MiniMind 的 6400 词表。真实编码结果：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">rm_input_ids.shape      = [1,523]</span><br><span class="line">rm_attention_mask.shape = [1,523]</span><br><span class="line">first 12 ids = [1,92543,1008,364,1008,334,262,70513,68544,68968,68347,68360]</span><br><span class="line">last  12 ids = [60353,68405,69572,68508,68398,73820,60510,70713,60355,92542,364,92527]</span><br><span class="line">reward_token_id = 92527</span><br></pre></td></tr></tbody></table></figure>
+
+<p>最后的 <code>92527</code> 是 <code>&lt;|reward|&gt;</code>。Reward Model 对 <code>[1,523]</code> forward，并取这个末尾 reward token 对应的 scalar score：<code>-0.55029296875</code>。</p>
+<p>Reward 各项输出：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>输入检查</th>
+<th align="right">输出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>长度</td>
+<td>完整 response 在 20–800 字符</td>
+<td align="right">+0.5</td>
+</tr>
+<tr>
+<td>thinking</td>
+<td><code>&lt;/think&gt;</code> 前内容在 20–300 字符</td>
+<td align="right">+1.0</td>
+</tr>
+<tr>
+<td>格式</td>
+<td>恰好一个 <code>&lt;/think&gt;</code></td>
+<td align="right">+0.25</td>
+</tr>
+<tr>
+<td>重复惩罚</td>
+<td>answer 的 3-gram</td>
+<td align="right">-0.0</td>
+</tr>
+<tr>
+<td>Reward Model</td>
+<td><code>messages + answer</code></td>
+<td align="right">-0.55029296875</td>
+</tr>
+<tr>
+<td>final reward</td>
+<td>上述相加</td>
+<td align="right">1.19970703125</td>
+</tr>
+</tbody></table>
+<h3 id="步骤-6：Critic-的实际输入和-value-输出"><a href="#步骤-6：Critic-的实际输入和-value-输出" class="headerlink" title="步骤 6：Critic 的实际输入和 value 输出"></a>步骤 6：Critic 的实际输入和 value 输出</h3><p>Critic 的输入不是只有 answer，而是完整 Actor output：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">critic input_ids      = output_ids [1,667]</span><br><span class="line">critic attention_mask = full_mask [1,667]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>网络内：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[1,667]</span><br><span class="line">→ embedding/8层 Transformer</span><br><span class="line">→ hidden [1,667,768]</span><br><span class="line">→ value_head Linear(768,1)</span><br><span class="line">→ values_seq [1,667]</span><br><span class="line">→ gather logp_pos=560...665</span><br><span class="line">→ old_resp_values [1,106]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>选取的真实 value：</p>
+<table>
+<thead>
+<tr>
+<th align="right">t</th>
+<th>状态含义</th>
+<th align="right">old value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0</td>
+<td>看完 prompt、准备生成“今天”</td>
+<td align="right">0.654884</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td>已生成“今天”、准备生成“用户”</td>
+<td align="right">0.711958</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td>已生成“今天用户”、准备生成“想”</td>
+<td align="right">0.597131</td>
+</tr>
+<tr>
+<td align="right">103</td>
+<td>准备生成“隐私”</td>
+<td align="right">0.729777</td>
+</tr>
+<tr>
+<td align="right">104</td>
+<td>准备生成“。”</td>
+<td align="right">0.646647</td>
+</tr>
+<tr>
+<td align="right">105</td>
+<td>准备生成 `&lt;</td>
+<td align="right">im_end</td>
+</tr>
+</tbody></table>
+<p>Critic 的 value 不是概率，也不是 Reward Model score。它预测“从当前生成状态继续下去，预计能得到多少未来回报”。</p>
+<h3 id="步骤-7：reward-怎样进入-GAE"><a href="#步骤-7：reward-怎样进入-GAE" class="headerlink" title="步骤 7：reward 怎样进入 GAE"></a>步骤 7：reward 怎样进入 GAE</h3><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">final reward   [1]     = [1.199707]</span><br><span class="line">token_rewards  [1,106] = [0,0,...,0,1.199707]</span><br><span class="line">old_values     [1,106]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>最后三个位置逐个计算：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">t=105:</span><br><span class="line">delta = 1.199707 + 1×0 - 0.716022 = 0.483685</span><br><span class="line">A105  = 0.483685</span><br><span class="line">return= 0.483685 + 0.716022       = 1.199707</span><br><span class="line"></span><br><span class="line">t=104:</span><br><span class="line">delta = 0 + 1×0.716022 - 0.646647 = 0.069375</span><br><span class="line">A104  = 0.069375 + 0.95×0.483685  = 0.528876</span><br><span class="line">return= 0.528876 + 0.646647        = 1.175523</span><br><span class="line"></span><br><span class="line">t=103:</span><br><span class="line">delta = 0 + 1×0.646647 - 0.729777 = -0.083130</span><br><span class="line">A103  = -0.083130 + 0.95×0.528876 = 0.419302</span><br><span class="line">return= 0.419302 + 0.729777        = 1.149079</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="步骤-8：真实-PPO-token-账本"><a href="#步骤-8：真实-PPO-token-账本" class="headerlink" title="步骤 8：真实 PPO token 账本"></a>步骤 8：真实 PPO token 账本</h3><table>
+<thead>
+<tr>
+<th align="right">t</th>
+<th>token</th>
+<th align="right">old logp</th>
+<th align="right">ref logp</th>
+<th align="right">ratio</th>
+<th align="right">KL</th>
+<th align="right">old value</th>
+<th align="right">reward</th>
+<th align="right">raw A</th>
+<th align="right">return</th>
+<th align="right">norm A</th>
+<th align="right">actor token loss</th>
+<th align="right">value token loss</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0</td>
+<td>今天</td>
+<td align="right">-0.049993</td>
+<td align="right">-9.877064</td>
+<td align="right">1</td>
+<td align="right">8.827125</td>
+<td align="right">0.654884</td>
+<td align="right">0</td>
+<td align="right">0.024116</td>
+<td align="right">0.678999</td>
+<td align="right">-0.586995</td>
+<td align="right">0.586995</td>
+<td align="right">0.000291</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td>用户</td>
+<td align="right">-3.231891</td>
+<td align="right">-4.410814</td>
+<td align="right">1</td>
+<td align="right">0.486533</td>
+<td align="right">0.711958</td>
+<td align="right">0</td>
+<td align="right">-0.034693</td>
+<td align="right">0.677265</td>
+<td align="right">-1.051236</td>
+<td align="right">1.051236</td>
+<td align="right">0.000602</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td>想</td>
+<td align="right">-1.103230</td>
+<td align="right">-1.711979</td>
+<td align="right">1</td>
+<td align="right">0.152780</td>
+<td align="right">0.597131</td>
+<td align="right">0</td>
+<td align="right">0.084351</td>
+<td align="right">0.681482</td>
+<td align="right">-0.111488</td>
+<td align="right">0.111488</td>
+<td align="right">0.003558</td>
+</tr>
+<tr>
+<td align="right">103</td>
+<td>隐私</td>
+<td align="right">-0.469710</td>
+<td align="right">-0.360522</td>
+<td align="right">1</td>
+<td align="right">0.006184</td>
+<td align="right">0.729777</td>
+<td align="right">0</td>
+<td align="right">0.419302</td>
+<td align="right">1.149079</td>
+<td align="right">2.532647</td>
+<td align="right">-2.532647</td>
+<td align="right">0.087907</td>
+</tr>
+<tr>
+<td align="right">104</td>
+<td>。</td>
+<td align="right">-0.135955</td>
+<td align="right">-0.090445</td>
+<td align="right">1</td>
+<td align="right">0.001052</td>
+<td align="right">0.646647</td>
+<td align="right">0</td>
+<td align="right">0.528876</td>
+<td align="right">1.175523</td>
+<td align="right">3.397639</td>
+<td align="right">-3.397639</td>
+<td align="right">0.139855</td>
+</tr>
+<tr>
+<td align="right">105</td>
+<td>EOS</td>
+<td align="right">-0.887186</td>
+<td align="right">-0.018923</td>
+<td align="right">1</td>
+<td align="right">0.514506</td>
+<td align="right">0.716022</td>
+<td align="right">1.199707</td>
+<td align="right">0.483685</td>
+<td align="right">1.199707</td>
+<td align="right">3.040898</td>
+<td align="right">-3.040898</td>
+<td align="right">0.116976</td>
+</tr>
+</tbody></table>
+<h3 id="步骤-9：真实-scalar-输出"><a href="#步骤-9：真实-scalar-输出" class="headerlink" title="步骤 9：真实 scalar 输出"></a>步骤 9：真实 scalar 输出</h3><p>106 个 token 经 mask 求均值：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">raw advantage mean = 0.098474</span><br><span class="line">raw advantage std  = 0.126677</span><br><span class="line">ratio mean         = 1.0</span><br><span class="line">actor loss         ≈ 0.000000036</span><br><span class="line">Reference KL mean  = 0.335082</span><br><span class="line">policy loss        = 0.006702</span><br><span class="line">value loss         = 0.012872</span><br><span class="line">total loss         = 0.013138</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这就是这条真实输入在“更新前 PPO forward”中的完整输出链。</p>
+<h2 id="4-JSONL-到-prompt-tensor"><a href="#4-JSONL-到-prompt-tensor" class="headerlink" title="4. JSONL 到 prompt tensor"></a>4. JSONL 到 prompt tensor</h2><h3 id="4-1-为什么使用-conversations-1"><a href="#4-1-为什么使用-conversations-1" class="headerlink" title="4.1 为什么使用 conversations[:-1]"></a>4.1 为什么使用 <code>conversations[:-1]</code></h3><p>真实数据最后一条是：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"assistant"</span><span class="punctuation">,</span> <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">""</span><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>RLAIFDataset.create_chat_prompt()</code> 使用：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">tokenizer.apply_chat_template(</span><br><span class="line">    conversations[:-<span class="number">1</span>],</span><br><span class="line">    tokenize=<span class="literal">False</span>,</span><br><span class="line">    open_thinking=use_thinking,</span><br><span class="line">    add_generation_prompt=<span class="literal">True</span>,</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>[:-1]</code> 删除空 assistant 占位。PPO/GRPO 要让当前 Actor 在线生成回答；如果数据里已经提供标准 assistant 文本并对它做逐 token 模仿，那更接近 SFT。</p>
+<h3 id="4-2-真实-prompt"><a href="#4-2-真实-prompt" class="headerlink" title="4.2 真实 prompt"></a>4.2 真实 prompt</h3><p>固定：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sample_index   = 0</span><br><span class="line">seed           = 42</span><br><span class="line">thinking_ratio = 0.9</span><br></pre></td></tr></tbody></table></figure>
+
+<p>得到：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">prompt 类型             str</span><br><span class="line">prompt 字符数           991</span><br><span class="line">input_ids.shape         [1,561]</span><br><span class="line">attention_mask.shape    [1,561]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>此时还没有 completion、reward、advantage 或 loss。</p>
+<h2 id="5-PPO-完整回顾"><a href="#5-PPO-完整回顾" class="headerlink" title="5. PPO 完整回顾"></a>5. PPO 完整回顾</h2><h2 id="5-1-PPO-中的五个角色"><a href="#5-1-PPO-中的五个角色" class="headerlink" title="5.1 PPO 中的五个角色"></a>5.1 PPO 中的五个角色</h2><table>
+<thead>
+<tr>
+<th>对象</th>
+<th>本项目实现</th>
+<th>输出</th>
+<th>是否训练</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Current Actor</td>
+<td><code>MiniMindForCausalLM</code></td>
+<td>token logits / current logp</td>
+<td>是</td>
+<td>生成并学习回答</td>
+</tr>
+<tr>
+<td>Old policy</td>
+<td>rollout 时保存的 old logp</td>
+<td><code>[B,R]</code></td>
+<td>否</td>
+<td>表示采样数据时的策略</td>
+</tr>
+<tr>
+<td>Reference</td>
+<td>冻结 DPO checkpoint</td>
+<td>ref logp <code>[B,R]</code></td>
+<td>否</td>
+<td>KL 锚点，限制长期漂移</td>
+</tr>
+<tr>
+<td>Reward Model</td>
+<td>InternLM2 1.8B RM</td>
+<td>每条回答一个 score</td>
+<td>否</td>
+<td>评价完整回答</td>
+</tr>
+<tr>
+<td>Critic</td>
+<td>MiniMind 主干 + value head</td>
+<td>value <code>[B,R]</code></td>
+<td>是</td>
+<td>预测每个状态未来回报</td>
+</tr>
+</tbody></table>
+<p>Old policy 与 Reference 不是同一个东西：</p>
+<ul>
+<li>old policy 比较“一次 rollout 采样时”和“当前更新时”的变化；</li>
+<li>Reference 比较 Actor 与 PPO 开始前稳定模型的长期变化。</li>
+</ul>
+<h3 id="5-1-1-先把四个最容易混淆的词钉死"><a href="#5-1-1-先把四个最容易混淆的词钉死" class="headerlink" title="5.1.1 先把四个最容易混淆的词钉死"></a>5.1.1 先把四个最容易混淆的词钉死</h3><p><img src="/images/minimind-ppo-real-complete/02-reference-policy-timeline.svg" alt="Reference / Old / Current / New 时间线"></p>
+<p>设第 <code>k</code> 个训练 batch 开始时，Actor 参数为 $\theta^{k}$，Critic 参数为 $\phi^{k}$，冻结 Reference 参数为 $\theta_{ref}$。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>在本项目里到底是什么</th>
+<th align="right">是否单独占一套可训练参数</th>
+<th>什么时候改变</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Reference</td>
+<td>从 <code>lifeos_agent_dpo_v1_768.pth</code> 单独加载的完整模型，参数记为 $\theta_{ref}$</td>
+<td align="right">是一套独立模型，但冻结</td>
+<td>PPO 全程不改变</td>
+</tr>
+<tr>
+<td>Old policy</td>
+<td>本轮 rollout 时 Actor 对已生成 token 给出的 <code>old_resp_logp</code>，即 $\log\pi_{\theta^k}(a_t\mid s_t)$ 的缓存张量</td>
+<td align="right"><strong>不是</strong>第四套模型</td>
+<td>每次新 rollout 都重新生成并覆盖语义上的“old”基准</td>
+</tr>
+<tr>
+<td>Current policy</td>
+<td>正在参加当前 forward/backward 的 Actor；参数就是此刻内存中的 $\theta$</td>
+<td align="right">就是 Actor 本身</td>
+<td>每次 <code>actor_optimizer.step()</code> 后改变</td>
+</tr>
+<tr>
+<td>New policy</td>
+<td>optimizer step 完成后的 Current Actor，例如 $\theta^{k,1}$、$\theta^{k,2}$</td>
+<td align="right"><strong>不是</strong>另一套模型</td>
+<td><code>actor_optimizer.step()</code> 执行瞬间产生；随后它就成为新的 Current</td>
+</tr>
+</tbody></table>
+<p>因此，“旧、当前、新”是同一 Actor 在不同时间点的身份，不代表 GPU 上同时常驻三套 Actor：</p>
 
 $$
-R_{\mathrm{final}}
-=
-R_{\mathrm{length}}
-+R_{\mathrm{think}}
-+R_{\mathrm{format}}
--R_{\mathrm{repeat}}
-+R_{\mathrm{RM}}
+\underbrace{\theta^k}_{\text{rollout 时的 Actor}}
+\xrightarrow{\text{保存 old logp}}
+\underbrace{\theta^k}_{\text{第 1 次更新前的 Current}}
+\xrightarrow{optimizer.step}
+\underbrace{\theta^{k,1}}_{\text{New，立刻成为 Current}}
+\xrightarrow{optimizer.step}
+\underbrace{\theta^{k,2}}_{\text{再次更新后的 New}}
 $$
 
 
-<p>本文真实 rollout 的规则部分：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">回答长度合格           +0.50</span><br><span class="line">thinking 长度合格      +1.00</span><br><span class="line">think 格式合格         +0.25</span><br><span class="line">重复惩罚               -0.00</span><br><span class="line">规则奖励合计            1.75</span><br></pre></td></tr></tbody></table></figure>
-
-<p>再加上 Reward Model score，得到 <code>rewards [B]</code>。</p>
-<p>但 GAE 工作在逐 token 维度 <code>[B,R]</code>。代码先创建全 0 Tensor，再把整条 reward 放到最后有效 token：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">token_rewards = torch.zeros_like(old_resp_logp)</span><br><span class="line">last_idx = resp_lengths - <span class="number">1</span></span><br><span class="line">token_rewards[batch_index, last_idx] += rewards</span><br></pre></td></tr></tbody></table></figure>
-
-<p>因此真实 shape 是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rewards                 [1]</span><br><span class="line">token_rewards           [1, 106]</span><br><span class="line">token_rewards           [0, 0, ..., 0, final_reward]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>这一步必须记牢：<code>token_rewards</code> 不是 GAE 的输出，而是 GAE 的输入。</p>
-<h2 id="5-TD-residual：Critic-这一步到底估错了多少"><a href="#5-TD-residual：Critic-这一步到底估错了多少" class="headerlink" title="5. TD residual：Critic 这一步到底估错了多少"></a>5. TD residual：Critic 这一步到底估错了多少</h2><p>Bellman 一步目标是“当前 reward 加下一状态的折扣价值”：</p>
+<p>Reference 不在这条更新链上：</p>
 
 $$
-\mathrm{TDTarget}_t
-=
-r_t+\gamma V_{\mathrm{old}}(s_{t+1})
+\theta_{ref}^{start}=\theta_{ref}^{step\ 1}=\cdots=\theta_{ref}^{end}
 $$
 
 
-<p>用它减去 Critic 原预测，得到 TD residual：</p>
+<h3 id="5-1-2-Reference-从哪里来，为什么最初看起来和-Actor-一样"><a href="#5-1-2-Reference-从哪里来，为什么最初看起来和-Actor-一样" class="headerlink" title="5.1.2 Reference 从哪里来，为什么最初看起来和 Actor 一样"></a>5.1.2 Reference 从哪里来，为什么最初看起来和 Actor 一样</h3><p>PPO 初始化时源码连续执行两次 <code>init_model(lm_config, base_weight)</code>：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">actor_model, tokenizer = init_model(lm_config, base_weight, ...)</span><br><span class="line">ref_model, _ = init_model(lm_config, base_weight, ...)</span><br><span class="line">ref_model = ref_model.<span class="built_in">eval</span>().requires_grad_(<span class="literal">False</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>历史任务中 <code>base_weight=lifeos_agent_dpo_v1</code>，所以训练刚开始时：</p>
 
 $$
-\delta_t
-=
-r_t
-+\gamma V_{\mathrm{old}}(s_{t+1})
--V_{\mathrm{old}}(s_t)
+\theta^{0}=\theta_{ref}=\theta_{DPO}
 $$
 
 
-<p>各项来源：</p>
+<p>这里的等号表示<strong>初始参数数值相同</strong>，并不表示二者是同一个 Python 模型或共享同一块参数。随后只有 Actor 被交给：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">actor_optimizer = AdamW(actor_model.parameters(), lr=<span class="number">3e-7</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Reference 没有 optimizer、<code>requires_grad=False</code>，也在 <code>no_grad()</code> 中 forward，所以：</p>
+<ul>
+<li>Actor 每次 optimizer step 都可能变化；</li>
+<li>Reference 永远保留 PPO 开始前的 DPO 行为；</li>
+<li>PPO 越往后训练，Current Actor 与 Reference 通常越不相同；</li>
+<li>Reference 的<strong>参数</strong>固定，但每个 batch 的 prompt/completion 不同，所以每轮仍要对新 <code>output_ids</code> 计算新的 <code>ref_resp_logp</code> 张量。</li>
+</ul>
+<p>Reference 的作用是长期锚点。Old policy 约束“不要相对刚才采样时跳太远”，Reference KL 约束“不要相对 PPO 起点长期漂移太远”。</p>
+<h3 id="5-1-3-一个真实-PPO-batch-的严格执行顺序"><a href="#5-1-3-一个真实-PPO-batch-的严格执行顺序" class="headerlink" title="5.1.3 一个真实 PPO batch 的严格执行顺序"></a>5.1.3 一个真实 PPO batch 的严格执行顺序</h3><p>历史配置为：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">B                  = 1</span><br><span class="line">mini_batch_size    = 1</span><br><span class="line">ppo_update_iters   = 2</span><br><span class="line">accumulation_steps = 1</span><br><span class="line">Actor learning rate  = 3e-7</span><br><span class="line">Critic learning rate = 5e-7</span><br><span class="line">rollout_engine       = torch</span><br></pre></td></tr></tbody></table></figure>
+
+<p>下面的<strong>执行顺序</strong>来自远程当前 <code>train_ppo.py</code>，形状和 token 数值来自真实 PPO checkpoint 的只读 probe。probe 没有执行 backward/optimizer step，因此它能真实证明“更新前 current=old”，但不能提供第一次 step 后的新 logp；后者只写公式，不造数。</p>
+<p>第 <code>k</code> 个 batch 按下面顺序执行。</p>
+<h4 id="时刻-T0：batch-开始"><a href="#时刻-T0：batch-开始" class="headerlink" title="时刻 T0：batch 开始"></a>时刻 T0：batch 开始</h4><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Actor 当前参数     = theta^k</span><br><span class="line">Critic 当前参数    = phi^k</span><br><span class="line">Reference 参数     = theta_ref（冻结，仍是 DPO 起点）</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="时刻-T1：Current-Actor-先生成-rollout，并把这一刻冻结成-Old-数据"><a href="#时刻-T1：Current-Actor-先生成-rollout，并把这一刻冻结成-Old-数据" class="headerlink" title="时刻 T1：Current Actor 先生成 rollout，并把这一刻冻结成 Old 数据"></a>时刻 T1：Current Actor 先生成 rollout，并把这一刻冻结成 Old 数据</h4><p><code>TorchRolloutEngine</code> 持有同一个 Actor 对象，用 $\theta^k$ 生成真实的 106 个 completion token，并保存：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">completion_ids [1,106]</span><br><span class="line">old_resp_logp  [1,106] = log pi_{theta^k}(a_t | s_t)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>此时没有复制出 <code>old_model</code>。所谓 Old policy，是 <code>old_resp_logp.detach()</code> 所代表的采样时刻策略。</p>
+<h4 id="时刻-T2：先算整条回答-reward，再固定本轮-Critic-x2F-Reference-目标"><a href="#时刻-T2：先算整条回答-reward，再固定本轮-Critic-x2F-Reference-目标" class="headerlink" title="时刻 T2：先算整条回答 reward，再固定本轮 Critic/Reference 目标"></a>时刻 T2：先算整条回答 reward，再固定本轮 Critic/Reference 目标</h4><p>rollout 返回后，源码先执行：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rewards [1] = calculate_rewards(prompts, responses_text, reward_model)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>本真实回答得到 <code>reward=1.199707</code>。随后建立 completion mask，再进入 <code>torch.no_grad()</code>，严格按源码顺序得到：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">old_resp_values [1,106] = V_{phi^k}(s_t)</span><br><span class="line">ref_resp_logp   [1,106] = log pi_ref(a_t | s_t)</span><br><span class="line">token_rewards   [1,106]</span><br><span class="line">advantages      [1,106]</span><br><span class="line">returns         [1,106]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这些张量在本 batch 的两次 PPO update 中保持不变。特别注意：</p>
+<ul>
+<li><code>old_resp_values</code> 是 Critic 在更新前的缓存，不会随第一次 Critic step 改写；</li>
+<li><code>ref_resp_logp</code> 是冻结 Reference 对本轮固定 <code>output_ids</code> 的计算结果；</li>
+<li>advantages 和 returns 只计算一次，两次 update 共用。</li>
+</ul>
+<h4 id="时刻-T3：第-1-次-PPO-update，更新前-Current-与-Old-相同"><a href="#时刻-T3：第-1-次-PPO-update，更新前-Current-与-Old-相同" class="headerlink" title="时刻 T3：第 1 次 PPO update，更新前 Current 与 Old 相同"></a>时刻 T3：第 1 次 PPO update，更新前 Current 与 Old 相同</h4><p>每个 minibatch 中，源码先让 Current Critic forward 得到 <code>mb_resp_values</code>，再让 Current Actor 对同一批 <code>output_ids</code> forward 得到 <code>mb_resp_logp</code>。此刻尚未执行任何 Actor/Critic step，所以：</p>
+
+$$
+\theta_{current}=\theta^k=\theta_{old\ rollout}
+$$
+
+
+<p>真实 EOS token：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">old_logp     = -0.887186</span><br><span class="line">current_logp = -0.887186</span><br><span class="line">ratio        = exp(-0.887186 - (-0.887186)) = 1</span><br><span class="line">ref_logp     = -0.018923</span><br><span class="line">Reference KL = 0.514506</span><br></pre></td></tr></tbody></table></figure>
+
+<p>随后按顺序执行：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">loss.backward()</span><br><span class="line">clip_grad_norm_(Actor, 1.0)</span><br><span class="line">clip_grad_norm_(Critic, 1.0)</span><br><span class="line">actor_optimizer.step()   -&gt; theta^k 变成 theta^{k,1}</span><br><span class="line">critic_optimizer.step()  -&gt; phi^k   变成 phi^{k,1}</span><br><span class="line">actor_scheduler.step()</span><br><span class="line">critic_scheduler.step()</span><br><span class="line">actor_optimizer.zero_grad()</span><br><span class="line">critic_optimizer.zero_grad()</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>theta^{k,1}</code> 在刚产生时可以叫 New policy；从下一行代码开始，它就是 Current policy。</p>
+<h4 id="时刻-T4：第-2-次-PPO-update，Current-已经是新的，Old-仍是-T1-的缓存"><a href="#时刻-T4：第-2-次-PPO-update，Current-已经是新的，Old-仍是-T1-的缓存" class="headerlink" title="时刻 T4：第 2 次 PPO update，Current 已经是新的，Old 仍是 T1 的缓存"></a>时刻 T4：第 2 次 PPO update，Current 已经是新的，Old 仍是 T1 的缓存</h4><p>源码再次按“Current Critic forward → Current Actor forward”的顺序重算当前值。Actor ratio 使用：</p>
+
+$$
+ratio_t^{(2)}
+=\exp\left(
+\log\pi_{\theta^{k,1}}(a_t\mid s_t)
+-\underbrace{\log\pi_{\theta^k}(a_t\mid s_t)}_{old\_resp\_logp\text{，仍固定}}
+\right)
+$$
+
+
+<p>以真实 EOS 的 old logp 写开就是：</p>
+
+$$
+ratio_{EOS}^{(2)}
+=\exp\left(\log\pi_{\theta^{k,1}}(EOS\mid s)-(-0.887186)\right)
+$$
+
+
+<p>这一次 ratio 才可能不等于 1。只读探针没有执行 <code>optimizer.step()</code>，因此没有真实的 $\log\pi_{\theta^{k,1}}$ 数值；这里保留公式，不伪造更新后结果。</p>
+<p>第二次 backward/step 后：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Actor  = theta^{k,2}</span><br><span class="line">Critic = phi^{k,2}</span><br></pre></td></tr></tbody></table></figure>
+
+<p>若 <code>approx_kl &gt; early_stop_kl</code>，源码会把该次 loss 乘 0，完成 DDP forward-backward 闭环但不做有效参数更新。这是提前停止的保护分支。</p>
+<h4 id="时刻-T5：进入下一个-batch，上一轮-New-变成下一轮-Old-的来源"><a href="#时刻-T5：进入下一个-batch，上一轮-New-变成下一轮-Old-的来源" class="headerlink" title="时刻 T5：进入下一个 batch，上一轮 New 变成下一轮 Old 的来源"></a>时刻 T5：进入下一个 batch，上一轮 New 变成下一轮 Old 的来源</h4><p>令：</p>
+
+$$
+\theta^{k+1}=\theta^{k,2},\qquad \phi^{k+1}=\phi^{k,2}
+$$
+
+
+<p>下一批先用 $\theta^{k+1}$ 重新生成文本和 logp。新缓存的：</p>
+
+$$
+old\_resp\_logp^{k+1}=\log\pi_{\theta^{k+1}}(a_t^{k+1}\mid s_t^{k+1})
+$$
+
+
+<p>才成为下一批的 Old 基准。上一批的 <code>old_resp_logp^k</code> 不会被拿来和下一批不同的 token 比较。</p>
+<h3 id="5-1-4-用一张表看清“谁在什么时候更新”"><a href="#5-1-4-用一张表看清“谁在什么时候更新”" class="headerlink" title="5.1.4 用一张表看清“谁在什么时候更新”"></a>5.1.4 用一张表看清“谁在什么时候更新”</h3><table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>Actor/Current</th>
+<th>Old logp</th>
+<th>Critic/Current value</th>
+<th>Old value</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>初始化</td>
+<td>$\theta^0=\theta_{DPO}$</td>
+<td>尚无</td>
+<td>$\phi^0$</td>
+<td>尚无</td>
+<td>$\theta_{ref}=\theta_{DPO}$，冻结</td>
+</tr>
+<tr>
+<td>T1 rollout 后</td>
+<td>仍是 $\theta^k$</td>
+<td>保存自 $\theta^k$</td>
+<td>仍是 $\phi^k$</td>
+<td>尚无</td>
+<td>参数不变</td>
+</tr>
+<tr>
+<td>T2 目标计算后</td>
+<td>仍是 $\theta^k$</td>
+<td>固定</td>
+<td>仍是 $\phi^k$</td>
+<td>保存自 $\phi^k$</td>
+<td>参数不变；得到本批 ref logp</td>
+</tr>
+<tr>
+<td>第 1 次 step 后</td>
+<td>$\theta^{k,1}$</td>
+<td>仍是 $\theta^k$ 的缓存</td>
+<td>$\phi^{k,1}$</td>
+<td>仍是 $\phi^k$ 的缓存</td>
+<td>不变</td>
+</tr>
+<tr>
+<td>第 2 次 step 后</td>
+<td>$\theta^{k,2}$</td>
+<td>仍是 $\theta^k$ 的缓存</td>
+<td>$\phi^{k,2}$</td>
+<td>仍是 $\phi^k$ 的缓存</td>
+<td>不变</td>
+</tr>
+<tr>
+<td>下一批 rollout 后</td>
+<td>$\theta^{k+1}$</td>
+<td>重新保存自 $\theta^{k+1}$</td>
+<td>$\phi^{k+1}$</td>
+<td>随后重新保存</td>
+<td>不变</td>
+</tr>
+</tbody></table>
+<h3 id="5-1-5-为什么必须同时有-Old-和-Reference"><a href="#5-1-5-为什么必须同时有-Old-和-Reference" class="headerlink" title="5.1.5 为什么必须同时有 Old 和 Reference"></a>5.1.5 为什么必须同时有 Old 和 Reference</h3><p>它们回答的是两个不同问题：</p>
+
+$$
+ratio_t=\frac{\pi_{current}(a_t\mid s_t)}{\pi_{old}(a_t\mid s_t)}
+$$
+
+
+<p>回答：“这次参数更新相对产生本批数据的策略走了多远？”它服务于 PPO clip 和近端更新。</p>
+
+$$
+KL_t=f\!\left(\log\pi_{ref}(a_t\mid s_t)-\log\pi_{current}(a_t\mid s_t)\right)
+$$
+
+
+<p>回答：“当前 Actor 相对 PPO 开始前的 DPO 模型累计漂移了多远？”它服务于长期行为约束。</p>
+<p>即使第 1 次 update 的 <code>ratio=1</code>，Reference KL 也不一定为 0。本真实 EOS 上就是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">current = old  -&gt; ratio = 1</span><br><span class="line">current != ref -&gt; Reference KL = 0.514506</span><br></pre></td></tr></tbody></table></figure>
+
+<p>原因是探针加载的是已经训练完成的 PPO Actor，而 Reference 仍是 DPO checkpoint；探针中的 Current/Old 在当前 rollout 时相同，但 Current 与长期 Reference 已经不同。</p>
+<h3 id="5-1-6-update-policy-到底什么时候更新-Rollout-Actor"><a href="#5-1-6-update-policy-到底什么时候更新-Rollout-Actor" class="headerlink" title="5.1.6 update_policy() 到底什么时候更新 Rollout Actor"></a>5.1.6 <code>update_policy()</code> 到底什么时候更新 Rollout Actor</h3><p>历史训练用 <code>rollout_engine=torch</code>。<code>TorchRolloutEngine</code> 保存的是 Actor 模型对象的引用：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.policy_model = actor_model</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>actor_optimizer.step()</code> 会原地修改这个对象的参数，所以每次 step 后，下一次 Torch rollout 自动看到最新 Actor。源码虽然只在训练开始、每 <code>save_interval=250</code> 步以及训练结束显式调用 <code>rollout_engine.update_policy(actor_model)</code>，但对 Torch 引擎而言，这个调用只是重新赋同一个对象引用，不代表中间 249 步使用旧权重。</p>
+<p>如果改用 <code>rollout_engine=sglang</code>，情况不同：SGLang 是外部服务，<code>update_policy()</code> 会先把权重写到共享目录，再请求 <code>/update_weights_from_disk</code>。按当前源码，它只在初始化、保存间隔和结束处显式同步，因此两个同步点之间外部 rollout 服务可能落后于训练 Actor。在远端 API 返回的 token logp 确实由“实际执行本次采样的那版权重和分布”计算这一必要前提下，<code>old_logp</code> 才正确表示生成这批 token 的远程策略；Current forward 使用本地最新 Actor，第一次比较时 ratio 也可能不再等于 1。</p>
+<h2 id="5-2-PPO-真实-rollout"><a href="#5-2-PPO-真实-rollout" class="headerlink" title="5.2 PPO 真实 rollout"></a>5.2 PPO 真实 rollout</h2><p>Actor 使用 <code>temperature=0.8</code> 采样，得到：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">prompt_ids       [1,561]</span><br><span class="line">output_ids       [1,667]</span><br><span class="line">completion_ids   [1,106]</span><br><span class="line">old_logps        [1,106]</span><br><span class="line">completion_mask  [1,106]</span><br><span class="line">valid tokens     106</span><br></pre></td></tr></tbody></table></figure>
+
+<p>关系是沿 sequence 维拼接：</p>
+
+$$
+output\_ids=concat(prompt\_ids,completion\_ids)
+$$
+
+
+<p>不是 Tensor 数值相加。</p>
+<p>真实生成文本为：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">今天用户想知道如何在保证高效的同时，确保产品不被滥用，同时保护用户隐私和数据安全。</span><br><span class="line">需要平衡技术细节和用户隐私保护，确保用户在使用过程中不被滥用。</span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">在保证高效的同时，需确保产品不被滥用，同时保护用户数据的安全与隐私……</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这条回答没有直接回答稳定 Wi-Fi 和安装说明，因此语义偏离。</p>
+<h2 id="5-3-自回归位置对齐"><a href="#5-3-自回归位置对齐" class="headerlink" title="5.3 自回归位置对齐"></a>5.3 自回归位置对齐</h2><p>第 <code>t</code> 个 completion token 位于完整 output 的 <code>P+t</code>，由 logits 的 <code>P+t-1</code> 预测：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">completion token 0：output[561] ← logits[560] 预测</span><br><span class="line">completion token 1：output[562] ← logits[561] 预测</span><br><span class="line">...</span><br><span class="line">completion token 105：output[666] ← logits[665] 预测</span><br></pre></td></tr></tbody></table></figure>
+
+<p>代码等价于：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">labels = output_ids[:, <span class="number">1</span>:]</span><br><span class="line">logp_pos = prompt_lens.unsqueeze(<span class="number">1</span>) - <span class="number">1</span> + torch.arange(R)</span><br><span class="line">selected_logps = all_shifted_logps.gather(<span class="number">1</span>, logp_pos)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因此：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">logits       [B,L,V]</span><br><span class="line">右移后 logits [B,L-1,V]</span><br><span class="line">实际 token id [B,L-1]</span><br><span class="line">gather 后     [B,L-1]</span><br><span class="line">再选 response [B,R]</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="5-4-probability、logp-与-old-logp"><a href="#5-4-probability、logp-与-old-logp" class="headerlink" title="5.4 probability、logp 与 old logp"></a>5.4 probability、logp 与 old logp</h2><p>语言模型计算：</p>
+
+$$
+p_t=P(a_t\mid s_t)
+$$
+
+
+<p>其中：</p>
+<ul>
+<li><code>s_t</code>：prompt 加已经生成的 token；</li>
+<li><code>a_t</code>：当前实际生成 token；</li>
+<li><code>p_t</code>：Actor 给这个实际 token 的条件概率。</li>
+</ul>
+<p>对数概率：</p>
+
+$$
+logp_t=\log p_t
+$$
+
+
+<p>真实 PPO token：</p>
+<table>
+<thead>
+<tr>
+<th align="right">t</th>
+<th>token</th>
+<th align="right">old logp</th>
+<th align="right"><code>exp(old_logp)</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0</td>
+<td>今天</td>
+<td align="right">-0.049993</td>
+<td align="right">0.951236</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td>用户</td>
+<td align="right">-3.231891</td>
+<td align="right">0.039483</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td>想</td>
+<td align="right">-1.103230</td>
+<td align="right">0.331798</td>
+</tr>
+<tr>
+<td align="right">105</td>
+<td>`&lt;</td>
+<td align="right">im_end</td>
+<td align="right">&gt;`</td>
+</tr>
+</tbody></table>
+<p>实现注意：<code>generate()</code> 用温度 0.8 采样，但 <code>compute_per_token_logps()</code> 对原始 logits 做 <code>log_softmax</code>，没有再次除以 0.8。因此保存的 old logp 对应基础 logits，并不严格等于温度化采样分布的 logp。</p>
+<h2 id="5-5-PPO-reward"><a href="#5-5-PPO-reward" class="headerlink" title="5.5 PPO reward"></a>5.5 PPO reward</h2><p>本项目终局奖励：</p>
+
+$$
+R_{final}=R_{length}+R_{think}+R_{format}-R_{repeat}+R_{RM}
+$$
+
+
+<p>每个变量：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th align="right">真实值</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>R_length</code></td>
+<td align="right"><code>+0.5</code></td>
+<td>response 字符数位于 20–800</td>
+</tr>
+<tr>
+<td><code>R_think</code></td>
+<td align="right"><code>+1.0</code></td>
+<td>thinking 内容长度位于 20–300</td>
+</tr>
+<tr>
+<td><code>R_format</code></td>
+<td align="right"><code>+0.25</code></td>
+<td>恰好一个 <code>&lt;/think&gt;</code></td>
+</tr>
+<tr>
+<td><code>R_repeat</code></td>
+<td align="right"><code>0.0</code></td>
+<td>answer 的 3-gram 重复惩罚</td>
+</tr>
+<tr>
+<td><code>R_RM</code></td>
+<td align="right"><code>-0.55029296875</code></td>
+<td>InternLM2 Reward Model</td>
+</tr>
+</tbody></table>
+<p>代入：</p>
+
+$$
+R_{final}=0.5+1.0+0.25-0-0.55029296875
+=1.19970703125
+$$
+
+
+<p>规则评分完整 response；若存在 <code>&lt;/think&gt;</code>，Reward Model 只评分 <code>&lt;/think&gt;</code> 后的 answer 加 prompt messages。</p>
+<h2 id="5-6-从-sequence-reward-到-token-rewards"><a href="#5-6-从-sequence-reward-到-token-rewards" class="headerlink" title="5.6 从 sequence reward 到 token rewards"></a>5.6 从 sequence reward 到 token rewards</h2><p>PPO 创建：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">token_rewards.shape = [1,106]</span><br><span class="line">token_rewards       = [0,0,...,0,1.199707]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>只有最后一个有效 token 得到终局 reward：</p>
+
+$$
+r_{105}=1.19970703125,\qquad r_t=0\;(t\lt 105)
+$$
+
+
+<p><code>token_rewards</code> 是 GAE 的输入，不是 GAE 输出。</p>
+<h2 id="5-7-Critic-value"><a href="#5-7-Critic-value" class="headerlink" title="5.7 Critic value"></a>5.7 Critic value</h2><p>Critic 对每个生成前状态预测未来总回报：</p>
+
+$$
+V_{old,t}=V_{\phi_{old}}(s_t)
+$$
+
+
+<p>完整序列一次 forward：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">input_ids     [1,667]</span><br><span class="line">hidden        [1,667,768]</span><br><span class="line">value_head    Linear(768,1)</span><br><span class="line">values        [1,667]</span><br><span class="line">response value gather 后 [1,106]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>它不是逐 token 运行 106 次 Transformer。</p>
+<h2 id="5-8-TD-residual"><a href="#5-8-TD-residual" class="headerlink" title="5.8 TD residual"></a>5.8 TD residual</h2><p><img src="/images/minimind-ppo-real-complete/03-critic-gae-tensors.svg" alt="Critic、TD、GAE 与 Returns 张量流"></p>
+<p>公式：</p>
+
+$$
+\delta_t=r_t+\gamma V_{old,t+1}-V_{old,t}
+$$
+
+
+<p>变量：</p>
 <table>
 <thead>
 <tr>
 <th>变量</th>
 <th>含义</th>
-<th>来源</th>
+<th>本项目参数/来源</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>$r_t$</td>
-<td>当前 token reward</td>
-<td><code>token_rewards [B,R]</code></td>
+<td><code>r_t</code></td>
+<td>当前 token 后立即得到的 reward</td>
+<td><code>token_rewards</code></td>
 </tr>
 <tr>
-<td>$V_{\mathrm{old}}(s_t)$</td>
-<td>当前状态旧价值预测</td>
+<td><code>V_old,t</code></td>
+<td>Critic 对当前状态的旧预测</td>
 <td>old Critic forward</td>
 </tr>
 <tr>
-<td>$V_{\mathrm{old}}(s_{t+1})$</td>
-<td>下一状态旧价值预测</td>
-<td>同一次 forward 的下一位置</td>
+<td><code>V_old,t+1</code></td>
+<td>下一状态的旧预测</td>
+<td>同一 value tensor 下一位置</td>
 </tr>
 <tr>
-<td>$\gamma$</td>
-<td>未来折扣</td>
-<td>本项目为 1.0</td>
+<td><code>gamma</code></td>
+<td>未来回报折扣</td>
+<td><code>1.0</code></td>
 </tr>
 <tr>
-<td>$\delta_t$</td>
-<td>一步目标与旧预测的差</td>
-<td>GAE 的原料</td>
+<td><code>delta_t</code></td>
+<td>当前 value 的一步预测误差</td>
+<td>由上述量计算</td>
 </tr>
 </tbody></table>
-<p>直觉上：</p>
-<ul>
-<li><code>delta</code> 为正：看到下一状态后，发现 Critic 原来低估了当前状态。</li>
-<li><code>delta</code> 为负：Critic 原来高估了当前状态。</li>
-<li>终止位置没有下一状态，本实现令 next value 为 0。</li>
-</ul>
-<p>TD residual 来自 Bellman/时序差分框架，不是 PPO 发明的。</p>
-<h2 id="6-GAE：把终局结果传给更早-token"><a href="#6-GAE：把终局结果传给更早-token" class="headerlink" title="6. GAE：把终局结果传给更早 token"></a>6. GAE：把终局结果传给更早 token</h2><p>语言模型通常到回答结束才拿到 reward，但前面每个 token 都参与了这次结果。GAE 的作用就是信用分配。</p>
-<p><img src="/images/minimind-ppo-source-code/03-gae-credit-assignment.svg" alt="三 token 例子中 TD residual、GAE advantage 与 returns 的反向递推"></p>
-<p>GAE 的递推形式：</p>
+<p>终止位置没有下一状态，令 <code>V_{106}=0</code>。</p>
+<h2 id="5-9-GAE"><a href="#5-9-GAE" class="headerlink" title="5.9 GAE"></a>5.9 GAE</h2><p>递推公式：</p>
 
 $$
-A_t
-=
-\delta_t
-+\gamma\lambda A_{t+1}
+A_t^{raw}=\delta_t+\gamma\lambda A_{t+1}^{raw}
 $$
 
 
-<p>展开后：</p>
+<p>项目参数：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gamma  = 1.0</span><br><span class="line">lambda = 0.95</span><br></pre></td></tr></tbody></table></figure>
 
-$$
-A_t
-=
-\delta_t
-+(\gamma\lambda)\delta_{t+1}
-+(\gamma\lambda)^2\delta_{t+2}
-+\cdots
-$$
-
-
-<p><code>lambda</code> 控制未来 TD residual 向前传播多远：</p>
-<ul>
-<li><code>lambda=0</code>：只看当前一步，更依赖 Critic，方差低但偏差可能更高。</li>
-<li><code>lambda</code> 接近 1：终局信息传得更远，更接近完整回报，但方差可能更高。</li>
-<li>MiniMind 使用 <code>lambda=0.95</code>。</li>
-</ul>
-<h3 id="三-token-手算"><a href="#三-token-手算" class="headerlink" title="三 token 手算"></a>三 token 手算</h3><p>假设：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">token_rewards = [0.0, 0.0, 1.0]</span><br><span class="line">old_values    = [0.2, 0.3, 0.4]</span><br><span class="line">gamma         = 1.0</span><br><span class="line">lambda        = 0.95</span><br></pre></td></tr></tbody></table></figure>
-
-<p>从后向前：</p>
-
-$$
-\delta_2=1.0-0.4=0.6,
-\qquad
-A_2=0.6
-$$
-
-
-
-$$
-\delta_1=0+0.4-0.3=0.1,
-\qquad
-A_1=0.1+0.95\times0.6=0.67
-$$
-
-
-
-$$
-\delta_0=0+0.3-0.2=0.1,
-\qquad
-A_0=0.1+0.95\times0.67=0.7365
-$$
-
-
-<p>所以：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">raw_advantages = [0.7365, 0.6700, 0.6000]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Returns 由 raw advantages 与 old values 构造：</p>
-
-$$
-\mathrm{Return}_t
-=
-A_t^{\mathrm{raw}}
-+V_{\mathrm{old},t}
-$$
-
-
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">returns = [0.9365, 0.9700, 1.0000]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>现在可以精确回答“label 是什么”：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">raw advantages          用来构造 returns</span><br><span class="line">normalized advantages   Actor loss 的逐 token 权重</span><br><span class="line">returns                 Critic 的训练目标，也就是 Critic label</span><br><span class="line">current values          Critic 当前预测</span><br></pre></td></tr></tbody></table></figure>
-
-<p>代码先计算 <code>returns = raw_advantages + old_values</code>，之后才标准化 advantages，因此 returns 不会受到 advantage 标准化影响。</p>
-<h3 id="从后向前会不会很慢"><a href="#从后向前会不会很慢" class="headerlink" title="从后向前会不会很慢"></a>从后向前会不会很慢</h3><p>不会。Critic 先对完整 <code>[B,P+R]</code> 序列做一次并行 forward，得到所有位置的 value。GAE 只是对已有 <code>[B,R]</code> Tensor 做一次复杂度为 <code>O(BR)</code> 的反向循环。</p>
-<p>它既不是逐 token 重跑 Critic，也不是神经网络的 <code>loss.backward()</code>。PPO 的主要计算仍在自回归生成和 Transformer 前向/反向。</p>
-<h2 id="7-PPO-Loss：三道安全闸"><a href="#7-PPO-Loss：三道安全闸" class="headerlink" title="7. PPO Loss：三道安全闸"></a>7. PPO Loss：三道安全闸</h2><p>PPO 的 loss 不是单独一个公式。MiniMind 的核心组成是 Actor clipped loss、Reference KL penalty 和 Critic clipped value loss；启用 MoE 时还会增加 auxiliary loss。</p>
-<p><img src="/images/minimind-ppo-source-code/04-ppo-losses.svg" alt="Actor clipped loss、Reference KL 和 Critic value loss 的输入、系数与约束对象"></p>
-<h3 id="7-1-Actor-clipped-loss"><a href="#7-1-Actor-clipped-loss" class="headerlink" title="7.1 Actor clipped loss"></a>7.1 Actor clipped loss</h3><p>当前策略与 old policy 对同一生成 token 的概率比：</p>
-
-$$
-\mathrm{ratio}_t
-=
-\exp\left(
-\log p_{\mathrm{current},t}
--\log p_{\mathrm{old},t}
-\right)
-$$
-
-
-<p>注意：ratio 是 <code>[B,R]</code>，每个有效 token 一个，不是整条回答只有一个。</p>
-<p>本项目 <code>clip_epsilon=0.2</code>：</p>
-
-$$
-\mathrm{ratio}^{\mathrm{clip}}_t
-=
-\operatorname{clip}(\mathrm{ratio}_t,0.8,1.2)
-$$
-
-
-<p>逐 token Actor loss：</p>
-
-$$
-L_{\mathrm{actor},t}
-=
-\max\left(
--A_t\,\mathrm{ratio}_t,
--A_t\,\mathrm{ratio}^{\mathrm{clip}}_t
-\right)
-$$
-
-
-<p>正 advantage 会推动 token 概率上升，负 advantage 会推动它下降；clip 让一次更新不要走太远。</p>
-<h3 id="7-2-Reference-KL-penalty"><a href="#7-2-Reference-KL-penalty" class="headerlink" title="7.2 Reference KL penalty"></a>7.2 Reference KL penalty</h3><p>令：</p>
-
-$$
-d_t
-=
-\log p_{\mathrm{ref},t}
--\log p_{\mathrm{current},t}
-$$
-
-
-<p>MiniMind 使用的逐 token KL 形式为：</p>
-
-$$
-L_{\mathrm{KL}}
-=
-\operatorname{masked\ mean}_t
-\left(
-\exp(d_t)-d_t-1
-\right)
-$$
-
-
-<p><code>kl_coef=0.02</code>。它不直接判断答案好坏，而是约束 Actor 不要偏离冻结 Reference 太远。</p>
-<h3 id="7-3-Critic-clipped-value-loss"><a href="#7-3-Critic-clipped-value-loss" class="headerlink" title="7.3 Critic clipped value loss"></a>7.3 Critic clipped value loss</h3><p>Critic 的目标是 returns。先计算当前 value 的普通平方误差：</p>
-
-$$
-E_{1,t}
-=
-\left(
-V_{\mathrm{current},t}
--\mathrm{Return}_t
-\right)^2
-$$
-
-
-<p>再把当前 value 限制在 old value 附近：</p>
-
-$$
-V_{\mathrm{clip},t}
-=
-\operatorname{clip}
-\left(
-V_{\mathrm{current},t},
-V_{\mathrm{old},t}-0.2,
-V_{\mathrm{old},t}+0.2
-\right)
-$$
-
-
-
-$$
-E_{2,t}
-=
-\left(
-V_{\mathrm{clip},t}
--\mathrm{Return}_t
-\right)^2
-$$
-
-
-<p>逐 token value loss：</p>
-
-$$
-L_{\mathrm{value},t}
-=
-\frac{1}{2}
-\max(E_{1,t},E_{2,t})
-$$
-
-
-<p>它一边拟合 returns，一边惩罚 value 相对 old prediction 一次跳太远。</p>
-<h3 id="7-4-Total-loss"><a href="#7-4-Total-loss" class="headerlink" title="7.4 Total loss"></a>7.4 Total loss</h3><p>远程实际配置：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">clip_epsilon       0.2</span><br><span class="line">cliprange_value    0.2</span><br><span class="line">kl_coef            0.02</span><br><span class="line">vf_coef            0.5</span><br><span class="line">use_moe            0</span><br></pre></td></tr></tbody></table></figure>
-
-
-$$
-L_{\mathrm{total}}
-=
-L_{\mathrm{actor}}
-+0.02L_{\mathrm{KL}}
-+0.5L_{\mathrm{value}}
-+L_{\mathrm{MoE\ aux}}
-$$
-
-
-<p>所有 token loss 都先乘 response mask，再除以有效 token 数，从 <code>[B,R]</code> 聚合成标量 <code>[]</code>，最后执行 <code>backward()</code>。</p>
-<p><code>reward</code>、<code>token_rewards</code>、<code>advantages</code> 和 <code>returns</code> 是评分、输入、权重或目标，不是额外 loss。<code>approx_kl</code> 与 <code>clipfrac</code> 是监控/early-stop 指标，也不是 loss。</p>
-<h2 id="8-一张变量总账"><a href="#8-一张变量总账" class="headerlink" title="8. 一张变量总账"></a>8. 一张变量总账</h2><table>
+<p><code>lambda</code> 决定后续 TD residual 向前传播的强度。GAE 从后向前做 Tensor 递推，不是神经网络的 <code>loss.backward()</code>。</p>
+<h3 id="最后三个真实-token"><a href="#最后三个真实-token" class="headerlink" title="最后三个真实 token"></a>最后三个真实 token</h3><p>真实值：</p>
+<table>
 <thead>
 <tr>
-<th>变量</th>
-<th>来源</th>
-<th align="right">Shape</th>
-<th>是否有梯度</th>
-<th>用途</th>
+<th align="right">t</th>
+<th>token</th>
+<th align="right"><code>V_old,t</code></th>
+<th align="right"><code>r_t</code></th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>prompts</code></td>
-<td>RLAIFDataset</td>
-<td align="right"><code>list[str]</code></td>
-<td>否</td>
-<td>tokenizer 输入</td>
+<td align="right">103</td>
+<td>隐私</td>
+<td align="right">0.729777</td>
+<td align="right">0</td>
 </tr>
 <tr>
-<td><code>input_ids</code></td>
-<td>tokenizer</td>
-<td align="right"><code>[B,P]</code></td>
-<td>否</td>
-<td>rollout 输入</td>
+<td align="right">104</td>
+<td>。</td>
+<td align="right">0.646647</td>
+<td align="right">0</td>
 </tr>
 <tr>
-<td><code>output_ids</code></td>
-<td>Actor generate</td>
-<td align="right"><code>[B,P+R]</code></td>
-<td>否</td>
-<td>完整轨迹</td>
-</tr>
-<tr>
-<td><code>completion_ids</code></td>
-<td>output 切片</td>
-<td align="right"><code>[B,R]</code></td>
-<td>否</td>
-<td>新生成 token</td>
-</tr>
-<tr>
-<td><code>old_logps</code></td>
-<td>rollout Actor</td>
-<td align="right"><code>[B,R]</code></td>
-<td>否</td>
-<td>ratio 基准</td>
-</tr>
-<tr>
-<td><code>response_mask</code></td>
-<td>EOS + padding</td>
-<td align="right"><code>[B,R]</code></td>
-<td>否</td>
-<td>过滤无效 token</td>
-</tr>
-<tr>
-<td><code>rewards</code></td>
-<td>规则 + RM</td>
-<td align="right"><code>[B]</code></td>
-<td>否</td>
-<td>整条回答评分</td>
-</tr>
-<tr>
-<td><code>old_values</code></td>
-<td>rollout Critic</td>
-<td align="right"><code>[B,R]</code></td>
-<td>否</td>
-<td>GAE 与 value clip</td>
-</tr>
-<tr>
-<td><code>token_rewards</code></td>
-<td>terminal scatter</td>
-<td align="right"><code>[B,R]</code></td>
-<td>否</td>
-<td>GAE 输入</td>
-</tr>
-<tr>
-<td><code>advantages</code></td>
-<td>GAE + 标准化</td>
-<td align="right"><code>[B,R]</code></td>
-<td>否</td>
-<td>Actor loss 权重</td>
-</tr>
-<tr>
-<td><code>returns</code></td>
-<td>raw advantage + old value</td>
-<td align="right"><code>[B,R]</code></td>
-<td>否</td>
-<td>Critic label</td>
-</tr>
-<tr>
-<td><code>current_logps</code></td>
-<td>current Actor</td>
-<td align="right"><code>[B,R]</code></td>
-<td>是</td>
-<td>Actor loss</td>
-</tr>
-<tr>
-<td><code>current_values</code></td>
-<td>current Critic</td>
-<td align="right"><code>[B,R]</code></td>
-<td>是</td>
-<td>value loss</td>
-</tr>
-<tr>
-<td><code>policy_loss</code></td>
-<td>Actor clip + KL</td>
-<td align="right"><code>[]</code></td>
-<td>是</td>
-<td>更新 Actor</td>
-</tr>
-<tr>
-<td><code>value_loss</code></td>
-<td>clipped value error</td>
-<td align="right"><code>[]</code></td>
-<td>是</td>
-<td>更新 Critic</td>
-</tr>
-<tr>
-<td><code>total_loss</code></td>
-<td>所有项加权</td>
-<td align="right"><code>[]</code></td>
-<td>是</td>
-<td>backward</td>
+<td align="right">105</td>
+<td>`&lt;</td>
+<td align="right">im_end</td>
+<td align="right">&gt;`</td>
 </tr>
 </tbody></table>
-<h2 id="9-最容易混淆的十件事"><a href="#9-最容易混淆的十件事" class="headerlink" title="9. 最容易混淆的十件事"></a>9. 最容易混淆的十件事</h2><table>
-<thead>
-<tr>
-<th>误解</th>
-<th>正确结论</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Prompt 只是最后一句用户问题</td>
-<td>Prompt 是 chat template 渲染后的完整多轮历史</td>
-</tr>
-<tr>
-<td>output 与 completion 相同</td>
-<td>output 是 prompt + completion；completion 只是新生成部分</td>
-</tr>
-<tr>
-<td>Actor 是另一个神秘网络</td>
-<td>Actor 就是负责生成 token 的因果语言模型</td>
-</tr>
-<tr>
-<td>Critic 与 Reward Model 相同</td>
-<td>Reward 评整条；Critic 逐状态估未来回报</td>
-</tr>
-<tr>
-<td>old policy 就是 Reference</td>
-<td>old policy 由 rollout old logps 表示；Reference 是独立冻结模型</td>
-</tr>
-<tr>
-<td>token_rewards 是 GAE 输出</td>
-<td>token_rewards 在 GAE 之前构造，是 GAE 输入</td>
-</tr>
-<tr>
-<td>advantages 是 Critic label</td>
-<td>标准化 advantages 教 Actor；returns 教 Critic</td>
-</tr>
-<tr>
-<td>代码变量 <code>labels</code> 是 Critic label</td>
-<td>它是 gather logp 用的右移 token IDs</td>
-</tr>
-<tr>
-<td>ratio 每条回答一个</td>
-<td>ratio 是 <code>[B,R]</code>，每 token 一个</td>
-</tr>
-<tr>
-<td>GAE 倒推会逐 token 跑 Critic</td>
-<td>Critic 一次并行 forward；GAE 只是 Tensor 递推</td>
-</tr>
-</tbody></table>
-<h2 id="10-推荐的源码阅读顺序"><a href="#10-推荐的源码阅读顺序" class="headerlink" title="10. 推荐的源码阅读顺序"></a>10. 推荐的源码阅读顺序</h2><p>不要从训练脚本第一行机械读到底。按对象追踪：</p>
-<ol>
-<li><code>dataset/lm_dataset.py:195-224</code>：<code>RLAIFDataset</code>、<code>conversations[:-1]</code>、chat template。</li>
-<li><code>trainer/rollout_engine.py:39-47</code>：先看 <code>RolloutResult</code> 输入输出合同。</li>
-<li><code>trainer/rollout_engine.py:71-92</code>：<code>generate()</code>、completion 切片与 decode。</li>
-<li><code>trainer/rollout_engine.py:24-36</code>：逐 token old logp 的 gather。</li>
-<li><code>trainer/train_ppo.py:84-101</code>：tokenizer、rollout 与 reward 接入。</li>
-<li><code>trainer/train_ppo.py:117-128</code>：右移、位置对齐、EOS 与 response mask。</li>
-<li><code>trainer/train_ppo.py:36-49,130-151</code>：Critic、token reward、GAE、returns。</li>
-<li><code>trainer/train_ppo.py:171-203</code>：current Actor/Critic 与三类 loss。</li>
-<li><code>trainer/train_ppo.py:208-214</code>：total loss 与 backward。</li>
-</ol>
-<p>第一次调试建议先使用只读数据流脚本，观察对象与 shape，不要直接进入包含 <code>optimizer.step()</code> 和 checkpoint 保存的完整训练入口。</p>
-<h2 id="最后总结"><a href="#最后总结" class="headerlink" title="最后总结"></a>最后总结</h2><p>PPO 可以看成两个学习问题共享同一条 rollout：</p>
+<p>终止位置：</p>
+
+$$
+\delta_{105}=1.199707+0-0.716022=0.483685
+$$
+
+
+
+$$
+A_{105}^{raw}=0.483685
+$$
+
+
+<p>倒数第二个位置：</p>
+
+$$
+\delta_{104}=0+0.716022-0.646647=0.069375
+$$
+
+
+
+$$
+A_{104}^{raw}=0.069375+0.95\times0.483685=0.528876
+$$
+
+
+<p>再前一个位置：</p>
+
+$$
+\delta_{103}=0+0.646647-0.729777=-0.083130
+$$
+
+
+
+$$
+A_{103}^{raw}=-0.083130+0.95\times0.528876=0.419302
+$$
+
+
+<h2 id="5-10-Returns-与-advantage-标准化"><a href="#5-10-Returns-与-advantage-标准化" class="headerlink" title="5.10 Returns 与 advantage 标准化"></a>5.10 Returns 与 advantage 标准化</h2><p>Critic 的目标：</p>
+
+$$
+Return_t=A_t^{raw}+V_{old,t}
+$$
+
+
+<p>真实值：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Return103 = 0.419302 + 0.729777 = 1.149079</span><br><span class="line">Return104 = 0.528876 + 0.646647 = 1.175523</span><br><span class="line">Return105 = 0.483685 + 0.716022 = 1.199707</span><br></pre></td></tr></tbody></table></figure>
+
+<p>106 个位置的 raw advantage 统计：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mean = 0.098474</span><br><span class="line">std  = 0.126677</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Actor 使用标准化 advantage：</p>
+
+$$
+\hat A_t=\frac{A_t^{raw}-\mu_A}{\sqrt{Var(A^{raw})+10^{-8}}}
+$$
+
+
+<p>EOS：</p>
+
+$$
+\hat A_{105}
+=\frac{0.483685-0.098474}{0.126677}
+=3.040898
+$$
+
+
+<p>必须区分：</p>
 <ul>
-<li>Actor 学“哪些 token 决策值得增加或降低概率”，权重是 normalized advantages。</li>
-<li>Critic 学“当前状态未来能拿多少回报”，目标是 returns。</li>
+<li>raw advantage：构造 returns；</li>
+<li>normalized advantage：Actor loss 权重；</li>
+<li>returns：Critic label；</li>
+<li>current values：Critic prediction。</li>
 </ul>
-<p>终局 reward 先放到最后有效 token，TD residual 衡量 Critic 的一步预测误差，GAE 再把后续误差按 <code>gamma × lambda</code> 衰减传回更早位置。</p>
-<p>最终，Actor clip 限制策略突变，Reference KL 防止语言行为跑偏，Critic value clip 限制估值突变。所有逐 token 量保持 <code>[B,R]</code>，直到 response mask 聚合后才变成一个可执行 <code>backward()</code> 的标量 loss。</p>
-<p>如果只记一条链，请记住：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">JSONL → prompt → rollout → old logps / old values</span><br><span class="line">      → terminal reward → token_rewards</span><br><span class="line">      → TD residual → GAE</span><br><span class="line">      → advantages 教 Actor</span><br><span class="line">      → returns 教 Critic</span><br><span class="line">      → clipped losses → total loss</span><br></pre></td></tr></tbody></table></figure>
+<h2 id="5-11-PPO-Actor-ratio-与-clip"><a href="#5-11-PPO-Actor-ratio-与-clip" class="headerlink" title="5.11 PPO Actor ratio 与 clip"></a>5.11 PPO Actor ratio 与 clip</h2><p>逐 token ratio：</p>
+
+$$
+ratio_t
+=\frac{\pi_{current}(a_t|s_t)}{\pi_{old}(a_t|s_t)}
+=\exp(logp_{current,t}-logp_{old,t})
+$$
+
+
+<p>参数：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">clip_epsilon = 0.2</span><br><span class="line">允许区间       [0.8,1.2]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Actor token loss：</p>
+
+$$
+L_{actor,t}=\max\left(
+-\hat A_t ratio_t,
+-\hat A_t clip(ratio_t,0.8,1.2)
+\right)
+$$
+
+
+<p>真实探针在 optimizer step 前重新计算 current logp，因此 current=old、ratio=1。例如 EOS：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">old_logp     = -0.887186</span><br><span class="line">current_logp = -0.887186</span><br><span class="line">ratio        = exp(0) = 1</span><br></pre></td></tr></tbody></table></figure>
+
+<p>执行 optimizer step 后再用同一 rollout 更新时，current 才可能与 old 分开。本文不虚构更新后的逐 token ratio。</p>
+<h2 id="5-12-Reference-KL"><a href="#5-12-Reference-KL" class="headerlink" title="5.12 Reference KL"></a>5.12 Reference KL</h2><p>令：</p>
+
+$$
+d_t=logp_{ref,t}-logp_{current,t}
+$$
+
+
+<p>本项目使用非负估计：</p>
+
+$$
+KL_t=e^{d_t}-d_t-1
+$$
+
+
+<p>EOS 真实值：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ref_logp     = -0.018923</span><br><span class="line">current_logp = -0.887186</span><br><span class="line">d            = 0.868264</span><br><span class="line">KL           = exp(0.868264)-0.868264-1</span><br><span class="line">             = 0.514506</span><br></pre></td></tr></tbody></table></figure>
+
+<p>PPO 的 <code>kl_coef=0.02</code>。</p>
+<h2 id="5-13-Critic-clipped-value-loss"><a href="#5-13-Critic-clipped-value-loss" class="headerlink" title="5.13 Critic clipped value loss"></a>5.13 Critic clipped value loss</h2><p>项目参数：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cliprange_value = 0.2</span><br><span class="line">vf_coef         = 0.5</span><br></pre></td></tr></tbody></table></figure>
+
+<p>公式：</p>
+
+$$
+E_{1,t}=(V_{current,t}-Return_t)^2
+$$
+
+
+
+$$
+V_{clip,t}=clip(V_{current,t},V_{old,t}-0.2,V_{old,t}+0.2)
+$$
+
+
+
+$$
+E_{2,t}=(V_{clip,t}-Return_t)^2
+$$
+
+
+
+$$
+L_{value,t}=\frac12\max(E_{1,t},E_{2,t})
+$$
+
+
+<p>探针更新前 <code>V_current=V_old</code>。EOS：</p>
+
+$$
+L_{value,105}=\frac12(0.716022-1.199707)^2=0.116976
+$$
+
+
+<h2 id="5-14-PPO-total-loss"><a href="#5-14-PPO-total-loss" class="headerlink" title="5.14 PPO total loss"></a>5.14 PPO total loss</h2>
+$$
+L_{policy}=L_{actor}+0.02L_{reference\ KL}
+$$
+
+
+
+$$
+L_{total}=L_{policy}+0.5L_{value}+L_{MoE\ aux}
+$$
+
+
+<p>本次 <code>use_moe=0</code>，所以 aux loss 为 0。真实只读 scalar：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">actor_loss  ≈ 3.60e-8</span><br><span class="line">KL mean      = 0.335082</span><br><span class="line">policy_loss  = 0.006702</span><br><span class="line">value_loss   = 0.012872</span><br><span class="line">total_loss   = 0.006702 + 0.5×0.012872</span><br><span class="line">             = 0.013138</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Actor loss 接近 0 的原因是 ratio=1 且 normalized advantage 的 masked mean 约为 0；不是 Actor 永远没有梯度。</p>
+<h2 id="6-PPO-在-RTX-3090-Ti-上的真实-GPU-路径"><a href="#6-PPO-在-RTX-3090-Ti-上的真实-GPU-路径" class="headerlink" title="6. PPO 在 RTX 3090 Ti 上的真实 GPU 路径"></a>6. PPO 在 RTX 3090 Ti 上的真实 GPU 路径</h2><p><img src="/images/minimind-ppo-real-complete/04-ppo-gpu-loss-path.svg" alt="PPO GPU 与三类 Loss 路径"></p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CPU JSONL/template/tokenizer</span><br><span class="line">→ input_ids [1,561] 搬到 CUDA</span><br><span class="line">→ Actor no_grad rollout，completion [1,106]</span><br><span class="line">→ old logps [1,106]</span><br><span class="line">→ Reward Model FP16 forward，reward [1]</span><br><span class="line">→ Critic no_grad forward，old values [1,106]</span><br><span class="line">→ GPU Tensor 递推 TD/GAE，advantages/returns [1,106]</span><br><span class="line">→ Current Actor + Current Critic forward（训练时保留图）</span><br><span class="line">→ Actor clip + Reference KL + value loss</span><br><span class="line">→ scalar [] → backward → AdamW Actor/Critic step</span><br></pre></td></tr></tbody></table></figure>
+
+<p>真实只读显存：Actor+Reference+Critic allocated 808.4 MiB；rollout peak 963.4 MiB；加载并运行 1.8B Reward Model 后 peak 4175.2 MiB。它不是训练峰值，因为 probe 没有梯度、反向激活和 AdamW 状态；allocated 也不等于 reserved 或 nvidia-smi 进程显存。</p>
+<h2 id="7-PPO-一句话总链路"><a href="#7-PPO-一句话总链路" class="headerlink" title="7. PPO 一句话总链路"></a>7. PPO 一句话总链路</h2><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">真实 5 条历史消息</span><br><span class="line">→ prompt 991 chars</span><br><span class="line">→ input_ids [1,561]</span><br><span class="line">→ Actor completion [1,106]</span><br><span class="line">→ output [1,667]</span><br><span class="line">→ final reward 1.199707</span><br><span class="line">→ token_rewards [0,...,0,1.199707]</span><br><span class="line">→ Critic values [1,106]</span><br><span class="line">→ TD + GAE</span><br><span class="line">→ normalized advantages [1,106] 给 Actor</span><br><span class="line">→ returns [1,106] 给 Critic</span><br><span class="line">→ total loss 0.013138（更新前只读 forward）</span><br></pre></td></tr></tbody></table></figure>
+
+<!-- ORIGINAL_NOTE_END -->
 </article>
 <div class="article-footer slide-up">
 
@@ -712,7 +1580,7 @@ $$
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/08/01/yolov10-vehicle-pose-compression/">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</a></div></section></div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/">MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</a></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/08/01/yolov10-vehicle-pose-compression/">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</a></div></section></div>
 
 
 
@@ -742,7 +1610,7 @@ $$
 
 
 
-<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E7%BB%99%E5%87%BA%E5%85%A8%E5%B1%80%E7%BB%93%E8%AE%BA"><span class="toc-text">先给出全局结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%95%B0%E6%8D%AE%E9%9B%86%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-conversations-1"><span class="toc-text">1. 数据集：为什么是 conversations[:-1]</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Prompt-%E4%B8%8D%E6%98%AF%E6%9C%80%E5%90%8E%E4%B8%80%E5%8F%A5%E7%94%A8%E6%88%B7%E9%97%AE%E9%A2%98"><span class="toc-text">Prompt 不是最后一句用户问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E9%87%8C"><span class="toc-text">数据增强发生在哪里</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Batch-padding-%E7%9A%84%E7%BB%B4%E5%BA%A6"><span class="toc-text">Batch padding 的维度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Actor%E3%80%81Critic%E3%80%81Reward%E3%80%81Reference-%E5%88%B0%E5%BA%95%E6%98%AF%E8%B0%81"><span class="toc-text">2. Actor、Critic、Reward、Reference 到底是谁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Actor%EF%BC%9A%E8%B4%9F%E8%B4%A3%E9%80%89%E6%8B%A9%E4%B8%8B%E4%B8%80%E4%B8%AA-token"><span class="toc-text">Actor：负责选择下一个 token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Critic%EF%BC%9A%E4%B8%8D%E9%80%89-token%EF%BC%8C%E5%8F%AA%E4%BC%B0%E8%AE%A1%E6%9C%AA%E6%9D%A5%E5%9B%9E%E6%8A%A5"><span class="toc-text">Critic：不选 token，只估计未来回报</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reward-Model%EF%BC%9A%E5%9B%9E%E7%AD%94%E5%AE%8C%E6%88%90%E5%90%8E%E7%BB%99%E6%95%B4%E6%9D%A1%E8%BD%A8%E8%BF%B9%E8%AF%84%E5%88%86"><span class="toc-text">Reward Model：回答完成后给整条轨迹评分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reference-Model%EF%BC%9A%E9%98%B2%E6%AD%A2%E7%AD%96%E7%95%A5%E4%B8%BA%E8%BF%BD-reward-%E8%B7%91%E5%81%8F"><span class="toc-text">Reference Model：防止策略为追 reward 跑偏</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Rollout%EF%BC%9Aprompt%E3%80%81output%E3%80%81completion-%E5%A6%82%E4%BD%95%E5%AF%B9%E9%BD%90"><span class="toc-text">3. Rollout：prompt、output、completion 如何对齐</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#old-logp-%E6%98%AF%E6%80%8E%E6%A0%B7%E5%BE%97%E5%88%B0%E7%9A%84"><span class="toc-text">old logp 是怎样得到的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%8D%E7%BD%AE%E8%A6%81%E5%8F%B3%E7%A7%BB%E4%B8%80%E4%BD%8D"><span class="toc-text">为什么位置要右移一位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#response-mask-%E6%98%AF%E5%90%A6%E5%8C%85%E5%90%AB-EOS"><span class="toc-text">response mask 是否包含 EOS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E5%80%BC%E5%BE%97%E4%BF%9D%E7%95%99%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%B7%AE%E5%BC%82"><span class="toc-text">一个值得保留的实现差异</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Reward%EF%BC%9A%E4%B8%80%E4%B8%AA%E5%88%86%E6%95%B0%E5%A6%82%E4%BD%95%E6%94%BE%E8%BF%9B-106-%E4%B8%AA-token"><span class="toc-text">4. Reward：一个分数如何放进 106 个 token</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-TD-residual%EF%BC%9ACritic-%E8%BF%99%E4%B8%80%E6%AD%A5%E5%88%B0%E5%BA%95%E4%BC%B0%E9%94%99%E4%BA%86%E5%A4%9A%E5%B0%91"><span class="toc-text">5. TD residual：Critic 这一步到底估错了多少</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-GAE%EF%BC%9A%E6%8A%8A%E7%BB%88%E5%B1%80%E7%BB%93%E6%9E%9C%E4%BC%A0%E7%BB%99%E6%9B%B4%E6%97%A9-token"><span class="toc-text">6. GAE：把终局结果传给更早 token</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89-token-%E6%89%8B%E7%AE%97"><span class="toc-text">三 token 手算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E5%90%8E%E5%90%91%E5%89%8D%E4%BC%9A%E4%B8%8D%E4%BC%9A%E5%BE%88%E6%85%A2"><span class="toc-text">从后向前会不会很慢</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-PPO-Loss%EF%BC%9A%E4%B8%89%E9%81%93%E5%AE%89%E5%85%A8%E9%97%B8"><span class="toc-text">7. PPO Loss：三道安全闸</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-Actor-clipped-loss"><span class="toc-text">7.1 Actor clipped loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-Reference-KL-penalty"><span class="toc-text">7.2 Reference KL penalty</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-Critic-clipped-value-loss"><span class="toc-text">7.3 Critic clipped value loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-4-Total-loss"><span class="toc-text">7.4 Total loss</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E4%B8%80%E5%BC%A0%E5%8F%98%E9%87%8F%E6%80%BB%E8%B4%A6"><span class="toc-text">8. 一张变量总账</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E6%9C%80%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%9A%84%E5%8D%81%E4%BB%B6%E4%BA%8B"><span class="toc-text">9. 最容易混淆的十件事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E6%8E%A8%E8%8D%90%E7%9A%84%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E9%A1%BA%E5%BA%8F"><span class="toc-text">10. 推荐的源码阅读顺序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E6%80%BB%E7%BB%93"><span class="toc-text">最后总结</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MiniMind-PPO%EF%BC%9A%E7%9C%9F%E5%AE%9E%E8%BE%93%E5%85%A5%E3%80%81Token%E3%80%81Reward%E3%80%81Critic%E3%80%81GAE%E3%80%81Loss-%E4%B8%8E-GPU-%E5%85%A8%E6%B5%81%E7%A8%8B"><span class="toc-text">MiniMind PPO：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%98%85%E8%AF%BB%E7%9B%AE%E6%A0%87"><span class="toc-text">阅读目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%9C%9F%E5%AE%9E%E7%8E%AF%E5%A2%83%E4%B8%8E%E8%AF%81%E6%8D%AE%E8%BE%B9%E7%95%8C"><span class="toc-text">1. 真实环境与证据边界</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E8%BF%9C%E7%A8%8B%E7%8E%AF%E5%A2%83"><span class="toc-text">1.1 远程环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E4%B8%89%E7%B1%BB%E6%95%B0%E5%AD%97%E5%BF%85%E9%A1%BB%E5%88%86%E5%BC%80"><span class="toc-text">1.2 三类数字必须分开</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%AC%A6%E5%8F%B7%E3%80%81shape-%E4%B8%8E%E7%B1%BB%E5%9E%8B%E6%80%BB%E8%A1%A8"><span class="toc-text">2. 符号、shape 与类型总表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%B4%AF%E7%A9%BF%E5%85%A8%E6%96%87%E7%9A%84%E7%9C%9F%E5%AE%9E%E6%A0%B7%E6%9C%AC"><span class="toc-text">3. 贯穿全文的真实样本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E4%B8%80%E6%AC%A1%E7%9C%9F%E5%AE%9E-PPO-%E6%A0%B7%E6%9C%AC%E4%BB%8E%E8%BE%93%E5%85%A5%E8%B7%91%E5%88%B0%E8%BE%93%E5%87%BA"><span class="toc-text">3.1 一次真实 PPO 样本从输入跑到输出</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-0%EF%BC%9AJSONL-%E4%B8%AD%E5%8E%9F%E5%A7%8B%E8%BE%93%E5%85%A5%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text">步骤 0：JSONL 中原始输入是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A-1-%E5%90%8E%E5%89%A9%E4%B8%8B%E4%BB%80%E4%B9%88"><span class="toc-text">步骤 1：[:-1] 后剩下什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E7%9C%9F%E6%AD%A3%E4%BA%A4%E7%BB%99-Tokenizer-%E7%9A%84%E6%96%87%E5%AD%97%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text">步骤 2：真正交给 Tokenizer 的文字是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E5%85%B7%E4%BD%93%E5%88%87%E6%88%90%E4%BA%86%E4%BB%80%E4%B9%88-token"><span class="toc-text">步骤 3：具体切成了什么 token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-4%EF%BC%9AActor-%E7%9A%84%E5%AE%9E%E9%99%85%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA"><span class="toc-text">步骤 4：Actor 的实际输入和输出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-5%EF%BC%9AReward-%E7%9A%84%E5%AE%9E%E9%99%85%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA"><span class="toc-text">步骤 5：Reward 的实际输入和输出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-6%EF%BC%9ACritic-%E7%9A%84%E5%AE%9E%E9%99%85%E8%BE%93%E5%85%A5%E5%92%8C-value-%E8%BE%93%E5%87%BA"><span class="toc-text">步骤 6：Critic 的实际输入和 value 输出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-7%EF%BC%9Areward-%E6%80%8E%E6%A0%B7%E8%BF%9B%E5%85%A5-GAE"><span class="toc-text">步骤 7：reward 怎样进入 GAE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-8%EF%BC%9A%E7%9C%9F%E5%AE%9E-PPO-token-%E8%B4%A6%E6%9C%AC"><span class="toc-text">步骤 8：真实 PPO token 账本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-9%EF%BC%9A%E7%9C%9F%E5%AE%9E-scalar-%E8%BE%93%E5%87%BA"><span class="toc-text">步骤 9：真实 scalar 输出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-JSONL-%E5%88%B0-prompt-tensor"><span class="toc-text">4. JSONL 到 prompt tensor</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8-conversations-1"><span class="toc-text">4.1 为什么使用 conversations[:-1]</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E7%9C%9F%E5%AE%9E-prompt"><span class="toc-text">4.2 真实 prompt</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-PPO-%E5%AE%8C%E6%95%B4%E5%9B%9E%E9%A1%BE"><span class="toc-text">5. PPO 完整回顾</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-PPO-%E4%B8%AD%E7%9A%84%E4%BA%94%E4%B8%AA%E8%A7%92%E8%89%B2"><span class="toc-text">5.1 PPO 中的五个角色</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-1-%E5%85%88%E6%8A%8A%E5%9B%9B%E4%B8%AA%E6%9C%80%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%9A%84%E8%AF%8D%E9%92%89%E6%AD%BB"><span class="toc-text">5.1.1 先把四个最容易混淆的词钉死</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-2-Reference-%E4%BB%8E%E5%93%AA%E9%87%8C%E6%9D%A5%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%80%E5%88%9D%E7%9C%8B%E8%B5%B7%E6%9D%A5%E5%92%8C-Actor-%E4%B8%80%E6%A0%B7"><span class="toc-text">5.1.2 Reference 从哪里来，为什么最初看起来和 Actor 一样</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-3-%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E-PPO-batch-%E7%9A%84%E4%B8%A5%E6%A0%BC%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="toc-text">5.1.3 一个真实 PPO batch 的严格执行顺序</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T0%EF%BC%9Abatch-%E5%BC%80%E5%A7%8B"><span class="toc-text">时刻 T0：batch 开始</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T1%EF%BC%9ACurrent-Actor-%E5%85%88%E7%94%9F%E6%88%90-rollout%EF%BC%8C%E5%B9%B6%E6%8A%8A%E8%BF%99%E4%B8%80%E5%88%BB%E5%86%BB%E7%BB%93%E6%88%90-Old-%E6%95%B0%E6%8D%AE"><span class="toc-text">时刻 T1：Current Actor 先生成 rollout，并把这一刻冻结成 Old 数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T2%EF%BC%9A%E5%85%88%E7%AE%97%E6%95%B4%E6%9D%A1%E5%9B%9E%E7%AD%94-reward%EF%BC%8C%E5%86%8D%E5%9B%BA%E5%AE%9A%E6%9C%AC%E8%BD%AE-Critic-x2F-Reference-%E7%9B%AE%E6%A0%87"><span class="toc-text">时刻 T2：先算整条回答 reward，再固定本轮 Critic&#x2F;Reference 目标</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T3%EF%BC%9A%E7%AC%AC-1-%E6%AC%A1-PPO-update%EF%BC%8C%E6%9B%B4%E6%96%B0%E5%89%8D-Current-%E4%B8%8E-Old-%E7%9B%B8%E5%90%8C"><span class="toc-text">时刻 T3：第 1 次 PPO update，更新前 Current 与 Old 相同</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T4%EF%BC%9A%E7%AC%AC-2-%E6%AC%A1-PPO-update%EF%BC%8CCurrent-%E5%B7%B2%E7%BB%8F%E6%98%AF%E6%96%B0%E7%9A%84%EF%BC%8COld-%E4%BB%8D%E6%98%AF-T1-%E7%9A%84%E7%BC%93%E5%AD%98"><span class="toc-text">时刻 T4：第 2 次 PPO update，Current 已经是新的，Old 仍是 T1 的缓存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T5%EF%BC%9A%E8%BF%9B%E5%85%A5%E4%B8%8B%E4%B8%80%E4%B8%AA-batch%EF%BC%8C%E4%B8%8A%E4%B8%80%E8%BD%AE-New-%E5%8F%98%E6%88%90%E4%B8%8B%E4%B8%80%E8%BD%AE-Old-%E7%9A%84%E6%9D%A5%E6%BA%90"><span class="toc-text">时刻 T5：进入下一个 batch，上一轮 New 变成下一轮 Old 的来源</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-4-%E7%94%A8%E4%B8%80%E5%BC%A0%E8%A1%A8%E7%9C%8B%E6%B8%85%E2%80%9C%E8%B0%81%E5%9C%A8%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E6%9B%B4%E6%96%B0%E2%80%9D"><span class="toc-text">5.1.4 用一张表看清“谁在什么时候更新”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-5-%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E9%A1%BB%E5%90%8C%E6%97%B6%E6%9C%89-Old-%E5%92%8C-Reference"><span class="toc-text">5.1.5 为什么必须同时有 Old 和 Reference</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-6-update-policy-%E5%88%B0%E5%BA%95%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E6%9B%B4%E6%96%B0-Rollout-Actor"><span class="toc-text">5.1.6 update_policy() 到底什么时候更新 Rollout Actor</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-PPO-%E7%9C%9F%E5%AE%9E-rollout"><span class="toc-text">5.2 PPO 真实 rollout</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-%E8%87%AA%E5%9B%9E%E5%BD%92%E4%BD%8D%E7%BD%AE%E5%AF%B9%E9%BD%90"><span class="toc-text">5.3 自回归位置对齐</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-probability%E3%80%81logp-%E4%B8%8E-old-logp"><span class="toc-text">5.4 probability、logp 与 old logp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-5-PPO-reward"><span class="toc-text">5.5 PPO reward</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-6-%E4%BB%8E-sequence-reward-%E5%88%B0-token-rewards"><span class="toc-text">5.6 从 sequence reward 到 token rewards</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-7-Critic-value"><span class="toc-text">5.7 Critic value</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-8-TD-residual"><span class="toc-text">5.8 TD residual</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-9-GAE"><span class="toc-text">5.9 GAE</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E4%B8%89%E4%B8%AA%E7%9C%9F%E5%AE%9E-token"><span class="toc-text">最后三个真实 token</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-10-Returns-%E4%B8%8E-advantage-%E6%A0%87%E5%87%86%E5%8C%96"><span class="toc-text">5.10 Returns 与 advantage 标准化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-11-PPO-Actor-ratio-%E4%B8%8E-clip"><span class="toc-text">5.11 PPO Actor ratio 与 clip</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-12-Reference-KL"><span class="toc-text">5.12 Reference KL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-13-Critic-clipped-value-loss"><span class="toc-text">5.13 Critic clipped value loss</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-14-PPO-total-loss"><span class="toc-text">5.14 PPO total loss</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-PPO-%E5%9C%A8-RTX-3090-Ti-%E4%B8%8A%E7%9A%84%E7%9C%9F%E5%AE%9E-GPU-%E8%B7%AF%E5%BE%84"><span class="toc-text">6. PPO 在 RTX 3090 Ti 上的真实 GPU 路径</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-PPO-%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E9%93%BE%E8%B7%AF"><span class="toc-text">7. PPO 一句话总链路</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
 </div></aside><div class='float-panel'>
   <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>

@@ -1,0 +1,2560 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程 - Caius Lu</title>
+
+  
+    <meta name="description" content="基于远程 WSL 与真实 MiniMind GRPO checkpoint，从同一 561-token prompt 生成 4 条真实回答，逐项计算 reward、组均值、总体标准差、advantage、Reference KL、GRPO&#x2F;CISPO loss，并解释策略更新时间线与 GPU 路径。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MiniMind GRPO&#x2F;CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程">
+<meta property="og:url" content="https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="基于远程 WSL 与真实 MiniMind GRPO checkpoint，从同一 561-token prompt 生成 4 条真实回答，逐项计算 reward、组均值、总体标准差、advantage、Reference KL、GRPO&#x2F;CISPO loss，并解释策略更新时间线与 GPU 路径。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-08-03T13:35:00.000Z">
+<meta property="article:modified_time" content="2026-08-03T13:35:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="MiniMind">
+<meta property="article:tag" content="GRPO">
+<meta property="article:tag" content="CISPO">
+<meta property="article:tag" content="RLHF">
+<meta property="article:tag" content="Group-Relative-Policy-Optimization">
+<meta property="article:tag" content="Reference-Model">
+<meta property="article:tag" content="GPU">
+<meta property="article:tag" content="LLM-Alignment">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="MiniMind,GRPO,CISPO,RLHF,Group-Relative-Policy-Optimization,Reference-Model,GPU,LLM-Alignment">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-08-03T21:35:00+08:00","dateModified":"2026-08-03T21:35:00+08:00","datePublished":"2026-08-03T21:35:00+08:00","description":"这是一篇不省略中间步骤的 GRPO/CISPO 长文：从同一条真实输入生成四条候选，保留每条reward、组均值、总体标准差、advantage、逐 token loss、Reference、Old/Current/New policy与 GPU 路径的全部细节。正文完整收录原始笔记，只增加发布导航与配图。","headline":"MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/","keywords":"MiniMind, GRPO, CISPO, RLHF, Group-Relative-Policy-Optimization, Reference-Model, GPU, LLM-Alignment","thumbnailUrl":"/images/minimind-grpo-cispo-real-complete/01-grpo-full-pipeline.svg","image":1}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="deep-dive" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="Home" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:home-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="Projects" href="/projects/" style="color:#10B981"><img src="https://api.iconify.design/solar:rocket-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="BEV" href="/roadside-bev/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:camera-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="Fusion" href="/radar-camera-fusion/" style="color:#EC4899"><img src="https://api.iconify.design/solar:radar-bold-duotone.svg?color=%23EC4899"/></a><a class="nav-item" title="LLM" href="/llm-reading-map/" style="color:#8B5CF6"><img src="https://api.iconify.design/solar:atom-bold-duotone.svg?color=%238B5CF6"/></a><a class="nav-item" title="Notes" href="/notes/" style="color:#0EA5E9"><img src="https://api.iconify.design/solar:notebook-bookmark-bold-duotone.svg?color=%230EA5E9"/></a><a class="nav-item" title="Review" href="/review/" style="color:#F43F5E"><img src="https://api.iconify.design/solar:checklist-minimalistic-bold-duotone.svg?color=%23F43F5E"/></a><a class="nav-item" title="About" href="/about/" style="color:#64748B"><img src="https://api.iconify.design/solar:user-id-bold-duotone.svg?color=%2364748B"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"><span class="title">MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/minimind-ppo-from-rollout-to-loss/"><span class="title">MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/yolov10-vehicle-pose-compression/"><span class="title">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</span></a><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a><a class="item title" href="/2026/07/13/dynamic-programming-from-recursion-to-state-transition/"><span class="title">动态规划完全图解：从重复递归到状态转移</span></a><a class="item title" href="/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/"><span class="title">Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</span></a><a class="item title" href="/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"><span class="title">LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</span></a><a class="item title" href="/2019/07/26/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/"><span class="title">c++中级教程 顺序容器的定义</span></a><a class="item title" href="/2019/09/05/%E8%B7%B3%E5%8F%B0%E9%98%B6/"><span class="title">跳台阶</span></a><a class="item title" href="/2019/08/29/%E9%80%8F%E8%A7%86%E5%8F%98%E6%8D%A2/"><span class="title">透视变换</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-08-03T13:35:00.000Z">2026-08-03</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-08-03T13:35:00.000Z">2026-08-03</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><p>这是一篇不省略中间步骤的 GRPO/CISPO 长文：从同一条真实输入生成四条候选，保留每条reward、组均值、总体标准差、advantage、逐 token loss、Reference、Old/Current/New policy与 GPU 路径的全部细节。正文完整收录原始笔记，只增加发布导航与配图。</p>
+<span id="more"></span>
+
+<!-- ORIGINAL_NOTE_BEGIN: source content preserved; publication additions are image lines and MathJax wrappers -->
+<h1 id="MiniMind-GRPO-x2F-CISPO：真实输入、四条-Rollout、Reward、Advantage、Loss-与-GPU-全流程"><a href="#MiniMind-GRPO-x2F-CISPO：真实输入、四条-Rollout、Reward、Advantage、Loss-与-GPU-全流程" class="headerlink" title="MiniMind GRPO/CISPO：真实输入、四条 Rollout、Reward、Advantage、Loss 与 GPU 全流程"></a>MiniMind GRPO/CISPO：真实输入、四条 Rollout、Reward、Advantage、Loss 与 GPU 全流程</h1><blockquote>
+<p>本文只讲 GRPO 框架及项目实际 CISPO loss。所有具体值来自远程 WSL <code>wsl-dev</code>、MiniMind commit <code>4497610</code>、固定 <code>sample_index=0, seed=42, G=4</code> 的真实只读 forward。没有执行 backward、optimizer.step 或保存权重。</p>
+</blockquote>
+<h2 id="阅读目标"><a href="#阅读目标" class="headerlink" title="阅读目标"></a>阅读目标</h2><p>本文从一条真实文字输入开始，展示实际 prompt、token ID 与 shape；随后让同一输入生成 4 条真实回答，逐条计算规则奖励、Reward Model score、组均值、总体标准差、advantage、逐 token GRPO/CISPO loss和最终 scalar。</p>
+<h2 id="1-真实环境与证据边界"><a href="#1-真实环境与证据边界" class="headerlink" title="1. 真实环境与证据边界"></a>1. 真实环境与证据边界</h2><h3 id="1-1-远程环境"><a href="#1-1-远程环境" class="headerlink" title="1.1 远程环境"></a>1.1 远程环境</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>真实值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>远程主机</td>
+<td><code>wsl-dev</code> / <code>caius-PC</code></td>
+</tr>
+<tr>
+<td>MiniMind 路径</td>
+<td><code>/home/caius/minimind</code></td>
+</tr>
+<tr>
+<td>MiniMind commit</td>
+<td><code>4497610</code></td>
+</tr>
+<tr>
+<td>GPU</td>
+<td>NVIDIA GeForce RTX 3090 Ti</td>
+</tr>
+<tr>
+<td>GPU 总显存</td>
+<td>24,564 MiB</td>
+</tr>
+<tr>
+<td>驱动</td>
+<td>560.94</td>
+</tr>
+<tr>
+<td>PyTorch</td>
+<td><code>2.6.0+cu124</code></td>
+</tr>
+<tr>
+<td>PyTorch CUDA</td>
+<td>12.4</td>
+</tr>
+<tr>
+<td>RLAIF 数据</td>
+<td><code>/home/caius/datasets/minimind_dataset/rlaif.jsonl</code></td>
+</tr>
+<tr>
+<td>数据行数</td>
+<td>19,502</td>
+</tr>
+<tr>
+<td>Reward Model</td>
+<td><code>/home/caius/internlm2-1_8b-reward</code></td>
+</tr>
+<tr>
+<td>PPO 权重</td>
+<td><code>out/lifeos_agent_ppo_v1_768.pth</code></td>
+</tr>
+<tr>
+<td>GRPO 权重</td>
+<td><code>out/lifeos_agent_grpo_v1_768.pth</code></td>
+</tr>
+<tr>
+<td>Reference 起点</td>
+<td><code>out/lifeos_agent_dpo_v1_768.pth</code></td>
+</tr>
+</tbody></table>
+<h3 id="1-2-三类数字必须分开"><a href="#1-2-三类数字必须分开" class="headerlink" title="1.2 三类数字必须分开"></a>1.2 三类数字必须分开</h3><p>本文会遇到三类数字：</p>
+<ol>
+<li><strong>真实数据值</strong>：JSONL 内容、prompt 长度、真实生成文本。</li>
+<li><strong>真实 forward 值</strong>：logp、value、Reward Model score、advantage、KL、loss、PyTorch 显存。</li>
+<li><strong>历史训练日志值</strong>：训练 step、平均 reward、平均长度、耗时和最终 checkpoint。</li>
+</ol>
+<p>真实 forward 是“固定 checkpoint 在当前环境中的一次可复算观察”，不等同于历史训练中的某一步；历史日志只有聚合指标，不能从中反推出当时每个 token 的 logp。</p>
+<h2 id="2-符号、shape-与类型总表"><a href="#2-符号、shape-与类型总表" class="headerlink" title="2. 符号、shape 与类型总表"></a>2. 符号、shape 与类型总表</h2><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+<th align="right">本文真实值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>B</code></td>
+<td>原始 prompt batch size</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td><code>G</code></td>
+<td>每个 prompt 的生成数</td>
+<td align="right">PPO 为 1；历史 GRPO 为 4</td>
+</tr>
+<tr>
+<td><code>P</code></td>
+<td>padding 后的 prompt tensor 宽度</td>
+<td align="right">561</td>
+</tr>
+<tr>
+<td><code>R</code></td>
+<td>completion tensor 宽度</td>
+<td align="right">PPO 106；GRPO 256</td>
+</tr>
+<tr>
+<td><code>L</code></td>
+<td>完整序列宽度，<code>P+R</code></td>
+<td align="right">PPO 667；GRPO 817</td>
+</tr>
+<tr>
+<td><code>H</code></td>
+<td>hidden size</td>
+<td align="right">768</td>
+</tr>
+<tr>
+<td><code>V</code></td>
+<td>vocabulary size</td>
+<td align="right">6,400</td>
+</tr>
+<tr>
+<td><code>i</code></td>
+<td>rollout / 候选回答索引</td>
+<td align="right"><code>0...B×G-1</code></td>
+</tr>
+<tr>
+<td><code>t</code></td>
+<td>completion token 位置</td>
+<td align="right"><code>0...R-1</code></td>
+</tr>
+<tr>
+<td><code>m_{i,t}</code></td>
+<td>completion 有效位置 mask</td>
+<td align="right">0 或 1</td>
+</tr>
+<tr>
+<td><code>R_i</code></td>
+<td>第 i 条完整回答的终局 reward</td>
+<td align="right">scalar</td>
+</tr>
+<tr>
+<td><code>A_i</code></td>
+<td>GRPO 第 i 条回答的组相对 advantage</td>
+<td align="right">scalar</td>
+</tr>
+<tr>
+<td><code>A_{i,t}</code></td>
+<td>PPO 第 i 条回答第 t 个位置的 GAE advantage</td>
+<td align="right">scalar</td>
+</tr>
+</tbody></table>
+<p>需要特别区分：</p>
+<ul>
+<li><code>R</code> 在 shape 中表示 response width，不表示 reward。</li>
+<li><code>R_i</code> 才表示第 i 条回答的 reward。</li>
+<li>tensor width 是 padding 后的统一宽度，不一定等于每条回答的有效 token 数。</li>
+</ul>
+<h2 id="3-贯穿全文的真实样本"><a href="#3-贯穿全文的真实样本" class="headerlink" title="3. 贯穿全文的真实样本"></a>3. 贯穿全文的真实样本</h2><p><img src="/images/minimind-grpo-cispo-real-complete/01-grpo-full-pipeline.svg" alt="GRPO/CISPO 真实四候选完整链路"></p>
+<p>远程 <code>rlaif.jsonl</code> 第 0 行共有 6 条消息：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">user：给出张明（销售经理）和刘琳（智能家居研发工程师）的角色信息。</span><br><span class="line"></span><br><span class="line">assistant：两人进行长对话，其中明确提到：</span><br><span class="line">1. 使用前需要稳定 Wi-Fi；</span><br><span class="line">2. 提供详细说明书，包含安装和使用步骤；</span><br><span class="line">3. 有数据加密、防火墙、实时安全更新；</span><br><span class="line">4. 有在线客服和售后服务。</span><br><span class="line"></span><br><span class="line">user：基于以上对话提出一个问题。</span><br><span class="line">assistant：这些智能家居产品需要哪些前提条件才能够使用？</span><br><span class="line">user：请回答这个问题。</span><br><span class="line">assistant：""</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这道题的直接答案至少应包括：</p>
+<ul>
+<li>客户需要稳定的 Wi-Fi 网络；</li>
+<li>应阅读说明书，并按说明完成安装、连接和使用。</li>
+</ul>
+<p>安全措施与售后虽然在上下文中出现，但不是“使用前提”的主要答案。</p>
+<h2 id="3-1-这条真实样本的原文、模板与-Token"><a href="#3-1-这条真实样本的原文、模板与-Token" class="headerlink" title="3.1 这条真实样本的原文、模板与 Token"></a>3.1 这条真实样本的原文、模板与 Token</h2><p>这一节先不抽象。下面只追踪 <code>sample_index=0</code>、<code>seed=42</code> 这一条真实轨迹。</p>
+<h3 id="步骤-0：JSONL-中原始输入是什么"><a href="#步骤-0：JSONL-中原始输入是什么" class="headerlink" title="步骤 0：JSONL 中原始输入是什么"></a>步骤 0：JSONL 中原始输入是什么</h3><p>原始 <code>conversations</code> 的 6 条消息如下。第二条 assistant 很长，但它不是标签，而是当前问题所依赖的历史上下文：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">  <span class="punctuation">{</span></span><br><span class="line">    <span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"user"</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"基于以下角色信息完成一段对话\n张明（30岁），一位IT公司的销售经理。外表干练，擅长沟通。最近他需要协助生产部门促销一批新的智能家居产品，但是他对于这些新产品的技术方面并不够熟悉。\n刘琳（25岁），一名来自生产部门的研发工程师。外表看起来有些内向，但实则是一名技术精湛的工程师。最近生产的智能家居产品是她和她的团队开发的。"</span></span><br><span class="line">  <span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span></span><br><span class="line">    <span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"assistant"</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"张明：嗨，刘琳，我听说智能家居产品已经进入了我们公司，我真的很想能够了解一下这些产品的技术方面，以便于在销售中向客户传递正确的信息。\n刘琳：嗨，张明，很高兴为您介绍。这些智能家居产品基于物联网技术开发，并且已经通过了一系列的测试，具有很高的品质保证，其中包括智能插座、智能门锁等产品，您想了解哪些方面？\n张明：首先，我想知道产品的使用前提是什么，例如，在产品安装之前客户需要做哪些准备，以及在使用产品时需要注意哪些事项？\n刘琳：客户使用产品之前需要保证有一个稳定的Wi-Fi网络，因为产品只能够通过Wi-Fi网络进行连接和控制。此外，我们提供了一份详细的使用说明书，其中包含了如何安装和使用产品的所有步骤。\n张明：我也想问一下产品的安全性能如何，客户的隐私是否会被泄露？\n刘琳：我们的产品具有完善的安全措施，可以保证客户的隐私不会泄露。这些措施包括数据加密技术、防火墙以及实时的安全更新等。\n张明：听起来很不错，但是我想问一下，如果客户在使用产品时遇到问题，我们应该如何解决？\n刘琳：我们提供了在线客服服务以及售后服务，如果客户在使用过程中遇到问题，可以随时和我们取得联系，我们会在第一时间为客户解决问题。\n张明：感谢您对我的解答，我对这些产品有了更全面的了解，并且可以更好地向客户介绍这些产品了。\n刘琳：没关系，很高兴能够为您提供帮助。"</span></span><br><span class="line">  <span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"user"</span><span class="punctuation">,</span> <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"基于以上对话提出一个问题。"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"assistant"</span><span class="punctuation">,</span> <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"这些智能家居产品需要哪些前提条件才能够使用？"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"user"</span><span class="punctuation">,</span> <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"请回答这个问题。"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span> <span class="string">"assistant"</span><span class="punctuation">,</span> <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">""</span><span class="punctuation">}</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="步骤-1：-1-后剩下什么"><a href="#步骤-1：-1-后剩下什么" class="headerlink" title="步骤 1：[:-1] 后剩下什么"></a>步骤 1：<code>[:-1]</code> 后剩下什么</h3><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">before = 6 条</span><br><span class="line">after  = 5 条</span><br><span class="line">删除   = {"role":"assistant","content":""}</span><br><span class="line">保留角色顺序 = [user, assistant, user, assistant, user]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="步骤-2：真正交给-Tokenizer-的文字是什么"><a href="#步骤-2：真正交给-Tokenizer-的文字是什么" class="headerlink" title="步骤 2：真正交给 Tokenizer 的文字是什么"></a>步骤 2：真正交给 Tokenizer 的文字是什么</h3><p>固定 seed 42 后，本次 <code>open_thinking=True</code>。Chat template 输出 991 个字符。下面是实际 prompt，不是示意文本：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;|im_start|&gt;user</span><br><span class="line">基于以下角色信息完成一段对话</span><br><span class="line">张明（30岁），一位IT公司的销售经理。外表干练，擅长沟通。最近他需要协助生产部门促销一批新的智能家居产品，但是他对于这些新产品的技术方面并不够熟悉。</span><br><span class="line">刘琳（25岁），一名来自生产部门的研发工程师。外表看起来有些内向，但实则是一名技术精湛的工程师。最近生产的智能家居产品是她和她的团队开发的。&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;assistant</span><br><span class="line">&lt;think&gt;</span><br><span class="line"></span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">张明：嗨，刘琳，我听说智能家居产品已经进入了我们公司，我真的很想能够了解一下这些产品的技术方面，以便于在销售中向客户传递正确的信息。</span><br><span class="line">刘琳：嗨，张明，很高兴为您介绍。这些智能家居产品基于物联网技术开发，并且已经通过了一系列的测试，具有很高的品质保证，其中包括智能插座、智能门锁等产品，您想了解哪些方面？</span><br><span class="line">张明：首先，我想知道产品的使用前提是什么，例如，在产品安装之前客户需要做哪些准备，以及在使用产品时需要注意哪些事项？</span><br><span class="line">刘琳：客户使用产品之前需要保证有一个稳定的Wi-Fi网络，因为产品只能够通过Wi-Fi网络进行连接和控制。此外，我们提供了一份详细的使用说明书，其中包含了如何安装和使用产品的所有步骤。</span><br><span class="line">张明：我也想问一下产品的安全性能如何，客户的隐私是否会被泄露？</span><br><span class="line">刘琳：我们的产品具有完善的安全措施，可以保证客户的隐私不会泄露。这些措施包括数据加密技术、防火墙以及实时的安全更新等。</span><br><span class="line">张明：听起来很不错，但是我想问一下，如果客户在使用产品时遇到问题，我们应该如何解决？</span><br><span class="line">刘琳：我们提供了在线客服服务以及售后服务，如果客户在使用过程中遇到问题，可以随时和我们取得联系，我们会在第一时间为客户解决问题。</span><br><span class="line">张明：感谢您对我的解答，我对这些产品有了更全面的了解，并且可以更好地向客户介绍这些产品了。</span><br><span class="line">刘琳：没关系，很高兴能够为您提供帮助。&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;user</span><br><span class="line">基于以上对话提出一个问题。&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;assistant</span><br><span class="line">&lt;think&gt;</span><br><span class="line"></span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">这些智能家居产品需要哪些前提条件才能够使用？&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;user</span><br><span class="line">请回答这个问题。&lt;|im_end|&gt;</span><br><span class="line">&lt;|im_start|&gt;assistant</span><br><span class="line">&lt;think&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>注意最后停在 <code>&lt;think&gt;\n</code>，这正是 Actor 开始续写的位置。</p>
+<h3 id="步骤-3：具体切成了什么-token"><a href="#步骤-3：具体切成了什么-token" class="headerlink" title="步骤 3：具体切成了什么 token"></a>步骤 3：具体切成了什么 token</h3><p>Tokenizer 输出：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">input_ids.dtype      = torch.int64</span><br><span class="line">input_ids.shape      = [1,561]</span><br><span class="line">attention_mask.shape = [1,561]</span><br><span class="line">valid tokens         = 561</span><br></pre></td></tr></tbody></table></figure>
+
+<p>开头 20 个真实 token：</p>
+<table>
+<thead>
+<tr>
+<th align="right">index</th>
+<th align="right">token id</th>
+<th>decode 后文本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0</td>
+<td align="right">1</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td align="right">832</td>
+<td><code>us</code></td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">311</td>
+<td><code>er</code></td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td align="right">2061</td>
+<td><code>基于</code></td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td align="right">850</td>
+<td><code>以下</code></td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="right">2351</td>
+<td><code>角色</code></td>
+</tr>
+<tr>
+<td align="right">7</td>
+<td align="right">839</td>
+<td><code>信息</code></td>
+</tr>
+<tr>
+<td align="right">8</td>
+<td align="right">1996</td>
+<td><code>完成</code></td>
+</tr>
+<tr>
+<td align="right">9</td>
+<td align="right">3875</td>
+<td><code>一段</code></td>
+</tr>
+<tr>
+<td align="right">10</td>
+<td align="right">3109</td>
+<td><code>对话</code></td>
+</tr>
+<tr>
+<td align="right">11</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">12</td>
+<td align="right">2370</td>
+<td><code>张</code></td>
+</tr>
+<tr>
+<td align="right">13</td>
+<td align="right">851</td>
+<td><code>明</code></td>
+</tr>
+<tr>
+<td align="right">14</td>
+<td align="right">555</td>
+<td><code>（</code></td>
+</tr>
+<tr>
+<td align="right">15</td>
+<td align="right">2921</td>
+<td><code>30</code></td>
+</tr>
+<tr>
+<td align="right">16</td>
+<td align="right">4744</td>
+<td><code>岁</code></td>
+</tr>
+<tr>
+<td align="right">17</td>
+<td align="right">2097</td>
+<td><code>），</code></td>
+</tr>
+<tr>
+<td align="right">18</td>
+<td align="right">5752</td>
+<td><code>一位</code></td>
+</tr>
+<tr>
+<td align="right">19</td>
+<td align="right">6103</td>
+<td><code>IT</code></td>
+</tr>
+</tbody></table>
+<p>末尾 30 个真实 token：</p>
+<table>
+<thead>
+<tr>
+<th align="right">index</th>
+<th align="right">token id</th>
+<th>decode 后文本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">531</td>
+<td align="right">5949</td>
+<td><code>家居</code></td>
+</tr>
+<tr>
+<td align="right">532</td>
+<td align="right">1306</td>
+<td><code>产品</code></td>
+</tr>
+<tr>
+<td align="right">533</td>
+<td align="right">630</td>
+<td><code>需要</code></td>
+</tr>
+<tr>
+<td align="right">534</td>
+<td align="right">2489</td>
+<td><code>哪些</code></td>
+</tr>
+<tr>
+<td align="right">535</td>
+<td align="right">938</td>
+<td><code>前</code></td>
+</tr>
+<tr>
+<td align="right">536</td>
+<td align="right">454</td>
+<td><code>提</code></td>
+</tr>
+<tr>
+<td align="right">537</td>
+<td align="right">2041</td>
+<td><code>条件</code></td>
+</tr>
+<tr>
+<td align="right">538</td>
+<td align="right">2478</td>
+<td><code>才</code></td>
+</tr>
+<tr>
+<td align="right">539</td>
+<td align="right">934</td>
+<td><code>能够</code></td>
+</tr>
+<tr>
+<td align="right">540</td>
+<td align="right">533</td>
+<td><code>使用</code></td>
+</tr>
+<tr>
+<td align="right">541</td>
+<td align="right">776</td>
+<td><code>？</code></td>
+</tr>
+<tr>
+<td align="right">542</td>
+<td align="right">2</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">543</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">544</td>
+<td align="right">1</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">545</td>
+<td align="right">832</td>
+<td><code>us</code></td>
+</tr>
+<tr>
+<td align="right">546</td>
+<td align="right">311</td>
+<td><code>er</code></td>
+</tr>
+<tr>
+<td align="right">547</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">548</td>
+<td align="right">960</td>
+<td><code>请</code></td>
+</tr>
+<tr>
+<td align="right">549</td>
+<td align="right">3854</td>
+<td><code>回答</code></td>
+</tr>
+<tr>
+<td align="right">550</td>
+<td align="right">4582</td>
+<td><code>这个问题</code></td>
+</tr>
+<tr>
+<td align="right">551</td>
+<td align="right">302</td>
+<td><code>。</code></td>
+</tr>
+<tr>
+<td align="right">552</td>
+<td align="right">2</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">553</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">554</td>
+<td align="right">1</td>
+<td>`&lt;</td>
+</tr>
+<tr>
+<td align="right">555</td>
+<td align="right">1388</td>
+<td><code>ass</code></td>
+</tr>
+<tr>
+<td align="right">556</td>
+<td align="right">570</td>
+<td><code>ist</code></td>
+</tr>
+<tr>
+<td align="right">557</td>
+<td align="right">811</td>
+<td><code>ant</code></td>
+</tr>
+<tr>
+<td align="right">558</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+<tr>
+<td align="right">559</td>
+<td align="right">25</td>
+<td><code>&lt;think&gt;</code></td>
+</tr>
+<tr>
+<td align="right">560</td>
+<td align="right">234</td>
+<td>换行</td>
+</tr>
+</tbody></table>
+<p>这解释了为什么人眼看到一个单词，Tokenizer 不一定只产生一个 token。例如 <code>user</code> 被切成 <code>us + er</code>，<code>assistant</code> 被切成 <code>ass + ist + ant</code>，“前提条件”被切成 <code>前 + 提 + 条件</code>。</p>
+<h2 id="4-GRPO-真实四候选数据流"><a href="#4-GRPO-真实四候选数据流" class="headerlink" title="4. GRPO 真实四候选数据流"></a>4. GRPO 真实四候选数据流</h2><h2 id="4-1-历史配置与当前默认值"><a href="#4-1-历史配置与当前默认值" class="headerlink" title="4.1 历史配置与当前默认值"></a>4.1 历史配置与当前默认值</h2><p>历史 LifeOS GRPO 训练显式使用：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">B                 = 1</span><br><span class="line">G                 = 4</span><br><span class="line">max_seq_len       = 768</span><br><span class="line">max_gen_len       = 256</span><br><span class="line">hidden_size       = 768</span><br><span class="line">num_hidden_layers = 8</span><br><span class="line">learning_rate     = 3e-7</span><br><span class="line">temperature       = 0.8</span><br><span class="line">beta              = 0.1</span><br><span class="line">loss_type         = cispo</span><br><span class="line">epsilon_high      = 5.0</span><br><span class="line">dtype             = bfloat16</span><br><span class="line">seed              = 42</span><br></pre></td></tr></tbody></table></figure>
+
+<p>当前源码的 <code>num_generations</code> 默认值后来是 6。复现历史实验必须显式传 <code>--num_generations 4</code>，不能用当前默认值代替历史参数。</p>
+<h2 id="4-2-真实-shape"><a href="#4-2-真实-shape" class="headerlink" title="4.2 真实 shape"></a>4.2 真实 shape</h2><p>Rollout engine 执行：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">prompt_ids.repeat_interleave(G, dim=<span class="number">0</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>真实张量：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">prompt_ids          [1,561]</span><br><span class="line">重复后的 prompt      [4,561]</span><br><span class="line">output_ids          [4,817]</span><br><span class="line">completion_ids      [4,256]</span><br><span class="line">old_logps           [4,256]</span><br><span class="line">current_logps       [4,256]</span><br><span class="line">reference_logps     [4,256]</span><br><span class="line">completion_mask     [4,256]</span><br><span class="line">rewards             [4]</span><br><span class="line">grouped_rewards     [1,4]</span><br><span class="line">advantages          [4]</span><br><span class="line">per_token_loss      [4,256]</span><br><span class="line">policy_loss         []</span><br></pre></td></tr></tbody></table></figure>
+
+<p>四条有效长度：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[186,184,256,193]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>第 3 条（索引 2）达到 256 token 上限，没有 EOS；其他三条的 mask 包含首个 EOS，并过滤 EOS 后的 padding。</p>
+<h2 id="4-3-四条真实回答和-reward"><a href="#4-3-四条真实回答和-reward" class="headerlink" title="4.3 四条真实回答和 reward"></a>4.3 四条真实回答和 reward</h2><p><img src="/images/minimind-grpo-cispo-real-complete/02-four-rollouts-reward.svg" alt="四条真实回答的 Reward 与 Advantage"></p>
+<p>四条回答都把问题误解成“安全性如何”，没有直接回答稳定 Wi-Fi 和安装说明。</p>
+<table>
+<thead>
+<tr>
+<th align="right">索引</th>
+<th align="right">有效 token</th>
+<th>回答概要</th>
+<th align="right">规则分</th>
+<th align="right">RM score</th>
+<th align="right">final reward</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0</td>
+<td align="right">186</td>
+<td>加密、访问控制、隐私安全</td>
+<td align="right">1.75</td>
+<td align="right">-0.111023</td>
+<td align="right">1.638977</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td align="right">184</td>
+<td>数据加密、防火墙、实时更新</td>
+<td align="right">1.75</td>
+<td align="right">-0.131836</td>
+<td align="right">1.618164</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right">256</td>
+<td>重复讨论加密与访问控制，未正常结束</td>
+<td align="right">1.75</td>
+<td align="right">-1.102539</td>
+<td align="right">0.647461</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td align="right">193</td>
+<td>加密、防火墙、安全更新、专业帮助</td>
+<td align="right">1.75</td>
+<td align="right">-0.574219</td>
+<td align="right">1.175781</td>
+</tr>
+</tbody></table>
+<p>每条规则分 <code>1.75</code> 都是逐项算出的：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">完整 response 字符长度在 20–800      +0.50</span><br><span class="line">thinking 内容长度在 20–300           +1.00</span><br><span class="line">恰好出现一个 &lt;/think&gt;                +0.25</span><br><span class="line">answer 3-gram 重复惩罚                -0.00</span><br><span class="line">规则小计                              1.75</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Reward Model 不直接接收 MiniMind 的 <code>[4,256]</code> completion tensor。对每条回答，它把相同历史 prompt 压成一条 RM user message，把 <code>&lt;/think&gt;</code> 后的 answer 作为 RM assistant message，再使用 InternLM2 自己的 tokenizer 编码并在末尾追加 <code>reward_token_id=92527</code>。</p>
+<p>四条真实 RM 输入 shape：</p>
+<table>
+<thead>
+<tr>
+<th align="right">generation</th>
+<th align="right">RM <code>input_ids</code></th>
+<th align="right">RM <code>attention_mask</code></th>
+<th align="right">reward token</th>
+<th align="right">RM scalar 输出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0</td>
+<td align="right"><code>[1,505]</code></td>
+<td align="right"><code>[1,505]</code></td>
+<td align="right">92527</td>
+<td align="right">-0.1110229492</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td align="right"><code>[1,522]</code></td>
+<td align="right"><code>[1,522]</code></td>
+<td align="right">92527</td>
+<td align="right">-0.1318359375</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="right"><code>[1,549]</code></td>
+<td align="right"><code>[1,549]</code></td>
+<td align="right">92527</td>
+<td align="right">-1.1025390625</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td align="right"><code>[1,500]</code></td>
+<td align="right"><code>[1,500]</code></td>
+<td align="right">92527</td>
+<td align="right">-0.5742187500</td>
+</tr>
+</tbody></table>
+<p>四条 RM 输入的开头 token IDs 相同：<code>[1,92543,1008,364,1008,334,262,70513]</code>。长度不同，是因为四个 answer 文本不同。</p>
+<p>这里出现一个非常重要的事实：</p>
+<blockquote>
+<p>四条语义上都没有正确回答原问题，但 reward 仍能产生清晰排名。GRPO 只能优化 reward 定义的相对优劣；reward 与任务目标错配时，算法可能稳定地优化错误方向。</p>
+</blockquote>
+<h2 id="4-4-Reward-组均值"><a href="#4-4-Reward-组均值" class="headerlink" title="4.4 Reward 组均值"></a>4.4 Reward 组均值</h2><p>未舍入原始值：</p>
+
+$$
+R=[1.63897705078125,1.6181640625,0.6474609375,1.17578125]
+$$
+
+
+<p>组均值：</p>
+
+$$
+\mu_R=\frac1G\sum_{i=1}^{G}R_i
+$$
+
+
+<p>代入：</p>
+
+$$
+\mu_R
+=\frac{1.6389770508+1.6181640625+0.6474609375+1.17578125}{4}
+=1.2700958252
+$$
+
+
+<p><code>mu</code> 是同一个 prompt 内的 baseline，不与其他 prompt 混合。</p>
+<h2 id="4-5-组标准差"><a href="#4-5-组标准差" class="headerlink" title="4.5 组标准差"></a>4.5 组标准差</h2><p>源码使用 <code>unbiased=False</code>，即总体标准差：</p>
+
+$$
+\sigma_R
+=\sqrt{\frac1G\sum_{i=1}^{G}(R_i-\mu_R)^2}
+$$
+
+
+<p>真实结果：</p>
+
+$$
+\sigma_R=0.4042877257
+$$
+
+
+<p>不是除以 <code>G-1</code> 的样本标准差。</p>
+<h2 id="4-6-组相对-advantage"><a href="#4-6-组相对-advantage" class="headerlink" title="4.6 组相对 advantage"></a>4.6 组相对 advantage</h2><p>公式：</p>
+
+$$
+A_i=\frac{R_i-\mu_R}{\sigma_R+10^{-4}}
+$$
+
+
+<p><code>1e-4</code> 防止同组 reward 几乎相同时除以 0。</p>
+<p>逐条代入：</p>
+
+$$
+A_0=\frac{1.6389770508-1.2700958252}{0.4042877257+0.0001}
+=0.9121969
+$$
+
+
+
+$$
+A_1=0.8607290
+$$
+
+
+
+$$
+A_2=\frac{0.6474609375-1.2700958252}{0.4042877257+0.0001}
+=-1.5396979
+$$
+
+
+
+$$
+A_3=-0.2332281
+$$
+
+
+<p>最终：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">advantages = [0.912197, 0.860729, -1.539698, -0.233228]</span><br><span class="line">mean       = 0</span><br></pre></td></tr></tbody></table></figure>
+
+<p>含义：</p>
+<ul>
+<li>正 advantage：该回答高于同题平均水平；</li>
+<li>负 advantage：低于同题平均水平；</li>
+<li>如果 4 条 reward 完全相同，所有 advantage 接近 0，这一组几乎没有相对学习信号。</li>
+</ul>
+<h2 id="4-7-从回答级-advantage-广播到-token"><a href="#4-7-从回答级-advantage-广播到-token" class="headerlink" title="4.7 从回答级 advantage 广播到 token"></a>4.7 从回答级 advantage 广播到 token</h2><p>GRPO 的 <code>advantages.shape=[B×G]</code>，本例是 <code>[4]</code>。</p>
+<p>代码：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">advantages.unsqueeze(<span class="number">1</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>shape 变为 <code>[4,1]</code>，与 <code>[4,256]</code> 的 logp/ratio 运算时广播：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">回答 0 的 186 个有效 token 共用 A0= 0.912197</span><br><span class="line">回答 1 的 184 个有效 token 共用 A1= 0.860729</span><br><span class="line">回答 2 的 256 个有效 token 共用 A2=-1.539698</span><br><span class="line">回答 3 的 193 个有效 token 共用 A3=-0.233228</span><br></pre></td></tr></tbody></table></figure>
+
+<p>所以 GRPO 没有 token 级 Critic advantage，但仍然计算逐 token policy loss。</p>
+<h2 id="5-GRPO-的-logp、ratio、KL-与-mask"><a href="#5-GRPO-的-logp、ratio、KL-与-mask" class="headerlink" title="5. GRPO 的 logp、ratio、KL 与 mask"></a>5. GRPO 的 logp、ratio、KL 与 mask</h2><h2 id="5-1-三套-logp"><a href="#5-1-三套-logp" class="headerlink" title="5.1 三套 logp"></a>5.1 三套 logp</h2><table>
+<thead>
+<tr>
+<th>变量</th>
+<th align="right">shape</th>
+<th>来源</th>
+<th>梯度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>old_per_token_logps</code></td>
+<td align="right"><code>[4,256]</code></td>
+<td>rollout Actor</td>
+<td>detach</td>
+</tr>
+<tr>
+<td><code>per_token_logps</code></td>
+<td align="right"><code>[4,256]</code></td>
+<td>Current Actor 再 forward</td>
+<td>有</td>
+</tr>
+<tr>
+<td><code>ref_per_token_logps</code></td>
+<td align="right"><code>[4,256]</code></td>
+<td>Frozen Reference</td>
+<td>无</td>
+</tr>
+</tbody></table>
+<p>自回归对齐与 PPO 相同：completion token <code>P+t</code> 由 logits <code>P+t-1</code> 预测。</p>
+<h2 id="5-2-Reference、Old、Current、New-的时间身份"><a href="#5-2-Reference、Old、Current、New-的时间身份" class="headerlink" title="5.2 Reference、Old、Current、New 的时间身份"></a>5.2 Reference、Old、Current、New 的时间身份</h2><p><img src="/images/minimind-grpo-cispo-real-complete/03-reference-policy-timeline.svg" alt="GRPO 的 Reference / Old / Current / New 时间线"></p>
+<h3 id="5-2-1-四个词分别指什么"><a href="#5-2-1-四个词分别指什么" class="headerlink" title="5.2.1 四个词分别指什么"></a>5.2.1 四个词分别指什么</h3><p>设第 <code>k</code> 个训练 batch 开始时 Actor 参数为 $\theta^k$，冻结 Reference 参数为 $\theta_{ref}$。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>本项目中的实体</th>
+<th align="right">是否独立模型</th>
+<th>是否更新</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Reference</td>
+<td>从 DPO checkpoint 单独加载的 <code>ref_model</code></td>
+<td align="right">是，但冻结</td>
+<td>GRPO 全程不更新</td>
+</tr>
+<tr>
+<td>Old policy</td>
+<td>rollout 返回的 <code>old_per_token_logps.detach()</code></td>
+<td align="right">否，只是 <code>[B×G,R]</code> 缓存</td>
+<td>每次新 rollout 重新产生</td>
+</tr>
+<tr>
+<td>Current policy</td>
+<td>当前正在 forward/backward 的 <code>model</code></td>
+<td align="right">就是 Actor</td>
+<td>optimizer step 时更新</td>
+</tr>
+<tr>
+<td>New policy</td>
+<td>optimizer step 后的同一个 Actor</td>
+<td align="right">否，不是新建模型</td>
+<td>step 后产生，并立即成为 Current</td>
+</tr>
+</tbody></table>
+<p>初始化源码是：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">model, tokenizer = init_model(lm_config, base_weight, ...)</span><br><span class="line">ref_model, _ = init_model(lm_config, base_weight, ...)</span><br><span class="line">ref_model = ref_model.<span class="built_in">eval</span>().requires_grad_(<span class="literal">False</span>)</span><br><span class="line">optimizer = AdamW(model.parameters(), lr=<span class="number">3e-7</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>历史 <code>base_weight=lifeos_agent_dpo_v1</code>，所以训练起点参数数值相同：</p>
+
+$$
+\theta^0=\theta_{ref}=\theta_{DPO}
+$$
+
+
+<p>但二者是两个独立模型实例。只有 Actor 进入 optimizer；Reference 没有梯度、没有 optimizer、没有 <code>step()</code>。</p>
+<p>Reference 参数始终不变：</p>
+
+$$
+\theta_{ref}^{start}=\theta_{ref}^{batch\ 1}=\cdots=\theta_{ref}^{end}
+$$
+
+
+<p>不过每批生成的 token 不同，所以冻结 Reference 仍要对本批新 <code>outputs</code> forward，得到新的 <code>ref_per_token_logps</code>。这里“重新计算输出”不等于“更新参数”。</p>
+<h3 id="5-2-2-真实-GRPO-x2F-CISPO-batch-的严格顺序"><a href="#5-2-2-真实-GRPO-x2F-CISPO-batch-的严格顺序" class="headerlink" title="5.2.2 真实 GRPO/CISPO batch 的严格顺序"></a>5.2.2 真实 GRPO/CISPO batch 的严格顺序</h3><p>历史配置：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">B                  = 1</span><br><span class="line">G                  = 4</span><br><span class="line">accumulation_steps = 1</span><br><span class="line">learning_rate      = 3e-7</span><br><span class="line">loss_type          = cispo</span><br><span class="line">rollout_engine     = torch</span><br></pre></td></tr></tbody></table></figure>
+
+<p>下面的<strong>执行顺序</strong>来自远程当前 <code>train_grpo.py</code>，四条回答、shape、logp、reward 和 advantage 来自真实 GRPO checkpoint 的只读 probe。probe 不执行 backward/optimizer step，所以文档不会虚构 step 后的新参数或新 logp。</p>
+<h4 id="时刻-T0：batch-开始"><a href="#时刻-T0：batch-开始" class="headerlink" title="时刻 T0：batch 开始"></a>时刻 T0：batch 开始</h4><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Actor 当前参数 = theta^k</span><br><span class="line">Reference      = theta_ref（冻结 DPO 起点）</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="时刻-T1：Actor-生成-4-条回答，当前参数被记录为-Old-数据"><a href="#时刻-T1：Actor-生成-4-条回答，当前参数被记录为-Old-数据" class="headerlink" title="时刻 T1：Actor 生成 4 条回答，当前参数被记录为 Old 数据"></a>时刻 T1：Actor 生成 4 条回答，当前参数被记录为 Old 数据</h4><p>Torch rollout 用 $\theta^k$ 生成四条 completion：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">completion_ids       [4,256]</span><br><span class="line">old_per_token_logps  [4,256]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>数学上：</p>
+
+$$
+old\_logp_{i,t}^{k}=\log\pi_{\theta^k}(a_{i,t}\mid s_{i,t})
+$$
+
+
+<p>这一步没有复制 <code>old_model</code>。Old 是采样时 logp 的冻结快照。</p>
+<h4 id="时刻-T2：先评价四条完整回答"><a href="#时刻-T2：先评价四条完整回答" class="headerlink" title="时刻 T2：先评价四条完整回答"></a>时刻 T2：先评价四条完整回答</h4><p>rollout 返回后，源码立即执行：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rewards [4] = calculate_rewards(prompts, completions, reward_model)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>得到真实 reward：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[1.638977, 1.618164, 0.647461, 1.175781]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Reward Model 和规则奖励只评价文本，不更新 Actor 或 Reference。源码在 reward 完成后才进行带梯度的 Current Actor forward。</p>
+<h4 id="时刻-T3：同一个-Actor-做带梯度的-Current-forward"><a href="#时刻-T3：同一个-Actor-做带梯度的-Current-forward" class="headerlink" title="时刻 T3：同一个 Actor 做带梯度的 Current forward"></a>时刻 T3：同一个 Actor 做带梯度的 Current forward</h4><p>reward 计算完成后，源码用本地 Actor 对同一 <code>outputs</code> 再 forward：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">per_token_logps [4,256]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>历史任务使用 Torch 引擎，而 Torch 引擎和训练端持有同一个 Actor 对象；从 T1 rollout 到 T3 Current forward 之间没有 optimizer step，所以：</p>
+
+$$
+\theta_{current}=\theta^k=\theta_{old\ rollout}
+$$
+
+
+<p>真实探针生成索引 2 的最后 token“隐私”：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">old_logp     = -2.855593</span><br><span class="line">current_logp = -2.855593</span><br><span class="line">ratio        = exp(-2.855593 - (-2.855593)) = 1</span><br></pre></td></tr></tbody></table></figure>
+
+<h4 id="时刻-T4：冻结-Reference-对同一批-outputs-forward"><a href="#时刻-T4：冻结-Reference-对同一批-outputs-forward" class="headerlink" title="时刻 T4：冻结 Reference 对同一批 outputs forward"></a>时刻 T4：冻结 Reference 对同一批 outputs forward</h4><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ref_per_token_logps [4,256]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Reference 只提供 KL 锚点，不参与生成这四条回答，也不参与参数更新：</p>
+
+$$
+d_{i,t}=\log\pi_{ref}(a_{i,t}\mid s_{i,t})
+-\log\pi_{\theta^k}(a_{i,t}\mid s_{i,t})
+$$
+
+
+<p>真实“隐私”token 的非负 KL penalty 为 <code>0.090796</code>。这说明即使 <code>current=old</code>、ratio 恰好为 1，Current 与长期 Reference 仍可以不同。</p>
+<h4 id="时刻-T5：组相对-advantage、mask-和-loss"><a href="#时刻-T5：组相对-advantage、mask-和-loss" class="headerlink" title="时刻 T5：组相对 advantage、mask 和 loss"></a>时刻 T5：组相对 advantage、mask 和 loss</h4><p>T2 的四条 reward 转成组相对 advantage：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[0.912197, 0.860729, -1.539698, -0.233228]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>随后计算 ratio、Reference KL、CISPO token loss 和 scalar policy loss。到这个时刻，Actor 参数仍然是 $\theta^k$。</p>
+<h4 id="时刻-T6：唯一一次-backward-x2F-optimizer-step-产生-New-policy"><a href="#时刻-T6：唯一一次-backward-x2F-optimizer-step-产生-New-policy" class="headerlink" title="时刻 T6：唯一一次 backward/optimizer step 产生 New policy"></a>时刻 T6：唯一一次 backward/optimizer step 产生 New policy</h4><p>历史 <code>accumulation_steps=1</code>，因此本 batch 立即执行：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">loss.backward()</span><br><span class="line">clip_grad_norm_(Actor, 1.0)</span><br><span class="line">optimizer.step()     -&gt; theta^k 变成 theta^{k+1}</span><br><span class="line">scheduler.step()</span><br><span class="line">optimizer.zero_grad()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>刚 step 完的 $\theta^{k+1}$ 可以叫 New policy；它马上成为下一时刻的 Current policy。Reference 仍是 $\theta_{ref}$，本批的 <code>old_per_token_logps</code> 也不会被改写。</p>
+<h4 id="时刻-T7：下一批重新定义-Old"><a href="#时刻-T7：下一批重新定义-Old" class="headerlink" title="时刻 T7：下一批重新定义 Old"></a>时刻 T7：下一批重新定义 Old</h4><p>下一批用 $\theta^{k+1}$ 生成新的四条回答：</p>
+
+$$
+old\_logp^{k+1}=\log\pi_{\theta^{k+1}}(a^{k+1}\mid s^{k+1})
+$$
+
+
+<p>这时上一批的 New 成为下一批 rollout 的生成策略，而新 rollout 保存下来的 logp 又被称为 Old。完整循环是：</p>
+
+$$
+\theta^k
+\xrightarrow{\text{rollout，保存 old logp}^k}
+\theta^k
+\xrightarrow{\text{backward + step}}
+\theta^{k+1}
+\xrightarrow{\text{下一批 rollout}}
+old\_logp^{k+1}
+$$
+
+
+<h3 id="5-2-3-为什么本项目-GRPO-的-ratio-通常是-1"><a href="#5-2-3-为什么本项目-GRPO-的-ratio-通常是-1" class="headerlink" title="5.2.3 为什么本项目 GRPO 的 ratio 通常是 1"></a>5.2.3 为什么本项目 GRPO 的 ratio 通常是 1</h3><p>PPO 历史配置会对同一 rollout 做 <code>ppo_update_iters=2</code>：第一次 step 后，第二次还能用新 Current 对比固定 Old，所以 ratio 可能偏离 1。</p>
+<p>当前 <code>train_grpo.py</code> 没有 PPO 那样的内层重复更新。每个 rollout 只在 optimizer step <strong>之前</strong>计算一次 Current logp；历史 Torch 引擎又与训练端共享 Actor 对象，因此本批观察到 <code>ratio=1</code> 是执行顺序的直接结果，不是近似值。</p>
+<p>这并不表示 ratio 公式永远无用。以下情况会使它不等于 1：</p>
+<ol>
+<li>rollout 由落后于训练端的外部策略生成；</li>
+<li>同一 rollout 被复用进行多次策略更新；</li>
+<li>rollout 与 Current forward 之间发生了参数同步或其他更新。</li>
+</ol>
+<h3 id="5-2-4-Torch-与-SGLang-的更新时间差异"><a href="#5-2-4-Torch-与-SGLang-的更新时间差异" class="headerlink" title="5.2.4 Torch 与 SGLang 的更新时间差异"></a>5.2.4 Torch 与 SGLang 的更新时间差异</h3><p>历史实跑为 <code>rollout_engine=torch</code>。<code>TorchRolloutEngine</code> 保存同一个模型对象的引用，optimizer 原地更新参数，因此下一批 rollout 自动读取最新 $\theta^{k+1}$。源码中每 <code>save_interval=250</code> 步显式调用一次 <code>update_policy(model)</code>，对 Torch 引擎只是重新设置同一对象引用，中间并不会真的停留在旧参数。</p>
+<p>若使用 <code>rollout_engine=sglang</code>，rollout 在外部服务运行。<code>update_policy()</code> 会写出本地权重并调用 <code>/update_weights_from_disk</code>；按当前源码，显式同步发生在初始化、每个保存间隔和结束处。因此两个同步点之间：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">远程 rollout policy 可能是较旧参数 theta_rollout</span><br><span class="line">本地 Current Actor   可能是较新参数 theta_current</span><br><span class="line">old_logp = log pi_{theta_rollout}</span><br><span class="line">current_logp = log pi_{theta_current}</span><br><span class="line">ratio 可能不等于 1</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这里 Old 必须以“真正生成 token 的策略”返回的 logp 为准，不能拿 Reference logp 代替。其正确性有一个必要前提：SGLang API 返回的 token logp 必须确实由远端本次采样所使用的那版权重和采样分布计算；否则 importance ratio 本身就失去可信基准。</p>
+<h3 id="5-2-5-一张最终时间表"><a href="#5-2-5-一张最终时间表" class="headerlink" title="5.2.5 一张最终时间表"></a>5.2.5 一张最终时间表</h3><table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>Actor/Current</th>
+<th>Old logp</th>
+<th>Reference</th>
+<th>会不会更新参数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>初始化</td>
+<td>$\theta^0=\theta_{DPO}$</td>
+<td>无</td>
+<td>$\theta_{ref}=\theta_{DPO}$</td>
+<td>都只是加载</td>
+</tr>
+<tr>
+<td>T1 rollout 后</td>
+<td>仍是 $\theta^k$</td>
+<td>保存自 rollout Actor</td>
+<td>不变</td>
+<td>否</td>
+</tr>
+<tr>
+<td>T2 reward 完成</td>
+<td>仍是 $\theta^k$</td>
+<td>固定</td>
+<td>不变</td>
+<td>否</td>
+</tr>
+<tr>
+<td>T3 Current forward</td>
+<td>仍是 $\theta^k$</td>
+<td>固定</td>
+<td>不变</td>
+<td>否</td>
+</tr>
+<tr>
+<td>T4 Reference forward</td>
+<td>仍是 $\theta^k$</td>
+<td>固定</td>
+<td>参数不变；计算 ref logp</td>
+<td>否</td>
+</tr>
+<tr>
+<td>T5 loss 完成</td>
+<td>仍是 $\theta^k$</td>
+<td>固定</td>
+<td>不变</td>
+<td>否</td>
+</tr>
+<tr>
+<td>T6 optimizer step 后</td>
+<td>$\theta^{k+1}$（New→Current）</td>
+<td>仍是本批 $\theta^k$ 的缓存</td>
+<td>不变</td>
+<td>只更新 Actor</td>
+</tr>
+<tr>
+<td>T7 下一批 rollout</td>
+<td>$\theta^{k+1}$</td>
+<td>重新保存自新 rollout</td>
+<td>不变</td>
+<td>rollout 本身不更新</td>
+</tr>
+</tbody></table>
+<h2 id="5-3-Ratio"><a href="#5-3-Ratio" class="headerlink" title="5.3 Ratio"></a>5.3 Ratio</h2>
+$$
+ratio_{i,t}=\exp(
+logp_{current,i,t}-logp_{old,i,t}
+)
+$$
+
+
+<p>本次探针在更新前计算，因此所有有效位置 ratio 为 1。它是真实观察，但只代表更新前状态。</p>
+<h2 id="5-4-Reference-KL"><a href="#5-4-Reference-KL" class="headerlink" title="5.4 Reference KL"></a>5.4 Reference KL</h2>
+$$
+d_{i,t}=logp_{ref,i,t}-logp_{current,i,t}
+$$
+
+
+
+$$
+KL_{i,t}=e^{d_{i,t}}-d_{i,t}-1
+$$
+
+
+<p><code>beta=0.1</code> 控制 GRPO/CISPO 中 KL 惩罚强度。</p>
+<h2 id="5-5-Completion-mask"><a href="#5-5-Completion-mask" class="headerlink" title="5.5 Completion mask"></a>5.5 Completion mask</h2><p>GRPO 主循环：</p>
+<ol>
+<li>从 rollout 的 completion pad mask 开始；</li>
+<li>查找每条回答第一个 EOS；</li>
+<li>保留 <code>position &lt;= eos_index</code>，所以 EOS 自身参与 loss；</li>
+<li>EOS 后和 padding 位置为 0；</li>
+<li>没有 EOS 时保留到 tensor 末尾。</li>
+</ol>
+<p>最终：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">completion_mask.shape = [4,256]</span><br><span class="line">每行有效数           = [186,184,256,193]</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="6-标准-GRPO-风格分支"><a href="#6-标准-GRPO-风格分支" class="headerlink" title="6. 标准 GRPO 风格分支"></a>6. 标准 GRPO 风格分支</h2><p>项目 <code>loss_type="grpo"</code> 分支采用 PPO-clip 风格目标。</p>
+<h3 id="6-1-Clip-ratio"><a href="#6-1-Clip-ratio" class="headerlink" title="6.1 Clip ratio"></a>6.1 Clip ratio</h3>
+$$
+ratio^{clip}_{i,t}=clip(ratio_{i,t},1-\epsilon,1+\epsilon)
+$$
+
+
+<p>参数：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">epsilon = 0.2</span><br><span class="line">区间    = [0.8,1.2]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="6-2-Token-loss"><a href="#6-2-Token-loss" class="headerlink" title="6.2 Token loss"></a>6.2 Token loss</h3>
+$$
+L^{GRPO}_{i,t}
+=-\left[
+\min(ratio_{i,t}A_i,ratio^{clip}_{i,t}A_i)
+-\beta KL_{i,t}
+\right]
+$$
+
+
+<p>每个变量：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th align="right">shape</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ratio</code></td>
+<td align="right"><code>[4,256]</code></td>
+<td>current 相对 old 的概率倍数</td>
+</tr>
+<tr>
+<td><code>ratio_clip</code></td>
+<td align="right"><code>[4,256]</code></td>
+<td>限制策略更新幅度</td>
+</tr>
+<tr>
+<td><code>A_i</code></td>
+<td align="right"><code>[4]→[4,1]</code></td>
+<td>回答级方向和强度</td>
+</tr>
+<tr>
+<td><code>KL</code></td>
+<td align="right"><code>[4,256]</code></td>
+<td>限制相对 Reference 漂移</td>
+</tr>
+<tr>
+<td><code>token_loss</code></td>
+<td align="right"><code>[4,256]</code></td>
+<td>mask 前逐 token loss</td>
+</tr>
+</tbody></table>
+<h3 id="6-3-真实-token-手算"><a href="#6-3-真实-token-手算" class="headerlink" title="6.3 真实 token 手算"></a>6.3 真实 token 手算</h3><p>生成索引 2 的最后 token 是“隐私”：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A              = -1.539698</span><br><span class="line">ratio          = 1</span><br><span class="line">ratio_clip     = 1</span><br><span class="line">KL             = 0.090796</span><br><span class="line">beta           = 0.1</span><br></pre></td></tr></tbody></table></figure>
+
+<p>代入：</p>
+
+$$
+L^{GRPO}
+=-[-1.539698-0.1\times0.090796]
+=1.548778
+$$
+
+
+<h2 id="7-本项目实际执行的-CISPO-分支"><a href="#7-本项目实际执行的-CISPO-分支" class="headerlink" title="7. 本项目实际执行的 CISPO 分支"></a>7. 本项目实际执行的 CISPO 分支</h2><p>历史训练任务虽然叫 GRPO，但有效参数是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">loss_type   = cispo</span><br><span class="line">epsilon_high = 5.0</span><br><span class="line">beta         = 0.1</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因此必须区分：</p>
+<ul>
+<li><strong>GRPO 框架</strong>：同题生成 G 条、组内 reward 标准化；</li>
+<li><strong>标准 GRPO 风格 loss</strong>：ratio 双边 clip 后乘 advantage；</li>
+<li><strong>本项目实际 loss</strong>：CISPO。</li>
+</ul>
+<h2 id="7-1-CISPO-ratio"><a href="#7-1-CISPO-ratio" class="headerlink" title="7.1 CISPO ratio"></a>7.1 CISPO ratio</h2>
+$$
+c_{i,t}=\min(ratio_{i,t},\epsilon_{high})
+$$
+
+
+<p>代码还对 <code>c</code> 执行 <code>detach()</code>：ratio 只作为截断权重，主策略梯度直接通过 <code>logp_current</code>。</p>
+<h2 id="7-2-CISPO-token-loss"><a href="#7-2-CISPO-token-loss" class="headerlink" title="7.2 CISPO token loss"></a>7.2 CISPO token loss</h2>
+$$
+L^{CISPO}_{i,t}
+=-\left[
+c_{i,t}A_i\log\pi_\theta(a_{i,t}|s_{i,t})
+-\beta KL_{i,t}
+\right]
+$$
+
+
+<p>变量：</p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>真实/参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>c_i,t</code></td>
+<td><code>min(ratio,5).detach()</code></td>
+<td>截断重要性权重</td>
+</tr>
+<tr>
+<td><code>A_i</code></td>
+<td>组相对 advantage</td>
+<td>指定整条回答的学习方向</td>
+</tr>
+<tr>
+<td><code>log πθ</code></td>
+<td>current token logp</td>
+<td>真正接收策略梯度</td>
+</tr>
+<tr>
+<td><code>β</code></td>
+<td>0.1</td>
+<td>KL 权重</td>
+</tr>
+<tr>
+<td><code>KL_i,t</code></td>
+<td>非负逐 token 估计</td>
+<td>防止偏离 Reference</td>
+</tr>
+</tbody></table>
+<h2 id="7-3-真实-CISPO-token-手算"><a href="#7-3-真实-CISPO-token-手算" class="headerlink" title="7.3 真实 CISPO token 手算"></a>7.3 真实 CISPO token 手算</h2><p>仍使用生成索引 2 的最后 token：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">c             = 1</span><br><span class="line">A             = -1.539698</span><br><span class="line">current_logp  = -2.855593</span><br><span class="line">KL            = 0.090796</span><br><span class="line">beta          = 0.1</span><br></pre></td></tr></tbody></table></figure>
+
+<p>策略主项：</p>
+
+$$
+cA\log\pi
+=1\times(-1.539698)\times(-2.855593)
+\approx4.396751
+$$
+
+
+<p>减 KL：</p>
+
+$$
+4.396751-0.1\times0.090796
+=4.387671
+$$
+
+
+<p>取外层负号：</p>
+
+$$
+L^{CISPO}=-4.387671
+$$
+
+
+<p>Policy surrogate 可以为负。重点不是 loss 必须为正，而是梯度是否推动正 advantage token 概率上升、负 advantage token 概率下降。</p>
+<h2 id="8-从-token-loss-聚合为-scalar"><a href="#8-从-token-loss-聚合为-scalar" class="headerlink" title="8. 从 token loss 聚合为 scalar"></a>8. 从 token loss 聚合为 scalar</h2><p>先对每条回答做长度归一化：</p>
+
+$$
+L_i
+=\frac{\sum_t m_{i,t}L_{i,t}}
+{\sum_t m_{i,t}}
+$$
+
+
+<p>再对 <code>B×G</code> 条回答取均值：</p>
+
+$$
+L_{policy}=\frac1{BG}\sum_iL_i
+$$
+
+
+<p>先做每条回答内 mean，避免 256-token 回答天然比 184-token 回答权重大。</p>
+<p>真实只读结果：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">标准 GRPO 风格 sequence losses:</span><br><span class="line">[-0.905423, -0.854993, 1.546728, 0.237660]</span><br><span class="line">policy_loss = 0.005993</span><br><span class="line"></span><br><span class="line">CISPO sequence losses:</span><br><span class="line">[0.797861, 0.769677, -1.414265, -0.174611]</span><br><span class="line">policy_loss = -0.005334</span><br></pre></td></tr></tbody></table></figure>
+
+<p>训练时：</p>
+
+$$
+loss=\frac{policy\_loss+aux\_loss}{accumulation\_steps}
+$$
+
+
+<p>本项目 <code>use_moe=0</code>、<code>accumulation_steps=1</code>，因此就是 policy loss。</p>
+<h2 id="9-GPU-上的完整执行过程"><a href="#9-GPU-上的完整执行过程" class="headerlink" title="9. GPU 上的完整执行过程"></a>9. GPU 上的完整执行过程</h2><p><img src="/images/minimind-grpo-cispo-real-complete/04-cispo-gpu-loss.svg" alt="CISPO 与 GPU 张量路径"></p>
+<h2 id="9-1-CPU-阶段"><a href="#9-1-CPU-阶段" class="headerlink" title="9.1 CPU 阶段"></a>9.1 CPU 阶段</h2><ol>
+<li>DataLoader 从 JSONL 取 conversations。</li>
+<li>Python 执行 <code>conversations[:-1]</code>。</li>
+<li>Chat template 生成 prompt 字符串。</li>
+<li>Tokenizer 在 CPU 生成 <code>input_ids</code> 和 <code>attention_mask</code>。</li>
+<li><code>.to(cuda)</code> 把小型整数 Tensor 送入 GPU。</li>
+</ol>
+<h2 id="9-2-Rollout-阶段"><a href="#9-2-Rollout-阶段" class="headerlink" title="9.2 Rollout 阶段"></a>9.2 Rollout 阶段</h2><ol>
+<li><code>[1,561]</code> repeat-interleave 成 <code>[4,561]</code>。</li>
+<li>Actor 在 <code>torch.no_grad()</code> 与 bfloat16 autocast 下自回归生成。</li>
+<li>每生成一个 token 都依赖前缀，因此 decoding 在时间维是逐步的。</li>
+<li>GPU 保存/更新 KV cache，避免每一步重新计算全部前缀。</li>
+<li>最终得到 <code>[4,817]</code>，切出 completion <code>[4,256]</code>。</li>
+<li>Actor 对完整 output 计算 old logp <code>[4,256]</code>。</li>
+</ol>
+<h2 id="9-3-Reward-阶段"><a href="#9-3-Reward-阶段" class="headerlink" title="9.3 Reward 阶段"></a>9.3 Reward 阶段</h2><ol>
+<li>Python 对 response 做长度、thinking、格式和重复规则评分。</li>
+<li>Reward Model 驻留 GPU，以 FP16 对四个 answer 逐条打分。</li>
+<li>合并规则分和 RM score，得到 rewards <code>[4]</code>。</li>
+</ol>
+<h2 id="9-4-Target-构造阶段"><a href="#9-4-Target-构造阶段" class="headerlink" title="9.4 Target 构造阶段"></a>9.4 Target 构造阶段</h2><p>这些运算都在 GPU 上，但开销远小于 Transformer：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">rewards [4]</span><br><span class="line">→ grouped [1,4]</span><br><span class="line">→ mean/std [1]</span><br><span class="line">→ advantages [4]</span><br><span class="line">→ broadcast [4,1]</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="9-5-Policy-与-Reference-forward"><a href="#9-5-Policy-与-Reference-forward" class="headerlink" title="9.5 Policy 与 Reference forward"></a>9.5 Policy 与 Reference forward</h2><ol>
+<li>Current Actor 对 <code>[4,817]</code> forward，保留 autograd graph。</li>
+<li>得到 logits <code>[4,817,6400]</code>，右移并 gather 成 current logps <code>[4,256]</code>。</li>
+<li>Frozen Reference 在 <code>no_grad()</code> 中 forward，得到 ref logps <code>[4,256]</code>。</li>
+<li>计算 ratio、KL、token loss、mask 与 scalar loss。</li>
+</ol>
+<h2 id="9-6-Backward-与更新"><a href="#9-6-Backward-与更新" class="headerlink" title="9.6 Backward 与更新"></a>9.6 Backward 与更新</h2><p>真实训练而非 probe 时：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">loss.backward()</span><br><span class="line">clip_grad_norm_(model.parameters(), <span class="number">1.0</span>)</span><br><span class="line">optimizer.step()</span><br><span class="line">scheduler.step()</span><br><span class="line">optimizer.zero_grad()</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>backward()</code> 从 scalar loss 沿 current logp、Transformer 激活回传到 Actor 参数。Reference 和 Reward Model 都冻结，不接收梯度。</p>
+<h2 id="9-7-Checkpoint"><a href="#9-7-Checkpoint" class="headerlink" title="9.7 Checkpoint"></a>9.7 Checkpoint</h2><p>保存时：</p>
+<ol>
+<li>取 current policy state dict；</li>
+<li>转 FP16 并移动到 CPU；</li>
+<li>保存 <code>.pth</code>；</li>
+<li>保存 resume checkpoint 中的 optimizer/scheduler 状态；</li>
+<li>rollout engine 在指定节点同步最新 policy。</li>
+</ol>
+<h2 id="10-真实显存观察"><a href="#10-真实显存观察" class="headerlink" title="10. 真实显存观察"></a>10. 真实显存观察</h2><p>PyTorch 探针记录的是 <code>memory_allocated()</code> 与 <code>max_memory_allocated()</code>：</p>
+<h3 id="PPO-只读-forward"><a href="#PPO-只读-forward" class="headerlink" title="PPO 只读 forward"></a>PPO 只读 forward</h3><table>
+<thead>
+<tr>
+<th>时点</th>
+<th align="right">allocated / peak</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Actor + Reference + Critic</td>
+<td align="right">808.4 MiB</td>
+</tr>
+<tr>
+<td>rollout 后 peak</td>
+<td align="right">963.4 MiB</td>
+</tr>
+<tr>
+<td>Actor/Reference/Critic forward 后 peak</td>
+<td align="right">981.3 MiB</td>
+</tr>
+<tr>
+<td>加载并运行 Reward Model 后 peak</td>
+<td align="right">4,175.2 MiB</td>
+</tr>
+</tbody></table>
+<h3 id="GRPO-只读-forward"><a href="#GRPO-只读-forward" class="headerlink" title="GRPO 只读 forward"></a>GRPO 只读 forward</h3><table>
+<thead>
+<tr>
+<th>时点</th>
+<th align="right">allocated / peak</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Actor + Reference</td>
+<td align="right">539.2 MiB</td>
+</tr>
+<tr>
+<td>4 路 rollout 后 peak</td>
+<td align="right">773.5 MiB</td>
+</tr>
+<tr>
+<td>Actor/Reference forward 后 peak</td>
+<td align="right">870.7 MiB</td>
+</tr>
+<tr>
+<td>加载并运行 Reward Model 后 peak</td>
+<td align="right">3,910.5 MiB</td>
+</tr>
+</tbody></table>
+<p>注意：</p>
+<ul>
+<li><code>allocated</code> 不等于 PyTorch <code>reserved</code>；</li>
+<li>二者也不等于 <code>nvidia-smi</code> 显示的进程显存；</li>
+<li>probe 没有 backward、梯度、训练激活和 AdamW 状态；</li>
+<li>KV cache、训练 forward/backward、optimizer step 属于时间线上的不同阶段峰值，不能直接相加；</li>
+<li>Reward Model 参数通常常驻，RM no-grad 激活是临时量。</li>
+</ul>
+<h2 id="11-历史训练事实"><a href="#11-历史训练事实" class="headerlink" title="11. 历史训练事实"></a>11. 历史训练事实</h2><p>GRPO 历史训练：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">step             19,502 / 19,502</span><br><span class="line">开始             2026-07-12 14:12:44</span><br><span class="line">结束             2026-07-13 02:04:19</span><br><span class="line">耗时             约 11 小时 51 分</span><br><span class="line">最终权重         lifeos_agent_grpo_v1_768.pth</span><br><span class="line">权重大小         约 132 MiB</span><br></pre></td></tr></tbody></table></figure>
+
+<p>日志第 1 步：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Reward: -1.4673</span><br><span class="line">KL_ref: 0.0005</span><br><span class="line">Adv Std: 1.1545</span><br><span class="line">Adv Mean: -0.0000</span><br><span class="line">Actor Loss: 0.0097</span><br><span class="line">Avg Response Len: 100.25</span><br><span class="line">LR: 3e-7</span><br></pre></td></tr></tbody></table></figure>
+
+<p>最后一步：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Reward: 2.0661</span><br><span class="line">KL_ref: -0.0982</span><br><span class="line">Adv Std: 1.1543</span><br><span class="line">Adv Mean: 0.0000</span><br><span class="line">Actor Loss: 0.0764</span><br><span class="line">Avg Response Len: 202.75</span><br><span class="line">LR: 3e-8</span><br></pre></td></tr></tbody></table></figure>
+
+<p>日志中的 <code>KL_ref</code> 是 <code>ref_logp-current_logp</code> 的采样均值，可以为负；loss 中的 <code>exp(d)-d-1</code> 才是非负 KL penalty。二者不是同一个指标。</p>
+<p>训练完成、无 OOM/NaN 只证明工程流程完成，不证明模型回答质量合格。</p>
+<h2 id="12-PPO-与-GRPO-x2F-CISPO-总对照"><a href="#12-PPO-与-GRPO-x2F-CISPO-总对照" class="headerlink" title="12. PPO 与 GRPO/CISPO 总对照"></a>12. PPO 与 GRPO/CISPO 总对照</h2><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>PPO</th>
+<th>GRPO 框架 + CISPO loss</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>prompt 数据</td>
+<td>RLAIF prompt</td>
+<td>同一 RLAIF prompt</td>
+</tr>
+<tr>
+<td>每题生成</td>
+<td>1 条</td>
+<td>4 条</td>
+</tr>
+<tr>
+<td>Reward</td>
+<td>每条完整回答一个</td>
+<td>每条完整回答一个</td>
+</tr>
+<tr>
+<td>Advantage</td>
+<td>Critic + TD + GAE，token 级</td>
+<td>组内 reward 标准化，回答级</td>
+</tr>
+<tr>
+<td>Critic</td>
+<td>有</td>
+<td>无</td>
+</tr>
+<tr>
+<td>Returns</td>
+<td>有，Critic label</td>
+<td>无</td>
+</tr>
+<tr>
+<td>Value loss</td>
+<td>有</td>
+<td>无</td>
+</tr>
+<tr>
+<td>Old logp</td>
+<td>有</td>
+<td>有</td>
+</tr>
+<tr>
+<td>Reference KL</td>
+<td>有</td>
+<td>有</td>
+</tr>
+<tr>
+<td>Policy loss</td>
+<td>PPO clipped surrogate</td>
+<td>CISPO；可切换 GRPO clip 分支</td>
+</tr>
+<tr>
+<td>主要额外成本</td>
+<td>Critic forward/backward/optimizer</td>
+<td>G 倍 rollout 与 RM 评分</td>
+</tr>
+<tr>
+<td>适合前提</td>
+<td>Critic 能学到可信 value</td>
+<td>同题多回答能被 reward 可靠排序</td>
+</tr>
+</tbody></table>
+<h2 id="13-全变量账本"><a href="#13-全变量账本" class="headerlink" title="13. 全变量账本"></a>13. 全变量账本</h2><table>
+<thead>
+<tr>
+<th>变量</th>
+<th>来源</th>
+<th align="right">Shape</th>
+<th>是否有梯度</th>
+<th>下一步消费者</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>prompts</code></td>
+<td>RLAIFDataset</td>
+<td align="right"><code>list[str]</code></td>
+<td>否</td>
+<td>tokenizer</td>
+</tr>
+<tr>
+<td><code>input_ids</code></td>
+<td>tokenizer</td>
+<td align="right"><code>[B,P]</code></td>
+<td>否</td>
+<td>rollout</td>
+</tr>
+<tr>
+<td><code>output_ids</code></td>
+<td>Actor generate</td>
+<td align="right"><code>[BG,P+R]</code></td>
+<td>否</td>
+<td>logp/ref/reward</td>
+</tr>
+<tr>
+<td><code>completion_ids</code></td>
+<td>output slice</td>
+<td align="right"><code>[BG,R]</code></td>
+<td>否</td>
+<td>decode/mask</td>
+</tr>
+<tr>
+<td><code>old_logps</code></td>
+<td>rollout Actor</td>
+<td align="right"><code>[BG,R]</code></td>
+<td>否</td>
+<td>ratio</td>
+</tr>
+<tr>
+<td><code>current_logps</code></td>
+<td>Current Actor</td>
+<td align="right"><code>[BG,R]</code></td>
+<td>是</td>
+<td>policy loss</td>
+</tr>
+<tr>
+<td><code>ref_logps</code></td>
+<td>Frozen Reference</td>
+<td align="right"><code>[BG,R]</code></td>
+<td>否</td>
+<td>KL</td>
+</tr>
+<tr>
+<td><code>rewards</code></td>
+<td>rules + RM</td>
+<td align="right"><code>[BG]</code></td>
+<td>否</td>
+<td>PPO token reward / GRPO group stats</td>
+</tr>
+<tr>
+<td><code>old_values</code></td>
+<td>PPO old Critic</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>TD/GAE/value clip</td>
+</tr>
+<tr>
+<td><code>token_rewards</code></td>
+<td>PPO terminal scatter</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>GAE</td>
+</tr>
+<tr>
+<td><code>raw_advantages</code></td>
+<td>PPO GAE</td>
+<td align="right"><code>[B,R]</code></td>
+<td>否</td>
+<td>returns</td>
+</tr>
+<tr>
+<td><code>returns</code></td>
+<td>raw advantage + old value</td>
+<td align="right"><code>[B,R]</code></td>
+<td>target</td>
+<td>Critic loss</td>
+</tr>
+<tr>
+<td><code>ppo_advantages</code></td>
+<td>standardized GAE</td>
+<td align="right"><code>[B,R]</code></td>
+<td>权重</td>
+<td>Actor loss</td>
+</tr>
+<tr>
+<td><code>grouped_rewards</code></td>
+<td>GRPO view</td>
+<td align="right"><code>[B,G]</code></td>
+<td>否</td>
+<td>mean/std</td>
+</tr>
+<tr>
+<td><code>grpo_advantages</code></td>
+<td>group normalize</td>
+<td align="right"><code>[BG]</code></td>
+<td>权重</td>
+<td>token policy loss</td>
+</tr>
+<tr>
+<td><code>completion_mask</code></td>
+<td>EOS/padding logic</td>
+<td align="right"><code>[BG,R]</code></td>
+<td>否</td>
+<td>loss reduction</td>
+</tr>
+<tr>
+<td><code>ratio</code></td>
+<td>exp(current-old)</td>
+<td align="right"><code>[BG,R]</code></td>
+<td>依分支</td>
+<td>GRPO/CISPO</td>
+</tr>
+<tr>
+<td><code>per_token_kl</code></td>
+<td>current/ref</td>
+<td align="right"><code>[BG,R]</code></td>
+<td>对 current 有</td>
+<td>policy loss</td>
+</tr>
+<tr>
+<td><code>per_token_loss</code></td>
+<td>policy objective</td>
+<td align="right"><code>[BG,R]</code></td>
+<td>是</td>
+<td>masked reduction</td>
+</tr>
+<tr>
+<td><code>policy_loss</code></td>
+<td>sequence/group mean</td>
+<td align="right"><code>[]</code></td>
+<td>是</td>
+<td>backward</td>
+</tr>
+<tr>
+<td><code>value_loss</code></td>
+<td>PPO only</td>
+<td align="right"><code>[]</code></td>
+<td>是</td>
+<td>total loss</td>
+</tr>
+<tr>
+<td><code>total loss</code></td>
+<td>weighted sum</td>
+<td align="right"><code>[]</code></td>
+<td>是</td>
+<td>backward</td>
+</tr>
+</tbody></table>
+<h2 id="14-参数账本"><a href="#14-参数账本" class="headerlink" title="14. 参数账本"></a>14. 参数账本</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th align="right">PPO</th>
+<th align="right">GRPO 历史实验</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>hidden_size</code></td>
+<td align="right">768</td>
+<td align="right">768</td>
+<td>Transformer 隐藏维度</td>
+</tr>
+<tr>
+<td><code>num_hidden_layers</code></td>
+<td align="right">8</td>
+<td align="right">8</td>
+<td>Transformer 层数</td>
+</tr>
+<tr>
+<td><code>max_seq_len</code></td>
+<td align="right">768</td>
+<td align="right">768</td>
+<td>prompt 最大宽度</td>
+</tr>
+<tr>
+<td><code>max_gen_len</code></td>
+<td align="right">256（历史实跑）</td>
+<td align="right">256</td>
+<td>最大生成 token</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td align="right">0.8</td>
+<td align="right">0.8</td>
+<td>rollout 采样随机性</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td align="right">3e-7 Actor</td>
+<td align="right">3e-7</td>
+<td>policy 学习率</td>
+</tr>
+<tr>
+<td><code>critic_learning_rate</code></td>
+<td align="right">5e-7</td>
+<td align="right">不适用</td>
+<td>Critic 学习率</td>
+</tr>
+<tr>
+<td><code>gamma</code></td>
+<td align="right">1.0</td>
+<td align="right">不适用</td>
+<td>TD/GAE 折扣</td>
+</tr>
+<tr>
+<td><code>lambda</code></td>
+<td align="right">0.95</td>
+<td align="right">不适用</td>
+<td>GAE 衰减</td>
+</tr>
+<tr>
+<td><code>clip_epsilon</code></td>
+<td align="right">0.2</td>
+<td align="right">GRPO 分支 0.2</td>
+<td>ratio 双边 clip</td>
+</tr>
+<tr>
+<td><code>cliprange_value</code></td>
+<td align="right">0.2</td>
+<td align="right">不适用</td>
+<td>Critic value clip</td>
+</tr>
+<tr>
+<td><code>vf_coef</code></td>
+<td align="right">0.5</td>
+<td align="right">不适用</td>
+<td>value loss 权重</td>
+</tr>
+<tr>
+<td><code>kl_coef/beta</code></td>
+<td align="right">0.02</td>
+<td align="right">0.1</td>
+<td>Reference KL 权重</td>
+</tr>
+<tr>
+<td><code>num_generations</code></td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td>每题 rollout 数</td>
+</tr>
+<tr>
+<td><code>epsilon_high</code></td>
+<td align="right">不适用</td>
+<td align="right">5.0</td>
+<td>CISPO ratio 上界</td>
+</tr>
+<tr>
+<td><code>grad_clip</code></td>
+<td align="right">1.0</td>
+<td align="right">1.0</td>
+<td>梯度范数上限</td>
+</tr>
+<tr>
+<td><code>dtype</code></td>
+<td align="right">bfloat16 autocast</td>
+<td align="right">bfloat16 autocast</td>
+<td>混合精度</td>
+</tr>
+<tr>
+<td><code>seed</code></td>
+<td align="right">42</td>
+<td align="right">42</td>
+<td>随机可复现</td>
+</tr>
+</tbody></table>
+<h2 id="15-真实源码阅读顺序"><a href="#15-真实源码阅读顺序" class="headerlink" title="15. 真实源码阅读顺序"></a>15. 真实源码阅读顺序</h2><ol>
+<li><code>vendor/minimind-master/dataset/lm_dataset.py:195-224</code>：RLAIF、<code>[:-1]</code>、thinking 与 prompt。</li>
+<li><code>vendor/minimind-master/trainer/rollout_engine.py:23-36</code>：逐 token old logp。</li>
+<li><code>vendor/minimind-master/trainer/rollout_engine.py:39-92</code>：RolloutResult、repeat-interleave、generate 与 completion。</li>
+<li><code>vendor/minimind-master/trainer/train_ppo.py:84-151</code>：PPO rollout、mask、Critic、TD/GAE、returns。</li>
+<li><code>vendor/minimind-master/trainer/train_ppo.py:171-214</code>：PPO ratio、Actor loss、KL、value loss 与 backward。</li>
+<li><code>vendor/minimind-master/trainer/train_grpo.py:37-68</code>：GRPO reward。</li>
+<li><code>vendor/minimind-master/trainer/train_grpo.py:71-104</code>：GRPO rollout 与三套 logp。</li>
+<li><code>vendor/minimind-master/trainer/train_grpo.py:121-145</code>：组 advantage、mask、KL、GRPO/CISPO loss。</li>
+<li><code>vendor/minimind-master/trainer/train_grpo.py:205-243</code>：当前默认参数。</li>
+<li><code>real_ppo_probe.py</code>、<code>real_grpo_probe.py</code>：固定真实 checkpoint 的只读复算。</li>
+</ol>
+<h2 id="16-最容易混淆的结论"><a href="#16-最容易混淆的结论" class="headerlink" title="16. 最容易混淆的结论"></a>16. 最容易混淆的结论</h2><ol>
+<li>Prompt 是完整历史，不只是最后一句“请回答这个问题”。</li>
+<li>output 是 prompt+completion；completion 只是新生成部分。</li>
+<li>old policy 不一定是一套驻留模型，本项目保存 old logp。</li>
+<li>Reward Model 与 Critic 不同：前者评整条，后者逐状态估值。</li>
+<li>token_rewards 是 GAE 输入；不是 GAE 输出。</li>
+<li>normalized advantage 是 Actor 权重；returns 才是 Critic label。</li>
+<li>代码变量 <code>labels=output_ids[:,1:]</code> 是 gather token id，不是 Critic label。</li>
+<li>GRPO 去掉 Critic，不等于去掉逐 token policy loss。</li>
+<li>历史任务叫 GRPO，但实际 <code>loss_type=cispo</code>。</li>
+<li>ratio=1 是更新前状态，不代表算法没有作用。</li>
+<li>policy surrogate 可以为负。</li>
+<li>reward 高不等于事实正确；本真实样例已经证明这一点。</li>
+<li>PyTorch allocated、reserved 与 nvidia-smi process memory 不相等。</li>
+<li>不同训练阶段的显存峰值不能简单相加。</li>
+</ol>
+<h2 id="17-四条真实-GRPO-输出全文"><a href="#17-四条真实-GRPO-输出全文" class="headerlink" title="17. 四条真实 GRPO 输出全文"></a>17. 四条真实 GRPO 输出全文</h2><h3 id="Generation-0：reward-1-638977，advantage-0-912197"><a href="#Generation-0：reward-1-638977，advantage-0-912197" class="headerlink" title="Generation 0：reward 1.638977，advantage 0.912197"></a>Generation 0：reward 1.638977，advantage 0.912197</h3><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">好的，用户问的是关于智能家居产品的安全性，以及如何确保客户的隐私和安全。首先，我需要确认用户的需求，他们可能关心产品的可靠性、性能和可靠性。</span><br><span class="line"></span><br><span class="line">接下来，我要确保回答符合之前的对话，保持简洁和真诚。用户可能希望得到实际的建议，而不仅仅是理论上的回答。需要强调安全措施，比如加密、访问控制等。</span><br><span class="line"></span><br><span class="line">还要注意用户可能没有提到的地方，比如是否在测试某些方面有问题，但根据之前的回答，用户更关注安全性和可靠性。因此，回答中应提到安全措施，比如加密、访问控制、访问控制等。</span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">确保客户的隐私和安全是关键。需要明确安全措施的作用，比如加密和访问控制，同时提供可追溯的保护措施，如加密和访问控制。</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="Generation-1：reward-1-618164，advantage-0-860729"><a href="#Generation-1：reward-1-618164，advantage-0-860729" class="headerlink" title="Generation 1：reward 1.618164，advantage 0.860729"></a>Generation 1：reward 1.618164，advantage 0.860729</h3><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">好的，用户问的是产品的安全性如何，需要解决数据加密技术、防火墙以及实时安全更新。首先，我需要确认用户的需求，他们可能是在测试我的反应，或者想了解具体的安全措施。</span><br><span class="line"></span><br><span class="line">根据之前的对话，用户之前问过关于智能家居产品的问题，现在进一步探讨安全措施。我应该强调数据加密技术和防火墙，同时提供详细的安全说明。</span><br><span class="line"></span><br><span class="line">用户可能希望了解具体的安全措施，比如数据加密、防火墙、实时安全更新等。需要确保回答既专业又易懂，同时保持简洁。</span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">产品在使用过程中，需确保数据加密、防火墙和实时安全，同时采用多层次安全协议。例如，采用AES（高强度加密）和BES（安全系统防护）确保数据在传输和存储的同时保障数据。</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="Generation-2：reward-0-647461，advantage-1-539698"><a href="#Generation-2：reward-0-647461，advantage-1-539698" class="headerlink" title="Generation 2：reward 0.647461，advantage -1.539698"></a>Generation 2：reward 0.647461，advantage -1.539698</h3><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">好的，用户问的是“如何处理智能家居产品中的安全问题，比如数据加密和实时安全更新”。首先，我需要确认用户的需求，他们可能关心数据安全和用户隐私，所以回答中需要强调数据安全和隐私保护。</span><br><span class="line"></span><br><span class="line">接下来，我要确保回答符合系统规则，不透露身份信息，保持简洁。用户的问题涉及数据安全和隐私保护，所以需要强调用户保护措施，比如加密、访问控制、访问控制等。</span><br><span class="line"></span><br><span class="line">然后，我需要确保回答符合系统规则，不透露身份信息，保持简洁。同时，要确保回答准确，不违反系统规则。可能需要提到一些常见的安全措施，比如加密、访问控制、访问控制等，但需要说明这些措施的必要性，并说明为什么这些措施是必要的。</span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">产品在确保数据安全和隐私保护的前提下，可通过加密、访问控制、访问控制等技术实现。例如，可将敏感数据加密存储，同时限制外部访问控制，确保产品在生产中不被滥用。此外，用户可设置安全措施，如加密存储和身份验证，确保产品在运输中不被盗用。关键在于如何确保安全，同时保持对用户隐私</span><br></pre></td></tr></tbody></table></figure>
+
+<p>该回答达到 256 token 上限，没有生成 EOS。</p>
+<h3 id="Generation-3：reward-1-175781，advantage-0-233228"><a href="#Generation-3：reward-1-175781，advantage-0-233228" class="headerlink" title="Generation 3：reward 1.175781，advantage -0.233228"></a>Generation 3：reward 1.175781，advantage -0.233228</h3><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">好的，用户问的是产品的安全性能如何。我需要先回顾之前的对话，确保回答连贯。之前讨论过智能家居产品的常见问题，比如数据加密和防火墙，现在用户想知道产品的安全性。</span><br><span class="line"></span><br><span class="line">用户可能对安全性有疑问，或者想了解是否需要进一步的信息。需要确保回答准确，同时保持简洁。要提到具体的技术细节，比如加密和防火墙，这样用户能更全面地了解产品。</span><br><span class="line"></span><br><span class="line">还要注意用户可能的深层需求，比如他们可能对系统安全性感兴趣，或者想了解如何应对类似问题。因此，在回答中可以加入一些实际的措施，比如定期进行安全演练，或者向用户推荐相关的防护措施。</span><br><span class="line">&lt;/think&gt;</span><br><span class="line"></span><br><span class="line">这些产品的安全性能体现在安全性上，包括数据加密、防火墙和实时安全更新。若出现问题，应及时寻求专业人员的帮助。</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="18-一句话总链路"><a href="#18-一句话总链路" class="headerlink" title="18. 一句话总链路"></a>18. 一句话总链路</h2><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">同一真实 prompt [1,561]</span><br><span class="line">→ repeat_interleave(G=4) [4,561]</span><br><span class="line">→ 4 条 completion [4,256]，有效长度 [186,184,256,193]</span><br><span class="line">→ rewards [1.638977,1.618164,0.647461,1.175781]</span><br><span class="line">→ mean 1.270096，std 0.404288</span><br><span class="line">→ advantages [0.912197,0.860729,-1.539698,-0.233228]</span><br><span class="line">→ 广播到 token [4,256]</span><br><span class="line">→ current/old ratio + Reference KL</span><br><span class="line">→ 实际 CISPO token loss [4,256]</span><br><span class="line">→ 每条 masked mean → 4 条 mean</span><br><span class="line">→ policy loss -0.005334（更新前只读 forward）</span><br></pre></td></tr></tbody></table></figure>
+
+<!-- ORIGINAL_NOTE_END -->
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>分享文章</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;复制成功&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/08/01/minimind-ppo-from-rollout-to-loss/">MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MiniMind-GRPO-x2F-CISPO%EF%BC%9A%E7%9C%9F%E5%AE%9E%E8%BE%93%E5%85%A5%E3%80%81%E5%9B%9B%E6%9D%A1-Rollout%E3%80%81Reward%E3%80%81Advantage%E3%80%81Loss-%E4%B8%8E-GPU-%E5%85%A8%E6%B5%81%E7%A8%8B"><span class="toc-text">MiniMind GRPO&#x2F;CISPO：真实输入、四条 Rollout、Reward、Advantage、Loss 与 GPU 全流程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%98%85%E8%AF%BB%E7%9B%AE%E6%A0%87"><span class="toc-text">阅读目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%9C%9F%E5%AE%9E%E7%8E%AF%E5%A2%83%E4%B8%8E%E8%AF%81%E6%8D%AE%E8%BE%B9%E7%95%8C"><span class="toc-text">1. 真实环境与证据边界</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E8%BF%9C%E7%A8%8B%E7%8E%AF%E5%A2%83"><span class="toc-text">1.1 远程环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E4%B8%89%E7%B1%BB%E6%95%B0%E5%AD%97%E5%BF%85%E9%A1%BB%E5%88%86%E5%BC%80"><span class="toc-text">1.2 三类数字必须分开</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%AC%A6%E5%8F%B7%E3%80%81shape-%E4%B8%8E%E7%B1%BB%E5%9E%8B%E6%80%BB%E8%A1%A8"><span class="toc-text">2. 符号、shape 与类型总表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%B4%AF%E7%A9%BF%E5%85%A8%E6%96%87%E7%9A%84%E7%9C%9F%E5%AE%9E%E6%A0%B7%E6%9C%AC"><span class="toc-text">3. 贯穿全文的真实样本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E8%BF%99%E6%9D%A1%E7%9C%9F%E5%AE%9E%E6%A0%B7%E6%9C%AC%E7%9A%84%E5%8E%9F%E6%96%87%E3%80%81%E6%A8%A1%E6%9D%BF%E4%B8%8E-Token"><span class="toc-text">3.1 这条真实样本的原文、模板与 Token</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-0%EF%BC%9AJSONL-%E4%B8%AD%E5%8E%9F%E5%A7%8B%E8%BE%93%E5%85%A5%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text">步骤 0：JSONL 中原始输入是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A-1-%E5%90%8E%E5%89%A9%E4%B8%8B%E4%BB%80%E4%B9%88"><span class="toc-text">步骤 1：[:-1] 后剩下什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E7%9C%9F%E6%AD%A3%E4%BA%A4%E7%BB%99-Tokenizer-%E7%9A%84%E6%96%87%E5%AD%97%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text">步骤 2：真正交给 Tokenizer 的文字是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E5%85%B7%E4%BD%93%E5%88%87%E6%88%90%E4%BA%86%E4%BB%80%E4%B9%88-token"><span class="toc-text">步骤 3：具体切成了什么 token</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-GRPO-%E7%9C%9F%E5%AE%9E%E5%9B%9B%E5%80%99%E9%80%89%E6%95%B0%E6%8D%AE%E6%B5%81"><span class="toc-text">4. GRPO 真实四候选数据流</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E5%8E%86%E5%8F%B2%E9%85%8D%E7%BD%AE%E4%B8%8E%E5%BD%93%E5%89%8D%E9%BB%98%E8%AE%A4%E5%80%BC"><span class="toc-text">4.1 历史配置与当前默认值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-%E7%9C%9F%E5%AE%9E-shape"><span class="toc-text">4.2 真实 shape</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E5%9B%9B%E6%9D%A1%E7%9C%9F%E5%AE%9E%E5%9B%9E%E7%AD%94%E5%92%8C-reward"><span class="toc-text">4.3 四条真实回答和 reward</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-Reward-%E7%BB%84%E5%9D%87%E5%80%BC"><span class="toc-text">4.4 Reward 组均值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-%E7%BB%84%E6%A0%87%E5%87%86%E5%B7%AE"><span class="toc-text">4.5 组标准差</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-%E7%BB%84%E7%9B%B8%E5%AF%B9-advantage"><span class="toc-text">4.6 组相对 advantage</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-7-%E4%BB%8E%E5%9B%9E%E7%AD%94%E7%BA%A7-advantage-%E5%B9%BF%E6%92%AD%E5%88%B0-token"><span class="toc-text">4.7 从回答级 advantage 广播到 token</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-GRPO-%E7%9A%84-logp%E3%80%81ratio%E3%80%81KL-%E4%B8%8E-mask"><span class="toc-text">5. GRPO 的 logp、ratio、KL 与 mask</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-%E4%B8%89%E5%A5%97-logp"><span class="toc-text">5.1 三套 logp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-Reference%E3%80%81Old%E3%80%81Current%E3%80%81New-%E7%9A%84%E6%97%B6%E9%97%B4%E8%BA%AB%E4%BB%BD"><span class="toc-text">5.2 Reference、Old、Current、New 的时间身份</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-1-%E5%9B%9B%E4%B8%AA%E8%AF%8D%E5%88%86%E5%88%AB%E6%8C%87%E4%BB%80%E4%B9%88"><span class="toc-text">5.2.1 四个词分别指什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-2-%E7%9C%9F%E5%AE%9E-GRPO-x2F-CISPO-batch-%E7%9A%84%E4%B8%A5%E6%A0%BC%E9%A1%BA%E5%BA%8F"><span class="toc-text">5.2.2 真实 GRPO&#x2F;CISPO batch 的严格顺序</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T0%EF%BC%9Abatch-%E5%BC%80%E5%A7%8B"><span class="toc-text">时刻 T0：batch 开始</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T1%EF%BC%9AActor-%E7%94%9F%E6%88%90-4-%E6%9D%A1%E5%9B%9E%E7%AD%94%EF%BC%8C%E5%BD%93%E5%89%8D%E5%8F%82%E6%95%B0%E8%A2%AB%E8%AE%B0%E5%BD%95%E4%B8%BA-Old-%E6%95%B0%E6%8D%AE"><span class="toc-text">时刻 T1：Actor 生成 4 条回答，当前参数被记录为 Old 数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T2%EF%BC%9A%E5%85%88%E8%AF%84%E4%BB%B7%E5%9B%9B%E6%9D%A1%E5%AE%8C%E6%95%B4%E5%9B%9E%E7%AD%94"><span class="toc-text">时刻 T2：先评价四条完整回答</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T3%EF%BC%9A%E5%90%8C%E4%B8%80%E4%B8%AA-Actor-%E5%81%9A%E5%B8%A6%E6%A2%AF%E5%BA%A6%E7%9A%84-Current-forward"><span class="toc-text">时刻 T3：同一个 Actor 做带梯度的 Current forward</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T4%EF%BC%9A%E5%86%BB%E7%BB%93-Reference-%E5%AF%B9%E5%90%8C%E4%B8%80%E6%89%B9-outputs-forward"><span class="toc-text">时刻 T4：冻结 Reference 对同一批 outputs forward</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T5%EF%BC%9A%E7%BB%84%E7%9B%B8%E5%AF%B9-advantage%E3%80%81mask-%E5%92%8C-loss"><span class="toc-text">时刻 T5：组相对 advantage、mask 和 loss</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T6%EF%BC%9A%E5%94%AF%E4%B8%80%E4%B8%80%E6%AC%A1-backward-x2F-optimizer-step-%E4%BA%A7%E7%94%9F-New-policy"><span class="toc-text">时刻 T6：唯一一次 backward&#x2F;optimizer step 产生 New policy</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E5%88%BB-T7%EF%BC%9A%E4%B8%8B%E4%B8%80%E6%89%B9%E9%87%8D%E6%96%B0%E5%AE%9A%E4%B9%89-Old"><span class="toc-text">时刻 T7：下一批重新定义 Old</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-3-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%AC%E9%A1%B9%E7%9B%AE-GRPO-%E7%9A%84-ratio-%E9%80%9A%E5%B8%B8%E6%98%AF-1"><span class="toc-text">5.2.3 为什么本项目 GRPO 的 ratio 通常是 1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-4-Torch-%E4%B8%8E-SGLang-%E7%9A%84%E6%9B%B4%E6%96%B0%E6%97%B6%E9%97%B4%E5%B7%AE%E5%BC%82"><span class="toc-text">5.2.4 Torch 与 SGLang 的更新时间差异</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-5-%E4%B8%80%E5%BC%A0%E6%9C%80%E7%BB%88%E6%97%B6%E9%97%B4%E8%A1%A8"><span class="toc-text">5.2.5 一张最终时间表</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-Ratio"><span class="toc-text">5.3 Ratio</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-4-Reference-KL"><span class="toc-text">5.4 Reference KL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-5-Completion-mask"><span class="toc-text">5.5 Completion mask</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%A0%87%E5%87%86-GRPO-%E9%A3%8E%E6%A0%BC%E5%88%86%E6%94%AF"><span class="toc-text">6. 标准 GRPO 风格分支</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-Clip-ratio"><span class="toc-text">6.1 Clip ratio</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-Token-loss"><span class="toc-text">6.2 Token loss</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E7%9C%9F%E5%AE%9E-token-%E6%89%8B%E7%AE%97"><span class="toc-text">6.3 真实 token 手算</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E6%9C%AC%E9%A1%B9%E7%9B%AE%E5%AE%9E%E9%99%85%E6%89%A7%E8%A1%8C%E7%9A%84-CISPO-%E5%88%86%E6%94%AF"><span class="toc-text">7. 本项目实际执行的 CISPO 分支</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-1-CISPO-ratio"><span class="toc-text">7.1 CISPO ratio</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-2-CISPO-token-loss"><span class="toc-text">7.2 CISPO token loss</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-3-%E7%9C%9F%E5%AE%9E-CISPO-token-%E6%89%8B%E7%AE%97"><span class="toc-text">7.3 真实 CISPO token 手算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E4%BB%8E-token-loss-%E8%81%9A%E5%90%88%E4%B8%BA-scalar"><span class="toc-text">8. 从 token loss 聚合为 scalar</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-GPU-%E4%B8%8A%E7%9A%84%E5%AE%8C%E6%95%B4%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="toc-text">9. GPU 上的完整执行过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-1-CPU-%E9%98%B6%E6%AE%B5"><span class="toc-text">9.1 CPU 阶段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-2-Rollout-%E9%98%B6%E6%AE%B5"><span class="toc-text">9.2 Rollout 阶段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-3-Reward-%E9%98%B6%E6%AE%B5"><span class="toc-text">9.3 Reward 阶段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-4-Target-%E6%9E%84%E9%80%A0%E9%98%B6%E6%AE%B5"><span class="toc-text">9.4 Target 构造阶段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-5-Policy-%E4%B8%8E-Reference-forward"><span class="toc-text">9.5 Policy 与 Reference forward</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-6-Backward-%E4%B8%8E%E6%9B%B4%E6%96%B0"><span class="toc-text">9.6 Backward 与更新</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-7-Checkpoint"><span class="toc-text">9.7 Checkpoint</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E7%9C%9F%E5%AE%9E%E6%98%BE%E5%AD%98%E8%A7%82%E5%AF%9F"><span class="toc-text">10. 真实显存观察</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PPO-%E5%8F%AA%E8%AF%BB-forward"><span class="toc-text">PPO 只读 forward</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GRPO-%E5%8F%AA%E8%AF%BB-forward"><span class="toc-text">GRPO 只读 forward</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-%E5%8E%86%E5%8F%B2%E8%AE%AD%E7%BB%83%E4%BA%8B%E5%AE%9E"><span class="toc-text">11. 历史训练事实</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-PPO-%E4%B8%8E-GRPO-x2F-CISPO-%E6%80%BB%E5%AF%B9%E7%85%A7"><span class="toc-text">12. PPO 与 GRPO&#x2F;CISPO 总对照</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-%E5%85%A8%E5%8F%98%E9%87%8F%E8%B4%A6%E6%9C%AC"><span class="toc-text">13. 全变量账本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-%E5%8F%82%E6%95%B0%E8%B4%A6%E6%9C%AC"><span class="toc-text">14. 参数账本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-%E7%9C%9F%E5%AE%9E%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E9%A1%BA%E5%BA%8F"><span class="toc-text">15. 真实源码阅读顺序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#16-%E6%9C%80%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%9A%84%E7%BB%93%E8%AE%BA"><span class="toc-text">16. 最容易混淆的结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-%E5%9B%9B%E6%9D%A1%E7%9C%9F%E5%AE%9E-GRPO-%E8%BE%93%E5%87%BA%E5%85%A8%E6%96%87"><span class="toc-text">17. 四条真实 GRPO 输出全文</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Generation-0%EF%BC%9Areward-1-638977%EF%BC%8Cadvantage-0-912197"><span class="toc-text">Generation 0：reward 1.638977，advantage 0.912197</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generation-1%EF%BC%9Areward-1-618164%EF%BC%8Cadvantage-0-860729"><span class="toc-text">Generation 1：reward 1.618164，advantage 0.860729</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generation-2%EF%BC%9Areward-0-647461%EF%BC%8Cadvantage-1-539698"><span class="toc-text">Generation 2：reward 0.647461，advantage -1.539698</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generation-3%EF%BC%9Areward-1-175781%EF%BC%8Cadvantage-0-233228"><span class="toc-text">Generation 3：reward 1.175781，advantage -0.233228</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#18-%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E9%93%BE%E8%B7%AF"><span class="toc-text">18. 一句话总链路</span></a></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

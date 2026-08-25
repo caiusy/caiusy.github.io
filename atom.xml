@@ -12,7 +12,29 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-08-03T13:35:00.000Z</updated>
+  <updated>2026-08-25T15:48:53.000Z</updated>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
+    <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
+    <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
+    <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
+    <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
+    <category term="MiniMind-V" scheme="https://caiusy.github.io/tags/MiniMind-V/"/>
+    <category term="Vision-Language-Model" scheme="https://caiusy.github.io/tags/Vision-Language-Model/"/>
+    <category term="Pretrain" scheme="https://caiusy.github.io/tags/Pretrain/"/>
+    <category term="SigLIP2" scheme="https://caiusy.github.io/tags/SigLIP2/"/>
+    <id>https://caiusy.github.io/2026/08/25/minimind-to-minimind-v-real-training-source-code/</id>
+    <link href="https://caiusy.github.io/2026/08/25/minimind-to-minimind-v-real-training-source-code/"/>
+    <published>2026-08-25T14:10:00.000Z</published>
+    <summary>从 MiniMind 与 MiniMind-V 的真实源码出发，对比语言模型 Pretrain/SFT、VLM Pretrain/SFT、视觉 token 注入、冻结策略、梯度边界与 next-token cross-entropy，并用最终 checkpoint 对一张真实图片完成逐维前向和数值复算。</summary>
+    <title>从 MiniMind 到 MiniMind-V：Pretrain、SFT、视觉 Token 与 Loss 的源码级推导</title>
+    <updated>2026-08-25T15:48:53.000Z</updated>
+  </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -86,10 +108,10 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
+    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
     <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
-    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <id>https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/</id>
     <link href="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"/>
     <published>2026-07-23T12:30:00.000Z</published>
@@ -553,8 +575,8 @@
     </author>
     <category term="工程实践" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
     <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
+    <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
     <category term="工具" scheme="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/"/>
     <id>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</id>
     <link href="https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/"/>
@@ -573,22 +595,6 @@
     </summary>
     <title>如何使用Hexo写博客</title>
     <updated>2026-05-15T17:03:44.272Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
-    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/"/>
-    <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀</summary>
-    <title>🔢 LeetCode 150 - 二分查找专题</title>
-    <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
   <entry>
     <author>

@@ -8,9 +8,27 @@
     </description>
     <language>zh-CN</language>
     <copyright>All rights reserved 2026, Caius Lu</copyright>
-    <lastBuildDate>Mon, 03 Aug 2026 13:35:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 25 Aug 2026 15:48:53 GMT</lastBuildDate>
     <generator>Hexo</generator>
     <atom:link href="https://caiusy.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>从 MiniMind 到 MiniMind-V：Pretrain、SFT、视觉 Token 与 Loss 的源码级推导</title>
+      <link>https://caiusy.github.io/2026/08/25/minimind-to-minimind-v-real-training-source-code/</link>
+      <description>从 MiniMind 与 MiniMind-V 的真实源码出发，对比语言模型 Pretrain/SFT、VLM Pretrain/SFT、视觉 token 注入、冻结策略、梯度边界与 next-token cross-entropy，并用最终 checkpoint 对一张真实图片完成逐维前向和数值复算。</description>
+      <author>Caius Lu</author>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
+      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
+      <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
+      <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
+      <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
+      <category domain="https://caiusy.github.io/tags/MiniMind-V/">MiniMind-V</category>
+      <category domain="https://caiusy.github.io/tags/Vision-Language-Model/">Vision-Language-Model</category>
+      <category domain="https://caiusy.github.io/tags/Pretrain/">Pretrain</category>
+      <category domain="https://caiusy.github.io/tags/SigLIP2/">SigLIP2</category>
+      <pubDate>Tue, 25 Aug 2026 14:10:00 GMT</pubDate>
+    </item>
     <item>
       <title>MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</title>
       <link>https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/</link>
@@ -73,10 +91,10 @@
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
       <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
+      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
       <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
-      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <pubDate>Thu, 23 Jul 2026 12:30:00 GMT</pubDate>
     </item>
     <item>
@@ -459,22 +477,10 @@
       <author>Caius Lu</author>
       <category domain="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/">工程实践</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
-      <category domain="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/">工具</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/">工程笔记</category>
+      <category domain="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/">工具</category>
       <category domain="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/">工具</category>
       <pubDate>Sun, 18 Jan 2026 12:04:34 GMT</pubDate>
-    </item>
-    <item>
-      <title>🔢 LeetCode 150 - 二分查找专题</title>
-      <link>https://caiusy.github.io/2026/01/18/leetcode-150-binary-search/</link>
-      <description>LeetCode 面试 150 题之二分查找专题，含红蓝染色法图解、代码模板、记忆口诀</description>
-      <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/">算法基础</category>
-      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/">算法</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
-      <category domain="https://caiusy.github.io/tags/LeetCode/">LeetCode</category>
-      <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
     </item>
     <item>
       <title>📚 LeetCode 150 - 数组与字符串专题</title>

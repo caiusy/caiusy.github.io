@@ -1,13 +1,199 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
-<rect width="1200" height="620" fill="#101827"/><style>text{font-family:Arial,"PingFang SC",sans-serif;fill:#e5eefb}.box{fill:#1f3150;stroke:#61dafb;stroke-width:2;rx:14}.exp{fill:#164b43;stroke:#63e6be;stroke-width:2;rx:14}.line{stroke:#b9c8dc;stroke-width:3;fill:none}</style>
-<text x="55" y="55" font-size="30" font-weight="bold">MoE：Router 为每个 token 选择 Expert</text>
-<rect class="box" x="60" y="230" width="180" height="90"/><text x="120" y="285" font-size="24">token x</text>
-<rect class="box" x="330" y="230" width="220" height="90"/><text x="392" y="285" font-size="24">Gate + Softmax</text>
-<rect class="exp" x="720" y="90" width="190" height="75"/><text x="777" y="136" font-size="22">Expert 0</text>
-<rect class="exp" x="720" y="205" width="190" height="75"/><text x="777" y="251" font-size="22">Expert 1</text>
-<rect class="exp" x="720" y="320" width="190" height="75"/><text x="777" y="366" font-size="22">Expert 2</text>
-<rect class="exp" x="720" y="435" width="190" height="75"/><text x="777" y="481" font-size="22">Expert 3</text>
-<rect class="box" x="1010" y="230" width="130" height="90"/><text x="1050" y="285" font-size="24">输出 y</text>
-<path class="line" d="M240 275H330M550 275C630 275 630 128 720 128M550 275C630 275 630 243 720 243M550 275C630 275 630 358 720 358M550 275C630 275 630 473 720 473M910 128C965 128 965 275 1010 275M910 243C965 243 965 275 1010 275M910 358C965 358 965 275 1010 275M910 473C965 473 965 275 1010 275"/>
-<text x="325" y="390" font-size="21" fill="#9fb3cc">Top-K：只激活少数专家，再按路由权重聚合</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520" style="font-family:Inter,Segoe UI,sans-serif;">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#13111a"/>
+    </linearGradient>
+    <linearGradient id="titleGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+    </linearGradient>
+    <linearGradient id="routerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4c1d95"/>
+      <stop offset="100%" stop-color="#2e1065"/>
+    </linearGradient>
+    <linearGradient id="expertActive" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="100%" stop-color="#022c22"/>
+    </linearGradient>
+    <linearGradient id="expertInactive" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </linearGradient>
+    <filter id="glow-purple">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-green">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arr-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa"/>
+    </marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#34d399"/>
+    </marker>
+    <marker id="arr-gray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#374151"/>
+    </marker>
+    <marker id="arr-pink" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#f472b6"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" fill="url(#bg2)" rx="12"/>
+
+  <!-- Grid -->
+  <g opacity="0.04" stroke="#94a3b8" stroke-width="1">
+    <line x1="0" y1="100" x2="900" y2="100"/>
+    <line x1="0" y1="200" x2="900" y2="200"/>
+    <line x1="0" y1="300" x2="900" y2="300"/>
+    <line x1="0" y1="400" x2="900" y2="400"/>
+    <line x1="180" y1="0" x2="180" y2="520"/>
+    <line x1="360" y1="0" x2="360" y2="520"/>
+    <line x1="540" y1="0" x2="540" y2="520"/>
+    <line x1="720" y1="0" x2="720" y2="520"/>
+  </g>
+
+  <!-- Title -->
+  <text x="450" y="42" text-anchor="middle" font-size="22" font-weight="700" fill="url(#titleGrad2)">MoE: Mixture of Experts</text>
+  <text x="450" y="64" text-anchor="middle" font-size="13" fill="#64748b">稀疏条件计算 — 参数量 8×，每 token 算力仅 2×</text>
+
+  <!-- INPUT -->
+  <rect x="370" y="80" width="160" height="52" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5" filter="url(#glow-purple)"/>
+  <text x="450" y="104" text-anchor="middle" font-size="13" font-weight="600" fill="#a78bfa">hidden state h</text>
+  <text x="450" y="122" text-anchor="middle" font-size="11" fill="#c4b5fd">[B, T, d]  d=512</text>
+
+  <!-- Arrow h → Router -->
+  <line x1="450" y1="132" x2="450" y2="158" stroke="#a78bfa" stroke-width="2" marker-end="url(#arr-purple)"/>
+
+  <!-- ROUTER BOX -->
+  <rect x="300" y="160" width="300" height="72" rx="10" fill="url(#routerGrad)" stroke="#7c3aed" stroke-width="1.8" filter="url(#glow-purple)"/>
+  <text x="450" y="186" text-anchor="middle" font-size="14" font-weight="700" fill="#ddd6fe">Router / Gate</text>
+  <text x="450" y="206" text-anchor="middle" font-size="11" fill="#c4b5fd">W_g ∈ R^{E×d}  →  logits [B·T, E=8]</text>
+  <text x="450" y="222" text-anchor="middle" font-size="10" fill="#a78bfa">TopK(Softmax(·), K=2)  → 选中2个专家</text>
+
+  <!-- 8 Experts row -->
+  <!-- Expert positions: x = 40 + i*105, y = 290, width=88, height=80 -->
+
+  <!-- Expert 0 - inactive -->
+  <rect x="28" y="285" width="80" height="76" rx="7" fill="url(#expertInactive)" stroke="#1f2937" stroke-width="1"/>
+  <text x="68" y="314" text-anchor="middle" font-size="11" fill="#374151">Expert</text>
+  <text x="68" y="330" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">0</text>
+  <text x="68" y="347" text-anchor="middle" font-size="9" fill="#1f2937">FFN</text>
+  <text x="68" y="362" text-anchor="middle" font-size="9" fill="#1f2937">😴</text>
+
+  <!-- Expert 1 - inactive -->
+  <rect x="118" y="285" width="80" height="76" rx="7" fill="url(#expertInactive)" stroke="#1f2937" stroke-width="1"/>
+  <text x="158" y="314" text-anchor="middle" font-size="11" fill="#374151">Expert</text>
+  <text x="158" y="330" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">1</text>
+  <text x="158" y="347" text-anchor="middle" font-size="9" fill="#1f2937">FFN</text>
+  <text x="158" y="362" text-anchor="middle" font-size="9" fill="#1f2937">😴</text>
+
+  <!-- Expert 2 - ACTIVE -->
+  <rect x="208" y="272" width="88" height="96" rx="8" fill="url(#expertActive)" stroke="#10b981" stroke-width="2.5" filter="url(#glow-green)"/>
+  <text x="252" y="302" text-anchor="middle" font-size="11" font-weight="700" fill="#34d399">Expert</text>
+  <text x="252" y="318" text-anchor="middle" font-size="13" font-weight="700" fill="#34d399">2</text>
+  <text x="252" y="334" text-anchor="middle" font-size="9" fill="#6ee7b7">FFN (active)</text>
+  <text x="252" y="351" text-anchor="middle" font-size="12" fill="#34d399">✓</text>
+  <rect x="210" y="357" width="84" height="18" rx="4" fill="#052e16"/>
+  <text x="252" y="370" text-anchor="middle" font-size="10" font-weight="700" fill="#86efac">w = 0.72</text>
+
+  <!-- Expert 3 - inactive -->
+  <rect x="308" y="285" width="80" height="76" rx="7" fill="url(#expertInactive)" stroke="#1f2937" stroke-width="1"/>
+  <text x="348" y="314" text-anchor="middle" font-size="11" fill="#374151">Expert</text>
+  <text x="348" y="330" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">3</text>
+  <text x="348" y="347" text-anchor="middle" font-size="9" fill="#1f2937">FFN</text>
+  <text x="348" y="362" text-anchor="middle" font-size="9" fill="#1f2937">😴</text>
+
+  <!-- Expert 4 - inactive -->
+  <rect x="398" y="285" width="80" height="76" rx="7" fill="url(#expertInactive)" stroke="#1f2937" stroke-width="1"/>
+  <text x="438" y="314" text-anchor="middle" font-size="11" fill="#374151">Expert</text>
+  <text x="438" y="330" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">4</text>
+  <text x="438" y="347" text-anchor="middle" font-size="9" fill="#1f2937">FFN</text>
+  <text x="438" y="362" text-anchor="middle" font-size="9" fill="#1f2937">😴</text>
+
+  <!-- Expert 5 - ACTIVE -->
+  <rect x="484" y="272" width="88" height="96" rx="8" fill="url(#expertActive)" stroke="#10b981" stroke-width="2.5" filter="url(#glow-green)"/>
+  <text x="528" y="302" text-anchor="middle" font-size="11" font-weight="700" fill="#34d399">Expert</text>
+  <text x="528" y="318" text-anchor="middle" font-size="13" font-weight="700" fill="#34d399">5</text>
+  <text x="528" y="334" text-anchor="middle" font-size="9" fill="#6ee7b7">FFN (active)</text>
+  <text x="528" y="351" text-anchor="middle" font-size="12" fill="#34d399">✓</text>
+  <rect x="486" y="357" width="84" height="18" rx="4" fill="#052e16"/>
+  <text x="528" y="370" text-anchor="middle" font-size="10" font-weight="700" fill="#86efac">w = 0.28</text>
+
+  <!-- Expert 6 - inactive -->
+  <rect x="584" y="285" width="80" height="76" rx="7" fill="url(#expertInactive)" stroke="#1f2937" stroke-width="1"/>
+  <text x="624" y="314" text-anchor="middle" font-size="11" fill="#374151">Expert</text>
+  <text x="624" y="330" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">6</text>
+  <text x="624" y="347" text-anchor="middle" font-size="9" fill="#1f2937">FFN</text>
+  <text x="624" y="362" text-anchor="middle" font-size="9" fill="#1f2937">😴</text>
+
+  <!-- Expert 7 - inactive -->
+  <rect x="674" y="285" width="80" height="76" rx="7" fill="url(#expertInactive)" stroke="#1f2937" stroke-width="1"/>
+  <text x="714" y="314" text-anchor="middle" font-size="11" fill="#374151">Expert</text>
+  <text x="714" y="330" text-anchor="middle" font-size="11" font-weight="600" fill="#374151">7</text>
+  <text x="714" y="347" text-anchor="middle" font-size="9" fill="#1f2937">FFN</text>
+  <text x="714" y="362" text-anchor="middle" font-size="9" fill="#1f2937">😴</text>
+
+  <!-- Arrows Router → Experts (active ones bold) -->
+  <line x1="380" y1="232" x2="68" y2="285" stroke="#1f2937" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-gray)"/>
+  <line x1="400" y1="232" x2="158" y2="285" stroke="#1f2937" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-gray)"/>
+  <line x1="420" y1="232" x2="252" y2="272" stroke="#10b981" stroke-width="2.5" marker-end="url(#arr-green)"/>
+  <line x1="440" y1="232" x2="348" y2="285" stroke="#1f2937" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-gray)"/>
+  <line x1="460" y1="232" x2="438" y2="285" stroke="#1f2937" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-gray)"/>
+  <line x1="480" y1="232" x2="528" y2="272" stroke="#10b981" stroke-width="2.5" marker-end="url(#arr-green)"/>
+  <line x1="500" y1="232" x2="624" y2="285" stroke="#1f2937" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-gray)"/>
+  <line x1="520" y1="232" x2="714" y2="285" stroke="#1f2937" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-gray)"/>
+
+  <!-- Weighted sum symbol -->
+  <circle cx="390" cy="430" r="24" fill="#0f172a" stroke="#34d399" stroke-width="2" filter="url(#glow-green)"/>
+  <text x="390" y="438" text-anchor="middle" font-size="22" font-weight="700" fill="#34d399">Σ</text>
+
+  <!-- Arrows active experts → sum -->
+  <line x1="252" y1="368" x2="375" y2="418" stroke="#34d399" stroke-width="2" marker-end="url(#arr-green)"/>
+  <text x="295" y="408" text-anchor="middle" font-size="10" fill="#34d399">0.72 × Expert₂(h)</text>
+  <line x1="528" y1="368" x2="408" y2="418" stroke="#34d399" stroke-width="2" marker-end="url(#arr-green)"/>
+  <text x="492" y="408" text-anchor="middle" font-size="10" fill="#34d399">0.28 × Expert₅(h)</text>
+
+  <!-- OUTPUT -->
+  <rect x="308" y="468" width="164" height="36" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5" filter="url(#glow-green)"/>
+  <text x="390" y="488" text-anchor="middle" font-size="12" font-weight="600" fill="#34d399">输出 y  [B, T, d]</text>
+  <line x1="390" y1="454" x2="390" y2="467" stroke="#34d399" stroke-width="2" marker-end="url(#arr-green)"/>
+
+  <!-- Info panel right -->
+  <rect x="770" y="88" width="120" height="150" rx="8" fill="#0a0f1a" stroke="#7c3aed" stroke-width="1.2"/>
+  <text x="830" y="110" text-anchor="middle" font-size="11" font-weight="600" fill="#a78bfa">参数 vs 算力</text>
+  <line x1="780" y1="118" x2="880" y2="118" stroke="#4c1d95" stroke-width="1"/>
+  <text x="830" y="134" text-anchor="middle" font-size="10" fill="#94a3b8">E = 8 专家</text>
+  <text x="830" y="150" text-anchor="middle" font-size="10" fill="#94a3b8">K = 2 激活</text>
+  <text x="830" y="170" text-anchor="middle" font-size="10" fill="#64748b">参数量:</text>
+  <text x="830" y="184" text-anchor="middle" font-size="11" font-weight="600" fill="#f472b6">8× Dense</text>
+  <text x="830" y="202" text-anchor="middle" font-size="10" fill="#64748b">每token算力:</text>
+  <text x="830" y="216" text-anchor="middle" font-size="11" font-weight="600" fill="#34d399">2× Dense ✓</text>
+  <text x="830" y="232" text-anchor="middle" font-size="9" fill="#4b5563">性价比: 4×</text>
+
+  <!-- Aux loss panel -->
+  <rect x="770" y="254" width="120" height="108" rx="8" fill="#0a0f1a" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="830" y="276" text-anchor="middle" font-size="11" font-weight="600" fill="#fca5a5">负载均衡损失</text>
+  <line x1="780" y1="283" x2="880" y2="283" stroke="#7f1d1d" stroke-width="1"/>
+  <text x="830" y="300" text-anchor="middle" font-size="10" fill="#94a3b8">防止路由崩塌</text>
+  <text x="830" y="318" text-anchor="middle" font-size="10" fill="#fca5a5">L_aux = α·E·Σ fᵢPᵢ</text>
+  <text x="830" y="336" text-anchor="middle" font-size="9" fill="#64748b">fᵢ: token 分配比例</text>
+  <text x="830" y="350" text-anchor="middle" font-size="9" fill="#64748b">Pᵢ: 路由概率均值</text>
+  <text x="830" y="355" text-anchor="middle" font-size="9" fill="#6b7280">α ≈ 0.01</text>
+
+  <!-- Legend -->
+  <rect x="30" y="456" width="240" height="52" rx="6" fill="#0a0f1a" stroke="#1e293b" stroke-width="1"/>
+  <text x="150" y="473" text-anchor="middle" font-size="11" font-weight="600" fill="#94a3b8">图例</text>
+  <rect x="44" y="482" width="14" height="10" rx="2" fill="url(#expertActive)" stroke="#10b981"/>
+  <text x="66" y="492" font-size="10" fill="#34d399">激活专家 (K=2)</text>
+  <rect x="152" y="482" width="14" height="10" rx="2" fill="url(#expertInactive)" stroke="#1f2937"/>
+  <text x="174" y="492" font-size="10" fill="#374151">休眠专家 (6/8)</text>
+
+  <!-- Expert pool label -->
+  <rect x="24" y="264" width="736" height="4" rx="2" fill="none" stroke="#1e293b" stroke-width="1" stroke-dasharray="6,4"/>
+  <text x="390" y="258" text-anchor="middle" font-size="10" fill="#374151">── Expert Pool (E=8 个独立 FFN) ──</text>
 </svg>

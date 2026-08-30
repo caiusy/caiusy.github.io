@@ -1,0 +1,1240 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>结合 MiniMind 源码彻底搞懂 LoRA 与 MoE - Caius Lu</title>
+
+  
+    <meta name="description" content="从 MiniMind 的真实实现出发，拆解 LoRA 的低秩适配、MoE 的路由与专家选择、辅助损失、张量形状、训练保存合并，以及两者组合时的工程细节。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="结合 MiniMind 源码彻底搞懂 LoRA 与 MoE">
+<meta property="og:url" content="https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="从 MiniMind 的真实实现出发，拆解 LoRA 的低秩适配、MoE 的路由与专家选择、辅助损失、张量形状、训练保存合并，以及两者组合时的工程细节。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-08-30T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-30T14:39:38.481Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="MiniMind">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="MoE">
+<meta property="article:tag" content="LoRA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="MiniMind,Transformer,MoE,LoRA">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-08-30T20:00:00+08:00","dateModified":"2026-08-30T22:39:38+08:00","datePublished":"2026-08-30T20:00:00+08:00","description":"大模型里经常同时出现两个缩写：LoRA 和 MoE。它们看起来都在优化模型，但优化的方向完全不同。\nLoRA 关心的是：模型已经很大了，怎样用很少的可训练参数完成微调？\nMoE 关心的是：怎样让模型拥有很多不同的专家能力，但每个 token 不必经过所有参数？\n这篇文章不从概念图开始，而是直接沿着本项目 vendor/minimind-master 中的真实代码，把一次 token 的数据流走一遍。","headline":"结合 MiniMind 源码彻底搞懂 LoRA 与 MoE","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/","keywords":"MiniMind, Transformer, MoE, LoRA","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="article" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="Home" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:home-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="Projects" href="/projects/" style="color:#10B981"><img src="https://api.iconify.design/solar:rocket-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="BEV" href="/roadside-bev/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:camera-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="Fusion" href="/radar-camera-fusion/" style="color:#EC4899"><img src="https://api.iconify.design/solar:radar-bold-duotone.svg?color=%23EC4899"/></a><a class="nav-item" title="LLM" href="/llm-reading-map/" style="color:#8B5CF6"><img src="https://api.iconify.design/solar:atom-bold-duotone.svg?color=%238B5CF6"/></a><a class="nav-item" title="Notes" href="/notes/" style="color:#0EA5E9"><img src="https://api.iconify.design/solar:notebook-bookmark-bold-duotone.svg?color=%230EA5E9"/></a><a class="nav-item" title="Review" href="/review/" style="color:#F43F5E"><img src="https://api.iconify.design/solar:checklist-minimalistic-bold-duotone.svg?color=%23F43F5E"/></a><a class="nav-item" title="About" href="/about/" style="color:#64748B"><img src="https://api.iconify.design/solar:user-id-bold-duotone.svg?color=%2364748B"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"><span class="title">结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></a><a class="item title" href="/2026/08/25/minimind-to-minimind-v-real-training-source-code/"><span class="title">从 MiniMind 到 MiniMind-V：Pretrain、SFT、视觉 Token 与 Loss 的源码级推导</span></a><a class="item title" href="/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"><span class="title">MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/minimind-ppo-from-rollout-to-loss/"><span class="title">MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/yolov10-vehicle-pose-compression/"><span class="title">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</span></a><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a><a class="item title" href="/2026/07/13/dynamic-programming-from-recursion-to-state-transition/"><span class="title">动态规划完全图解：从重复递归到状态转移</span></a><a class="item title" href="/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/"><span class="title">Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</span></a><a class="item title" href="/2026/07/13/LifeOS-Agent-SFT-DPO-PPO-GRPO-Agent-RL/"><span class="title">LifeOS-Agent 训练全解：从 SFT、DPO、PPO、GRPO 到多轮 Agent RL</span></a><a class="item title" href="/2019/07/26/%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89/"><span class="title">c++中级教程 顺序容器的定义</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E5%A4%9A%E6%A8%A1%E6%80%81-AI/">多模态 AI</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E5%A4%9A%E6%A8%A1%E6%80%81-AI/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-08-30T12:00:00.000Z">2026-08-30</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-08-30T14:39:38.481Z">2026-08-30</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><p>大模型里经常同时出现两个缩写：LoRA 和 MoE。它们看起来都在优化模型，但优化的方向完全不同。</p>
+<p>LoRA 关心的是：模型已经很大了，怎样用很少的可训练参数完成微调？</p>
+<p>MoE 关心的是：怎样让模型拥有很多不同的专家能力，但每个 token 不必经过所有参数？</p>
+<p>这篇文章不从概念图开始，而是直接沿着本项目 <code>vendor/minimind-master</code> 中的真实代码，把一次 token 的数据流走一遍。</p>
+<span id="more"></span>
+
+<p><img src="/images/lora-moe-deep-dive/lora-diagram.svg" alt="LoRA 原始 Linear 与低秩旁路结构图"></p>
+<h2 id="一、先把两件事放回-Transformer"><a href="#一、先把两件事放回-Transformer" class="headerlink" title="一、先把两件事放回 Transformer"></a>一、先把两件事放回 Transformer</h2><p>MiniMind 的一个 Block 可以抽象为：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x</span><br><span class="line"> ├── RMSNorm → Attention → Residual</span><br><span class="line"> └── RMSNorm → FFN 或 MoE-FFN → Residual</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Attention 负责 token 之间的信息交互，FFN 负责对每个 token 的特征做非线性变换。</p>
+<p>在 <code>model_minimind.py</code> 中，关键选择只有一句：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.mlp = FeedForward(config) <span class="keyword">if</span> <span class="keyword">not</span> config.use_moe <span class="keyword">else</span> MOEFeedForward(config)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>所以 MoE 是模型结构层面的替换：开启后，Block 的 FFN 变成多个专家加一个 Router。</p>
+<p>LoRA 则不替换 Block。它在模型创建完成后，通过 <code>apply_lora(model)</code> 给符合条件的 Linear 动态挂上旁路。</p>
+<p>可以先记住这个判断：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MoE 改变模型怎么计算</span><br><span class="line">LoRA 改变模型怎么训练</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="二、LoRA-到底在近似什么"><a href="#二、LoRA-到底在近似什么" class="headerlink" title="二、LoRA 到底在近似什么"></a>二、LoRA 到底在近似什么</h2><h3 id="2-1-全量微调的代价"><a href="#2-1-全量微调的代价" class="headerlink" title="2.1 全量微调的代价"></a>2.1 全量微调的代价</h3><p>普通 Linear 层的计算是：</p>
+
+$$
+y = Wx
+$$
+
+
+<p>全量微调时，权重变成：</p>
+
+$$
+W' = W + \Delta W
+$$
+
+
+<p>其中 <code>W</code> 是预训练知识，<code>ΔW</code> 是当前任务要求的变化。全量微调意味着直接保存并更新完整的 <code>ΔW</code>。</p>
+<p>LoRA 的经验假设是：对于一个具体任务，真正有用的变化并不需要覆盖整个高维空间，<code>ΔW</code> 可以用低秩矩阵近似：</p>
+
+$$
+\Delta W \approx BA
+$$
+
+
+<p>于是：</p>
+
+$$
+y = Wx + BAx
+$$
+
+
+<h3 id="2-2-对应到项目代码"><a href="#2-2-对应到项目代码" class="headerlink" title="2.2 对应到项目代码"></a>2.2 对应到项目代码</h3><p>文件 <code>model/model_lora.py</code> 中的实现非常直接：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LoRA</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_features, out_features, rank</span>):</span><br><span class="line">        self.A = nn.Linear(in_features, rank, bias=<span class="literal">False</span>)</span><br><span class="line">        self.B = nn.Linear(rank, out_features, bias=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="keyword">return</span> self.B(self.A(x))</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果原层是 <code>768 → 768</code>，完整权重有 <code>768 × 768 = 589824</code> 个参数。</p>
+<p>若 <code>rank=16</code>，LoRA 只有：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A: 768 × 16</span><br><span class="line">B: 16 × 768</span><br><span class="line">合计: 24576</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这不是把 768 维输入直接压成一个标量，而是让任务变化先进入一个 16 维的子空间，再投影回 768 维。</p>
+<h3 id="2-3-为什么是两个矩阵，而不是一个小矩阵"><a href="#2-3-为什么是两个矩阵，而不是一个小矩阵" class="headerlink" title="2.3 为什么是两个矩阵，而不是一个小矩阵"></a>2.3 为什么是两个矩阵，而不是一个小矩阵</h3><p><code>A</code> 学习输入方向，<code>B</code> 学习输出方向。它们的乘积 <code>BA</code> 的秩最多是 <code>r</code>：</p>
+
+$$
+\operatorname{rank}(BA) \le r
+$$
+
+
+<p>所以 rank 是 LoRA 的容量旋钮：rank 越大，表达能力越强，参数和显存也越高；rank 太小，则可能无法表达任务变化。</p>
+<h3 id="2-4-初始化为什么不破坏基座模型"><a href="#2-4-初始化为什么不破坏基座模型" class="headerlink" title="2.4 初始化为什么不破坏基座模型"></a>2.4 初始化为什么不破坏基座模型</h3><p>代码使用：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">self.A.weight.data.normal_(mean=<span class="number">0.0</span>, std=<span class="number">0.02</span>)</span><br><span class="line">self.B.weight.data.zero_()</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因为 <code>B=0</code>，刚挂载时：</p>
+
+$$
+BAx = 0
+$$
+
+
+<p>因此新模型初始行为和原模型一致。训练开始后，LoRA 分支才逐渐学会修正。</p>
+<h2 id="三、项目里的-LoRA-究竟挂在哪些层"><a href="#三、项目里的-LoRA-究竟挂在哪些层" class="headerlink" title="三、项目里的 LoRA 究竟挂在哪些层"></a>三、项目里的 LoRA 究竟挂在哪些层</h2><p><code>apply_lora()</code> 的筛选条件是：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">isinstance</span>(module, nn.Linear) <span class="keyword">and</span> module.in_features == module.out_features:</span><br></pre></td></tr></tbody></table></figure>
+
+<p>也就是只命中输入输出维度相同的 Linear。</p>
+<p>以默认 hidden size 768、KV heads 4 为例：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>形状</th>
+<th>当前实现是否命中</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>q_proj</code></td>
+<td>768 → 768</td>
+<td>是</td>
+</tr>
+<tr>
+<td><code>k_proj</code></td>
+<td>768 → 384</td>
+<td>否</td>
+</tr>
+<tr>
+<td><code>v_proj</code></td>
+<td>768 → 384</td>
+<td>否</td>
+</tr>
+<tr>
+<td><code>o_proj</code></td>
+<td>768 → 768</td>
+<td>是</td>
+</tr>
+<tr>
+<td><code>gate_proj</code></td>
+<td>768 → intermediate</td>
+<td>通常否</td>
+</tr>
+<tr>
+<td><code>up_proj</code></td>
+<td>768 → intermediate</td>
+<td>通常否</td>
+</tr>
+<tr>
+<td><code>down_proj</code></td>
+<td>intermediate → 768</td>
+<td>通常否</td>
+</tr>
+</tbody></table>
+<p>因此这份实现的 LoRA 主要覆盖 Attention 的 <code>q_proj</code> 和 <code>o_proj</code>。这和很多生产实现不同，后者通常会显式配置目标模块，而不是只判断是否为方阵。</p>
+<p>挂载后的 forward 相当于：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">forward_with_lora</span>(<span class="params">x, layer1=original_forward, layer2=lora</span>):</span><br><span class="line">    <span class="keyword">return</span> layer1(x) + layer2(x)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>注意这里用默认参数捕获 <code>original_forward</code> 和 <code>lora</code>，避免循环中的闭包引用被后续迭代覆盖。</p>
+<h2 id="四、LoRA-训练时到底更新什么"><a href="#四、LoRA-训练时到底更新什么" class="headerlink" title="四、LoRA 训练时到底更新什么"></a>四、LoRA 训练时到底更新什么</h2><p><code>train_lora.py</code> 中的冻结逻辑是：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> name, param <span class="keyword">in</span> model.named_parameters():</span><br><span class="line">    <span class="keyword">if</span> <span class="string">'lora'</span> <span class="keyword">in</span> name:</span><br><span class="line">        param.requires_grad = <span class="literal">True</span></span><br><span class="line">        lora_params.append(param)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        param.requires_grad = <span class="literal">False</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>这带来三件事：</p>
+<ol>
+<li>基座权重不更新。</li>
+<li>梯度只保留在 LoRA 参数上。</li>
+<li>AdamW 优化器只维护 LoRA 参数的状态。</li>
+</ol>
+<p>保存时也只筛选 <code>.lora.</code> 参数。推理时，模型先加载基座，再调用 <code>apply_lora()</code>，最后加载 LoRA checkpoint。</p>
+<p>如果追求推理速度，还可以合并：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">module.weight += module.lora.B.weight @ module.lora.A.weight</span><br></pre></td></tr></tbody></table></figure>
+
+<p>合并后的权重就是：</p>
+
+$$
+W_{merged}=W+BA
+$$
+
+
+<p>合并后可以移除 LoRA 分支，推理计算图恢复成普通 Linear。</p>
+<h2 id="五、MoE：从一个-FFN-变成多个专家"><a href="#五、MoE：从一个-FFN-变成多个专家" class="headerlink" title="五、MoE：从一个 FFN 变成多个专家"></a>五、MoE：从一个 FFN 变成多个专家</h2><p><img src="/images/lora-moe-deep-dive/moe-routing.svg" alt="MoE Router 将 token 分发到不同 Expert"></p>
+<h3 id="5-1-普通-FFN"><a href="#5-1-普通-FFN" class="headerlink" title="5.1 普通 FFN"></a>5.1 普通 FFN</h3><p>MiniMind 的普通 FFN 是 SwiGLU 形式：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> self.down_proj(</span><br><span class="line">    self.act_fn(self.gate_proj(x)) * self.up_proj(x)</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>它可以写成：</p>
+
+$$
+\operatorname{FFN}(x)=W_{down}\left(\operatorname{SiLU}(W_{gate}x)\odot W_{up}x\right)
+$$
+
+
+<p>所有 token 都经过同一个 FFN。</p>
+<h3 id="5-2-MoE-FFN"><a href="#5-2-MoE-FFN" class="headerlink" title="5.2 MoE FFN"></a>5.2 MoE FFN</h3><p><code>MOEFeedForward</code> 初始化时创建多个独立的 FFN：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">self.gate = nn.Linear(config.hidden_size, config.num_experts, bias=<span class="literal">False</span>)</span><br><span class="line">self.experts = nn.ModuleList([</span><br><span class="line">    FeedForward(config,</span><br><span class="line">                intermediate_size=config.moe_intermediate_size)</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(config.num_experts)</span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+
+<p>默认情况下：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">num_experts = 4</span><br><span class="line">num_experts_per_tok = 1</span><br></pre></td></tr></tbody></table></figure>
+
+<p>也就是说，模型保存 4 个 FFN，但每个 token 默认只激活其中 1 个。</p>
+<h2 id="六、一次-MoE-前向传播的完整数据流"><a href="#六、一次-MoE-前向传播的完整数据流" class="headerlink" title="六、一次 MoE 前向传播的完整数据流"></a>六、一次 MoE 前向传播的完整数据流</h2><p>假设输入隐藏状态为：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x: [batch, seq_len, hidden_size]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>代码先把它展平：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x_flat = x.view(-<span class="number">1</span>, hidden_dim)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>形状变成：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x_flat: [batch × seq_len, hidden_size]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这样 Router 可以把每一个 token 独立路由。</p>
+<h3 id="6-1-Router-打分"><a href="#6-1-Router-打分" class="headerlink" title="6.1 Router 打分"></a>6.1 Router 打分</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scores = F.softmax(self.gate(x_flat), dim=-<span class="number">1</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>如果有 4 个专家：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">self.gate(x_flat): [batch × seq_len, 4]</span><br><span class="line">scores:             [batch × seq_len, 4]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>某个 token 的分数可能是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[0.05, 0.10, 0.80, 0.05]</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="6-2-Top-K-选择"><a href="#6-2-Top-K-选择" class="headerlink" title="6.2 Top-K 选择"></a>6.2 Top-K 选择</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">topk_weight, topk_idx = torch.topk(</span><br><span class="line">    scores,</span><br><span class="line">    k=self.config.num_experts_per_tok,</span><br><span class="line">    dim=-<span class="number">1</span>,</span><br><span class="line">    <span class="built_in">sorted</span>=<span class="literal">False</span></span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Top-1 时，上面的 token 会得到：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">topk_idx    = [2]</span><br><span class="line">topk_weight = [0.80]</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Top-2 时，可能得到专家 2 和专家 1，并把两个专家的输出按权重相加：</p>
+
+$$
+y=w_1E_1(x)+w_2E_2(x)
+$$
+
+
+<p>代码还会归一化 Top-K 权重，确保选中的专家权重和为 1：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">topk_weight = topk_weight / topk_weight.<span class="built_in">sum</span>(dim=-<span class="number">1</span>, keepdim=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="6-3-分发-token-并聚合结果"><a href="#6-3-分发-token-并聚合结果" class="headerlink" title="6.3 分发 token 并聚合结果"></a>6.3 分发 token 并聚合结果</h3><p>核心循环是：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i, expert <span class="keyword">in</span> <span class="built_in">enumerate</span>(self.experts):</span><br><span class="line">    mask = (topk_idx == i)</span><br><span class="line">    <span class="keyword">if</span> mask.<span class="built_in">any</span>():</span><br><span class="line">        token_idx = mask.<span class="built_in">any</span>(dim=-<span class="number">1</span>).nonzero().flatten()</span><br><span class="line">        weight = topk_weight[mask].view(-<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">        y.index_add_(</span><br><span class="line">            <span class="number">0</span>,</span><br><span class="line">            token_idx,</span><br><span class="line">            (expert(x_flat[token_idx]) * weight).to(y.dtype)</span><br><span class="line">        )</span><br></pre></td></tr></tbody></table></figure>
+
+<p>假设有 8 个 token，路由结果是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Expert 0: token 1, 6</span><br><span class="line">Expert 1: token 0, 4, 7</span><br><span class="line">Expert 2: token 2, 3</span><br><span class="line">Expert 3: token 5</span><br></pre></td></tr></tbody></table></figure>
+
+<p>那么 Expert 0 不会处理 token 0、2、3 等不属于它的输入。各专家只计算自己收到的 token，最后通过 <code>index_add_</code> 写回原 token 位置。</p>
+<h2 id="七、MoE-的参数量与计算量"><a href="#七、MoE-的参数量与计算量" class="headerlink" title="七、MoE 的参数量与计算量"></a>七、MoE 的参数量与计算量</h2><p>假设普通模型有一个 FFN，MoE 有 4 个同规模 Expert：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">参数容量：约增加到 4 倍</span><br><span class="line">Top-1 每 token 的专家计算：仍约为 1 个 FFN</span><br></pre></td></tr></tbody></table></figure>
+
+<p>但这不代表总成本完全不变。</p>
+<p>Router 本身要计算，token 需要分发，专家负载可能不均匀，所有专家参数也必须存储。在多卡系统中，还可能发生跨卡通信。</p>
+<p>所以 MoE 的准确表述应该是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用稀疏激活换取更大的参数容量</span><br></pre></td></tr></tbody></table></figure>
+
+<p>而不是参数量增加后计算量完全不变。</p>
+<h2 id="八、为什么必须有-auxiliary-loss"><a href="#八、为什么必须有-auxiliary-loss" class="headerlink" title="八、为什么必须有 auxiliary loss"></a>八、为什么必须有 auxiliary loss</h2><p>Router 容易出现塌缩：几乎所有 token 都选择同一个专家。代码中使用实际负载和平均路由概率构造辅助损失：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">load = F.one_hot(</span><br><span class="line">    topk_idx,</span><br><span class="line">    self.config.num_experts</span><br><span class="line">).<span class="built_in">float</span>().mean(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">self.aux_loss = (</span><br><span class="line">    load * scores.mean(<span class="number">0</span>)</span><br><span class="line">).<span class="built_in">sum</span>() * self.config.num_experts \\</span><br><span class="line">                * self.config.router_aux_loss_coef</span><br></pre></td></tr></tbody></table></figure>
+
+<p>设第 <code>i</code> 个专家的实际 token 比例为 <code>f_i</code>，Router 平均概率为 <code>P_i</code>，则核心形式可以理解为：</p>
+
+$$
+L_{aux}=N\sum_{i=1}^{N}f_iP_i
+$$
+
+
+<p>如果某个专家既被大量选中，又长期得到很高概率，它对辅助损失的贡献就会变大，训练会推动 Router 改善负载分布。</p>
+<p>本项目还把 <code>router_aux_loss_coef</code> 默认设为 <code>5e-4</code>，说明它是约束项，不应压过语言建模的主损失。</p>
+<p>在训练循环中，MoE 的总目标通常是：</p>
+
+$$
+L=L_{CE}+L_{aux}
+$$
+
+
+<p>非 MoE 模式下，模型将 <code>aux_loss</code> 设置为零标量，因此训练流程可以统一处理。</p>
+<h2 id="九、MoE-中一个容易忽略的工程细节"><a href="#九、MoE-中一个容易忽略的工程细节" class="headerlink" title="九、MoE 中一个容易忽略的工程细节"></a>九、MoE 中一个容易忽略的工程细节</h2><p>代码里有这一段：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">elif</span> self.training:</span><br><span class="line">    y[<span class="number">0</span>, <span class="number">0</span>] += <span class="number">0</span> * <span class="built_in">sum</span>(</span><br><span class="line">        p.<span class="built_in">sum</span>() <span class="keyword">for</span> p <span class="keyword">in</span> expert.parameters()</span><br><span class="line">    )</span><br></pre></td></tr></tbody></table></figure>
+
+<p>它数值上等于加零，但把没有被当前 batch 选中的 Expert 参数接入了计算图。</p>
+<p>原因是分布式训练时，如果某些专家在一个 batch 中完全没有 token，框架可能把它们判断为 unused parameters，进而影响 DDP 的梯度同步。这个写法不改变前向数值，却保留了图连接。</p>
+<h2 id="十、LoRA-与-MoE-能不能一起用"><a href="#十、LoRA-与-MoE-能不能一起用" class="headerlink" title="十、LoRA 与 MoE 能不能一起用"></a>十、LoRA 与 MoE 能不能一起用</h2><p>可以，但要区分两层含义：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MoE 决定有哪些专家，以及 token 走哪个专家</span><br><span class="line">LoRA 决定哪些权重用低秩方式适配新任务</span><br></pre></td></tr></tbody></table></figure>
+
+<p>组合后可以是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Attention</span><br><span class="line"> ├── q_proj + LoRA</span><br><span class="line"> └── o_proj + LoRA</span><br><span class="line"></span><br><span class="line">MoE FFN</span><br><span class="line"> ├── Router</span><br><span class="line"> ├── Expert 0</span><br><span class="line"> ├── Expert 1</span><br><span class="line"> ├── Expert 2</span><br><span class="line"> └── Expert 3</span><br></pre></td></tr></tbody></table></figure>
+
+<p>但当前项目的 <code>apply_lora()</code> 只选择方阵 Linear。MoE 的 Router 是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hidden_size → num_experts</span><br></pre></td></tr></tbody></table></figure>
+
+<p>Expert 的投影通常是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hidden_size → intermediate_size</span><br><span class="line">intermediate_size → hidden_size</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这些层大多不是方阵，因此当前实现不会自动给 Expert 投影加 LoRA。</p>
+<p>如果要做专家 LoRA，应改成显式目标模块匹配，例如匹配 <code>experts.*.gate_proj</code>、<code>experts.*.up_proj</code> 和 <code>experts.*.down_proj</code>，并单独决定是否训练 Router。</p>
+<p>Router 是否训练是一个关键选择：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">冻结 Router：保持原有专家分工，训练更稳定</span><br><span class="line">训练 Router：允许任务重新定义 token 到专家的分配，但更容易负载失衡</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="十一、在本项目中如何选择"><a href="#十一、在本项目中如何选择" class="headerlink" title="十一、在本项目中如何选择"></a>十一、在本项目中如何选择</h2><p><img src="/images/lora-moe-deep-dive/comparison.svg" alt="LoRA 与 MoE 的目标和实现方式对比"></p>
+<p>如果你的目标是让 MiniMind 学会新的回答格式、工具调用格式或领域表达，优先考虑 LoRA。它改动小，checkpoint 小，训练成本低。</p>
+<p>如果你的目标是提高模型容量，允许不同 token 使用不同的 FFN 能力，才考虑 MoE。它需要从预训练或完整训练阶段就处理好专家负载、checkpoint 结构和推理部署。</p>
+<p>一个实用路线是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">先用 dense 模型验证数据和任务</span><br><span class="line"> ↓</span><br><span class="line">用 LoRA 快速验证微调收益</span><br><span class="line"> ↓</span><br><span class="line">任务规模和能力边界确认后，再评估 MoE</span><br></pre></td></tr></tbody></table></figure>
+
+<p>特别提醒：<code>use_moe=1</code> 不是一个可以随时打开的推理开关。MoE 模型的权重结构不同，必须加载对应的 MoE checkpoint。普通 dense 权重和 MoE 权重不能直接混用。</p>
+<h2 id="十二、最后把源码压缩成四个公式"><a href="#十二、最后把源码压缩成四个公式" class="headerlink" title="十二、最后把源码压缩成四个公式"></a>十二、最后把源码压缩成四个公式</h2><p>LoRA 的旁路：</p>
+
+$$
+y=Wx+BAx
+$$
+
+
+<p>低秩约束：</p>
+
+$$
+\operatorname{rank}(BA)\le r
+$$
+
+
+<p>MoE 的稀疏混合：</p>
+
+$$
+y=\sum_{i\in TopK(x)}w_iE_i(x)
+$$
+
+
+<p>MoE 的训练目标：</p>
+
+$$
+L=L_{CE}+L_{aux}
+$$
+
+
+<p>所以，LoRA 是在原模型旁边学习一个低秩补丁，MoE 是在原 FFN 位置建立一组专家并让 Router 动态分流。</p>
+<p>一个负责少训练参数，一个负责多模型容量。理解这两个差别，后面再看 QLoRA、Mixtral、专家并行或 MoE-LoRA，就不会只停留在名词层面了。</p>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>分享文章</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;复制成功&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/08/25/minimind-to-minimind-v-real-training-source-code/">从 MiniMind 到 MiniMind-V：Pretrain、SFT、视觉 Token 与 Loss 的源码级推导</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%85%88%E6%8A%8A%E4%B8%A4%E4%BB%B6%E4%BA%8B%E6%94%BE%E5%9B%9E-Transformer"><span class="toc-text">一、先把两件事放回 Transformer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81LoRA-%E5%88%B0%E5%BA%95%E5%9C%A8%E8%BF%91%E4%BC%BC%E4%BB%80%E4%B9%88"><span class="toc-text">二、LoRA 到底在近似什么</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E5%85%A8%E9%87%8F%E5%BE%AE%E8%B0%83%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="toc-text">2.1 全量微调的代价</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E5%AF%B9%E5%BA%94%E5%88%B0%E9%A1%B9%E7%9B%AE%E4%BB%A3%E7%A0%81"><span class="toc-text">2.2 对应到项目代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%A4%E4%B8%AA%E7%9F%A9%E9%98%B5%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E4%B8%80%E4%B8%AA%E5%B0%8F%E7%9F%A9%E9%98%B5"><span class="toc-text">2.3 为什么是两个矩阵，而不是一个小矩阵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%A0%B4%E5%9D%8F%E5%9F%BA%E5%BA%A7%E6%A8%A1%E5%9E%8B"><span class="toc-text">2.4 初始化为什么不破坏基座模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E9%A1%B9%E7%9B%AE%E9%87%8C%E7%9A%84-LoRA-%E7%A9%B6%E7%AB%9F%E6%8C%82%E5%9C%A8%E5%93%AA%E4%BA%9B%E5%B1%82"><span class="toc-text">三、项目里的 LoRA 究竟挂在哪些层</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81LoRA-%E8%AE%AD%E7%BB%83%E6%97%B6%E5%88%B0%E5%BA%95%E6%9B%B4%E6%96%B0%E4%BB%80%E4%B9%88"><span class="toc-text">四、LoRA 训练时到底更新什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81MoE%EF%BC%9A%E4%BB%8E%E4%B8%80%E4%B8%AA-FFN-%E5%8F%98%E6%88%90%E5%A4%9A%E4%B8%AA%E4%B8%93%E5%AE%B6"><span class="toc-text">五、MoE：从一个 FFN 变成多个专家</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E6%99%AE%E9%80%9A-FFN"><span class="toc-text">5.1 普通 FFN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-MoE-FFN"><span class="toc-text">5.2 MoE FFN</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E4%B8%80%E6%AC%A1-MoE-%E5%89%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%9A%84%E5%AE%8C%E6%95%B4%E6%95%B0%E6%8D%AE%E6%B5%81"><span class="toc-text">六、一次 MoE 前向传播的完整数据流</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-Router-%E6%89%93%E5%88%86"><span class="toc-text">6.1 Router 打分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-Top-K-%E9%80%89%E6%8B%A9"><span class="toc-text">6.2 Top-K 选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E5%88%86%E5%8F%91-token-%E5%B9%B6%E8%81%9A%E5%90%88%E7%BB%93%E6%9E%9C"><span class="toc-text">6.3 分发 token 并聚合结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81MoE-%E7%9A%84%E5%8F%82%E6%95%B0%E9%87%8F%E4%B8%8E%E8%AE%A1%E7%AE%97%E9%87%8F"><span class="toc-text">七、MoE 的参数量与计算量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E9%A1%BB%E6%9C%89-auxiliary-loss"><span class="toc-text">八、为什么必须有 auxiliary loss</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81MoE-%E4%B8%AD%E4%B8%80%E4%B8%AA%E5%AE%B9%E6%98%93%E5%BF%BD%E7%95%A5%E7%9A%84%E5%B7%A5%E7%A8%8B%E7%BB%86%E8%8A%82"><span class="toc-text">九、MoE 中一个容易忽略的工程细节</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E3%80%81LoRA-%E4%B8%8E-MoE-%E8%83%BD%E4%B8%8D%E8%83%BD%E4%B8%80%E8%B5%B7%E7%94%A8"><span class="toc-text">十、LoRA 与 MoE 能不能一起用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E5%9C%A8%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%AD%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9"><span class="toc-text">十一、在本项目中如何选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E6%9C%80%E5%90%8E%E6%8A%8A%E6%BA%90%E7%A0%81%E5%8E%8B%E7%BC%A9%E6%88%90%E5%9B%9B%E4%B8%AA%E5%85%AC%E5%BC%8F"><span class="toc-text">十二、最后把源码压缩成四个公式</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

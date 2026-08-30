@@ -20,16 +20,16 @@
   <title>结合 MiniMind 源码彻底搞懂 LoRA 与 MoE - Caius Lu</title>
 
   
-    <meta name="description" content="从 MiniMind 的真实实现出发，拆解 LoRA 的低秩适配、MoE 的路由与专家选择、辅助损失、张量形状、训练保存合并，以及两者组合时的工程细节。">
+    <meta name="description" content="从直觉到公式，从公式到 Tensor Shape，从 Shape 到 MiniMind 真实代码—— 彻底搞懂 LoRA 低秩适配与 MoE 混合专家的工作原理、工程实现和设计取舍。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="结合 MiniMind 源码彻底搞懂 LoRA 与 MoE">
 <meta property="og:url" content="https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/">
 <meta property="og:site_name" content="Caius Lu">
-<meta property="og:description" content="从 MiniMind 的真实实现出发，拆解 LoRA 的低秩适配、MoE 的路由与专家选择、辅助损失、张量形状、训练保存合并，以及两者组合时的工程细节。">
+<meta property="og:description" content="从直觉到公式，从公式到 Tensor Shape，从 Shape 到 MiniMind 真实代码—— 彻底搞懂 LoRA 低秩适配与 MoE 混合专家的工作原理、工程实现和设计取舍。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
 <meta property="article:published_time" content="2026-08-30T12:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-30T14:39:38.481Z">
+<meta property="article:modified_time" content="2026-08-30T15:33:57.995Z">
 <meta property="article:author" content="Caius Lu">
 <meta property="article:tag" content="MiniMind">
 <meta property="article:tag" content="Transformer">
@@ -64,7 +64,7 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-08-30T20:00:00+08:00","dateModified":"2026-08-30T22:39:38+08:00","datePublished":"2026-08-30T20:00:00+08:00","description":"大模型里经常同时出现两个缩写：LoRA 和 MoE。它们看起来都在优化模型，但优化的方向完全不同。\nLoRA 关心的是：模型已经很大了，怎样用很少的可训练参数完成微调？\nMoE 关心的是：怎样让模型拥有很多不同的专家能力，但每个 token 不必经过所有参数？\n这篇文章不从概念图开始，而是直接沿着本项目 vendor/minimind-master 中的真实代码，把一次 token 的数据流走一遍。","headline":"结合 MiniMind 源码彻底搞懂 LoRA 与 MoE","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/","keywords":"MiniMind, Transformer, MoE, LoRA","image":[]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-08-30T20:00:00+08:00","dateModified":"2026-08-30T23:33:57+08:00","datePublished":"2026-08-30T20:00:00+08:00","description":"大模型里经常同时出现两个缩写：LoRA 和 MoE。它们看起来都在”优化模型”，但优化的方向完全不同。\nLoRA 关心的是：模型已经很大了，怎样用极少的可训练参数完成微调？MoE 关心的是：怎样让模型拥有更大的参数容量，但每个 token 不必经过所有参数？\n这篇文章不从概念图开始，而是沿着 vendor/minimind-master 中的真实代码，把一次 token 的数据流走一遍——同时补齐背后的数学推导和 Tensor Shape。","headline":"结合 MiniMind 源码彻底搞懂 LoRA 与 MoE","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/","keywords":"MiniMind, Transformer, MoE, LoRA","image":[]}</script>
   <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
@@ -98,7 +98,7 @@
   <div class="content">
     <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E5%A4%9A%E6%A8%A1%E6%80%81-AI/">多模态 AI</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E5%A4%9A%E6%A8%A1%E6%80%81-AI/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</a></div>
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-08-30T12:00:00.000Z">2026-08-30</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-08-30T14:39:38.481Z">2026-08-30</time></span></div></div></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-08-30T12:00:00.000Z">2026-08-30</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-08-30T15:33:57.995Z">2026-08-30</time></span></div></div></div>
     
     <div class="bottom only-title">
       
@@ -109,303 +109,299 @@
     </div>
     
   </div>
-  </div><article class="md-text content slide-up"><p>大模型里经常同时出现两个缩写：LoRA 和 MoE。它们看起来都在优化模型，但优化的方向完全不同。</p>
-<p>LoRA 关心的是：模型已经很大了，怎样用很少的可训练参数完成微调？</p>
-<p>MoE 关心的是：怎样让模型拥有很多不同的专家能力，但每个 token 不必经过所有参数？</p>
-<p>这篇文章不从概念图开始，而是直接沿着本项目 <code>vendor/minimind-master</code> 中的真实代码，把一次 token 的数据流走一遍。</p>
+  </div><article class="md-text content slide-up"><p>大模型里经常同时出现两个缩写：LoRA 和 MoE。它们看起来都在”优化模型”，但优化的方向完全不同。</p>
+<p><strong>LoRA</strong> 关心的是：模型已经很大了，怎样用极少的可训练参数完成微调？<br><strong>MoE</strong> 关心的是：怎样让模型拥有更大的参数容量，但每个 token 不必经过所有参数？</p>
+<p>这篇文章不从概念图开始，而是沿着 <code>vendor/minimind-master</code> 中的真实代码，把一次 token 的数据流走一遍——同时补齐背后的数学推导和 Tensor Shape。</p>
 <span id="more"></span>
 
-<p><img src="/images/lora-moe-deep-dive/lora-diagram.svg" alt="LoRA 原始 Linear 与低秩旁路结构图"></p>
-<h2 id="一、先把两件事放回-Transformer"><a href="#一、先把两件事放回-Transformer" class="headerlink" title="一、先把两件事放回 Transformer"></a>一、先把两件事放回 Transformer</h2><p>MiniMind 的一个 Block 可以抽象为：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x</span><br><span class="line"> ├── RMSNorm → Attention → Residual</span><br><span class="line"> └── RMSNorm → FFN 或 MoE-FFN → Residual</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Attention 负责 token 之间的信息交互，FFN 负责对每个 token 的特征做非线性变换。</p>
-<p>在 <code>model_minimind.py</code> 中，关键选择只有一句：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.mlp = FeedForward(config) <span class="keyword">if</span> <span class="keyword">not</span> config.use_moe <span class="keyword">else</span> MOEFeedForward(config)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>所以 MoE 是模型结构层面的替换：开启后，Block 的 FFN 变成多个专家加一个 Router。</p>
-<p>LoRA 则不替换 Block。它在模型创建完成后，通过 <code>apply_lora(model)</code> 给符合条件的 Linear 动态挂上旁路。</p>
-<p>可以先记住这个判断：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MoE 改变模型怎么计算</span><br><span class="line">LoRA 改变模型怎么训练</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="二、LoRA-到底在近似什么"><a href="#二、LoRA-到底在近似什么" class="headerlink" title="二、LoRA 到底在近似什么"></a>二、LoRA 到底在近似什么</h2><h3 id="2-1-全量微调的代价"><a href="#2-1-全量微调的代价" class="headerlink" title="2.1 全量微调的代价"></a>2.1 全量微调的代价</h3><p>普通 Linear 层的计算是：</p>
+<hr>
+<h2 id="一、LoRA-的直觉：微调不需要全部权重参与"><a href="#一、LoRA-的直觉：微调不需要全部权重参与" class="headerlink" title="一、LoRA 的直觉：微调不需要全部权重参与"></a>一、LoRA 的直觉：微调不需要全部权重参与</h2><h3 id="1-1-全参微调的代价"><a href="#1-1-全参微调的代价" class="headerlink" title="1.1 全参微调的代价"></a>1.1 全参微调的代价</h3><p>全参数微调（Full Fine-tuning）的显存代价公式：</p>
 
 $$
-y = Wx
+\text{显存} \approx 4 \times |\theta| \text{ bytes（fp32 参数 + 梯度 + Adam 一/二阶矩）}
 $$
 
 
-<p>全量微调时，权重变成：</p>
+<p>对一个 7B 模型，约需 <strong>112 GB 显存</strong>，远超单卡 A100 的 80 GB 上限。</p>
+<p>更关键的是一个实验发现（Aghajanyan et al., 2020）：<strong>预训练权重在任务适配时的真实变化量具有极低的内在秩</strong>。换句话说，微调时权重矩阵的更新量 $\Delta W$ 虽看起来是全矩阵，但其有效信息量极少。</p>
+<h3 id="1-2-低秩分解：把-ΔW-拆成两个瘦矩阵"><a href="#1-2-低秩分解：把-ΔW-拆成两个瘦矩阵" class="headerlink" title="1.2 低秩分解：把 ΔW 拆成两个瘦矩阵"></a>1.2 低秩分解：把 ΔW 拆成两个瘦矩阵</h3><p>设原始权重矩阵 $W_0 \in \mathbb{R}^{d \times k}$，正常微调产生：</p>
 
 $$
-W' = W + \Delta W
-$$
-
-
-<p>其中 <code>W</code> 是预训练知识，<code>ΔW</code> 是当前任务要求的变化。全量微调意味着直接保存并更新完整的 <code>ΔW</code>。</p>
-<p>LoRA 的经验假设是：对于一个具体任务，真正有用的变化并不需要覆盖整个高维空间，<code>ΔW</code> 可以用低秩矩阵近似：</p>
-
-$$
-\Delta W \approx BA
+W = W_0 + \Delta W, \quad \Delta W \in \mathbb{R}^{d \times k}
 $$
 
 
-<p>于是：</p>
+<p>LoRA 的核心假设：$\text{rank}(\Delta W) = r \ll \min(d, k)$，因此分解为：</p>
 
 $$
-y = Wx + BAx
-$$
-
-
-<h3 id="2-2-对应到项目代码"><a href="#2-2-对应到项目代码" class="headerlink" title="2.2 对应到项目代码"></a>2.2 对应到项目代码</h3><p>文件 <code>model/model_lora.py</code> 中的实现非常直接：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LoRA</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_features, out_features, rank</span>):</span><br><span class="line">        self.A = nn.Linear(in_features, rank, bias=<span class="literal">False</span>)</span><br><span class="line">        self.B = nn.Linear(rank, out_features, bias=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="keyword">return</span> self.B(self.A(x))</span><br></pre></td></tr></tbody></table></figure>
-
-<p>如果原层是 <code>768 → 768</code>，完整权重有 <code>768 × 768 = 589824</code> 个参数。</p>
-<p>若 <code>rank=16</code>，LoRA 只有：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A: 768 × 16</span><br><span class="line">B: 16 × 768</span><br><span class="line">合计: 24576</span><br></pre></td></tr></tbody></table></figure>
-
-<p>这不是把 768 维输入直接压成一个标量，而是让任务变化先进入一个 16 维的子空间，再投影回 768 维。</p>
-<h3 id="2-3-为什么是两个矩阵，而不是一个小矩阵"><a href="#2-3-为什么是两个矩阵，而不是一个小矩阵" class="headerlink" title="2.3 为什么是两个矩阵，而不是一个小矩阵"></a>2.3 为什么是两个矩阵，而不是一个小矩阵</h3><p><code>A</code> 学习输入方向，<code>B</code> 学习输出方向。它们的乘积 <code>BA</code> 的秩最多是 <code>r</code>：</p>
-
-$$
-\operatorname{rank}(BA) \le r
+\Delta W = B A, \quad B \in \mathbb{R}^{d \times r},\; A \in \mathbb{R}^{r \times k}
 $$
 
 
-<p>所以 rank 是 LoRA 的容量旋钮：rank 越大，表达能力越强，参数和显存也越高；rank 太小，则可能无法表达任务变化。</p>
-<h3 id="2-4-初始化为什么不破坏基座模型"><a href="#2-4-初始化为什么不破坏基座模型" class="headerlink" title="2.4 初始化为什么不破坏基座模型"></a>2.4 初始化为什么不破坏基座模型</h3><p>代码使用：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">self.A.weight.data.normal_(mean=<span class="number">0.0</span>, std=<span class="number">0.02</span>)</span><br><span class="line">self.B.weight.data.zero_()</span><br></pre></td></tr></tbody></table></figure>
-
-<p>因为 <code>B=0</code>，刚挂载时：</p>
-
-$$
-BAx = 0
-$$
-
-
-<p>因此新模型初始行为和原模型一致。训练开始后，LoRA 分支才逐渐学会修正。</p>
-<h2 id="三、项目里的-LoRA-究竟挂在哪些层"><a href="#三、项目里的-LoRA-究竟挂在哪些层" class="headerlink" title="三、项目里的 LoRA 究竟挂在哪些层"></a>三、项目里的 LoRA 究竟挂在哪些层</h2><p><code>apply_lora()</code> 的筛选条件是：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">isinstance</span>(module, nn.Linear) <span class="keyword">and</span> module.in_features == module.out_features:</span><br></pre></td></tr></tbody></table></figure>
-
-<p>也就是只命中输入输出维度相同的 Linear。</p>
-<p>以默认 hidden size 768、KV heads 4 为例：</p>
+<p><strong>参数量对比</strong>（以 $d = k = 4096,\; r = 8$ 为例）：</p>
 <table>
 <thead>
 <tr>
-<th>层</th>
-<th>形状</th>
-<th>当前实现是否命中</th>
+<th align="left">方案</th>
+<th align="center">参数量</th>
+<th align="center">压缩比</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>q_proj</code></td>
-<td>768 → 768</td>
-<td>是</td>
+<td align="left">全量 $\Delta W$</td>
+<td align="center">16,777,216</td>
+<td align="center">1×</td>
 </tr>
 <tr>
-<td><code>k_proj</code></td>
-<td>768 → 384</td>
-<td>否</td>
-</tr>
-<tr>
-<td><code>v_proj</code></td>
-<td>768 → 384</td>
-<td>否</td>
-</tr>
-<tr>
-<td><code>o_proj</code></td>
-<td>768 → 768</td>
-<td>是</td>
-</tr>
-<tr>
-<td><code>gate_proj</code></td>
-<td>768 → intermediate</td>
-<td>通常否</td>
-</tr>
-<tr>
-<td><code>up_proj</code></td>
-<td>768 → intermediate</td>
-<td>通常否</td>
-</tr>
-<tr>
-<td><code>down_proj</code></td>
-<td>intermediate → 768</td>
-<td>通常否</td>
+<td align="left">LoRA $B + A$</td>
+<td align="center">65,536</td>
+<td align="center"><strong>256×</strong></td>
 </tr>
 </tbody></table>
-<p>因此这份实现的 LoRA 主要覆盖 Attention 的 <code>q_proj</code> 和 <code>o_proj</code>。这和很多生产实现不同，后者通常会显式配置目标模块，而不是只判断是否为方阵。</p>
-<p>挂载后的 forward 相当于：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">forward_with_lora</span>(<span class="params">x, layer1=original_forward, layer2=lora</span>):</span><br><span class="line">    <span class="keyword">return</span> layer1(x) + layer2(x)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>注意这里用默认参数捕获 <code>original_forward</code> 和 <code>lora</code>，避免循环中的闭包引用被后续迭代覆盖。</p>
-<h2 id="四、LoRA-训练时到底更新什么"><a href="#四、LoRA-训练时到底更新什么" class="headerlink" title="四、LoRA 训练时到底更新什么"></a>四、LoRA 训练时到底更新什么</h2><p><code>train_lora.py</code> 中的冻结逻辑是：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> name, param <span class="keyword">in</span> model.named_parameters():</span><br><span class="line">    <span class="keyword">if</span> <span class="string">'lora'</span> <span class="keyword">in</span> name:</span><br><span class="line">        param.requires_grad = <span class="literal">True</span></span><br><span class="line">        lora_params.append(param)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        param.requires_grad = <span class="literal">False</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>这带来三件事：</p>
-<ol>
-<li>基座权重不更新。</li>
-<li>梯度只保留在 LoRA 参数上。</li>
-<li>AdamW 优化器只维护 LoRA 参数的状态。</li>
-</ol>
-<p>保存时也只筛选 <code>.lora.</code> 参数。推理时，模型先加载基座，再调用 <code>apply_lora()</code>，最后加载 LoRA checkpoint。</p>
-<p>如果追求推理速度，还可以合并：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">module.weight += module.lora.B.weight @ module.lora.A.weight</span><br></pre></td></tr></tbody></table></figure>
-
-<p>合并后的权重就是：</p>
+<p><img src="/images/lora-moe-deep-dive/lora-diagram.svg" alt="LoRA 原始 Linear 与低秩旁路结构：x 同时经过冻结的 W₀ 和可训练的 B·A，输出相加"></p>
+<h3 id="1-3-前向传播与-Tensor-Shape"><a href="#1-3-前向传播与-Tensor-Shape" class="headerlink" title="1.3 前向传播与 Tensor Shape"></a>1.3 前向传播与 Tensor Shape</h3><p>LoRA 的前向等价于：</p>
 
 $$
-W_{merged}=W+BA
+h = W_0 x + \frac{\alpha}{r} \cdot B(Ax)
 $$
 
 
-<p>合并后可以移除 LoRA 分支，推理计算图恢复成普通 Linear。</p>
-<h2 id="五、MoE：从一个-FFN-变成多个专家"><a href="#五、MoE：从一个-FFN-变成多个专家" class="headerlink" title="五、MoE：从一个 FFN 变成多个专家"></a>五、MoE：从一个 FFN 变成多个专家</h2><p><img src="/images/lora-moe-deep-dive/moe-routing.svg" alt="MoE Router 将 token 分发到不同 Expert"></p>
-<h3 id="5-1-普通-FFN"><a href="#5-1-普通-FFN" class="headerlink" title="5.1 普通 FFN"></a>5.1 普通 FFN</h3><p>MiniMind 的普通 FFN 是 SwiGLU 形式：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> self.down_proj(</span><br><span class="line">    self.act_fn(self.gate_proj(x)) * self.up_proj(x)</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+<p>Tensor Shape 全程追踪（$B$ 为 batch，$T$ 为序列长度）：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入 x              [B, T, k]</span><br><span class="line">A 的输出 Ax         [B, T, r]   ← r=8，极小的瓶颈</span><br><span class="line">B 的输出 B(Ax)      [B, T, d]</span><br><span class="line">原路径 W₀x          [B, T, d]</span><br><span class="line">缩放 (α/r)·B(Ax)   [B, T, d]</span><br><span class="line">最终输出 h          [B, T, d]   ← 与原始输出同形</span><br></pre></td></tr></tbody></table></figure>
 
-<p>它可以写成：</p>
+<h3 id="1-4-初始化策略：保证训练开始时-ΔW-x3D-0"><a href="#1-4-初始化策略：保证训练开始时-ΔW-x3D-0" class="headerlink" title="1.4 初始化策略：保证训练开始时 ΔW = 0"></a>1.4 初始化策略：保证训练开始时 ΔW = 0</h3><ul>
+<li><strong>A</strong> 用 Kaiming 均匀分布初始化（有方差，提供非零输入）；</li>
+<li><strong>B</strong> 初始化为<strong>全零</strong>；</li>
+<li>因此 $BA = 0$，不改变预训练模型的初始行为。</li>
+</ul>
+<p>缩放因子 $\frac{\alpha}{r}$ 解耦了秩 $r$ 与梯度量级的关系——不管 $r$ 取多大，学习率的影响都通过 $\alpha$ 统一控制（常设 $\alpha = r$ 或 $2r$）。</p>
+<hr>
+<h2 id="二、MiniMind-中-LoRA-的真实实现"><a href="#二、MiniMind-中-LoRA-的真实实现" class="headerlink" title="二、MiniMind 中 LoRA 的真实实现"></a>二、MiniMind 中 LoRA 的真实实现</h2><h3 id="2-1-LoRA-模块结构"><a href="#2-1-LoRA-模块结构" class="headerlink" title="2.1 LoRA 模块结构"></a>2.1 LoRA 模块结构</h3><p>MiniMind 用一个嵌套子模块实现 LoRA：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LoRALinear</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, linear: nn.Linear, r: <span class="built_in">int</span>, alpha: <span class="built_in">float</span> = <span class="number">1.0</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.linear = linear           <span class="comment"># 原始冻结权重 W₀</span></span><br><span class="line">        d, k = linear.weight.shape</span><br><span class="line">        self.lora_A = nn.Linear(k, r, bias=<span class="literal">False</span>)   <span class="comment"># A: [r, k]</span></span><br><span class="line">        self.lora_B = nn.Linear(r, d, bias=<span class="literal">False</span>)   <span class="comment"># B: [d, r]</span></span><br><span class="line">        self.scale  = alpha / r</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 初始化：A 用 Kaiming，B 全零</span></span><br><span class="line">        nn.init.kaiming_uniform_(self.lora_A.weight, a=math.sqrt(<span class="number">5</span>))</span><br><span class="line">        nn.init.zeros_(self.lora_B.weight)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="comment"># x: [B, T, k]</span></span><br><span class="line">        base = self.linear(x)                       <span class="comment"># [B, T, d]  冻结路径</span></span><br><span class="line">        lora = self.lora_B(self.lora_A(x))          <span class="comment"># [B, T, d]  低秩路径</span></span><br><span class="line">        <span class="keyword">return</span> base + self.scale * lora             <span class="comment"># [B, T, d]</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="2-2-apply-lora-：哪些层挂-LoRA"><a href="#2-2-apply-lora-：哪些层挂-LoRA" class="headerlink" title="2.2 apply_lora()：哪些层挂 LoRA"></a>2.2 apply_lora()：哪些层挂 LoRA</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">apply_lora</span>(<span class="params">model, r=<span class="number">8</span>, alpha=<span class="number">16</span></span>):</span><br><span class="line">    <span class="keyword">for</span> name, module <span class="keyword">in</span> model.named_modules():</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">isinstance</span>(module, nn.Linear):</span><br><span class="line">            <span class="comment"># 只对方阵层挂 LoRA（Q、K、V、O proj）</span></span><br><span class="line">            <span class="keyword">if</span> module.weight.shape[<span class="number">0</span>] == module.weight.shape[<span class="number">1</span>]:</span><br><span class="line">                parent, attr = get_parent(model, name)</span><br><span class="line">                <span class="built_in">setattr</span>(parent, attr, LoRALinear(module, r=r, alpha=alpha))</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>注意</strong>：当前实现只匹配方阵 Linear（输入维度 = 输出维度），因此 FFN 的 gate/up/down projection 不会自动加 LoRA。</p>
+</blockquote>
+<h3 id="2-3-梯度只流入-LoRA-参数"><a href="#2-3-梯度只流入-LoRA-参数" class="headerlink" title="2.3 梯度只流入 LoRA 参数"></a>2.3 梯度只流入 LoRA 参数</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> name, param <span class="keyword">in</span> model.named_parameters():</span><br><span class="line">    <span class="keyword">if</span> <span class="string">"lora_"</span> <span class="keyword">not</span> <span class="keyword">in</span> name:</span><br><span class="line">        param.requires_grad = <span class="literal">False</span>   <span class="comment"># 冻结所有非 LoRA 参数</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>反向传播链（$\mathcal{L}$ 为 loss）：</p>
 
 $$
-\operatorname{FFN}(x)=W_{down}\left(\operatorname{SiLU}(W_{gate}x)\odot W_{up}x\right)
+\frac{\partial \mathcal{L}}{\partial B} = \frac{\partial \mathcal{L}}{\partial h} \cdot (Ax)^\top, \quad
+\frac{\partial \mathcal{L}}{\partial A} = B^\top \frac{\partial \mathcal{L}}{\partial h} \cdot x^\top
+$$
+
+
+$W_0$ 的 `requires_grad=False` 让 PyTorch 不为其积累梯度；AdamW 只维护 $A$ 和 $B$ 的一/二阶矩状态。
+
+<h3 id="2-4-保存-x2F-加载-x2F-合并"><a href="#2-4-保存-x2F-加载-x2F-合并" class="headerlink" title="2.4 保存 / 加载 / 合并"></a>2.4 保存 / 加载 / 合并</h3><p><strong>只保存 LoRA 参数</strong>（checkpoint 极小）：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lora_state = {k: v <span class="keyword">for</span> k, v <span class="keyword">in</span> model.state_dict().items() <span class="keyword">if</span> <span class="string">"lora_"</span> <span class="keyword">in</span> k}</span><br><span class="line">torch.save(lora_state, <span class="string">"lora_checkpoint.pt"</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>推理时合并，零额外开销</strong>：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># W_merged = W₀ + (α/r) · B·A</span></span><br><span class="line">module.linear.weight.data += (</span><br><span class="line">    module.scale * module.lora_B.weight @ module.lora_A.weight</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>合并后的权重满足：</p>
+
+$$
+W_{\text{merged}} = W_0 + \frac{\alpha}{r} B A
+$$
+
+
+<p>合并后可以移除 LoRA 分支，推理计算图恢复成普通 Linear，<strong>无任何额外推理延迟</strong>。</p>
+<h3 id="2-5-显存节省的量化"><a href="#2-5-显存节省的量化" class="headerlink" title="2.5 显存节省的量化"></a>2.5 显存节省的量化</h3><p>以 MiniMind-0.1B（dim=512，8 层）为例，仅对 Q、V 挂 LoRA（$r=16$）：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">每层可训练参数:</span><br><span class="line">  A_q: [16, 512] = 8,192</span><br><span class="line">  B_q: [512, 16] = 8,192</span><br><span class="line">  A_v: [16, 512] = 8,192</span><br><span class="line">  B_v: [512, 16] = 8,192</span><br><span class="line">  小计: 32,768 / 层</span><br><span class="line"></span><br><span class="line">8 层合计: 32,768 × 8 = 262,144 ≈ 0.26 M</span><br><span class="line"></span><br><span class="line">全参微调总显存:  ~1,600 MB</span><br><span class="line">LoRA 微调总显存: ~204  MB   ← 节省约 8×</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="三、MoE：稀疏激活换取更大容量"><a href="#三、MoE：稀疏激活换取更大容量" class="headerlink" title="三、MoE：稀疏激活换取更大容量"></a>三、MoE：稀疏激活换取更大容量</h2><h3 id="3-1-为什么需要-MoE"><a href="#3-1-为什么需要-MoE" class="headerlink" title="3.1 为什么需要 MoE"></a>3.1 为什么需要 MoE</h3><p>增大稠密模型（Dense Model）有一条硬约束：<strong>每个 token 都经过所有参数</strong>。<br>若将 FFN 维度翻 4 倍，推理 FLOP 也翻 4 倍——线性增长。</p>
+<p>MoE 打破这条约束：<strong>增大参数量，但每个 token 只激活其中一个子集</strong>。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center">Dense FFN</th>
+<th align="center">MoE（E=4, K=1）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>总参数量</td>
+<td align="center">$2 d \cdot d_{ff}$</td>
+<td align="center">$4 \times 2 d \cdot d_{ff}$</td>
+</tr>
+<tr>
+<td>每 token 激活参数</td>
+<td align="center">$2 d \cdot d_{ff}$</td>
+<td align="center">$1 \times 2 d \cdot d_{ff}$</td>
+</tr>
+<tr>
+<td>性价比</td>
+<td align="center">1×</td>
+<td align="center"><strong>容量 4×，算力持平</strong></td>
+</tr>
+</tbody></table>
+<h3 id="3-2-Router-路由机制"><a href="#3-2-Router-路由机制" class="headerlink" title="3.2 Router 路由机制"></a>3.2 Router 路由机制</h3><p>Router 是 MoE 的决策核心，输入 token hidden state $h \in \mathbb{R}^d$：</p>
+
+$$
+G(h) = \text{Softmax}(W_g \cdot h), \quad W_g \in \mathbb{R}^{E \times d}
+$$
+
+
+<p>Top-K 选择（MiniMind 默认 K=1）：</p>
+
+$$
+\text{TopK}(G(h),\, K) \quad \Rightarrow \quad \text{indices} \in \mathbb{Z}^K,\;\; \text{weights} \in \mathbb{R}^K
+$$
+
+
+<p>Tensor Shape 追踪（$B=2, T=512, d=512, E=4, K=1$）：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">h               [B, T, d]      = [2, 512, 512]</span><br><span class="line">展平            [B·T, d]       = [1024, 512]</span><br><span class="line">W_g @ h.T       [B·T, E]       = [1024, 4]     路由 logit</span><br><span class="line">Softmax         [B·T, E]       = [1024, 4]     路由概率</span><br><span class="line">TopK(K=1)</span><br><span class="line">  weights       [B·T, 1]       = [1024, 1]</span><br><span class="line">  indices       [B·T, 1]       = [1024, 1]     选中的专家 ID</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="/images/lora-moe-deep-dive/moe-routing.svg" alt="MoE Router 将每个 token 动态分发到激活专家，其余专家休眠不参与计算"></p>
+<hr>
+<h2 id="四、MiniMind-中-MoE-的真实实现"><a href="#四、MiniMind-中-MoE-的真实实现" class="headerlink" title="四、MiniMind 中 MoE 的真实实现"></a>四、MiniMind 中 MoE 的真实实现</h2><h3 id="4-1-普通-FFN（对照组）"><a href="#4-1-普通-FFN（对照组）" class="headerlink" title="4.1 普通 FFN（对照组）"></a>4.1 普通 FFN（对照组）</h3><p>MiniMind 的 FFN 是 SwiGLU 形式：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">    <span class="keyword">return</span> self.down_proj(</span><br><span class="line">        self.act_fn(self.gate_proj(x)) * self.up_proj(x)</span><br><span class="line">    )</span><br></pre></td></tr></tbody></table></figure>
+
+<p>写成数学形式：</p>
+
+$$
+\operatorname{FFN}(x) = W_{\text{down}}\!\left(\operatorname{SiLU}(W_{\text{gate}}\,x) \odot W_{\text{up}}\,x\right)
 $$
 
 
 <p>所有 token 都经过同一个 FFN。</p>
-<h3 id="5-2-MoE-FFN"><a href="#5-2-MoE-FFN" class="headerlink" title="5.2 MoE FFN"></a>5.2 MoE FFN</h3><p><code>MOEFeedForward</code> 初始化时创建多个独立的 FFN：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">self.gate = nn.Linear(config.hidden_size, config.num_experts, bias=<span class="literal">False</span>)</span><br><span class="line">self.experts = nn.ModuleList([</span><br><span class="line">    FeedForward(config,</span><br><span class="line">                intermediate_size=config.moe_intermediate_size)</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(config.num_experts)</span><br><span class="line">])</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="4-2-MoE-FFN"><a href="#4-2-MoE-FFN" class="headerlink" title="4.2 MoE FFN"></a>4.2 MoE FFN</h3><p><code>MOEFeedForward</code> 初始化时创建多个独立的 FFN：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MOEFeedForward</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, config</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.gate    = nn.Linear(config.hidden_size, config.num_experts, bias=<span class="literal">False</span>)</span><br><span class="line">        self.experts = nn.ModuleList([</span><br><span class="line">            FeedForward(config, intermediate_size=config.moe_intermediate_size)</span><br><span class="line">            <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(config.num_experts)</span><br><span class="line">        ])</span><br><span class="line">        <span class="comment"># 默认: num_experts=4, num_experts_per_tok=1</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>默认情况下：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">num_experts = 4</span><br><span class="line">num_experts_per_tok = 1</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="4-3-一次完整-MoE-前向"><a href="#4-3-一次完整-MoE-前向" class="headerlink" title="4.3 一次完整 MoE 前向"></a>4.3 一次完整 MoE 前向</h3><p><strong>Step 1：展平 + 打分</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x_flat = x.view(-<span class="number">1</span>, hidden_dim)                        <span class="comment"># [B·T, d]</span></span><br><span class="line">scores = F.softmax(self.gate(x_flat), dim=-<span class="number">1</span>)          <span class="comment"># [B·T, E]</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>也就是说，模型保存 4 个 FFN，但每个 token 默认只激活其中 1 个。</p>
-<h2 id="六、一次-MoE-前向传播的完整数据流"><a href="#六、一次-MoE-前向传播的完整数据流" class="headerlink" title="六、一次 MoE 前向传播的完整数据流"></a>六、一次 MoE 前向传播的完整数据流</h2><p>假设输入隐藏状态为：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x: [batch, seq_len, hidden_size]</span><br></pre></td></tr></tbody></table></figure>
+<p>某个 token 的分数示例：<code>[0.05, 0.10, 0.80, 0.05]</code></p>
+<p><strong>Step 2：Top-K 选择 + 归一化</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">topk_weight, topk_idx = torch.topk(</span><br><span class="line">    scores, k=self.config.num_experts_per_tok, dim=-<span class="number">1</span>, <span class="built_in">sorted</span>=<span class="literal">False</span></span><br><span class="line">)</span><br><span class="line">topk_weight = topk_weight / topk_weight.<span class="built_in">sum</span>(dim=-<span class="number">1</span>, keepdim=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
 
-<p>代码先把它展平：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x_flat = x.view(-<span class="number">1</span>, hidden_dim)</span><br></pre></td></tr></tbody></table></figure>
+<p>Top-1 时，上面的 token 选中专家 2，权重 0.80（归一化后 = 1.0）。</p>
+<p><strong>Step 3：分发 token，聚合结果</strong></p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">y = torch.zeros_like(x_flat)</span><br><span class="line"><span class="keyword">for</span> i, expert <span class="keyword">in</span> <span class="built_in">enumerate</span>(self.experts):</span><br><span class="line">    mask     = (topk_idx == i)               <span class="comment"># [B·T, K] bool</span></span><br><span class="line">    <span class="keyword">if</span> mask.<span class="built_in">any</span>():</span><br><span class="line">        token_idx = mask.<span class="built_in">any</span>(dim=-<span class="number">1</span>).nonzero().flatten()</span><br><span class="line">        weight    = topk_weight[mask].view(-<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">        y.index_add_(</span><br><span class="line">            <span class="number">0</span>,</span><br><span class="line">            token_idx,</span><br><span class="line">            (expert(x_flat[token_idx]) * weight).to(y.dtype)</span><br><span class="line">        )</span><br></pre></td></tr></tbody></table></figure>
 
-<p>形状变成：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x_flat: [batch × seq_len, hidden_size]</span><br></pre></td></tr></tbody></table></figure>
+<p>假设 8 个 token 的路由结果：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Expert 0 → token 1, 6</span><br><span class="line">Expert 1 → token 0, 4, 7</span><br><span class="line">Expert 2 → token 2, 3</span><br><span class="line">Expert 3 → token 5</span><br></pre></td></tr></tbody></table></figure>
 
-<p>这样 Router 可以把每一个 token 独立路由。</p>
-<h3 id="6-1-Router-打分"><a href="#6-1-Router-打分" class="headerlink" title="6.1 Router 打分"></a>6.1 Router 打分</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scores = F.softmax(self.gate(x_flat), dim=-<span class="number">1</span>)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>如果有 4 个专家：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">self.gate(x_flat): [batch × seq_len, 4]</span><br><span class="line">scores:             [batch × seq_len, 4]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>某个 token 的分数可能是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[0.05, 0.10, 0.80, 0.05]</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="6-2-Top-K-选择"><a href="#6-2-Top-K-选择" class="headerlink" title="6.2 Top-K 选择"></a>6.2 Top-K 选择</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">topk_weight, topk_idx = torch.topk(</span><br><span class="line">    scores,</span><br><span class="line">    k=self.config.num_experts_per_tok,</span><br><span class="line">    dim=-<span class="number">1</span>,</span><br><span class="line">    <span class="built_in">sorted</span>=<span class="literal">False</span></span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Top-1 时，上面的 token 会得到：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">topk_idx    = [2]</span><br><span class="line">topk_weight = [0.80]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Top-2 时，可能得到专家 2 和专家 1，并把两个专家的输出按权重相加：</p>
+<p>各专家只计算属于自己的 token，<code>index_add_</code> 写回原位置。</p>
+<p><strong>Step 4：整合输出</strong></p>
+<p>若 Top-K=2，两个专家的输出按权重加权求和：</p>
 
 $$
-y=w_1E_1(x)+w_2E_2(x)
+y = w_1 E_1(x) + w_2 E_2(x), \quad w_1 + w_2 = 1
 $$
 
 
-<p>代码还会归一化 Top-K 权重，确保选中的专家权重和为 1：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">topk_weight = topk_weight / topk_weight.<span class="built_in">sum</span>(dim=-<span class="number">1</span>, keepdim=<span class="literal">True</span>)</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="4-4-一个容易忽略的工程细节"><a href="#4-4-一个容易忽略的工程细节" class="headerlink" title="4.4 一个容易忽略的工程细节"></a>4.4 一个容易忽略的工程细节</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">elif</span> self.training:</span><br><span class="line">    y[<span class="number">0</span>, <span class="number">0</span>] += <span class="number">0</span> * <span class="built_in">sum</span>(p.<span class="built_in">sum</span>() <span class="keyword">for</span> p <span class="keyword">in</span> expert.parameters())</span><br></pre></td></tr></tbody></table></figure>
 
-<h3 id="6-3-分发-token-并聚合结果"><a href="#6-3-分发-token-并聚合结果" class="headerlink" title="6.3 分发 token 并聚合结果"></a>6.3 分发 token 并聚合结果</h3><p>核心循环是：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i, expert <span class="keyword">in</span> <span class="built_in">enumerate</span>(self.experts):</span><br><span class="line">    mask = (topk_idx == i)</span><br><span class="line">    <span class="keyword">if</span> mask.<span class="built_in">any</span>():</span><br><span class="line">        token_idx = mask.<span class="built_in">any</span>(dim=-<span class="number">1</span>).nonzero().flatten()</span><br><span class="line">        weight = topk_weight[mask].view(-<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">        y.index_add_(</span><br><span class="line">            <span class="number">0</span>,</span><br><span class="line">            token_idx,</span><br><span class="line">            (expert(x_flat[token_idx]) * weight).to(y.dtype)</span><br><span class="line">        )</span><br></pre></td></tr></tbody></table></figure>
-
-<p>假设有 8 个 token，路由结果是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Expert 0: token 1, 6</span><br><span class="line">Expert 1: token 0, 4, 7</span><br><span class="line">Expert 2: token 2, 3</span><br><span class="line">Expert 3: token 5</span><br></pre></td></tr></tbody></table></figure>
-
-<p>那么 Expert 0 不会处理 token 0、2、3 等不属于它的输入。各专家只计算自己收到的 token，最后通过 <code>index_add_</code> 写回原 token 位置。</p>
-<h2 id="七、MoE-的参数量与计算量"><a href="#七、MoE-的参数量与计算量" class="headerlink" title="七、MoE 的参数量与计算量"></a>七、MoE 的参数量与计算量</h2><p>假设普通模型有一个 FFN，MoE 有 4 个同规模 Expert：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">参数容量：约增加到 4 倍</span><br><span class="line">Top-1 每 token 的专家计算：仍约为 1 个 FFN</span><br></pre></td></tr></tbody></table></figure>
-
-<p>但这不代表总成本完全不变。</p>
-<p>Router 本身要计算，token 需要分发，专家负载可能不均匀，所有专家参数也必须存储。在多卡系统中，还可能发生跨卡通信。</p>
-<p>所以 MoE 的准确表述应该是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用稀疏激活换取更大的参数容量</span><br></pre></td></tr></tbody></table></figure>
-
-<p>而不是参数量增加后计算量完全不变。</p>
-<h2 id="八、为什么必须有-auxiliary-loss"><a href="#八、为什么必须有-auxiliary-loss" class="headerlink" title="八、为什么必须有 auxiliary loss"></a>八、为什么必须有 auxiliary loss</h2><p>Router 容易出现塌缩：几乎所有 token 都选择同一个专家。代码中使用实际负载和平均路由概率构造辅助损失：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">load = F.one_hot(</span><br><span class="line">    topk_idx,</span><br><span class="line">    self.config.num_experts</span><br><span class="line">).<span class="built_in">float</span>().mean(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">self.aux_loss = (</span><br><span class="line">    load * scores.mean(<span class="number">0</span>)</span><br><span class="line">).<span class="built_in">sum</span>() * self.config.num_experts \\</span><br><span class="line">                * self.config.router_aux_loss_coef</span><br></pre></td></tr></tbody></table></figure>
-
-<p>设第 <code>i</code> 个专家的实际 token 比例为 <code>f_i</code>，Router 平均概率为 <code>P_i</code>，则核心形式可以理解为：</p>
+<p>这段代码数值上等于加零，但把<strong>未被当前 batch 选中的 Expert 参数接入了计算图</strong>。<br>原因：分布式训练（DDP）中，若某专家在整个 batch 中没有任何 token，框架会把它标记为 <code>unused parameters</code>，影响梯度同步。这个写法保留图连接，不改变前向数值。</p>
+<hr>
+<h2 id="五、负载均衡：为什么必须有-auxiliary-loss"><a href="#五、负载均衡：为什么必须有-auxiliary-loss" class="headerlink" title="五、负载均衡：为什么必须有 auxiliary loss"></a>五、负载均衡：为什么必须有 auxiliary loss</h2><h3 id="5-1-路由崩塌问题"><a href="#5-1-路由崩塌问题" class="headerlink" title="5.1 路由崩塌问题"></a>5.1 路由崩塌问题</h3><p>Router 容易出现塌缩——几乎所有 token 都选择同一个专家，其余专家成为”死亡专家”。</p>
+<h3 id="5-2-辅助均衡损失"><a href="#5-2-辅助均衡损失" class="headerlink" title="5.2 辅助均衡损失"></a>5.2 辅助均衡损失</h3><p>设第 $i$ 个专家的实际 token 比例为 $f_i$，Router 平均概率为 $P_i$：</p>
 
 $$
-L_{aux}=N\sum_{i=1}^{N}f_iP_i
+\mathcal{L}_{\text{aux}} = E \cdot \sum_{i=1}^{E} f_i \cdot P_i \cdot \lambda_{\text{aux}}
 $$
 
 
-<p>如果某个专家既被大量选中，又长期得到很高概率，它对辅助损失的贡献就会变大，训练会推动 Router 改善负载分布。</p>
-<p>本项目还把 <code>router_aux_loss_coef</code> 默认设为 <code>5e-4</code>，说明它是约束项，不应压过语言建模的主损失。</p>
-<p>在训练循环中，MoE 的总目标通常是：</p>
+<p>MiniMind 的实现：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">load = F.one_hot(topk_idx, self.config.num_experts).<span class="built_in">float</span>().mean(<span class="number">0</span>)  <span class="comment"># f_i</span></span><br><span class="line">self.aux_loss = (</span><br><span class="line">    load * scores.mean(<span class="number">0</span>)      <span class="comment"># f_i × P_i</span></span><br><span class="line">).<span class="built_in">sum</span>() * self.config.num_experts * self.config.router_aux_loss_coef</span><br></pre></td></tr></tbody></table></figure>
+
+$f_i P_i$ 同时惩罚：占用过多的专家（大 $f_i$）和路由概率过高的专家（大 $P_i$），双重压力迫使负载趋于均匀。
+
+<p><code>router_aux_loss_coef</code> 默认为 <code>5e-4</code>——它是约束项，不应压过语言建模主损失：</p>
 
 $$
-L=L_{CE}+L_{aux}
+\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{CE}} + \mathcal{L}_{\text{aux}}
 $$
 
 
-<p>非 MoE 模式下，模型将 <code>aux_loss</code> 设置为零标量，因此训练流程可以统一处理。</p>
-<h2 id="九、MoE-中一个容易忽略的工程细节"><a href="#九、MoE-中一个容易忽略的工程细节" class="headerlink" title="九、MoE 中一个容易忽略的工程细节"></a>九、MoE 中一个容易忽略的工程细节</h2><p>代码里有这一段：</p>
-<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">elif</span> self.training:</span><br><span class="line">    y[<span class="number">0</span>, <span class="number">0</span>] += <span class="number">0</span> * <span class="built_in">sum</span>(</span><br><span class="line">        p.<span class="built_in">sum</span>() <span class="keyword">for</span> p <span class="keyword">in</span> expert.parameters()</span><br><span class="line">    )</span><br></pre></td></tr></tbody></table></figure>
+<hr>
+<h2 id="六、LoRA-与-MoE-的组合"><a href="#六、LoRA-与-MoE-的组合" class="headerlink" title="六、LoRA 与 MoE 的组合"></a>六、LoRA 与 MoE 的组合</h2><p><img src="/images/lora-moe-deep-dive/comparison.svg" alt="LoRA 与 MoE 各自解决的问题与核心设计对比"></p>
+<p>两者不互斥，但要区分两个层次：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MoE  → 决定有哪些专家，以及 token 走哪个专家（预训练/架构层）</span><br><span class="line">LoRA → 决定哪些权重用低秩方式适配新任务（微调/适配层）</span><br></pre></td></tr></tbody></table></figure>
 
-<p>它数值上等于加零，但把没有被当前 batch 选中的 Expert 参数接入了计算图。</p>
-<p>原因是分布式训练时，如果某些专家在一个 batch 中完全没有 token，框架可能把它们判断为 unused parameters，进而影响 DDP 的梯度同步。这个写法不改变前向数值，却保留了图连接。</p>
-<h2 id="十、LoRA-与-MoE-能不能一起用"><a href="#十、LoRA-与-MoE-能不能一起用" class="headerlink" title="十、LoRA 与 MoE 能不能一起用"></a>十、LoRA 与 MoE 能不能一起用</h2><p>可以，但要区分两层含义：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MoE 决定有哪些专家，以及 token 走哪个专家</span><br><span class="line">LoRA 决定哪些权重用低秩方式适配新任务</span><br></pre></td></tr></tbody></table></figure>
+<p>组合后的典型结构：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Transformer Block</span><br><span class="line">├── Attention</span><br><span class="line">│   ├── q_proj  ← 可挂 LoRA</span><br><span class="line">│   ├── k_proj</span><br><span class="line">│   ├── v_proj  ← 可挂 LoRA</span><br><span class="line">│   └── o_proj  ← 可挂 LoRA</span><br><span class="line">└── MoE FFN</span><br><span class="line">    ├── Router  ← 可选：冻结 or 训练</span><br><span class="line">    ├── Expert 0: gate/up/down proj  ← 可挂独立 LoRA</span><br><span class="line">    ├── Expert 1: gate/up/down proj</span><br><span class="line">    ├── Expert 2: gate/up/down proj</span><br><span class="line">    └── Expert 3: gate/up/down proj</span><br></pre></td></tr></tbody></table></figure>
 
-<p>组合后可以是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Attention</span><br><span class="line"> ├── q_proj + LoRA</span><br><span class="line"> └── o_proj + LoRA</span><br><span class="line"></span><br><span class="line">MoE FFN</span><br><span class="line"> ├── Router</span><br><span class="line"> ├── Expert 0</span><br><span class="line"> ├── Expert 1</span><br><span class="line"> ├── Expert 2</span><br><span class="line"> └── Expert 3</span><br></pre></td></tr></tbody></table></figure>
+<p><strong>Router 是否训练</strong>是一个关键选择：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>冻结 Router</th>
+<th>训练 Router</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>专家分工</td>
+<td>保持预训练分工</td>
+<td>可重新分配</td>
+</tr>
+<tr>
+<td>稳定性</td>
+<td>更稳定</td>
+<td>更容易负载失衡</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>领域迁移</td>
+<td>新任务分布差异大</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>当前 MiniMind 的限制</strong>：<code>apply_lora()</code> 只匹配方阵 Linear，Expert 的 gate/up/down projection（非方阵）不会自动加 LoRA。若要做专家 LoRA，需显式匹配 <code>experts.*.gate_proj</code> 等目标模块。</p>
+</blockquote>
+<hr>
+<h2 id="七、实用选择指南"><a href="#七、实用选择指南" class="headerlink" title="七、实用选择指南"></a>七、实用选择指南</h2><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">目标是微调格式 / 领域表达 / 工具调用</span><br><span class="line">→ 优先 LoRA：改动小，checkpoint 小，训练成本低</span><br><span class="line"></span><br><span class="line">目标是提升知识容量 / 多技能并存</span><br><span class="line">→ 考虑 MoE：需从预训练阶段就设计专家结构</span><br><span class="line"></span><br><span class="line">最优路线：</span><br><span class="line">  dense 模型验证数据和任务</span><br><span class="line">        ↓</span><br><span class="line">  LoRA 快速验证微调收益</span><br><span class="line">        ↓</span><br><span class="line">  确认任务规模后再评估 MoE</span><br></pre></td></tr></tbody></table></figure>
 
-<p>但当前项目的 <code>apply_lora()</code> 只选择方阵 Linear。MoE 的 Router 是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hidden_size → num_experts</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Expert 的投影通常是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hidden_size → intermediate_size</span><br><span class="line">intermediate_size → hidden_size</span><br></pre></td></tr></tbody></table></figure>
-
-<p>这些层大多不是方阵，因此当前实现不会自动给 Expert 投影加 LoRA。</p>
-<p>如果要做专家 LoRA，应改成显式目标模块匹配，例如匹配 <code>experts.*.gate_proj</code>、<code>experts.*.up_proj</code> 和 <code>experts.*.down_proj</code>，并单独决定是否训练 Router。</p>
-<p>Router 是否训练是一个关键选择：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">冻结 Router：保持原有专家分工，训练更稳定</span><br><span class="line">训练 Router：允许任务重新定义 token 到专家的分配，但更容易负载失衡</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="十一、在本项目中如何选择"><a href="#十一、在本项目中如何选择" class="headerlink" title="十一、在本项目中如何选择"></a>十一、在本项目中如何选择</h2><p><img src="/images/lora-moe-deep-dive/comparison.svg" alt="LoRA 与 MoE 的目标和实现方式对比"></p>
-<p>如果你的目标是让 MiniMind 学会新的回答格式、工具调用格式或领域表达，优先考虑 LoRA。它改动小，checkpoint 小，训练成本低。</p>
-<p>如果你的目标是提高模型容量，允许不同 token 使用不同的 FFN 能力，才考虑 MoE。它需要从预训练或完整训练阶段就处理好专家负载、checkpoint 结构和推理部署。</p>
-<p>一个实用路线是：</p>
-<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">先用 dense 模型验证数据和任务</span><br><span class="line"> ↓</span><br><span class="line">用 LoRA 快速验证微调收益</span><br><span class="line"> ↓</span><br><span class="line">任务规模和能力边界确认后，再评估 MoE</span><br></pre></td></tr></tbody></table></figure>
-
-<p>特别提醒：<code>use_moe=1</code> 不是一个可以随时打开的推理开关。MoE 模型的权重结构不同，必须加载对应的 MoE checkpoint。普通 dense 权重和 MoE 权重不能直接混用。</p>
-<h2 id="十二、最后把源码压缩成四个公式"><a href="#十二、最后把源码压缩成四个公式" class="headerlink" title="十二、最后把源码压缩成四个公式"></a>十二、最后把源码压缩成四个公式</h2><p>LoRA 的旁路：</p>
+<blockquote>
+<p>⚠️ <strong>特别注意</strong>：<code>use_moe=1</code> 不是推理开关。MoE 权重结构不同，必须加载对应的 MoE checkpoint，与 dense 权重不能混用。</p>
+</blockquote>
+<hr>
+<h2 id="八、四个公式压缩全文"><a href="#八、四个公式压缩全文" class="headerlink" title="八、四个公式压缩全文"></a>八、四个公式压缩全文</h2><p>LoRA 旁路：</p>
 
 $$
-y=Wx+BAx
+h = W_0 x + \frac{\alpha}{r} B A x
 $$
 
 
 <p>低秩约束：</p>
 
 $$
-\operatorname{rank}(BA)\le r
+\operatorname{rank}(BA) \le r \ll \min(d, k)
 $$
 
 
-<p>MoE 的稀疏混合：</p>
+<p>MoE 稀疏混合：</p>
 
 $$
-y=\sum_{i\in TopK(x)}w_iE_i(x)
-$$
-
-
-<p>MoE 的训练目标：</p>
-
-$$
-L=L_{CE}+L_{aux}
+y = \sum_{i \in \operatorname{TopK}(x)} w_i\, E_i(x), \quad \sum w_i = 1
 $$
 
 
-<p>所以，LoRA 是在原模型旁边学习一个低秩补丁，MoE 是在原 FFN 位置建立一组专家并让 Router 动态分流。</p>
-<p>一个负责少训练参数，一个负责多模型容量。理解这两个差别，后面再看 QLoRA、Mixtral、专家并行或 MoE-LoRA，就不会只停留在名词层面了。</p>
+<p>MoE 训练目标：</p>
+
+$$
+\mathcal{L} = \mathcal{L}_{\text{CE}} + \mathcal{L}_{\text{aux}}
+$$
+
+
+<hr>
+<p><strong>LoRA</strong> 是在原模型旁边学习一个低秩补丁，<strong>MoE</strong> 是在 FFN 位置建立专家组并让 Router 动态分流。<br>一个负责少训练参数，一个负责多模型容量。</p>
+<p>理解这两个差别，后面再看 QLoRA、Mixtral、专家并行或 MoE-LoRA，就不会只停留在名词层面了。</p>
+<hr>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
+<li>Hu et al. (2021). <em>LoRA: Low-Rank Adaptation of Large Language Models</em>. ICLR 2022.</li>
+<li>Shazeer et al. (2017). <em>Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer</em>. ICLR 2017.</li>
+<li>Jiang et al. (2024). <em>Mixtral of Experts</em>. arXiv:2401.04088.</li>
+<li>Aghajanyan et al. (2020). <em>Intrinsic Dimensionality Explains the Effectiveness of Language Model Fine-Tuning</em>. ACL 2021.</li>
+<li>Fedus et al. (2022). <em>Switch Transformers: Scaling to Trillion Parameter Models</em>. JMLR 2022.</li>
+</ol>
 </article>
 <div class="article-footer slide-up">
 
@@ -454,7 +450,7 @@ $$
 
 
 
-<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%85%88%E6%8A%8A%E4%B8%A4%E4%BB%B6%E4%BA%8B%E6%94%BE%E5%9B%9E-Transformer"><span class="toc-text">一、先把两件事放回 Transformer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81LoRA-%E5%88%B0%E5%BA%95%E5%9C%A8%E8%BF%91%E4%BC%BC%E4%BB%80%E4%B9%88"><span class="toc-text">二、LoRA 到底在近似什么</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E5%85%A8%E9%87%8F%E5%BE%AE%E8%B0%83%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="toc-text">2.1 全量微调的代价</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E5%AF%B9%E5%BA%94%E5%88%B0%E9%A1%B9%E7%9B%AE%E4%BB%A3%E7%A0%81"><span class="toc-text">2.2 对应到项目代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%A4%E4%B8%AA%E7%9F%A9%E9%98%B5%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E4%B8%80%E4%B8%AA%E5%B0%8F%E7%9F%A9%E9%98%B5"><span class="toc-text">2.3 为什么是两个矩阵，而不是一个小矩阵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%A0%B4%E5%9D%8F%E5%9F%BA%E5%BA%A7%E6%A8%A1%E5%9E%8B"><span class="toc-text">2.4 初始化为什么不破坏基座模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E9%A1%B9%E7%9B%AE%E9%87%8C%E7%9A%84-LoRA-%E7%A9%B6%E7%AB%9F%E6%8C%82%E5%9C%A8%E5%93%AA%E4%BA%9B%E5%B1%82"><span class="toc-text">三、项目里的 LoRA 究竟挂在哪些层</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81LoRA-%E8%AE%AD%E7%BB%83%E6%97%B6%E5%88%B0%E5%BA%95%E6%9B%B4%E6%96%B0%E4%BB%80%E4%B9%88"><span class="toc-text">四、LoRA 训练时到底更新什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81MoE%EF%BC%9A%E4%BB%8E%E4%B8%80%E4%B8%AA-FFN-%E5%8F%98%E6%88%90%E5%A4%9A%E4%B8%AA%E4%B8%93%E5%AE%B6"><span class="toc-text">五、MoE：从一个 FFN 变成多个专家</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E6%99%AE%E9%80%9A-FFN"><span class="toc-text">5.1 普通 FFN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-MoE-FFN"><span class="toc-text">5.2 MoE FFN</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E4%B8%80%E6%AC%A1-MoE-%E5%89%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%9A%84%E5%AE%8C%E6%95%B4%E6%95%B0%E6%8D%AE%E6%B5%81"><span class="toc-text">六、一次 MoE 前向传播的完整数据流</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-Router-%E6%89%93%E5%88%86"><span class="toc-text">6.1 Router 打分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-Top-K-%E9%80%89%E6%8B%A9"><span class="toc-text">6.2 Top-K 选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E5%88%86%E5%8F%91-token-%E5%B9%B6%E8%81%9A%E5%90%88%E7%BB%93%E6%9E%9C"><span class="toc-text">6.3 分发 token 并聚合结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81MoE-%E7%9A%84%E5%8F%82%E6%95%B0%E9%87%8F%E4%B8%8E%E8%AE%A1%E7%AE%97%E9%87%8F"><span class="toc-text">七、MoE 的参数量与计算量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E9%A1%BB%E6%9C%89-auxiliary-loss"><span class="toc-text">八、为什么必须有 auxiliary loss</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81MoE-%E4%B8%AD%E4%B8%80%E4%B8%AA%E5%AE%B9%E6%98%93%E5%BF%BD%E7%95%A5%E7%9A%84%E5%B7%A5%E7%A8%8B%E7%BB%86%E8%8A%82"><span class="toc-text">九、MoE 中一个容易忽略的工程细节</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E3%80%81LoRA-%E4%B8%8E-MoE-%E8%83%BD%E4%B8%8D%E8%83%BD%E4%B8%80%E8%B5%B7%E7%94%A8"><span class="toc-text">十、LoRA 与 MoE 能不能一起用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E5%9C%A8%E6%9C%AC%E9%A1%B9%E7%9B%AE%E4%B8%AD%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9"><span class="toc-text">十一、在本项目中如何选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E6%9C%80%E5%90%8E%E6%8A%8A%E6%BA%90%E7%A0%81%E5%8E%8B%E7%BC%A9%E6%88%90%E5%9B%9B%E4%B8%AA%E5%85%AC%E5%BC%8F"><span class="toc-text">十二、最后把源码压缩成四个公式</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81LoRA-%E7%9A%84%E7%9B%B4%E8%A7%89%EF%BC%9A%E5%BE%AE%E8%B0%83%E4%B8%8D%E9%9C%80%E8%A6%81%E5%85%A8%E9%83%A8%E6%9D%83%E9%87%8D%E5%8F%82%E4%B8%8E"><span class="toc-text">一、LoRA 的直觉：微调不需要全部权重参与</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E5%85%A8%E5%8F%82%E5%BE%AE%E8%B0%83%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="toc-text">1.1 全参微调的代价</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E4%BD%8E%E7%A7%A9%E5%88%86%E8%A7%A3%EF%BC%9A%E6%8A%8A-%CE%94W-%E6%8B%86%E6%88%90%E4%B8%A4%E4%B8%AA%E7%98%A6%E7%9F%A9%E9%98%B5"><span class="toc-text">1.2 低秩分解：把 ΔW 拆成两个瘦矩阵</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E5%89%8D%E5%90%91%E4%BC%A0%E6%92%AD%E4%B8%8E-Tensor-Shape"><span class="toc-text">1.3 前向传播与 Tensor Shape</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-%E5%88%9D%E5%A7%8B%E5%8C%96%E7%AD%96%E7%95%A5%EF%BC%9A%E4%BF%9D%E8%AF%81%E8%AE%AD%E7%BB%83%E5%BC%80%E5%A7%8B%E6%97%B6-%CE%94W-x3D-0"><span class="toc-text">1.4 初始化策略：保证训练开始时 ΔW &#x3D; 0</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81MiniMind-%E4%B8%AD-LoRA-%E7%9A%84%E7%9C%9F%E5%AE%9E%E5%AE%9E%E7%8E%B0"><span class="toc-text">二、MiniMind 中 LoRA 的真实实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-LoRA-%E6%A8%A1%E5%9D%97%E7%BB%93%E6%9E%84"><span class="toc-text">2.1 LoRA 模块结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-apply-lora-%EF%BC%9A%E5%93%AA%E4%BA%9B%E5%B1%82%E6%8C%82-LoRA"><span class="toc-text">2.2 apply_lora()：哪些层挂 LoRA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E6%A2%AF%E5%BA%A6%E5%8F%AA%E6%B5%81%E5%85%A5-LoRA-%E5%8F%82%E6%95%B0"><span class="toc-text">2.3 梯度只流入 LoRA 参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-%E4%BF%9D%E5%AD%98-x2F-%E5%8A%A0%E8%BD%BD-x2F-%E5%90%88%E5%B9%B6"><span class="toc-text">2.4 保存 &#x2F; 加载 &#x2F; 合并</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-%E6%98%BE%E5%AD%98%E8%8A%82%E7%9C%81%E7%9A%84%E9%87%8F%E5%8C%96"><span class="toc-text">2.5 显存节省的量化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81MoE%EF%BC%9A%E7%A8%80%E7%96%8F%E6%BF%80%E6%B4%BB%E6%8D%A2%E5%8F%96%E6%9B%B4%E5%A4%A7%E5%AE%B9%E9%87%8F"><span class="toc-text">三、MoE：稀疏激活换取更大容量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-MoE"><span class="toc-text">3.1 为什么需要 MoE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-Router-%E8%B7%AF%E7%94%B1%E6%9C%BA%E5%88%B6"><span class="toc-text">3.2 Router 路由机制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81MiniMind-%E4%B8%AD-MoE-%E7%9A%84%E7%9C%9F%E5%AE%9E%E5%AE%9E%E7%8E%B0"><span class="toc-text">四、MiniMind 中 MoE 的真实实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E6%99%AE%E9%80%9A-FFN%EF%BC%88%E5%AF%B9%E7%85%A7%E7%BB%84%EF%BC%89"><span class="toc-text">4.1 普通 FFN（对照组）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-MoE-FFN"><span class="toc-text">4.2 MoE FFN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4-MoE-%E5%89%8D%E5%90%91"><span class="toc-text">4.3 一次完整 MoE 前向</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E4%B8%80%E4%B8%AA%E5%AE%B9%E6%98%93%E5%BF%BD%E7%95%A5%E7%9A%84%E5%B7%A5%E7%A8%8B%E7%BB%86%E8%8A%82"><span class="toc-text">4.4 一个容易忽略的工程细节</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E9%A1%BB%E6%9C%89-auxiliary-loss"><span class="toc-text">五、负载均衡：为什么必须有 auxiliary loss</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E8%B7%AF%E7%94%B1%E5%B4%A9%E5%A1%8C%E9%97%AE%E9%A2%98"><span class="toc-text">5.1 路由崩塌问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E8%BE%85%E5%8A%A9%E5%9D%87%E8%A1%A1%E6%8D%9F%E5%A4%B1"><span class="toc-text">5.2 辅助均衡损失</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81LoRA-%E4%B8%8E-MoE-%E7%9A%84%E7%BB%84%E5%90%88"><span class="toc-text">六、LoRA 与 MoE 的组合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%AE%9E%E7%94%A8%E9%80%89%E6%8B%A9%E6%8C%87%E5%8D%97"><span class="toc-text">七、实用选择指南</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E5%9B%9B%E4%B8%AA%E5%85%AC%E5%BC%8F%E5%8E%8B%E7%BC%A9%E5%85%A8%E6%96%87"><span class="toc-text">八、四个公式压缩全文</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="toc-text">参考文献</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
 </div></aside><div class='float-panel'>
   <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>

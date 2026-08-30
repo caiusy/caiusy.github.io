@@ -12,7 +12,7 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-08-30T14:39:38.481Z</updated>
+  <updated>2026-08-30T15:33:57.995Z</updated>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -26,9 +26,9 @@
     <id>https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/</id>
     <link href="https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"/>
     <published>2026-08-30T12:00:00.000Z</published>
-    <summary>从 MiniMind 的真实实现出发，拆解 LoRA 的低秩适配、MoE 的路由与专家选择、辅助损失、张量形状、训练保存合并，以及两者组合时的工程细节。</summary>
+    <summary>从直觉到公式，从公式到 Tensor Shape，从 Shape 到 MiniMind 真实代码—— 彻底搞懂 LoRA 低秩适配与 MoE 混合专家的工作原理、工程实现和设计取舍。</summary>
     <title>结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</title>
-    <updated>2026-08-30T14:39:38.481Z</updated>
+    <updated>2026-08-30T15:33:57.995Z</updated>
   </entry>
   <entry>
     <author>
@@ -62,10 +62,10 @@
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
     <category term="CISPO" scheme="https://caiusy.github.io/tags/CISPO/"/>
     <category term="RLHF" scheme="https://caiusy.github.io/tags/RLHF/"/>
-    <category term="Group-Relative-Policy-Optimization" scheme="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/"/>
     <category term="Reference-Model" scheme="https://caiusy.github.io/tags/Reference-Model/"/>
     <category term="GPU" scheme="https://caiusy.github.io/tags/GPU/"/>
     <category term="LLM-Alignment" scheme="https://caiusy.github.io/tags/LLM-Alignment/"/>
+    <category term="Group-Relative-Policy-Optimization" scheme="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/"/>
     <id>https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/</id>
     <link href="https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"/>
     <published>2026-08-03T13:35:00.000Z</published>
@@ -82,11 +82,11 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
     <category term="RLHF" scheme="https://caiusy.github.io/tags/RLHF/"/>
+    <category term="Actor-Critic" scheme="https://caiusy.github.io/tags/Actor-Critic/"/>
+    <category term="GAE" scheme="https://caiusy.github.io/tags/GAE/"/>
     <category term="Reference-Model" scheme="https://caiusy.github.io/tags/Reference-Model/"/>
     <category term="GPU" scheme="https://caiusy.github.io/tags/GPU/"/>
     <category term="LLM-Alignment" scheme="https://caiusy.github.io/tags/LLM-Alignment/"/>
-    <category term="Actor-Critic" scheme="https://caiusy.github.io/tags/Actor-Critic/"/>
-    <category term="GAE" scheme="https://caiusy.github.io/tags/GAE/"/>
     <id>https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/</id>
     <link href="https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/"/>
     <published>2026-08-01T15:19:00.000Z</published>
@@ -125,10 +125,10 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
+    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
     <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
-    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <id>https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/</id>
     <link href="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"/>
     <published>2026-07-23T12:30:00.000Z</published>
@@ -202,8 +202,8 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/categories/LeetCode/"/>
-    <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
     <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
+    <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
     <category term="Hard" scheme="https://caiusy.github.io/tags/Hard/"/>
     <category term="数组" scheme="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/"/>
     <id>https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/</id>
@@ -592,8 +592,8 @@
     </author>
     <category term="工程实践" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
     <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
+    <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
     <category term="工具" scheme="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/"/>
     <id>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</id>
     <link href="https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/"/>
@@ -622,12 +622,11 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-array-string/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-array-string/"/>
+    <id>https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/</id>
+    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/"/>
     <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之数组与字符串专题，含图解、代码模板、记忆口诀</summary>
-    <title>📚 LeetCode 150 - 数组与字符串专题</title>
+    <summary>LeetCode 面试 150 题之回溯算法专题，含决策树图解、代码模板、记忆口诀</summary>
+    <title>🔢 LeetCode 150 - 回溯算法专题</title>
     <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
 </feed>

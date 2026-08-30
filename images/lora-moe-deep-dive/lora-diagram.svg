@@ -1,12 +1,164 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
-<rect width="1200" height="520" fill="#101827"/><style>text{font-family:Arial,"PingFang SC",sans-serif;fill:#e5eefb} .box{fill:#1f3150;stroke:#61dafb;stroke-width:2;rx:14} .green{fill:#164b43;stroke:#63e6be} .orange{fill:#52351b;stroke:#ffb86c}</style>
-<text x="60" y="55" font-size="30" font-weight="bold">LoRA：原始 Linear + 低秩旁路</text>
-<rect class="box" x="60" y="150" width="190" height="90"/><text x="112" y="204" font-size="25">输入 x</text>
-<rect class="box" x="350" y="90" width="230" height="90"/><text x="414" y="145" font-size="23">原始 W x</text>
-<rect class="green" x="350" y="270" width="230" height="90"/><text x="410" y="325" font-size="23">B(A(x))</text>
-<rect class="orange" x="760" y="180" width="220" height="90"/><text x="818" y="235" font-size="25">相加</text>
-<rect class="box" x="1030" y="180" width="120" height="90"/><text x="1062" y="235" font-size="25">y</text>
-<path d="M250 195H350M250 195C290 195 290 315 350 315M580 135H760M580 315C660 315 660 225 760 225M980 225H1030" fill="none" stroke="#d9e6f5" stroke-width="3" marker-end="url(#a)"/>
-<text x="350" y="420" font-size="21" fill="#9fb3cc">A: hidden → rank，B: rank → hidden</text>
-<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#d9e6f5"/></marker></defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500" style="font-family:Inter,Segoe UI,sans-serif;">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+    <linearGradient id="frozenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="aGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0e7490"/>
+      <stop offset="100%" stop-color="#155e75"/>
+    </linearGradient>
+    <linearGradient id="bGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#92400e"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+    <filter id="glow-blue">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-cyan">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#22d3ee"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#34d399"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="500" fill="url(#bg)" rx="12"/>
+
+  <!-- Grid lines subtle -->
+  <g opacity="0.04" stroke="#94a3b8" stroke-width="1">
+    <line x1="0" y1="100" x2="900" y2="100"/>
+    <line x1="0" y1="200" x2="900" y2="200"/>
+    <line x1="0" y1="300" x2="900" y2="300"/>
+    <line x1="0" y1="400" x2="900" y2="400"/>
+    <line x1="150" y1="0" x2="150" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/>
+    <line x1="450" y1="0" x2="450" y2="500"/>
+    <line x1="600" y1="0" x2="600" y2="500"/>
+    <line x1="750" y1="0" x2="750" y2="500"/>
+  </g>
+
+  <!-- Title -->
+  <text x="450" y="42" text-anchor="middle" font-size="22" font-weight="700" fill="url(#titleGrad)">LoRA: Low-Rank Adaptation</text>
+  <text x="450" y="64" text-anchor="middle" font-size="13" fill="#64748b">只训练 0.1%~1% 参数，实现接近全参微调的效果</text>
+
+  <!-- INPUT BOX -->
+  <rect x="30" y="200" width="110" height="56" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" filter="url(#glow-blue)"/>
+  <text x="85" y="224" text-anchor="middle" font-size="13" font-weight="600" fill="#38bdf8">输入 x</text>
+  <text x="85" y="244" text-anchor="middle" font-size="11" fill="#7dd3fc">[B, T, k]</text>
+  <text x="85" y="260" text-anchor="middle" font-size="10" fill="#475569">k = 512</text>
+
+  <!-- ARROW x → W0 -->
+  <line x1="140" y1="228" x2="225" y2="200" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+
+  <!-- FROZEN W0 BOX -->
+  <rect x="228" y="110" width="160" height="160" rx="10" fill="url(#frozenGrad)" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="308" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#94a3b8">W₀</text>
+  <text x="308" y="188" text-anchor="middle" font-size="11" fill="#64748b">d × k</text>
+  <text x="308" y="206" text-anchor="middle" font-size="11" fill="#64748b">Pre-trained</text>
+  <text x="308" y="224" text-anchor="middle" font-size="20">❄️</text>
+  <text x="308" y="254" text-anchor="middle" font-size="10" fill="#475569">requires_grad=False</text>
+
+  <!-- ARROW x → A (fork down) -->
+  <line x1="140" y1="240" x2="225" y2="330" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrowCyan)"/>
+
+  <!-- A MATRIX BOX (thin = low rank) -->
+  <rect x="228" y="300" width="60" height="90" rx="8" fill="url(#aGrad)" stroke="#22d3ee" stroke-width="1.5" filter="url(#glow-cyan)"/>
+  <text x="258" y="338" text-anchor="middle" font-size="13" font-weight="700" fill="#67e8f9">A</text>
+  <text x="258" y="355" text-anchor="middle" font-size="10" fill="#a5f3fc">r × k</text>
+  <text x="258" y="372" text-anchor="middle" font-size="10" fill="#a5f3fc">r = 8</text>
+
+  <!-- Label: Kaiming init -->
+  <text x="258" y="408" text-anchor="middle" font-size="9" fill="#0891b2">Kaiming init</text>
+
+  <!-- ARROW A → B -->
+  <line x1="288" y1="345" x2="350" y2="345" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrowCyan)"/>
+  <text x="318" y="332" text-anchor="middle" font-size="9" fill="#22d3ee">[B,T,r]</text>
+
+  <!-- B MATRIX BOX (tall = output dim) -->
+  <rect x="352" y="290" width="60" height="110" rx="8" fill="url(#bGrad)" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="382" y="335" text-anchor="middle" font-size="13" font-weight="700" fill="#fcd34d">B</text>
+  <text x="382" y="352" text-anchor="middle" font-size="10" fill="#fde68a">d × r</text>
+  <text x="382" y="369" text-anchor="middle" font-size="10" fill="#fde68a">r = 8</text>
+  <!-- Label: Zero init -->
+  <text x="382" y="416" text-anchor="middle" font-size="9" fill="#d97706">Zero init</text>
+
+  <!-- ARROW B → sum -->
+  <line x1="412" y1="345" x2="545" y2="310" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrowAmber)"/>
+  <text x="478" y="342" text-anchor="middle" font-size="9" fill="#f59e0b">[B,T,d]</text>
+
+  <!-- ARROW W0 output → sum -->
+  <line x1="388" y1="190" x2="545" y2="270" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="465" y="218" text-anchor="middle" font-size="9" fill="#94a3b8">[B,T,d]</text>
+
+  <!-- PLUS SUM CIRCLE -->
+  <circle cx="558" cy="290" r="22" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
+  <text x="558" y="296" text-anchor="middle" font-size="20" font-weight="700" fill="#34d399">+</text>
+
+  <!-- Scale factor annotation -->
+  <rect x="460" y="360" width="130" height="40" rx="6" fill="#0a0f1a" stroke="#6366f1" stroke-width="1"/>
+  <text x="525" y="376" text-anchor="middle" font-size="10" fill="#a5b4fc">缩放因子 α/r</text>
+  <text x="525" y="392" text-anchor="middle" font-size="10" fill="#818cf8">α=16, r=8 → ×2.0</text>
+
+  <!-- OUTPUT BOX -->
+  <rect x="615" y="258" width="120" height="64" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5" filter="url(#glow-cyan)"/>
+  <text x="675" y="283" text-anchor="middle" font-size="13" font-weight="600" fill="#34d399">输出 h</text>
+  <text x="675" y="300" text-anchor="middle" font-size="11" fill="#6ee7b7">[B, T, d]</text>
+  <text x="675" y="315" text-anchor="middle" font-size="10" fill="#475569">d = 512</text>
+
+  <!-- Arrow sum → output -->
+  <line x1="580" y1="290" x2="614" y2="290" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+
+  <!-- Formula box -->
+  <rect x="700" y="100" width="180" height="90" rx="8" fill="#0a0f1a" stroke="#6366f1" stroke-width="1.2"/>
+  <text x="790" y="124" text-anchor="middle" font-size="11" font-weight="600" fill="#a5b4fc">前向公式</text>
+  <text x="790" y="146" text-anchor="middle" font-size="12" fill="#e2e8f0">h = W₀x + BAx</text>
+  <text x="790" y="165" text-anchor="middle" font-size="11" fill="#94a3b8">ΔW = BA</text>
+  <text x="790" y="182" text-anchor="middle" font-size="10" fill="#64748b">rank(ΔW) = r ≪ min(d,k)</text>
+
+  <!-- Param compare box -->
+  <rect x="700" y="210" width="180" height="110" rx="8" fill="#0a0f1a" stroke="#22c55e" stroke-width="1.2"/>
+  <text x="790" y="232" text-anchor="middle" font-size="11" font-weight="600" fill="#86efac">参数量对比</text>
+  <text x="790" y="252" text-anchor="middle" font-size="10" fill="#94a3b8">全量 ΔW: 4096×4096</text>
+  <text x="790" y="268" text-anchor="middle" font-size="10" fill="#ef4444">= 16,777,216</text>
+  <text x="790" y="288" text-anchor="middle" font-size="10" fill="#94a3b8">LoRA A+B: 2×4096×8</text>
+  <text x="790" y="304" text-anchor="middle" font-size="10" fill="#22c55e">= 65,536  (256× 压缩)</text>
+
+  <!-- Merge annotation -->
+  <rect x="700" y="340" width="180" height="56" rx="8" fill="#0a0f1a" stroke="#f59e0b" stroke-width="1"/>
+  <text x="790" y="362" text-anchor="middle" font-size="11" font-weight="600" fill="#fcd34d">推理时合并</text>
+  <text x="790" y="380" text-anchor="middle" font-size="10" fill="#94a3b8">W' = W₀ + (α/r)·BA</text>
+  <text x="790" y="396" text-anchor="middle" font-size="10" fill="#f59e0b">零额外推理开销 ✓</text>
+
+  <!-- Legend -->
+  <rect x="30" y="420" width="370" height="60" rx="6" fill="#0a0f1a" stroke="#1e293b" stroke-width="1"/>
+  <text x="215" y="440" text-anchor="middle" font-size="11" font-weight="600" fill="#94a3b8">图例</text>
+  <rect x="50" y="450" width="14" height="10" rx="2" fill="#1e293b" stroke="#475569" stroke-dasharray="4,2"/>
+  <text x="72" y="460" font-size="10" fill="#64748b">冻结权重 W₀</text>
+  <rect x="150" y="450" width="14" height="10" rx="2" fill="#0e7490" stroke="#22d3ee"/>
+  <text x="172" y="460" font-size="10" fill="#22d3ee">低秩矩阵 A</text>
+  <rect x="250" y="450" width="14" height="10" rx="2" fill="#92400e" stroke="#f59e0b"/>
+  <text x="272" y="460" font-size="10" fill="#f59e0b">低秩矩阵 B</text>
+  <circle cx="358" cy="455" r="6" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+  <text x="370" y="459" font-size="10" fill="#34d399">加法融合</text>
 </svg>

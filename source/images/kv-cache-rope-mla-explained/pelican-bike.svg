@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 350" role="img" aria-labelledby="title desc">
+<title id="title">鹈鹕骑车，慢慢读懂注意力</title><desc id="desc">一只白色鹈鹕骑着墨绿色自行车，车轮和脚踏持续旋转，围巾随风摆动。</desc>
+<style>
+.wheel{animation:spin 2s linear infinite;transform-box:fill-box;transform-origin:center}.rider{animation:bob 1s ease-in-out infinite}.scarf{animation:flutter .65s ease-in-out infinite;transform-origin:535px 125px}.road{animation:road 2s linear infinite}.crank{animation:spin 2s linear infinite;transform-origin:510px 257px}.leg{animation:pedal 2s ease-in-out infinite;transform-origin:500px 205px}@keyframes spin{to{transform:rotate(360deg)}}@keyframes bob{50%{transform:translateY(-3px)}}@keyframes flutter{50%{transform:rotate(-7deg)}}@keyframes road{to{transform:translateX(-110px)}}@keyframes pedal{50%{transform:rotate(-17deg)}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+<defs><clipPath id="clip"><rect x="35" y="20" width="930" height="315" rx="18"/></clipPath></defs>
+<rect width="1000" height="350" rx="16" fill="#edf1e6"/>
+<g clip-path="url(#clip)"><circle cx="803" cy="87" r="35" fill="#e5cb9e"/><path d="M50 283Q150 190 270 283Q360 234 430 283M660 283Q795 202 955 283" fill="none" stroke="#d5dfcc" stroke-width="2"/>
+<g stroke="#a8bd9f" stroke-width="2" class="road"><path d="M100 316h45m65 0h45m65 0h45m65 0h45m65 0h45m65 0h45m65 0h45m65 0h45m65 0h45"/></g>
+<ellipse cx="523" cy="310" rx="195" ry="7" fill="#dce4d5"/>
+<g fill="none" stroke="#284f42"><g class="wheel"><circle cx="400" cy="257" r="51" stroke-width="6"/><circle cx="400" cy="257" r="43" stroke="#afc1aa"/><path d="M400 208v98m-49-49h98m-84-35 70 70m-70 0 70-70" stroke-width="1.5"/></g><g class="wheel"><circle cx="638" cy="257" r="51" stroke-width="6"/><circle cx="638" cy="257" r="43" stroke="#afc1aa"/><path d="M638 208v98m-49-49h98m-84-35 70 70m-70 0 70-70" stroke-width="1.5"/></g>
+<path d="M400 257L459 179 510 257H400M459 179H606L510 257M638 257L599 156 622 150" stroke="#427f60" stroke-width="6" stroke-linejoin="round"/><path d="M459 179l-9-24m-18 0h43M620 150h15" stroke-width="7" stroke-linecap="round"/></g>
+<g class="rider"><path d="M434 171l-32-25 43 6" fill="#fbfaf0" stroke="#789184" stroke-width="2"/>
+<path d="M440 156C427 127 449 109 479 116C495 120 510 134 524 123C538 112 526 75 545 59C560 47 581 54 585 69C590 86 576 91 571 111C567 132 577 151 555 171C530 193 464 190 440 156Z" fill="#fffdf2" stroke="#789184" stroke-width="2.5"/>
+<path d="M578 75L671 86Q645 92 576 91Z" fill="#d5a153" stroke="#ae793a" stroke-width="2"/><path d="M577 90L655 89Q605 123 577 90" fill="#ead0a1" stroke="#ae793a" stroke-width="1.5"/>
+<circle cx="573" cy="69" r="3.5" fill="#183b36"/><circle cx="574" cy="68" r="1" fill="white"/>
+<path d="M550 112Q562 115 571 114L570 123Q557 125 546 120Z" fill="#c18448"/><path class="scarf" d="M550 119Q522 119 509 99L498 104Q515 133 549 126" fill="#c18448"/>
+<path d="M474 138Q495 159 544 154L601 164" fill="none" stroke="#879d8b" stroke-width="8" stroke-linecap="round"/><path d="M484 156Q502 177 525 169" fill="none" stroke="#d5ddcd" stroke-width="2"/>
+<path class="leg" d="M500 180L480 216 523 246" fill="none" stroke="#c8954f" stroke-width="8" stroke-linecap="round"/>
+</g><g class="crank" stroke="#315d47" stroke-width="4"><circle cx="510" cy="257" r="10" fill="#f7f3e7"/><path d="M493 239L527 275"/><path d="M483 239h20m14 36h20" stroke-width="6"/></g>
+<g fill="none" stroke="#b0c1a8" stroke-width="2" stroke-linecap="round"><path d="M354 117h44M325 131h52M354 145h24"/></g>
+</g><g fill="#526e5d" font-family="PingFang SC,Microsoft YaHei,sans-serif"><text x="42" y="49" font-size="11" letter-spacing="3">A LITTLE RIDE / 阅读间歇</text><text x="42" y="79" font-size="19">慢慢骑，也慢慢想明白。</text></g>
+</svg>

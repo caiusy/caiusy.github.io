@@ -221,8 +221,8 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/categories/LeetCode/"/>
-    <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
     <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
+    <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
     <category term="Hard" scheme="https://caiusy.github.io/tags/Hard/"/>
     <category term="数组" scheme="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/"/>
     <id>https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/</id>
@@ -611,8 +611,8 @@
     </author>
     <category term="工程实践" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
     <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
+    <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
     <category term="工具" scheme="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/"/>
     <id>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</id>
     <link href="https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/"/>

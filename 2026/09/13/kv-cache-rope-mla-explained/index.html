@@ -449,7 +449,9 @@ $$
 <h3 id="带-RoPE-的-Key-能缓存吗"><a href="#带-RoPE-的-Key-能缓存吗" class="headerlink" title="带 RoPE 的 Key 能缓存吗"></a>带 RoPE 的 Key 能缓存吗</h3><p>可以。位置 j 固定，k_j 固定，R(jθ) 也固定，所以旋转后的 Key 固定。</p>
 <p>普通 RoPE 注意力可以缓存旋转后的 Key 与未显式旋转的 Value。下一步只旋转当前新 Query 和新 Key。</p>
 <p>别把 MLA 里的旋转与压缩矛盾，误解成 RoPE 导致 Key 无法缓存。<strong>普通 KV 缓存完全可以和 RoPE 配合；麻烦发生在希望只存潜变量，同时避免展开历史 Key 的那条计算路径上。</strong></p>
-<h2 id="09-·-MLA-第一层想法：K、V-共用一份潜变量"><a href="#09-·-MLA-第一层想法：K、V-共用一份潜变量" class="headerlink" title="09 · MLA 第一层想法：K、V 共用一份潜变量"></a>09 · MLA 第一层想法：K、V 共用一份潜变量</h2><p>暂时拿掉 RoPE，先理解低秩结构。</p>
+<h2 id="09-·-MLA-第一层想法：K、V-共用一份潜变量"><a href="#09-·-MLA-第一层想法：K、V-共用一份潜变量" class="headerlink" title="09 · MLA 第一层想法：K、V 共用一份潜变量"></a>09 · MLA 第一层想法：K、V 共用一份潜变量</h2><p><img src="/images/kv-cache-rope-mla-explained/kv-cache-vs-mla-original.png" alt="原始讲解图：标准 KV Cache 与 MLA 压缩缓存的计算路径对比"></p>
+<p>上图把两种缓存路径放在同一画面里：上半部分保存每个历史 token 展开后的 K、V；下半部分保存联合压缩后的 c^KV，再通过固定上投影恢复内容 Key 与 Value。右侧三行等式正是在说明，Key 上投影可以从历史侧移到当前 Query 一侧完成等价计算。</p>
+<p>暂时拿掉 RoPE，先理解低秩结构。</p>
 <p>假设当前状态是 h_t，先用一个降维矩阵产生较小的向量：</p>
 
 $$
@@ -629,7 +631,9 @@ $$
 <p>不能因为 R 是旋转矩阵就随意移过任意 W。除非对投影与旋转施加额外特殊结构，否则一般不成立。</p>
 <h3 id="这不是一个绝对的不可能性结论"><a href="#这不是一个绝对的不可能性结论" class="headerlink" title="这不是一个绝对的不可能性结论"></a>这不是一个绝对的不可能性结论</h3><p>仍然可以展开并旋转所有历史 Key；也可以缓存展开后的旋转 Key；或者设计其他带约束的架构。问题在于前者增加展开代价，后者丢掉主要缓存收益，而它们都不再是刚才那条简单高效的潜空间矩阵乘路径。</p>
 <p>MLA 的解耦设计是在这些约束下选择了一条清晰的计算路线。</p>
-<h2 id="13-·-MLA-的第二层想法：把内容匹配与位置匹配分开"><a href="#13-·-MLA-的第二层想法：把内容匹配与位置匹配分开" class="headerlink" title="13 · MLA 的第二层想法：把内容匹配与位置匹配分开"></a>13 · MLA 的第二层想法：把内容匹配与位置匹配分开</h2><p>现在写出完整的两条分支。对第 i 个头：</p>
+<h2 id="13-·-MLA-的第二层想法：把内容匹配与位置匹配分开"><a href="#13-·-MLA-的第二层想法：把内容匹配与位置匹配分开" class="headerlink" title="13 · MLA 的第二层想法：把内容匹配与位置匹配分开"></a>13 · MLA 的第二层想法：把内容匹配与位置匹配分开</h2><p><img src="/images/kv-cache-rope-mla-explained/mla-decoupled-rope-original.png" alt="原始 MLA 架构图：内容 Query、解耦 RoPE、压缩 KV 与推理缓存"></p>
+<p>这张原始结构图中的阴影圆表示推理期间需要跨步缓存的量。沿着箭头读，真正留下的是内容潜变量 c_t^KV 与旋转后的位置 Key k_t^R；左侧的 c_t^Q、q_t,i^C 和 q_t,i^R 都只服务于当前查询，因此不会形成随上下文增长的历史 Query 缓存。</p>
+<p>现在写出完整的两条分支。对第 i 个头：</p>
 
 $$
 q_{t,i}=[q_{t,i}^{C},q_{t,i}^{R}],\qquad

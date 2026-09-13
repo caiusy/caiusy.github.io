@@ -28,8 +28,8 @@
 <meta property="og:description" content="CAIUS &#x2F; 深度学习手记ATTENTION, EXPLAINED · 2026.09THE MECHANICS OF MEMORY &#x2F; 01从 KV 缓存到 MLA为什么记住 K 和 V，却让 Q 离开？沿着一次查询，把缓存、旋转与潜空间算到底。约 8,000 字中文正文 · 20 个章节 · 3 组交互动画逐步数值推导 &#x2F; 可复现 Python &#x2F; 本地公式渲染↓ Markdown 原文↓">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
-<meta property="article:published_time" content="2026-09-13T04:15:10.538Z">
-<meta property="article:modified_time" content="2026-09-13T04:07:23.490Z">
+<meta property="article:published_time" content="2026-09-13T07:10:01.577Z">
+<meta property="article:modified_time" content="2026-09-13T07:10:01.577Z">
 <meta property="article:author" content="Caius Lu">
 <meta property="article:tag" content="BEV Perception, Roadside Perception, Radar-Camera Fusion, Camera Geometry, Homography, Multimodal AI, LLaVA, CLIP, LoRA, Computer Vision">
 <meta name="twitter:card" content="summary">
@@ -96,7 +96,7 @@
   <span class="sep"></span>
   <a class="cap breadcrumb" href="/images/kv-cache-rope-mla-explained/interactive/"></a>
   </div>
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-09-13T04:15:10.538Z">2026-09-13</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-09-13T04:07:23.490Z">2026-09-13</time></span></div></div></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-09-13T07:10:01.577Z">2026-09-13</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-09-13T07:10:01.577Z">2026-09-13</time></span></div></div></div>
     
   </div>
   </div><article class="md-text content slide-up"><div class="progress"></div><div class="mast"><span>CAIUS / 深度学习手记</span><span>ATTENTION, EXPLAINED · 2026.09</span></div><header class="hero"><div><div class="eyebrow">THE MECHANICS OF MEMORY / 01</div><h1>从 KV 缓存<br>到 <em>MLA</em></h1><p>为什么记住 K 和 V，却让 Q 离开？<br>沿着一次查询，把缓存、旋转与潜空间算到底。</p><div class="meta">约 8,000 字中文正文 · 20 个章节 · 3 组交互动画<br>逐步数值推导 / 可复现 Python / 本地公式渲染</div><div class="download"><a href="从KV缓存到MLA.md" download="">↓ Markdown 原文</a><a href="verify.py" download="">↓ 数值校验脚本</a><a href="#lab-kv">进入动画实验 →</a></div></div><div class="hero-art"><svg viewBox="0 0 430 300" role="img" aria-label="当前查询穿过时间，读取持续保留的两条缓存"><g fill="none" stroke="#b6c9b8"><path d="M45 90H395M45 150H395M45 210H395"></path><path d="M95 65V235M175 65V235M255 65V235M335 65V235" stroke-dasharray="3 6"></path></g><g fill="#d2e1d0" stroke="#789a7f"><rect x="75" y="131" width="40" height="38" rx="7"></rect><rect x="155" y="131" width="40" height="38" rx="7"></rect><rect x="235" y="131" width="40" height="38" rx="7"></rect><rect x="75" y="191" width="40" height="38" rx="7"></rect><rect x="155" y="191" width="40" height="38" rx="7"></rect><rect x="235" y="191" width="40" height="38" rx="7"></rect></g><g fill="#ecd0a8" stroke="#b7834a"><circle cx="335" cy="90" r="23"></circle><rect x="315" y="131" width="40" height="38" rx="7"></rect><rect x="315" y="191" width="40" height="38" rx="7"></rect></g><g fill="#315a46" font-family="Georgia,serif" font-size="19"><text x="14" y="96">Q</text><text x="14" y="157">K</text><text x="14" y="217">V</text></g><g font-family="Menlo,monospace" font-size="11" fill="#748376"><text x="78" y="262">t−3</text><text x="158" y="262">t−2</text><text x="238" y="262">t−1</text><text x="330" y="262">t</text><text x="40" y="25">A QUERY PASSES. MEMORY STAYS.</text></g></svg></div></header><div class="layout"><aside><strong>阅读路线 / CONTENTS</strong><nav><a href="#s-8400450">01 · 先限定讨论范围，避免把不同阶段混在一起</a><a href="#s-5855905">02 · Q、K、V 是同一个位置的三种工作接口</a><a href="#s-3379835">03 · 为什么历史 K、V 可以保持不变</a><a href="#s-10481140">04 · 为什么 Q 不缓存：不是不能存，而是未来用不上</a><a href="#s-5952017">05 · 第一组完整数字：缓存后到底怎么算</a><a href="#s-4422876">06 · 有缓存之后，究竟节省了什么</a><a href="#s-2533075">07 · 位置编码为什么进入 Q、K</a><a href="#s-4956477">08 · 从二维旋转，亲手推出相对位置</a><a href="#s-6868381">09 · MLA 第一层想法：K、V 共用一份潜变量</a><a href="#s-8556374">10 · 只缓存 c，却每次展开历史 KV，真的划算吗</a><a href="#s-6034429">11 · Value 也可以不展开，关键在 Softmax 之后</a><a href="#s-9548384">12 · 为什么直接给压缩 Key 加 RoPE，会妨碍这种吸收</a><a href="#s-9906768">13 · MLA 的第二层想法：把内容匹配与位置匹配分开</a><a href="#s-8691550">14 · 到底缓存哪两个东西，为什么不是只存位置编号</a><a href="#s-3021552">15 · 为什么 MLA 连 c^Q 也不缓存</a><a href="#s-12801649">16 · 完整 MLA 数值例子：从缓存到输出，两条路径对答案</a><a href="#s-3888300">17 · 对照你发的两张图逐处阅读</a><a href="#s-5191484">18 · 用尺寸算一遍，缓存能缩到多小</a><a href="#s-2845330">19 · 足够接近实现的伪代码</a><a href="#s-5678249">20 · 用六个问题检查自己是否真的理解</a><a href="#s-236086">动图回放</a><a href="#s-386198">参考与复现</a></nav></aside><article>
@@ -360,6 +360,8 @@ $$</div>
 <p>普通 RoPE 注意力可以缓存旋转后的 Key 与未显式旋转的 Value。下一步只旋转当前新 Query 和新 Key。</p>
 <p>别把 MLA 里的旋转与压缩矛盾，误解成 RoPE 导致 Key 无法缓存。<strong>普通 KV 缓存完全可以和 RoPE 配合；麻烦发生在希望只存潜变量，同时避免展开历史 Key 的那条计算路径上。</strong></p>
 <h2 id="s-6868381">09 · MLA 第一层想法：K、V 共用一份潜变量</h2>
+<p><img alt="原始讲解图：标准 KV Cache 与 MLA 压缩缓存的计算路径对比" src="assets/kv-cache-vs-mla-original.png"></p>
+<p>上图把两种缓存路径放在同一画面里：上半部分保存每个历史 token 展开后的 K、V；下半部分保存联合压缩后的 c^KV，再通过固定上投影恢复内容 Key 与 Value。右侧三行等式正是在说明，Key 上投影可以从历史侧移到当前 Query 一侧完成等价计算。</p>
 <p>暂时拿掉 RoPE，先理解低秩结构。</p>
 <p>假设当前状态是 h_t，先用一个降维矩阵产生较小的向量：</p>
 <div class="equation">$$
@@ -500,6 +502,8 @@ $$</div>
 <p>仍然可以展开并旋转所有历史 Key；也可以缓存展开后的旋转 Key；或者设计其他带约束的架构。问题在于前者增加展开代价，后者丢掉主要缓存收益，而它们都不再是刚才那条简单高效的潜空间矩阵乘路径。</p>
 <p>MLA 的解耦设计是在这些约束下选择了一条清晰的计算路线。</p>
 <h2 id="s-9906768">13 · MLA 的第二层想法：把内容匹配与位置匹配分开</h2>
+<p><img alt="原始 MLA 架构图：内容 Query、解耦 RoPE、压缩 KV 与推理缓存" src="assets/mla-decoupled-rope-original.png"></p>
+<p>这张原始结构图中的阴影圆表示推理期间需要跨步缓存的量。沿着箭头读，真正留下的是内容潜变量 c_t^KV 与旋转后的位置 Key k_t^R；左侧的 c_t^Q、q_t,i^C 和 q_t,i^R 都只服务于当前查询，因此不会形成随上下文增长的历史 Query 缓存。</p>
 <p>现在写出完整的两条分支。对第 i 个头：</p>
 <div class="equation">$$
 q_{t,i}=[q_{t,i}^{C},q_{t,i}^{R}],\qquad

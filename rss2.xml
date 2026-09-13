@@ -8,9 +8,24 @@
     </description>
     <language>zh-CN</language>
     <copyright>All rights reserved 2026, Caius Lu</copyright>
-    <lastBuildDate>Sun, 30 Aug 2026 15:33:57 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 13 Sep 2026 04:30:00 GMT</lastBuildDate>
     <generator>Hexo</generator>
     <atom:link href="https://caiusy.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>从 KV 缓存到 MLA：把每一步都算清楚</title>
+      <link>https://caiusy.github.io/2026/09/13/kv-cache-rope-mla-explained/</link>
+      <description>为什么缓存 K 和 V，却不缓存 Q；RoPE 为什么作用在 Q、K；MLA 如何只缓存压缩内容和位置 Key。用完整数值例子逐步推导。</description>
+      <author>Caius Lu</author>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
+      <category domain="https://caiusy.github.io/tags/Attention/">Attention</category>
+      <category domain="https://caiusy.github.io/tags/KV-Cache/">KV-Cache</category>
+      <category domain="https://caiusy.github.io/tags/RoPE/">RoPE</category>
+      <category domain="https://caiusy.github.io/tags/MLA/">MLA</category>
+      <category domain="https://caiusy.github.io/tags/DeepSeek/">DeepSeek</category>
+      <pubDate>Sun, 13 Sep 2026 04:30:00 GMT</pubDate>
+    </item>
     <item>
       <title>结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</title>
       <link>https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/</link>
@@ -53,10 +68,10 @@
       <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
       <category domain="https://caiusy.github.io/tags/CISPO/">CISPO</category>
       <category domain="https://caiusy.github.io/tags/RLHF/">RLHF</category>
+      <category domain="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/">Group-Relative-Policy-Optimization</category>
       <category domain="https://caiusy.github.io/tags/Reference-Model/">Reference-Model</category>
       <category domain="https://caiusy.github.io/tags/GPU/">GPU</category>
       <category domain="https://caiusy.github.io/tags/LLM-Alignment/">LLM-Alignment</category>
-      <category domain="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/">Group-Relative-Policy-Optimization</category>
       <pubDate>Mon, 03 Aug 2026 13:35:00 GMT</pubDate>
     </item>
     <item>
@@ -69,11 +84,11 @@
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
       <category domain="https://caiusy.github.io/tags/RLHF/">RLHF</category>
-      <category domain="https://caiusy.github.io/tags/Actor-Critic/">Actor-Critic</category>
-      <category domain="https://caiusy.github.io/tags/GAE/">GAE</category>
       <category domain="https://caiusy.github.io/tags/Reference-Model/">Reference-Model</category>
       <category domain="https://caiusy.github.io/tags/GPU/">GPU</category>
       <category domain="https://caiusy.github.io/tags/LLM-Alignment/">LLM-Alignment</category>
+      <category domain="https://caiusy.github.io/tags/Actor-Critic/">Actor-Critic</category>
+      <category domain="https://caiusy.github.io/tags/GAE/">GAE</category>
       <pubDate>Sat, 01 Aug 2026 15:19:00 GMT</pubDate>
     </item>
     <item>
@@ -167,8 +182,8 @@
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
       <category domain="https://caiusy.github.io/categories/LeetCode/">LeetCode</category>
-      <category domain="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/">双指针</category>
       <category domain="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">动态规划</category>
+      <category domain="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/">双指针</category>
       <category domain="https://caiusy.github.io/tags/Hard/">Hard</category>
       <category domain="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/">数组</category>
       <pubDate>Tue, 10 Mar 2026 06:11:00 GMT</pubDate>
@@ -341,8 +356,8 @@
 </blockquote>]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
+      <category domain="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/">概念笔记</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/Python/">Python</category>
@@ -490,22 +505,10 @@
       <author>Caius Lu</author>
       <category domain="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/">工程实践</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
-      <category domain="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/">工具</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/">工程笔记</category>
+      <category domain="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/">工具</category>
       <category domain="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/">工具</category>
       <pubDate>Sun, 18 Jan 2026 12:04:34 GMT</pubDate>
-    </item>
-    <item>
-      <title>🔢 LeetCode 150 - 回溯算法专题</title>
-      <link>https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/</link>
-      <description>LeetCode 面试 150 题之回溯算法专题，含决策树图解、代码模板、记忆口诀</description>
-      <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/">算法基础</category>
-      <category domain="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/">算法</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
-      <category domain="https://caiusy.github.io/tags/LeetCode/">LeetCode</category>
-      <pubDate>Sat, 17 Jan 2026 16:00:00 GMT</pubDate>
     </item>
   </channel>
 </rss>

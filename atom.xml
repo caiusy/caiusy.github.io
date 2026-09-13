@@ -12,7 +12,26 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-08-30T15:33:57.995Z</updated>
+  <updated>2026-09-13T04:30:00.000Z</updated>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
+    <category term="Attention" scheme="https://caiusy.github.io/tags/Attention/"/>
+    <category term="KV-Cache" scheme="https://caiusy.github.io/tags/KV-Cache/"/>
+    <category term="RoPE" scheme="https://caiusy.github.io/tags/RoPE/"/>
+    <category term="MLA" scheme="https://caiusy.github.io/tags/MLA/"/>
+    <category term="DeepSeek" scheme="https://caiusy.github.io/tags/DeepSeek/"/>
+    <id>https://caiusy.github.io/2026/09/13/kv-cache-rope-mla-explained/</id>
+    <link href="https://caiusy.github.io/2026/09/13/kv-cache-rope-mla-explained/"/>
+    <published>2026-09-13T04:30:00.000Z</published>
+    <summary>为什么缓存 K 和 V，却不缓存 Q；RoPE 为什么作用在 Q、K；MLA 如何只缓存压缩内容和位置 Key。用完整数值例子逐步推导。</summary>
+    <title>从 KV 缓存到 MLA：把每一步都算清楚</title>
+    <updated>2026-09-13T04:30:00.000Z</updated>
+  </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -62,10 +81,10 @@
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
     <category term="CISPO" scheme="https://caiusy.github.io/tags/CISPO/"/>
     <category term="RLHF" scheme="https://caiusy.github.io/tags/RLHF/"/>
+    <category term="Group-Relative-Policy-Optimization" scheme="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/"/>
     <category term="Reference-Model" scheme="https://caiusy.github.io/tags/Reference-Model/"/>
     <category term="GPU" scheme="https://caiusy.github.io/tags/GPU/"/>
     <category term="LLM-Alignment" scheme="https://caiusy.github.io/tags/LLM-Alignment/"/>
-    <category term="Group-Relative-Policy-Optimization" scheme="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/"/>
     <id>https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/</id>
     <link href="https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"/>
     <published>2026-08-03T13:35:00.000Z</published>
@@ -82,11 +101,11 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
     <category term="RLHF" scheme="https://caiusy.github.io/tags/RLHF/"/>
-    <category term="Actor-Critic" scheme="https://caiusy.github.io/tags/Actor-Critic/"/>
-    <category term="GAE" scheme="https://caiusy.github.io/tags/GAE/"/>
     <category term="Reference-Model" scheme="https://caiusy.github.io/tags/Reference-Model/"/>
     <category term="GPU" scheme="https://caiusy.github.io/tags/GPU/"/>
     <category term="LLM-Alignment" scheme="https://caiusy.github.io/tags/LLM-Alignment/"/>
+    <category term="Actor-Critic" scheme="https://caiusy.github.io/tags/Actor-Critic/"/>
+    <category term="GAE" scheme="https://caiusy.github.io/tags/GAE/"/>
     <id>https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/</id>
     <link href="https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/"/>
     <published>2026-08-01T15:19:00.000Z</published>
@@ -202,8 +221,8 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/categories/LeetCode/"/>
-    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
+    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="Hard" scheme="https://caiusy.github.io/tags/Hard/"/>
     <category term="数组" scheme="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/"/>
     <id>https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/</id>
@@ -406,8 +425,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="概念笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>
@@ -592,8 +611,8 @@
     </author>
     <category term="工程实践" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
     <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
+    <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
     <category term="工具" scheme="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/"/>
     <id>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</id>
     <link href="https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/"/>
@@ -612,21 +631,5 @@
     </summary>
     <title>如何使用Hexo写博客</title>
     <updated>2026-05-15T17:03:44.272Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
-    <category term="算法" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
-    <id>https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/</id>
-    <link href="https://caiusy.github.io/2026/01/18/leetcode-150-backtrack/"/>
-    <published>2026-01-17T16:00:00.000Z</published>
-    <summary>LeetCode 面试 150 题之回溯算法专题，含决策树图解、代码模板、记忆口诀</summary>
-    <title>🔢 LeetCode 150 - 回溯算法专题</title>
-    <updated>2026-01-17T16:00:00.000Z</updated>
   </entry>
 </feed>

@@ -8,9 +8,25 @@
     </description>
     <language>zh-CN</language>
     <copyright>All rights reserved 2026, Caius Lu</copyright>
-    <lastBuildDate>Sun, 13 Sep 2026 04:30:00 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 01 Oct 2026 15:23:23 GMT</lastBuildDate>
     <generator>Hexo</generator>
     <atom:link href="https://caiusy.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>从 DeepSeek-V2 到 V4：MoE、注意力与 Loss 的完整演进</title>
+      <link>https://caiusy.github.io/2026/10/01/deepseek-v2-v3-v4-moe-attention-loss/</link>
+      <description>从细粒度专家与 MLA，到无辅助损失负载均衡、MTP、CSA/HCA、mHC、Muon 和 OPD，以九张原创图、公式推导和完整数值例子拆解 DeepSeek V2/V3/V4 的创新与训练目标。</description>
+      <author>Caius Lu</author>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
+      <category domain="https://caiusy.github.io/tags/MoE/">MoE</category>
+      <category domain="https://caiusy.github.io/tags/DeepSeek/">DeepSeek</category>
+      <category domain="https://caiusy.github.io/tags/MLA/">MLA</category>
+      <category domain="https://caiusy.github.io/tags/MTP/">MTP</category>
+      <category domain="https://caiusy.github.io/tags/Sparse-Attention/">Sparse-Attention</category>
+      <category domain="https://caiusy.github.io/tags/%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F/">知识蒸馏</category>
+      <pubDate>Thu, 01 Oct 2026 15:23:23 GMT</pubDate>
+    </item>
     <item>
       <title>从 KV 缓存到 MLA：把每一步都算清楚</title>
       <link>https://caiusy.github.io/2026/09/13/kv-cache-rope-mla-explained/</link>
@@ -20,10 +36,10 @@
       <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <category domain="https://caiusy.github.io/tags/Attention/">Attention</category>
+      <category domain="https://caiusy.github.io/tags/DeepSeek/">DeepSeek</category>
+      <category domain="https://caiusy.github.io/tags/MLA/">MLA</category>
       <category domain="https://caiusy.github.io/tags/KV-Cache/">KV-Cache</category>
       <category domain="https://caiusy.github.io/tags/RoPE/">RoPE</category>
-      <category domain="https://caiusy.github.io/tags/MLA/">MLA</category>
-      <category domain="https://caiusy.github.io/tags/DeepSeek/">DeepSeek</category>
       <pubDate>Sun, 13 Sep 2026 04:30:00 GMT</pubDate>
     </item>
     <item>
@@ -99,12 +115,12 @@
       <category domain="https://caiusy.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://caiusy.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/">工程实践</category>
       <category domain="https://caiusy.github.io/tags/PyTorch/">PyTorch</category>
+      <category domain="https://caiusy.github.io/tags/%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F/">知识蒸馏</category>
       <category domain="https://caiusy.github.io/tags/YOLOv10/">YOLOv10</category>
       <category domain="https://caiusy.github.io/tags/Vehicle-Pose/">Vehicle-Pose</category>
       <category domain="https://caiusy.github.io/tags/%E8%BD%A6%E8%BE%86%E5%85%B3%E9%94%AE%E7%82%B9/">车辆关键点</category>
       <category domain="https://caiusy.github.io/tags/CarFusion/">CarFusion</category>
       <category domain="https://caiusy.github.io/tags/%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9/">模型压缩</category>
-      <category domain="https://caiusy.github.io/tags/%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F/">知识蒸馏</category>
       <pubDate>Sat, 01 Aug 2026 10:30:00 GMT</pubDate>
     </item>
     <item>
@@ -119,10 +135,10 @@
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
       <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
-      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
       <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
+      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <pubDate>Thu, 23 Jul 2026 12:30:00 GMT</pubDate>
     </item>
     <item>
@@ -182,8 +198,8 @@
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">算法笔记</category>
       <category domain="https://caiusy.github.io/categories/LeetCode/">LeetCode</category>
-      <category domain="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/">双指针</category>
       <category domain="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">动态规划</category>
+      <category domain="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/">双指针</category>
       <category domain="https://caiusy.github.io/tags/Hard/">Hard</category>
       <category domain="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/">数组</category>
       <pubDate>Tue, 10 Mar 2026 06:11:00 GMT</pubDate>
@@ -486,29 +502,6 @@
       <category domain="https://caiusy.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://caiusy.github.io/tags/BEV/">BEV</category>
       <pubDate>Sun, 18 Jan 2026 16:36:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>如何使用Hexo写博客</title>
-      <link>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</link>
-      <description>
-        <![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>这是一篇示例文章，演示如何使用 Hexo 写博客。</p>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="1-创建新文章"><a href="#1-创建新文章" class="headerlink" title="1. 创建新文章"></a>1. 创建新文章</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx hexo new <span class="string">"文章标题"</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="2-编辑文章"><a href="#2-编辑文章" class="headerlink" title="2. 编辑文章"></a>2. 编辑文章</h3><p>在 <code>source/_posts/</code> 目录下找到刚创建的 Markdown 文件进行编辑。</p>
-<h3 id="3-本地预览"><a href="#3-本地预览" class="headerlink" title="3. 本地预览"></a>3. 本地预览</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx hexo server</span><br></pre></td></tr></tbody></table></figure>
-
-<p>访问 <a href="http://localhost:4000/">http://localhost:4000</a> 查看效果。</p>
-<h3 id="4-部署"><a href="#4-部署" class="headerlink" title="4. 部署"></a>4. 部署</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx hexo deploy</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>使用 Hexo 写博客非常简单！</p>]]>
-      </description>
-      <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/">工程实践</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
-      <category domain="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/">工具</category>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/">工程笔记</category>
-      <category domain="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/">工具</category>
-      <pubDate>Sun, 18 Jan 2026 12:04:34 GMT</pubDate>
     </item>
   </channel>
 </rss>

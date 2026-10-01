@@ -12,7 +12,27 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-09-13T04:30:00.000Z</updated>
+  <updated>2026-10-01T15:23:23.000Z</updated>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
+    <category term="MoE" scheme="https://caiusy.github.io/tags/MoE/"/>
+    <category term="DeepSeek" scheme="https://caiusy.github.io/tags/DeepSeek/"/>
+    <category term="MLA" scheme="https://caiusy.github.io/tags/MLA/"/>
+    <category term="MTP" scheme="https://caiusy.github.io/tags/MTP/"/>
+    <category term="Sparse-Attention" scheme="https://caiusy.github.io/tags/Sparse-Attention/"/>
+    <category term="知识蒸馏" scheme="https://caiusy.github.io/tags/%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F/"/>
+    <id>https://caiusy.github.io/2026/10/01/deepseek-v2-v3-v4-moe-attention-loss/</id>
+    <link href="https://caiusy.github.io/2026/10/01/deepseek-v2-v3-v4-moe-attention-loss/"/>
+    <published>2026-10-01T15:23:23.000Z</published>
+    <summary>从细粒度专家与 MLA，到无辅助损失负载均衡、MTP、CSA/HCA、mHC、Muon 和 OPD，以九张原创图、公式推导和完整数值例子拆解 DeepSeek V2/V3/V4 的创新与训练目标。</summary>
+    <title>从 DeepSeek-V2 到 V4：MoE、注意力与 Loss 的完整演进</title>
+    <updated>2026-10-01T15:23:23.000Z</updated>
+  </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -21,10 +41,10 @@
     <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="Attention" scheme="https://caiusy.github.io/tags/Attention/"/>
+    <category term="DeepSeek" scheme="https://caiusy.github.io/tags/DeepSeek/"/>
+    <category term="MLA" scheme="https://caiusy.github.io/tags/MLA/"/>
     <category term="KV-Cache" scheme="https://caiusy.github.io/tags/KV-Cache/"/>
     <category term="RoPE" scheme="https://caiusy.github.io/tags/RoPE/"/>
-    <category term="MLA" scheme="https://caiusy.github.io/tags/MLA/"/>
-    <category term="DeepSeek" scheme="https://caiusy.github.io/tags/DeepSeek/"/>
     <id>https://caiusy.github.io/2026/09/13/kv-cache-rope-mla-explained/</id>
     <link href="https://caiusy.github.io/2026/09/13/kv-cache-rope-mla-explained/"/>
     <published>2026-09-13T04:30:00.000Z</published>
@@ -120,12 +140,12 @@
     <category term="计算机视觉" scheme="https://caiusy.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="工程实践" scheme="https://caiusy.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
     <category term="PyTorch" scheme="https://caiusy.github.io/tags/PyTorch/"/>
+    <category term="知识蒸馏" scheme="https://caiusy.github.io/tags/%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F/"/>
     <category term="YOLOv10" scheme="https://caiusy.github.io/tags/YOLOv10/"/>
     <category term="Vehicle-Pose" scheme="https://caiusy.github.io/tags/Vehicle-Pose/"/>
     <category term="车辆关键点" scheme="https://caiusy.github.io/tags/%E8%BD%A6%E8%BE%86%E5%85%B3%E9%94%AE%E7%82%B9/"/>
     <category term="CarFusion" scheme="https://caiusy.github.io/tags/CarFusion/"/>
     <category term="模型压缩" scheme="https://caiusy.github.io/tags/%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9/"/>
-    <category term="知识蒸馏" scheme="https://caiusy.github.io/tags/%E7%9F%A5%E8%AF%86%E8%92%B8%E9%A6%8F/"/>
     <id>https://caiusy.github.io/2026/08/01/yolov10-vehicle-pose-compression/</id>
     <link href="https://caiusy.github.io/2026/08/01/yolov10-vehicle-pose-compression/"/>
     <published>2026-08-01T10:30:00.000Z</published>
@@ -144,10 +164,10 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
-    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
     <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
+    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <id>https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/</id>
     <link href="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"/>
     <published>2026-07-23T12:30:00.000Z</published>
@@ -221,8 +241,8 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/categories/LeetCode/"/>
-    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
+    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="Hard" scheme="https://caiusy.github.io/tags/Hard/"/>
     <category term="数组" scheme="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/"/>
     <id>https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/</id>
@@ -604,32 +624,5 @@
     <summary>详细讲解如何将透视图像转换为鸟瞰图，涵盖从基础概念到完整代码实现，适合所有水平的学习者。</summary>
     <title>从图像到俯视图：完整实现指南</title>
     <updated>2026-01-18T16:36:00.000Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="工程实践" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
-    <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
-    <category term="工具" scheme="https://caiusy.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
-    <category term="工程笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
-    <category term="工具" scheme="https://caiusy.github.io/tags/%E5%B7%A5%E5%85%B7/"/>
-    <id>https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/</id>
-    <link href="https://caiusy.github.io/2026/01/18/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Hexo%E5%86%99%E5%8D%9A%E5%AE%A2/"/>
-    <published>2026-01-18T12:04:34.000Z</published>
-    <summary>
-      <![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>这是一篇示例文章，演示如何使用 Hexo 写博客。</p>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="1-创建新文章"><a href="#1-创建新文章" class="headerlink" title="1. 创建新文章"></a>1. 创建新文章</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx hexo new <span class="string">"文章标题"</span></span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="2-编辑文章"><a href="#2-编辑文章" class="headerlink" title="2. 编辑文章"></a>2. 编辑文章</h3><p>在 <code>source/_posts/</code> 目录下找到刚创建的 Markdown 文件进行编辑。</p>
-<h3 id="3-本地预览"><a href="#3-本地预览" class="headerlink" title="3. 本地预览"></a>3. 本地预览</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx hexo server</span><br></pre></td></tr></tbody></table></figure>
-
-<p>访问 <a href="http://localhost:4000/">http://localhost:4000</a> 查看效果。</p>
-<h3 id="4-部署"><a href="#4-部署" class="headerlink" title="4. 部署"></a>4. 部署</h3><figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx hexo deploy</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>使用 Hexo 写博客非常简单！</p>]]>
-    </summary>
-    <title>如何使用Hexo写博客</title>
-    <updated>2026-05-15T17:03:44.272Z</updated>
   </entry>
 </feed>

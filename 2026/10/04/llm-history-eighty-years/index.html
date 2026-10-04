@@ -1,0 +1,1265 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>大模型发展史：从“会算”到“会聊、会看、会做事”的八十年 - Caius Lu</title>
+
+  
+    <meta name="description" content="从1943年人造神经元到2025年推理模型与Agent，以七幕故事、七张原创图和一张密集时间线，通俗讲清大模型八十年的技术演进。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大模型发展史：从“会算”到“会聊、会看、会做事”的八十年">
+<meta property="og:url" content="https://caiusy.github.io/2026/10/04/llm-history-eighty-years/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="从1943年人造神经元到2025年推理模型与Agent，以七幕故事、七张原创图和一张密集时间线，通俗讲清大模型八十年的技术演进。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-10-04T10:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-04T10:00:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="大模型">
+<meta property="article:tag" content="多模态">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="人工智能史">
+<meta property="article:tag" content="ChatGPT">
+<meta property="article:tag" content="推理模型">
+<meta property="article:tag" content="Agent">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="大模型,多模态,Transformer,人工智能史,ChatGPT,推理模型,Agent">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-10-04T18:00:00+08:00","dateModified":"2026-10-04T18:00:00+08:00","datePublished":"2026-10-04T18:00:00+08:00","description":"\n如果把人工智能想成一个孩子，那么过去八十年，人类一直在尝试回答三个问题：怎样让机器学习？怎样让机器理解语言？怎样让机器按人的意图做事？大语言模型，就是这三条河流汇合后的产物。\n\n这篇文章不要求数学基础。我们会沿着一条连续的时间线，看清神经网络为何两次遇冷、Transformer 为什么改变游戏规则，以及模型怎样从“预测下一个词”走到多模态、推理与 Agent。","headline":"大模型发展史：从“会算”到“会聊、会看、会做事”的八十年","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/10/04/llm-history-eighty-years/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/10/04/llm-history-eighty-years/","keywords":"大模型, 多模态, Transformer, 人工智能史, ChatGPT, 推理模型, Agent","thumbnailUrl":"/images/llm-history-eighty-years/01-timeline-seven-eras.png","image":1}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="guide" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="Home" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:home-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="Projects" href="/projects/" style="color:#10B981"><img src="https://api.iconify.design/solar:rocket-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="BEV" href="/roadside-bev/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:camera-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="Fusion" href="/radar-camera-fusion/" style="color:#EC4899"><img src="https://api.iconify.design/solar:radar-bold-duotone.svg?color=%23EC4899"/></a><a class="nav-item" title="LLM" href="/llm-reading-map/" style="color:#8B5CF6"><img src="https://api.iconify.design/solar:atom-bold-duotone.svg?color=%238B5CF6"/></a><a class="nav-item" title="Notes" href="/notes/" style="color:#0EA5E9"><img src="https://api.iconify.design/solar:notebook-bookmark-bold-duotone.svg?color=%230EA5E9"/></a><a class="nav-item" title="Review" href="/review/" style="color:#F43F5E"><img src="https://api.iconify.design/solar:checklist-minimalistic-bold-duotone.svg?color=%23F43F5E"/></a><a class="nav-item" title="About" href="/about/" style="color:#64748B"><img src="https://api.iconify.design/solar:user-id-bold-duotone.svg?color=%2364748B"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/10/04/llm-history-eighty-years/"><span class="title">大模型发展史：从“会算”到“会聊、会看、会做事”的八十年</span></a><a class="item title" href="/2026/10/01/deepseek-v2-v3-v4-moe-attention-loss/"><span class="title">从 DeepSeek-V2 到 V4：MoE、注意力与 Loss 的完整演进</span></a><a class="item title" href="/2026/09/13/kv-cache-rope-mla-explained/"><span class="title">从 KV 缓存到 MLA：把每一步都算清楚</span></a><a class="item title" href="/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"><span class="title">结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></a><a class="item title" href="/2026/08/25/minimind-to-minimind-v-real-training-source-code/"><span class="title">从 MiniMind 到 MiniMind-V：Pretrain、SFT、视觉 Token 与 Loss 的源码级推导</span></a><a class="item title" href="/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"><span class="title">MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/minimind-ppo-from-rollout-to-loss/"><span class="title">MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/yolov10-vehicle-pose-compression/"><span class="title">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</span></a><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a><a class="item title" href="/2026/07/13/dynamic-programming-from-recursion-to-state-transition/"><span class="title">动态规划完全图解：从重复递归到状态转移</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-10-04T10:00:00.000Z">2026-10-04</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-10-04T10:00:00.000Z">2026-10-04</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>大模型发展史：从“会算”到“会聊、会看、会做事”的八十年</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><blockquote>
+<p>如果把人工智能想成一个孩子，那么过去八十年，人类一直在尝试回答三个问题：怎样让机器学习？怎样让机器理解语言？怎样让机器按人的意图做事？大语言模型，就是这三条河流汇合后的产物。</p>
+</blockquote>
+<p>这篇文章不要求数学基础。我们会沿着一条连续的时间线，看清神经网络为何两次遇冷、Transformer 为什么改变游戏规则，以及模型怎样从“预测下一个词”走到多模态、推理与 Agent。</p>
+<span id="more"></span>
+
+<p><img src="/images/llm-history-eighty-years/01-timeline-seven-eras.png" alt="大模型发展的七个时代"></p>
+<h2 id="先用一句话看懂整段历史"><a href="#先用一句话看懂整段历史" class="headerlink" title="先用一句话看懂整段历史"></a>先用一句话看懂整段历史</h2><p>大模型不是某一天突然从实验室里“蹦”出来的。它经历了这样一条漫长路线：</p>
+<p><strong>人工写规则 → 让机器统计词语 → 让神经网络自己学习特征 → 用海量文本预训练 → 用人类反馈教它好好说话 → 让它同时理解文字、图片和声音 → 让它调用工具并完成任务。</strong></p>
+<p>这里的“大”，通常同时指三件事：参数多、训练数据多、消耗算力多。但真正重要的不是数字变大，而是规模扩大后，模型开始表现出更强的迁移、上下文学习、生成和推理能力。</p>
+<hr>
+<h2 id="第一幕：机器能不能模仿一个神经元？（1943—1969）"><a href="#第一幕：机器能不能模仿一个神经元？（1943—1969）" class="headerlink" title="第一幕：机器能不能模仿一个神经元？（1943—1969）"></a>第一幕：机器能不能模仿一个神经元？（1943—1969）</h2><h3 id="1943：用数学画出“人造神经元”"><a href="#1943：用数学画出“人造神经元”" class="headerlink" title="1943：用数学画出“人造神经元”"></a>1943：用数学画出“人造神经元”</h3><p>神经科学家麦卡洛克和逻辑学家皮茨提出了一个极简模型：一个神经元接收若干输入，达到阈值就输出信号。它当然远没有真实大脑复杂，却留下了一个影响深远的想法：<strong>思考也许可以拆成大量简单计算。</strong></p>
+<h3 id="1950：图灵把问题换了一种问法"><a href="#1950：图灵把问题换了一种问法" class="headerlink" title="1950：图灵把问题换了一种问法"></a>1950：图灵把问题换了一种问法</h3><p>艾伦·图灵没有纠缠“机器究竟有没有灵魂”，而是提出一个可操作的问题：如果隔着文字聊天，人分不清对面是人还是机器，能不能说机器表现出了智能？后来人们把这种思想实验称为“图灵测试”。</p>
+<h3 id="1956：“人工智能”有了名字"><a href="#1956：“人工智能”有了名字" class="headerlink" title="1956：“人工智能”有了名字"></a>1956：“人工智能”有了名字</h3><p>达特茅斯研讨会通常被视为人工智能学科的诞生点。早期研究者非常乐观，觉得只要把推理规则写清楚，机器很快就能达到人类水平。这个判断过于乐观，但它点燃了整个领域。</p>
+<h3 id="1957—1958：感知机登场"><a href="#1957—1958：感知机登场" class="headerlink" title="1957—1958：感知机登场"></a>1957—1958：感知机登场</h3><p>弗兰克·罗森布拉特提出感知机。它会根据错误调整输入的权重，已经带有“从例子中学习”的味道。媒体一度把它描述为会走、会说、会自我复制的电子大脑——科技新闻夸张标题的传统，可谓源远流长。</p>
+<h3 id="1966：ELIZA——最早让人“有感觉”的聊天程序"><a href="#1966：ELIZA——最早让人“有感觉”的聊天程序" class="headerlink" title="1966：ELIZA——最早让人“有感觉”的聊天程序"></a>1966：ELIZA——最早让人“有感觉”的聊天程序</h3><p>ELIZA 并不真正理解语言。它主要抓取关键词，再套用心理治疗师式的句型。例如你说“我最近很难过”，它可能回答“你为什么觉得难过？”令人意外的是，不少人仍会对它产生情感投射。这后来被称为“ELIZA 效应”：<strong>只要机器的回应像人，人就很容易脑补出理解和情感。</strong></p>
+<h3 id="1969：一次冷水澡"><a href="#1969：一次冷水澡" class="headerlink" title="1969：一次冷水澡"></a>1969：一次冷水澡</h3><p>明斯基和派珀特系统分析了单层感知机的局限，其中最著名的是它连简单的 XOR 问题都无法解决。神经网络研究迅速降温。问题不在于多层网络绝对不行，而在于当时还缺少有效训练多层网络的方法、数据和算力。</p>
+<p><img src="/images/llm-history-eighty-years/02-infographic-neural-foundations.png" alt="从神经元到深度网络"></p>
+<blockquote>
+<p><strong>通俗类比</strong>：单层感知机像只会画一条直线的裁判。遇到能被直线分开的题，它表现不错；题目一拐弯，它就懵了。多层网络相当于允许许多裁判接力，每一层处理一点复杂性。</p>
+</blockquote>
+<hr>
+<h2 id="第二幕：规则派与统计派轮流坐庄（1970—2002）"><a href="#第二幕：规则派与统计派轮流坐庄（1970—2002）" class="headerlink" title="第二幕：规则派与统计派轮流坐庄（1970—2002）"></a>第二幕：规则派与统计派轮流坐庄（1970—2002）</h2><h3 id="专家系统：把专家知识写进机器"><a href="#专家系统：把专家知识写进机器" class="headerlink" title="专家系统：把专家知识写进机器"></a>专家系统：把专家知识写进机器</h3><p>20 世纪 70—80 年代，主流路线是“符号主义”。工程师采访医生、地质学家等专家，把他们的知识写成大量“如果……那么……”规则。专家系统在边界清楚的小领域内非常好用，但维护困难：现实世界有无数例外，规则越加越容易互相打架。</p>
+<h3 id="两次-AI-寒冬"><a href="#两次-AI-寒冬" class="headerlink" title="两次 AI 寒冬"></a>两次 AI 寒冬</h3><p>当承诺远超实际能力，资金和兴趣便会退潮。人工智能大致经历了两次著名寒冬：一次在 1970 年代，一次从 1980 年代末延续到 1990 年代初。寒冬不等于研究消失，而是泡沫退去、预算缩减、宏大口号变少。</p>
+<h3 id="1986：反向传播让多层网络重新活过来"><a href="#1986：反向传播让多层网络重新活过来" class="headerlink" title="1986：反向传播让多层网络重新活过来"></a>1986：反向传播让多层网络重新活过来</h3><p>反向传播可以把输出端的错误一层层传回去，告诉每个参数“你应该往哪个方向改一点”。它像一场考试后的逐题复盘：不是只告诉学生总分低，而是把错误责任传回每一步。</p>
+<h3 id="语言模型的统计时代"><a href="#语言模型的统计时代" class="headerlink" title="语言模型的统计时代"></a>语言模型的统计时代</h3><p>早期语言模型常用 n-gram：看前面一两个词，统计下一个词出现的概率。输入“今天天气很”，训练语料里“好”出现得最多，模型就偏向预测“好”。它简单、有效，但看不远，也很容易遭遇没见过的组合。</p>
+<h3 id="1990-年代：机器学习成为实用派主角"><a href="#1990-年代：机器学习成为实用派主角" class="headerlink" title="1990 年代：机器学习成为实用派主角"></a>1990 年代：机器学习成为实用派主角</h3><p>隐马尔可夫模型推动语音识别，支持向量机、决策树等方法广泛应用。这个时代的重要转变是：与其把每条规则写死，不如给机器样本，让它从数据中估计规律。</p>
+<p><img src="/images/llm-history-eighty-years/03-comparison-language-paradigms.png" alt="机器理解语言的三条道路"></p>
+<hr>
+<h2 id="第三幕：词语变成向量，深度学习起飞（2003—2016）"><a href="#第三幕：词语变成向量，深度学习起飞（2003—2016）" class="headerlink" title="第三幕：词语变成向量，深度学习起飞（2003—2016）"></a>第三幕：词语变成向量，深度学习起飞（2003—2016）</h2><h3 id="2003：神经语言模型"><a href="#2003：神经语言模型" class="headerlink" title="2003：神经语言模型"></a>2003：神经语言模型</h3><p>约书亚·本吉奥等人提出用神经网络学习语言模型。一个关键变化是：词不再只是字典中的编号，而可以表示为一串数字，也就是“词向量”。意思相近的词，在向量空间里往往也比较接近。</p>
+<h3 id="2006：深度学习重新获得名字和信心"><a href="#2006：深度学习重新获得名字和信心" class="headerlink" title="2006：深度学习重新获得名字和信心"></a>2006：深度学习重新获得名字和信心</h3><p>多层神经网络并非新发明，但改进的训练方法、更大的数据集和更快的硬件让它重新变得可行。“深度学习”逐渐成为这一波浪潮的统一旗号。</p>
+<h3 id="2009：ImageNet-提供大规模训练场"><a href="#2009：ImageNet-提供大规模训练场" class="headerlink" title="2009：ImageNet 提供大规模训练场"></a>2009：ImageNet 提供大规模训练场</h3><p>ImageNet 把数百万张图片和类别标签组织起来。它不直接属于语言模型，却极大推动了“数据 + GPU + 深度网络”的工程范式。</p>
+<h3 id="2012：AlexNet-的“爆场时刻”"><a href="#2012：AlexNet-的“爆场时刻”" class="headerlink" title="2012：AlexNet 的“爆场时刻”"></a>2012：AlexNet 的“爆场时刻”</h3><p>AlexNet 在 ImageNet 图像识别比赛中大幅领先传统方法。GPU 证明自己不仅能打游戏，也特别适合神经网络的大量并行计算。此后，学界与产业界开始大规模转向深度学习。</p>
+<h3 id="2013：Word2Vec-让“词义关系”浮出水面"><a href="#2013：Word2Vec-让“词义关系”浮出水面" class="headerlink" title="2013：Word2Vec 让“词义关系”浮出水面"></a>2013：Word2Vec 让“词义关系”浮出水面</h3><p>Word2Vec 能从大量文本中学到词向量。著名演示是“国王 − 男人 + 女人 ≈ 女王”。它不是理解王室制度，而是从词的使用环境中压缩出了某些关系。</p>
+<h3 id="2014：序列到序列、注意力与-GAN"><a href="#2014：序列到序列、注意力与-GAN" class="headerlink" title="2014：序列到序列、注意力与 GAN"></a>2014：序列到序列、注意力与 GAN</h3><p>序列到序列模型让机器翻译变成“读入一句话，再生成一句话”。同年兴起的注意力机制允许模型在生成每个词时，有选择地回看输入中的不同位置。GAN 则开辟了生成图像的新路线。</p>
+<h3 id="2015—2016：机器在视觉、语音、翻译上连续突破"><a href="#2015—2016：机器在视觉、语音、翻译上连续突破" class="headerlink" title="2015—2016：机器在视觉、语音、翻译上连续突破"></a>2015—2016：机器在视觉、语音、翻译上连续突破</h3><p>残差网络让非常深的网络更容易训练；神经机器翻译质量迅速提高；AlphaGo 击败李世石，让公众第一次大规模感受到深度学习的威力。虽然 AlphaGo 不是大语言模型，但它证明了“神经网络 + 大算力 + 大规模训练”可以突破原本被认为很遥远的任务。</p>
+<hr>
+<h2 id="第四幕：Transformer-改写游戏规则（2017—2019）"><a href="#第四幕：Transformer-改写游戏规则（2017—2019）" class="headerlink" title="第四幕：Transformer 改写游戏规则（2017—2019）"></a>第四幕：Transformer 改写游戏规则（2017—2019）</h2><h3 id="2017：《Attention-Is-All-You-Need》"><a href="#2017：《Attention-Is-All-You-Need》" class="headerlink" title="2017：《Attention Is All You Need》"></a>2017：《Attention Is All You Need》</h3><p>Transformer 抛开循环神经网络逐字接力的主结构，主要依靠自注意力处理序列。它带来两个关键优势：</p>
+<ol>
+<li><strong>能并行训练</strong>：句子里的许多位置可以同时计算，更适合 GPU 和大规模数据。</li>
+<li><strong>能直接建立远距离联系</strong>：一句话开头和结尾的词，可以通过注意力直接交换信息。</li>
+</ol>
+<p>自注意力可以想成一场圆桌会议：每个词都能问其他词“你和我现在有多大关系？”随后按相关程度汇总信息。</p>
+<p><img src="/images/llm-history-eighty-years/04-framework-transformer.png" alt="Transformer结构示意"></p>
+<h3 id="2018：两条路线成形——理解与生成"><a href="#2018：两条路线成形——理解与生成" class="headerlink" title="2018：两条路线成形——理解与生成"></a>2018：两条路线成形——理解与生成</h3><ul>
+<li><strong>BERT</strong> 擅长通过“完形填空”学习双向语境，推动搜索、分类、抽取等理解任务。</li>
+<li><strong>GPT</strong> 采用“预测下一个词”的方式进行生成式预训练。这个目标看似朴素，却能迫使模型学习语法、事实、风格和部分推理模式。</li>
+</ul>
+<h3 id="2019：预训练再微调成为标准配方"><a href="#2019：预训练再微调成为标准配方" class="headerlink" title="2019：预训练再微调成为标准配方"></a>2019：预训练再微调成为标准配方</h3><p>GPT-2 展示了零样本生成能力，也引发了关于滥用风险的讨论。与此同时，越来越多研究证明：先在大语料上学通用能力，再针对具体任务微调，比每个任务从零训练更有效。</p>
+<hr>
+<h2 id="第五幕：规模化——“预测下一个词”长出了通用能力（2020—2021）"><a href="#第五幕：规模化——“预测下一个词”长出了通用能力（2020—2021）" class="headerlink" title="第五幕：规模化——“预测下一个词”长出了通用能力（2020—2021）"></a>第五幕：规模化——“预测下一个词”长出了通用能力（2020—2021）</h2><h3 id="2020：GPT-3-与上下文学习"><a href="#2020：GPT-3-与上下文学习" class="headerlink" title="2020：GPT-3 与上下文学习"></a>2020：GPT-3 与上下文学习</h3><p>GPT-3 拥有 1750 亿参数。更令人吃惊的不是参数数字，而是它能只看提示词中的几个例子，就模仿任务格式继续完成，无须为每项任务重新训练。这叫做 <strong>in-context learning，上下文学习</strong>。</p>
+<p>同一时期，研究者系统观察到“缩放定律”：在一定范围内，只要合理扩大模型、数据和计算量，损失会比较规律地下降。这让训练前沿模型从炼金术更接近一门可规划的工程。</p>
+<h3 id="2021：模型开始跨越文字边界"><a href="#2021：模型开始跨越文字边界" class="headerlink" title="2021：模型开始跨越文字边界"></a>2021：模型开始跨越文字边界</h3><p>CLIP 把图像和文字放进同一语义空间，DALL·E 展示文生图能力；Codex 展示从自然语言生成代码。语言模型不再只是续写文章，而开始成为连接不同模态和工具的通用接口。</p>
+<h3 id="为什么“大”会带来新能力？"><a href="#为什么“大”会带来新能力？" class="headerlink" title="为什么“大”会带来新能力？"></a>为什么“大”会带来新能力？</h3><p>并不是“参数多就自动产生智慧”。更准确的说法是：模型容量、数据覆盖面、训练计算量和训练方法共同扩大后，模型能压缩更多语言规律，并在提示中灵活组合这些规律。有些能力提升平滑，有些能力会在特定测试上看起来突然出现；其中也可能混有评测阈值造成的视觉效果。</p>
+<p><img src="/images/llm-history-eighty-years/05-flowchart-llm-pipeline.png" alt="一个大模型是怎样炼成的"></p>
+<hr>
+<h2 id="第六幕：ChatGPT-把大模型带进日常生活（2022—2023）"><a href="#第六幕：ChatGPT-把大模型带进日常生活（2022—2023）" class="headerlink" title="第六幕：ChatGPT 把大模型带进日常生活（2022—2023）"></a>第六幕：ChatGPT 把大模型带进日常生活（2022—2023）</h2><h3 id="2022：不只是“更大”，而是“更会配合人”"><a href="#2022：不只是“更大”，而是“更会配合人”" class="headerlink" title="2022：不只是“更大”，而是“更会配合人”"></a>2022：不只是“更大”，而是“更会配合人”</h3><p>指令微调让模型学习遵循各种任务指令；基于人类反馈的强化学习（RLHF）让人工评价参与模型对齐。InstructGPT 展示了一个重要事实：参数更大的原始模型，不一定比经过对齐的较小模型更让人满意。</p>
+<p>2022 年 11 月，ChatGPT 发布。它没有凭空发明一套全新底层架构，却把预训练、指令微调、对齐和自然对话界面组合成了极具传播力的产品。普通人第一次可以低门槛地让一个模型写邮件、解释概念、改代码、头脑风暴。</p>
+<h3 id="2023：竞赛从“一个模型”扩展成“整个生态”"><a href="#2023：竞赛从“一个模型”扩展成“整个生态”" class="headerlink" title="2023：竞赛从“一个模型”扩展成“整个生态”"></a>2023：竞赛从“一个模型”扩展成“整个生态”</h3><ul>
+<li>GPT-4 推动更强的复杂任务和多模态能力。</li>
+<li>LLaMA 系列带动开放权重模型生态；随后更多开源模型快速跟进。</li>
+<li>LoRA、量化等技术降低微调和部署成本。</li>
+<li>RAG（检索增强生成）让模型在回答前查询外部资料，缓解知识过时和无依据生成。</li>
+<li>插件、函数调用和代码执行让模型从“只会说”迈向“能使用工具”。</li>
+</ul>
+<p><img src="/images/llm-history-eighty-years/06-timeline-ecosystem-explosion.png" alt="从模型到生态"></p>
+<blockquote>
+<p><strong>一个容易混淆的点</strong>：ChatGPT 是产品，GPT 是模型家族，Transformer 是底层架构思想。就像微信是产品，里面运行着许多服务，而 TCP/IP 是更底层的通信技术。</p>
+</blockquote>
+<hr>
+<h2 id="第七幕：多模态、长上下文、推理模型与-Agent（2024—2025）"><a href="#第七幕：多模态、长上下文、推理模型与-Agent（2024—2025）" class="headerlink" title="第七幕：多模态、长上下文、推理模型与 Agent（2024—2025）"></a>第七幕：多模态、长上下文、推理模型与 Agent（2024—2025）</h2><h3 id="原生多模态：不再先“翻译”成文字"><a href="#原生多模态：不再先“翻译”成文字" class="headerlink" title="原生多模态：不再先“翻译”成文字"></a>原生多模态：不再先“翻译”成文字</h3><p>新一代模型越来越能统一处理文字、图片、语音和视频。它们可以看图解释、实时语音对话、理解屏幕内容。多模态的意义不是简单地给聊天框加一个上传按钮，而是让模型从更接近人类的多种信号中学习世界。</p>
+<h3 id="长上下文：从便签纸走向一摞资料"><a href="#长上下文：从便签纸走向一摞资料" class="headerlink" title="长上下文：从便签纸走向一摞资料"></a>长上下文：从便签纸走向一摞资料</h3><p>上下文窗口扩大后，模型能一次读取更长的代码库、会议记录或书籍。但“能塞进去”不等于“每个细节都记得同样好”。位置偏差、检索效率、成本和事实核验仍然重要。因此，长上下文与 RAG 往往不是互相替代，而是配合使用。</p>
+<h3 id="推理模型：用更多计算换更可靠的答案"><a href="#推理模型：用更多计算换更可靠的答案" class="headerlink" title="推理模型：用更多计算换更可靠的答案"></a>推理模型：用更多计算换更可靠的答案</h3><p>传统语言模型倾向于立即生成回答；推理模型则在回答前进行更长的内部计算，并配合强化学习、验证器或搜索，在数学、代码和复杂规划上提高表现。这是一种新缩放维度：除了训练阶段投入算力，还可以在推理阶段按题目难度投入更多计算。</p>
+<h3 id="Agent：让模型进入“观察—行动—反馈”循环"><a href="#Agent：让模型进入“观察—行动—反馈”循环" class="headerlink" title="Agent：让模型进入“观察—行动—反馈”循环"></a>Agent：让模型进入“观察—行动—反馈”循环</h3><p>当模型能调用搜索、终端、数据库、浏览器和各种 API，它便不再只输出一段文字，而可以分解任务、选择工具、读取结果、修正计划。这个系统通常被称为 Agent（智能体）。</p>
+<p><img src="/images/llm-history-eighty-years/07-framework-agent-loop.png" alt="Agent闭环"></p>
+<p>不过，“会调用工具”不等于“完全自治”。真正可靠的 Agent 需要权限边界、状态管理、错误恢复、结果验证、审计记录，以及在人事、金钱、隐私等高风险操作前让人确认。</p>
+<hr>
+<h2 id="一张足够密的时间线"><a href="#一张足够密的时间线" class="headerlink" title="一张足够密的时间线"></a>一张足够密的时间线</h2><table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事件</th>
+<th>为什么重要</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1943</td>
+<td>麦卡洛克—皮茨神经元</td>
+<td>用数学描述神经元计算</td>
+</tr>
+<tr>
+<td>1950</td>
+<td>图灵提出机器智能测试思想</td>
+<td>把“智能”变成可讨论的行为问题</td>
+</tr>
+<tr>
+<td>1956</td>
+<td>达特茅斯研讨会</td>
+<td>“人工智能”成为学科名称</td>
+</tr>
+<tr>
+<td>1957–1958</td>
+<td>感知机</td>
+<td>早期可学习的神经网络</td>
+</tr>
+<tr>
+<td>1966</td>
+<td>ELIZA</td>
+<td>展示人对聊天机器的情感投射</td>
+</tr>
+<tr>
+<td>1969</td>
+<td>感知机局限被系统讨论</td>
+<td>神经网络研究遇冷</td>
+</tr>
+<tr>
+<td>1970s</td>
+<td>专家系统兴起</td>
+<td>规则驱动 AI 进入实际领域</td>
+</tr>
+<tr>
+<td>1974–1980</td>
+<td>第一次 AI 寒冬</td>
+<td>期望与能力落差导致退潮</td>
+</tr>
+<tr>
+<td>1986</td>
+<td>反向传播广泛传播</td>
+<td>多层网络获得实用训练方法</td>
+</tr>
+<tr>
+<td>1987–1993</td>
+<td>第二次 AI 寒冬</td>
+<td>专家系统成本与脆弱性暴露</td>
+</tr>
+<tr>
+<td>1990s</td>
+<td>统计机器学习繁荣</td>
+<td>数据驱动方法成为主流</td>
+</tr>
+<tr>
+<td>1997</td>
+<td>LSTM</td>
+<td>改善长序列记忆问题</td>
+</tr>
+<tr>
+<td>1997</td>
+<td>深蓝击败卡斯帕罗夫</td>
+<td>专用 AI 的标志性胜利</td>
+</tr>
+<tr>
+<td>2003</td>
+<td>神经概率语言模型</td>
+<td>词向量与神经语言建模结合</td>
+</tr>
+<tr>
+<td>2006</td>
+<td>深度学习复兴</td>
+<td>多层网络重新受到重视</td>
+</tr>
+<tr>
+<td>2009</td>
+<td>ImageNet</td>
+<td>大数据集推动视觉学习</td>
+</tr>
+<tr>
+<td>2012</td>
+<td>AlexNet</td>
+<td>GPU 深度学习取得压倒性优势</td>
+</tr>
+<tr>
+<td>2013</td>
+<td>Word2Vec</td>
+<td>高效学习词语的分布式表示</td>
+</tr>
+<tr>
+<td>2014</td>
+<td>Seq2Seq 与注意力</td>
+<td>端到端翻译和选择性关注输入</td>
+</tr>
+<tr>
+<td>2014</td>
+<td>GAN</td>
+<td>生成式 AI 的另一条重要路线</td>
+</tr>
+<tr>
+<td>2015</td>
+<td>ResNet</td>
+<td>让超深网络更容易训练</td>
+</tr>
+<tr>
+<td>2016</td>
+<td>AlphaGo</td>
+<td>深度学习与搜索震动公众</td>
+</tr>
+<tr>
+<td>2017</td>
+<td>Transformer</td>
+<td>奠定现代大语言模型架构基础</td>
+</tr>
+<tr>
+<td>2018</td>
+<td>ELMo、GPT、BERT</td>
+<td>预训练语言模型全面兴起</td>
+</tr>
+<tr>
+<td>2019</td>
+<td>GPT-2、T5</td>
+<td>生成式预训练与“文本到文本”统一</td>
+</tr>
+<tr>
+<td>2020</td>
+<td>GPT-3</td>
+<td>大规模语言模型与上下文学习爆发</td>
+</tr>
+<tr>
+<td>2020</td>
+<td>缩放定律研究</td>
+<td>让规模扩张更可预测</td>
+</tr>
+<tr>
+<td>2021</td>
+<td>CLIP、DALL·E</td>
+<td>文字与图像进一步融合</td>
+</tr>
+<tr>
+<td>2021</td>
+<td>Codex</td>
+<td>自然语言驱动代码生成</td>
+</tr>
+<tr>
+<td>2022</td>
+<td>Chinchilla 缩放研究</td>
+<td>强调模型大小与数据量的平衡</td>
+</tr>
+<tr>
+<td>2022</td>
+<td>InstructGPT</td>
+<td>指令微调与 RLHF 证明对齐价值</td>
+</tr>
+<tr>
+<td>2022.11</td>
+<td>ChatGPT</td>
+<td>大模型进入大众产品时代</td>
+</tr>
+<tr>
+<td>2023</td>
+<td>GPT-4</td>
+<td>复杂任务与多模态能力提升</td>
+</tr>
+<tr>
+<td>2023</td>
+<td>LLaMA 等开放模型</td>
+<td>开源生态和本地部署加速</td>
+</tr>
+<tr>
+<td>2023</td>
+<td>RAG、工具调用普及</td>
+<td>模型开始连接知识库和软件工具</td>
+</tr>
+<tr>
+<td>2024</td>
+<td>长上下文与原生多模态加速</td>
+<td>文本、图像、语音交互逐渐统一</td>
+</tr>
+<tr>
+<td>2024</td>
+<td>推理阶段计算受重视</td>
+<td>“先多想一会儿”成为重要方向</td>
+</tr>
+<tr>
+<td>2024–2025</td>
+<td>推理模型快速发展</td>
+<td>数学、代码和规划能力显著加强</td>
+</tr>
+<tr>
+<td>2025</td>
+<td>Agent 工程化加速</td>
+<td>模型从回答者走向任务执行者</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五条暗线，帮你真正理解这段历史"><a href="#五条暗线，帮你真正理解这段历史" class="headerlink" title="五条暗线，帮你真正理解这段历史"></a>五条暗线，帮你真正理解这段历史</h2><h3 id="1-算法、数据、算力缺一不可"><a href="#1-算法、数据、算力缺一不可" class="headerlink" title="1. 算法、数据、算力缺一不可"></a>1. 算法、数据、算力缺一不可</h3><p>许多“旧思想”要等待硬件和数据成熟后才重新开花。神经网络、注意力甚至强化学习都不是凭空诞生于最近几年。历史常常不是新点子打败旧点子，而是旧点子终于等到了合适的条件。</p>
+<h3 id="2-从“写规则”到“学表示”"><a href="#2-从“写规则”到“学表示”" class="headerlink" title="2. 从“写规则”到“学表示”"></a>2. 从“写规则”到“学表示”</h3><p>传统程序由人明确告诉计算机步骤；机器学习从数据中学习边界；深度学习进一步自动学习表示；大模型则从海量数据中学习一种通用的语言与世界模式，再通过提示和微调适配任务。</p>
+<h3 id="3-从专用模型到基础模型"><a href="#3-从专用模型到基础模型" class="headerlink" title="3. 从专用模型到基础模型"></a>3. 从专用模型到基础模型</h3><p>过去往往一个任务训练一个模型。基础模型先进行昂贵的通用训练，再服务翻译、写作、问答、代码等许多任务。成本被集中到上游，能力则通过 API、开源权重和应用扩散到下游。</p>
+<h3 id="4-从模型能力到系统能力"><a href="#4-从模型能力到系统能力" class="headerlink" title="4. 从模型能力到系统能力"></a>4. 从模型能力到系统能力</h3><p>一个好用的 AI 产品不只有模型。它还包括检索、记忆、工具、权限、缓存、监控、评测和人机交互。模型像发动机，但汽车能否安全上路还取决于刹车、方向盘、仪表盘和交通规则。</p>
+<h3 id="5-能力越强，治理问题越重要"><a href="#5-能力越强，治理问题越重要" class="headerlink" title="5. 能力越强，治理问题越重要"></a>5. 能力越强，治理问题越重要</h3><p>幻觉、偏见、版权、隐私、能耗、就业影响、内容真实性和权力集中，都伴随能力提升而更加突出。“让模型更聪明”和“让系统更可靠、更符合公共利益”是两项不同但必须同时进行的工作。</p>
+<hr>
+<h2 id="三个常见误解"><a href="#三个常见误解" class="headerlink" title="三个常见误解"></a>三个常见误解</h2><h3 id="误解一：大模型只是高级搜索引擎"><a href="#误解一：大模型只是高级搜索引擎" class="headerlink" title="误解一：大模型只是高级搜索引擎"></a>误解一：大模型只是高级搜索引擎</h3><p>搜索引擎主要寻找已有页面；语言模型根据上下文生成新的 token 序列。现代系统常把两者组合成 RAG：先搜索，再让模型阅读资料并组织答案。</p>
+<h3 id="误解二：模型只是死记硬背"><a href="#误解二：模型只是死记硬背" class="headerlink" title="误解二：模型只是死记硬背"></a>误解二：模型只是死记硬背</h3><p>模型确实会记住部分训练内容，也会在相似模式间泛化。把它说成“纯背诵”或“像人一样真正理解”都过于简单。更稳妥的说法是：它学习了高维统计结构，这种结构足以支持惊人的生成与迁移，但仍会自信地犯错。</p>
+<h3 id="误解三：参数越多，模型一定越好"><a href="#误解三：参数越多，模型一定越好" class="headerlink" title="误解三：参数越多，模型一定越好"></a>误解三：参数越多，模型一定越好</h3><p>模型表现还取决于数据质量、训练配方、架构、计算预算、对齐方式、推理策略和评测任务。一个训练充分、数据匹配、工具使用合理的较小模型，可能在特定任务上胜过更大的通用模型。</p>
+<hr>
+<h2 id="站在今天，下一步可能是什么？"><a href="#站在今天，下一步可能是什么？" class="headerlink" title="站在今天，下一步可能是什么？"></a>站在今天，下一步可能是什么？</h2><p>未来的竞争不只是谁的参数更多，而可能集中在：</p>
+<ul>
+<li>用更少数据和能耗获得更高能力；</li>
+<li>更可靠的复杂推理和自我检查；</li>
+<li>文字、视觉、声音、视频与行动的统一；</li>
+<li>更长久且可控的个性化记忆；</li>
+<li>能在真实软件环境中协作的 Agent；</li>
+<li>更透明的评测、安全机制与社会治理；</li>
+<li>端侧小模型与云端大模型协同。</li>
+</ul>
+<p>真正值得记住的，也许不是某个排行榜第一名。过去八十年最稳定的规律是：<strong>每当机器获得一种新的学习方式、更多可用数据或更廉价的计算能力，人们就会重新定义“智能”的边界。</strong></p>
+<hr>
+<h2 id="延伸阅读（按历史顺序）"><a href="#延伸阅读（按历史顺序）" class="headerlink" title="延伸阅读（按历史顺序）"></a>延伸阅读（按历史顺序）</h2><ol>
+<li>Alan Turing, <em>Computing Machinery and Intelligence</em>（1950）</li>
+<li>Rumelhart, Hinton &amp; Williams, <em>Learning Representations by Back-propagating Errors</em>（1986）</li>
+<li>Bengio et al., <em>A Neural Probabilistic Language Model</em>（2003）</li>
+<li>Krizhevsky, Sutskever &amp; Hinton, <em>ImageNet Classification with Deep Convolutional Neural Networks</em>（2012）</li>
+<li>Vaswani et al., <em>Attention Is All You Need</em>（2017）</li>
+<li>Devlin et al., <em>BERT</em>（2018）</li>
+<li>Brown et al., <em>Language Models are Few-Shot Learners</em>（2020）</li>
+<li>Kaplan et al., <em>Scaling Laws for Neural Language Models</em>（2020）</li>
+<li>Ouyang et al., <em>Training Language Models to Follow Instructions with Human Feedback</em>（2022）</li>
+<li>Hoffmann et al., <em>Training Compute-Optimal Large Language Models</em>（2022）</li>
+</ol>
+<blockquote>
+<p>阅读建议：第一次读，先抓住七幕故事；第二次读，再沿“算法—数据—算力—对齐—工具”五条暗线回看时间表。你会发现，大模型史不是一串孤立产品名，而是一组思想不断相遇、失败、复兴和组合的历史。</p>
+</blockquote>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>分享文章</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/10/04/llm-history-eighty-years/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;复制成功&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/10/04/llm-history-eighty-years/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/10/01/deepseek-v2-v3-v4-moe-attention-loss/">从 DeepSeek-V2 到 V4：MoE、注意力与 Loss 的完整演进</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E7%9C%8B%E6%87%82%E6%95%B4%E6%AE%B5%E5%8E%86%E5%8F%B2"><span class="toc-text">先用一句话看懂整段历史</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E5%B9%95%EF%BC%9A%E6%9C%BA%E5%99%A8%E8%83%BD%E4%B8%8D%E8%83%BD%E6%A8%A1%E4%BB%BF%E4%B8%80%E4%B8%AA%E7%A5%9E%E7%BB%8F%E5%85%83%EF%BC%9F%EF%BC%881943%E2%80%941969%EF%BC%89"><span class="toc-text">第一幕：机器能不能模仿一个神经元？（1943—1969）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1943%EF%BC%9A%E7%94%A8%E6%95%B0%E5%AD%A6%E7%94%BB%E5%87%BA%E2%80%9C%E4%BA%BA%E9%80%A0%E7%A5%9E%E7%BB%8F%E5%85%83%E2%80%9D"><span class="toc-text">1943：用数学画出“人造神经元”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1950%EF%BC%9A%E5%9B%BE%E7%81%B5%E6%8A%8A%E9%97%AE%E9%A2%98%E6%8D%A2%E4%BA%86%E4%B8%80%E7%A7%8D%E9%97%AE%E6%B3%95"><span class="toc-text">1950：图灵把问题换了一种问法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1956%EF%BC%9A%E2%80%9C%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E2%80%9D%E6%9C%89%E4%BA%86%E5%90%8D%E5%AD%97"><span class="toc-text">1956：“人工智能”有了名字</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1957%E2%80%941958%EF%BC%9A%E6%84%9F%E7%9F%A5%E6%9C%BA%E7%99%BB%E5%9C%BA"><span class="toc-text">1957—1958：感知机登场</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1966%EF%BC%9AELIZA%E2%80%94%E2%80%94%E6%9C%80%E6%97%A9%E8%AE%A9%E4%BA%BA%E2%80%9C%E6%9C%89%E6%84%9F%E8%A7%89%E2%80%9D%E7%9A%84%E8%81%8A%E5%A4%A9%E7%A8%8B%E5%BA%8F"><span class="toc-text">1966：ELIZA——最早让人“有感觉”的聊天程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1969%EF%BC%9A%E4%B8%80%E6%AC%A1%E5%86%B7%E6%B0%B4%E6%BE%A1"><span class="toc-text">1969：一次冷水澡</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E5%B9%95%EF%BC%9A%E8%A7%84%E5%88%99%E6%B4%BE%E4%B8%8E%E7%BB%9F%E8%AE%A1%E6%B4%BE%E8%BD%AE%E6%B5%81%E5%9D%90%E5%BA%84%EF%BC%881970%E2%80%942002%EF%BC%89"><span class="toc-text">第二幕：规则派与统计派轮流坐庄（1970—2002）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%93%E5%AE%B6%E7%B3%BB%E7%BB%9F%EF%BC%9A%E6%8A%8A%E4%B8%93%E5%AE%B6%E7%9F%A5%E8%AF%86%E5%86%99%E8%BF%9B%E6%9C%BA%E5%99%A8"><span class="toc-text">专家系统：把专家知识写进机器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E6%AC%A1-AI-%E5%AF%92%E5%86%AC"><span class="toc-text">两次 AI 寒冬</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1986%EF%BC%9A%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E8%AE%A9%E5%A4%9A%E5%B1%82%E7%BD%91%E7%BB%9C%E9%87%8D%E6%96%B0%E6%B4%BB%E8%BF%87%E6%9D%A5"><span class="toc-text">1986：反向传播让多层网络重新活过来</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E7%9A%84%E7%BB%9F%E8%AE%A1%E6%97%B6%E4%BB%A3"><span class="toc-text">语言模型的统计时代</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1990-%E5%B9%B4%E4%BB%A3%EF%BC%9A%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%88%90%E4%B8%BA%E5%AE%9E%E7%94%A8%E6%B4%BE%E4%B8%BB%E8%A7%92"><span class="toc-text">1990 年代：机器学习成为实用派主角</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E5%B9%95%EF%BC%9A%E8%AF%8D%E8%AF%AD%E5%8F%98%E6%88%90%E5%90%91%E9%87%8F%EF%BC%8C%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E8%B5%B7%E9%A3%9E%EF%BC%882003%E2%80%942016%EF%BC%89"><span class="toc-text">第三幕：词语变成向量，深度学习起飞（2003—2016）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2003%EF%BC%9A%E7%A5%9E%E7%BB%8F%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B"><span class="toc-text">2003：神经语言模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2006%EF%BC%9A%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E9%87%8D%E6%96%B0%E8%8E%B7%E5%BE%97%E5%90%8D%E5%AD%97%E5%92%8C%E4%BF%A1%E5%BF%83"><span class="toc-text">2006：深度学习重新获得名字和信心</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2009%EF%BC%9AImageNet-%E6%8F%90%E4%BE%9B%E5%A4%A7%E8%A7%84%E6%A8%A1%E8%AE%AD%E7%BB%83%E5%9C%BA"><span class="toc-text">2009：ImageNet 提供大规模训练场</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2012%EF%BC%9AAlexNet-%E7%9A%84%E2%80%9C%E7%88%86%E5%9C%BA%E6%97%B6%E5%88%BB%E2%80%9D"><span class="toc-text">2012：AlexNet 的“爆场时刻”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2013%EF%BC%9AWord2Vec-%E8%AE%A9%E2%80%9C%E8%AF%8D%E4%B9%89%E5%85%B3%E7%B3%BB%E2%80%9D%E6%B5%AE%E5%87%BA%E6%B0%B4%E9%9D%A2"><span class="toc-text">2013：Word2Vec 让“词义关系”浮出水面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2014%EF%BC%9A%E5%BA%8F%E5%88%97%E5%88%B0%E5%BA%8F%E5%88%97%E3%80%81%E6%B3%A8%E6%84%8F%E5%8A%9B%E4%B8%8E-GAN"><span class="toc-text">2014：序列到序列、注意力与 GAN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2015%E2%80%942016%EF%BC%9A%E6%9C%BA%E5%99%A8%E5%9C%A8%E8%A7%86%E8%A7%89%E3%80%81%E8%AF%AD%E9%9F%B3%E3%80%81%E7%BF%BB%E8%AF%91%E4%B8%8A%E8%BF%9E%E7%BB%AD%E7%AA%81%E7%A0%B4"><span class="toc-text">2015—2016：机器在视觉、语音、翻译上连续突破</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E5%B9%95%EF%BC%9ATransformer-%E6%94%B9%E5%86%99%E6%B8%B8%E6%88%8F%E8%A7%84%E5%88%99%EF%BC%882017%E2%80%942019%EF%BC%89"><span class="toc-text">第四幕：Transformer 改写游戏规则（2017—2019）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2017%EF%BC%9A%E3%80%8AAttention-Is-All-You-Need%E3%80%8B"><span class="toc-text">2017：《Attention Is All You Need》</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2018%EF%BC%9A%E4%B8%A4%E6%9D%A1%E8%B7%AF%E7%BA%BF%E6%88%90%E5%BD%A2%E2%80%94%E2%80%94%E7%90%86%E8%A7%A3%E4%B8%8E%E7%94%9F%E6%88%90"><span class="toc-text">2018：两条路线成形——理解与生成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2019%EF%BC%9A%E9%A2%84%E8%AE%AD%E7%BB%83%E5%86%8D%E5%BE%AE%E8%B0%83%E6%88%90%E4%B8%BA%E6%A0%87%E5%87%86%E9%85%8D%E6%96%B9"><span class="toc-text">2019：预训练再微调成为标准配方</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E5%B9%95%EF%BC%9A%E8%A7%84%E6%A8%A1%E5%8C%96%E2%80%94%E2%80%94%E2%80%9C%E9%A2%84%E6%B5%8B%E4%B8%8B%E4%B8%80%E4%B8%AA%E8%AF%8D%E2%80%9D%E9%95%BF%E5%87%BA%E4%BA%86%E9%80%9A%E7%94%A8%E8%83%BD%E5%8A%9B%EF%BC%882020%E2%80%942021%EF%BC%89"><span class="toc-text">第五幕：规模化——“预测下一个词”长出了通用能力（2020—2021）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2020%EF%BC%9AGPT-3-%E4%B8%8E%E4%B8%8A%E4%B8%8B%E6%96%87%E5%AD%A6%E4%B9%A0"><span class="toc-text">2020：GPT-3 与上下文学习</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2021%EF%BC%9A%E6%A8%A1%E5%9E%8B%E5%BC%80%E5%A7%8B%E8%B7%A8%E8%B6%8A%E6%96%87%E5%AD%97%E8%BE%B9%E7%95%8C"><span class="toc-text">2021：模型开始跨越文字边界</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E2%80%9C%E5%A4%A7%E2%80%9D%E4%BC%9A%E5%B8%A6%E6%9D%A5%E6%96%B0%E8%83%BD%E5%8A%9B%EF%BC%9F"><span class="toc-text">为什么“大”会带来新能力？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%85%AD%E5%B9%95%EF%BC%9AChatGPT-%E6%8A%8A%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%B8%A6%E8%BF%9B%E6%97%A5%E5%B8%B8%E7%94%9F%E6%B4%BB%EF%BC%882022%E2%80%942023%EF%BC%89"><span class="toc-text">第六幕：ChatGPT 把大模型带进日常生活（2022—2023）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2022%EF%BC%9A%E4%B8%8D%E5%8F%AA%E6%98%AF%E2%80%9C%E6%9B%B4%E5%A4%A7%E2%80%9D%EF%BC%8C%E8%80%8C%E6%98%AF%E2%80%9C%E6%9B%B4%E4%BC%9A%E9%85%8D%E5%90%88%E4%BA%BA%E2%80%9D"><span class="toc-text">2022：不只是“更大”，而是“更会配合人”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2023%EF%BC%9A%E7%AB%9E%E8%B5%9B%E4%BB%8E%E2%80%9C%E4%B8%80%E4%B8%AA%E6%A8%A1%E5%9E%8B%E2%80%9D%E6%89%A9%E5%B1%95%E6%88%90%E2%80%9C%E6%95%B4%E4%B8%AA%E7%94%9F%E6%80%81%E2%80%9D"><span class="toc-text">2023：竞赛从“一个模型”扩展成“整个生态”</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%83%E5%B9%95%EF%BC%9A%E5%A4%9A%E6%A8%A1%E6%80%81%E3%80%81%E9%95%BF%E4%B8%8A%E4%B8%8B%E6%96%87%E3%80%81%E6%8E%A8%E7%90%86%E6%A8%A1%E5%9E%8B%E4%B8%8E-Agent%EF%BC%882024%E2%80%942025%EF%BC%89"><span class="toc-text">第七幕：多模态、长上下文、推理模型与 Agent（2024—2025）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E7%94%9F%E5%A4%9A%E6%A8%A1%E6%80%81%EF%BC%9A%E4%B8%8D%E5%86%8D%E5%85%88%E2%80%9C%E7%BF%BB%E8%AF%91%E2%80%9D%E6%88%90%E6%96%87%E5%AD%97"><span class="toc-text">原生多模态：不再先“翻译”成文字</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%95%BF%E4%B8%8A%E4%B8%8B%E6%96%87%EF%BC%9A%E4%BB%8E%E4%BE%BF%E7%AD%BE%E7%BA%B8%E8%B5%B0%E5%90%91%E4%B8%80%E6%91%9E%E8%B5%84%E6%96%99"><span class="toc-text">长上下文：从便签纸走向一摞资料</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E7%90%86%E6%A8%A1%E5%9E%8B%EF%BC%9A%E7%94%A8%E6%9B%B4%E5%A4%9A%E8%AE%A1%E7%AE%97%E6%8D%A2%E6%9B%B4%E5%8F%AF%E9%9D%A0%E7%9A%84%E7%AD%94%E6%A1%88"><span class="toc-text">推理模型：用更多计算换更可靠的答案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Agent%EF%BC%9A%E8%AE%A9%E6%A8%A1%E5%9E%8B%E8%BF%9B%E5%85%A5%E2%80%9C%E8%A7%82%E5%AF%9F%E2%80%94%E8%A1%8C%E5%8A%A8%E2%80%94%E5%8F%8D%E9%A6%88%E2%80%9D%E5%BE%AA%E7%8E%AF"><span class="toc-text">Agent：让模型进入“观察—行动—反馈”循环</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E5%BC%A0%E8%B6%B3%E5%A4%9F%E5%AF%86%E7%9A%84%E6%97%B6%E9%97%B4%E7%BA%BF"><span class="toc-text">一张足够密的时间线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E6%9D%A1%E6%9A%97%E7%BA%BF%EF%BC%8C%E5%B8%AE%E4%BD%A0%E7%9C%9F%E6%AD%A3%E7%90%86%E8%A7%A3%E8%BF%99%E6%AE%B5%E5%8E%86%E5%8F%B2"><span class="toc-text">五条暗线，帮你真正理解这段历史</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%AE%97%E6%B3%95%E3%80%81%E6%95%B0%E6%8D%AE%E3%80%81%E7%AE%97%E5%8A%9B%E7%BC%BA%E4%B8%80%E4%B8%8D%E5%8F%AF"><span class="toc-text">1. 算法、数据、算力缺一不可</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%BB%8E%E2%80%9C%E5%86%99%E8%A7%84%E5%88%99%E2%80%9D%E5%88%B0%E2%80%9C%E5%AD%A6%E8%A1%A8%E7%A4%BA%E2%80%9D"><span class="toc-text">2. 从“写规则”到“学表示”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%BB%8E%E4%B8%93%E7%94%A8%E6%A8%A1%E5%9E%8B%E5%88%B0%E5%9F%BA%E7%A1%80%E6%A8%A1%E5%9E%8B"><span class="toc-text">3. 从专用模型到基础模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E4%BB%8E%E6%A8%A1%E5%9E%8B%E8%83%BD%E5%8A%9B%E5%88%B0%E7%B3%BB%E7%BB%9F%E8%83%BD%E5%8A%9B"><span class="toc-text">4. 从模型能力到系统能力</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E8%83%BD%E5%8A%9B%E8%B6%8A%E5%BC%BA%EF%BC%8C%E6%B2%BB%E7%90%86%E9%97%AE%E9%A2%98%E8%B6%8A%E9%87%8D%E8%A6%81"><span class="toc-text">5. 能力越强，治理问题越重要</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E4%B8%AA%E5%B8%B8%E8%A7%81%E8%AF%AF%E8%A7%A3"><span class="toc-text">三个常见误解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E8%A7%A3%E4%B8%80%EF%BC%9A%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%8F%AA%E6%98%AF%E9%AB%98%E7%BA%A7%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E"><span class="toc-text">误解一：大模型只是高级搜索引擎</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E8%A7%A3%E4%BA%8C%EF%BC%9A%E6%A8%A1%E5%9E%8B%E5%8F%AA%E6%98%AF%E6%AD%BB%E8%AE%B0%E7%A1%AC%E8%83%8C"><span class="toc-text">误解二：模型只是死记硬背</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E8%A7%A3%E4%B8%89%EF%BC%9A%E5%8F%82%E6%95%B0%E8%B6%8A%E5%A4%9A%EF%BC%8C%E6%A8%A1%E5%9E%8B%E4%B8%80%E5%AE%9A%E8%B6%8A%E5%A5%BD"><span class="toc-text">误解三：参数越多，模型一定越好</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AB%99%E5%9C%A8%E4%BB%8A%E5%A4%A9%EF%BC%8C%E4%B8%8B%E4%B8%80%E6%AD%A5%E5%8F%AF%E8%83%BD%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">站在今天，下一步可能是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%B6%E4%BC%B8%E9%98%85%E8%AF%BB%EF%BC%88%E6%8C%89%E5%8E%86%E5%8F%B2%E9%A1%BA%E5%BA%8F%EF%BC%89"><span class="toc-text">延伸阅读（按历史顺序）</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/10/04/llm-history-eighty-years/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

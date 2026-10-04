@@ -12,7 +12,7 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-10-04T10:00:00.000Z</updated>
+  <updated>2026-10-04T12:00:00.000Z</updated>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -29,9 +29,9 @@
     <id>https://caiusy.github.io/2026/10/04/llm-history-eighty-years/</id>
     <link href="https://caiusy.github.io/2026/10/04/llm-history-eighty-years/"/>
     <published>2026-10-04T10:00:00.000Z</published>
-    <summary>从1943年人造神经元到2025年推理模型与Agent，以七幕故事、七张原创图和一张密集时间线，通俗讲清大模型八十年的技术演进。</summary>
+    <summary>从1943年人造神经元到2026年GPT-5.6、推理模型与Agent，以七幕故事、原创图和一张密集时间线，通俗讲清大模型八十余年的技术演进。</summary>
     <title>大模型发展史：从“会算”到“会聊、会看、会做事”的八十年</title>
-    <updated>2026-10-04T10:00:00.000Z</updated>
+    <updated>2026-10-04T12:00:00.000Z</updated>
   </entry>
   <entry>
     <author>
@@ -121,10 +121,10 @@
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
     <category term="CISPO" scheme="https://caiusy.github.io/tags/CISPO/"/>
     <category term="RLHF" scheme="https://caiusy.github.io/tags/RLHF/"/>
+    <category term="Group-Relative-Policy-Optimization" scheme="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/"/>
     <category term="Reference-Model" scheme="https://caiusy.github.io/tags/Reference-Model/"/>
     <category term="GPU" scheme="https://caiusy.github.io/tags/GPU/"/>
     <category term="LLM-Alignment" scheme="https://caiusy.github.io/tags/LLM-Alignment/"/>
-    <category term="Group-Relative-Policy-Optimization" scheme="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/"/>
     <id>https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/</id>
     <link href="https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"/>
     <published>2026-08-03T13:35:00.000Z</published>
@@ -141,11 +141,11 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
     <category term="RLHF" scheme="https://caiusy.github.io/tags/RLHF/"/>
-    <category term="Actor-Critic" scheme="https://caiusy.github.io/tags/Actor-Critic/"/>
-    <category term="GAE" scheme="https://caiusy.github.io/tags/GAE/"/>
     <category term="Reference-Model" scheme="https://caiusy.github.io/tags/Reference-Model/"/>
     <category term="GPU" scheme="https://caiusy.github.io/tags/GPU/"/>
     <category term="LLM-Alignment" scheme="https://caiusy.github.io/tags/LLM-Alignment/"/>
+    <category term="Actor-Critic" scheme="https://caiusy.github.io/tags/Actor-Critic/"/>
+    <category term="GAE" scheme="https://caiusy.github.io/tags/GAE/"/>
     <id>https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/</id>
     <link href="https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/"/>
     <published>2026-08-01T15:19:00.000Z</published>
@@ -261,8 +261,8 @@
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/categories/LeetCode/"/>
-    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
+    <category term="双指针" scheme="https://caiusy.github.io/tags/%E5%8F%8C%E6%8C%87%E9%92%88/"/>
     <category term="Hard" scheme="https://caiusy.github.io/tags/Hard/"/>
     <category term="数组" scheme="https://caiusy.github.io/tags/%E6%95%B0%E7%BB%84/"/>
     <id>https://caiusy.github.io/2026/03/10/leetcode-42-trapping-rain-water/</id>

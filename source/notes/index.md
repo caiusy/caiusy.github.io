@@ -71,7 +71,7 @@ description: 长期复习用的笔记总入口 — 概念笔记、论文笔记�
 - LoRA rank 消融
 - BEV 网格分辨率对比
 
-**入口**：[/categories/实验记录/](/categories/实验记录/)
+**入口**：[/engineering/](/engineering/)
 
 **新建**：`hexo new experiment-log "实验编号-描述"`
 

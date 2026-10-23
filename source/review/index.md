@@ -1,138 +1,52 @@
 ---
-title: Review Index
+title: 复习索引
 date: 2026-05-16
-updated: 2026-05-16
+updated: 2026-10-23
 type: topic
 layout: page
-description: 复习索引 — 按方向、状态、难度、笔记类型快速找到要复习的内容。
+menu_id: review
+description: 从相机几何、大模型到算法基础，沿着已发布的文章，用具体问题检验理解。
 ---
 
-## Review Index
+复习时先尝试回答问题，再打开文章核对公式、图示和代码。下面的入口都指向已经发布的内容。
 
-按多个维度索引博客中的知识点，帮助我快速复习。
+## 视觉与空间几何
 
----
-
-## 1. 按方向复习
-
-### BEV / 相机几何
-
-- 相机内参 — TODO
-- 相机外参 — TODO
-- 单应性矩阵 — TODO
-- Vanishing Point — TODO
-- IPM (Inverse Perspective Mapping) — TODO
-- LSS — TODO
-- BEVDet — TODO
-- GaussianLSS — TODO
-
-📁 全部入口：[/categories/BEV感知/](/categories/BEV感知/)
-
-### 雷达-相机融合
-
-- 雷达坐标系 — TODO
-- 图像坐标系 — TODO
-- 雷达到图像投影 — TODO
-- 点框匹配 — TODO
-- BEV 空间融合 — TODO
-- 有效检测区域 — TODO
-
-📁 全部入口：[/categories/雷达相机融合/](/categories/雷达相机融合/)
-
-### 多模态大模型
-
-- Transformer — TODO
-- Attention 机制 — TODO
-- BERT — TODO
-- GPT — TODO
-- CLIP — [LLaVA 终极指南](/) (现有文章) · TODO 重写
-- LLaVA — TODO
-- LoRA — TODO
-- QLoRA — TODO
-- MoE — TODO
-
-📁 全部入口：[/categories/多模态大模型/](/categories/多模态大模型/)
-
-### 工程实践
-
-- Docker — TODO
-- CUDA — TODO
-- PyTorch — TODO
-- Git — TODO
-- PyQt — TODO
-- OpenCV — TODO
-- 实验管理 — TODO
-
-📁 全部入口：[/categories/工程实践/](/categories/工程实践/)
-
-### 算法基础
-
-- 动态规划 — 见 [/categories/算法基础/](/categories/算法基础/)
-- 图论 / BFS / DFS — TODO
-- 链表 — TODO
-- 双指针 — TODO
-- 单调栈 — TODO
-
----
-
-## 2. 按复习状态复习
-
-| 状态 | 含义 | 链接 |
-|---|---|---|
-| `new` | 新笔记，尚未复习 | [/tags/new/](/tags/new/) |
-| `reviewing` | 正在复习 | [/tags/reviewing/](/tags/reviewing/) |
-| `mastered` | 已经掌握 | [/tags/mastered/](/tags/mastered/) |
-| `need-review` | 需要重新复习 | [/tags/need-review/](/tags/need-review/) |
-| `archived` | 归档 | [/tags/archived/](/tags/archived/) |
-
-> **使用说明**：在每篇 `note` 类型文章的 front-matter 加上 `tags: [reviewing]`（或对应状态），就会自动出现在上面对应链接里。Stellar 主题不支持 front-matter 字段直接做筛选 facet，所以暂时用 tag 实现。
-
----
-
-## 3. 按难度复习
-
-| 难度 | 含义 |
+| 文章 | 读完后试着回答 |
 |---|---|
-| `beginner` | 入门，第一次接触此话题就能读 |
-| `intermediate` | 有基础后再读会更顺 |
-| `advanced` | 需要相关研究背景 |
+| [相机几何完整指南](/2026/01/19/camera-geometry-complete-guide/) | 内参和外参各自完成哪一步坐标变换？ |
+| [从图像到俯视图](/2026/01/19/image-to-bird-eye-view/) | 单应性为什么需要平面假设？ |
+| [BEV 与路侧感知专题](/roadside-bev/) | 透视变换、BEV 表征和三维感知的边界在哪里？ |
+| [雷达与相机融合专题](/radar-camera-fusion/) | 坐标对齐和时间同步分别会产生什么误差？ |
 
-入口：[/tags/beginner/](/tags/beginner/) · [/tags/intermediate/](/tags/intermediate/) · [/tags/advanced/](/tags/advanced/)
+## 大模型：从表示到高效推理
 
----
-
-## 4. 按笔记类型复习
-
-| 类型 | 用途 |
+| 文章 | 读完后试着回答 |
 |---|---|
-| `concept` | 概念笔记 |
-| `paper` | 论文精读 |
-| `engineering` | 工程踩坑 |
-| `experiment` | 实验记录 |
-| `algorithm` | 算法模板 |
-| `project` | 项目文档 |
+| [Transformer 深入解析](/2026/02/02/Transformer-DeepDive/) | Q、K、V 的形状如何随多头划分变化？ |
+| [LLaVA 终极指南](/2026/03/04/LLaVA-Ultimate-Guide/) | 视觉特征如何进入语言模型的 token 序列？ |
+| [结合 MiniMind 理解 LoRA 与 MoE](/2026/08/30/结合-MiniMind-源码彻底搞懂-LoRA-与-MoE/) | LoRA 和 MoE 分别节省了什么，增加了什么？ |
+| [从 KV 缓存到 MLA](/2026/09/13/kv-cache-rope-mla-explained/) | 为什么历史 Q 不需要缓存？MLA 缓存里究竟是什么？ |
+| [DeepSeek DSA 与 Lightning Indexer](/2026/10/23/deepseek-dsa-lightning-indexer/) | 当前 Gate 为什么决定历史位置排名？Top-K 后读哪套缓存？ |
 
-对应分类入口：
+**动手验证**：[打开 DSA 交互实验室](/dsa-lab/)，改变一个 Gate，预测 Top-K 的变化，再检查结果。
 
-- 概念：[/categories/学习笔记/概念笔记/](/categories/学习笔记/概念笔记/)
-- 论文：[/categories/学习笔记/论文笔记/](/categories/学习笔记/论文笔记/)
-- 工程：[/categories/学习笔记/工程笔记/](/categories/学习笔记/工程笔记/)
-- 实验：[/categories/实验记录/](/categories/实验记录/)
-- 算法：[/categories/算法基础/](/categories/算法基础/)
-- 项目：[/projects/](/projects/)
+需要连续学习时，从[大模型阅读路线](/llm-reading-map/)进入。
 
----
+## 算法：从状态到实现
 
-## 5. 快速复习清单（每周）
+| 文章 | 读完后试着回答 |
+|---|---|
+| [动态规划：从递归到状态转移](/2026/07/13/dynamic-programming-from-recursion-to-state-transition/) | 状态包含哪些信息？为什么这些信息足够？ |
+| [图论与搜索](/2026/02/23/graph-theory-and-search/) | BFS 和 DFS 在状态访问顺序上有什么差异？ |
+| [单调栈指南](/2026/02/19/monotonic-stack-guide/) | 栈里保持什么单调性？弹出时确定了哪个答案？ |
+| [链表指针完整指南](/2026/02/22/linkedlist-pointer-complete-guide/) | 修改 next 之前，需要保留哪些后续节点？ |
 
-> 每周日花 30 分钟，过一遍这五道题：
+## 一次 30 分钟的复习
 
-1. 这周新写的笔记里，最重要的一条结论是什么？
-2. 上周标记 `need-review` 的内容，现在能凭印象回答吗？
-3. 这周遇到的某个工程坑，做成了一篇 engineering note 吗？
-4. 上次读的论文，能用 3 分钟讲清楚核心方法吗？
-5. 这周的实验，能用一张图说明结论吗？
+1. **5 分钟回忆**：选一个问题，不看原文写出自己的解释。
+2. **10 分钟核对**：对照文章里的例子，找出遗漏的前提和推导。
+3. **10 分钟动手**：复算一个数值、改一个参数，或写最小实现。
+4. **5 分钟记录**：写下一条仍然不确定的问题，下次从这里开始。
 
----
-
-> **维护原则**：本页随博客增长持续更新。每篇新增 `type: note` 的文章都应在第 1 节挂一个链接。
+更多内容：[学习笔记](/notes/) · [工程实践](/engineering/) · [完整归档](/archives/)

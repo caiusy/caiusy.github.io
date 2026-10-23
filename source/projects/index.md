@@ -94,7 +94,7 @@ GaussianLSS 在 LSS 框架基础上引入高斯深度分布，使深度预测更
 - loss 权重消融
 - BEV 网格分辨率对比
 
-**当前进展**：实验记录持续更新，[Experiment Logs](/categories/实验记录/)
+**当前进展**：实验记录持续更新，[Experiment Logs](/engineering/)
 
 **相关文章**
 - TODO: 写《GaussianLSS 论文精读》

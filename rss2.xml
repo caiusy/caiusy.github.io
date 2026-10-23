@@ -165,10 +165,10 @@
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
       <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
+      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
       <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
-      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <pubDate>Thu, 23 Jul 2026 12:30:00 GMT</pubDate>
     </item>
     <item>
@@ -402,8 +402,8 @@
 </blockquote>]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
       <category domain="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/">概念笔记</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/Python/">Python</category>

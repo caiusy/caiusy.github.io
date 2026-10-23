@@ -12,7 +12,25 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-10-04T12:00:00.000Z</updated>
+  <updated>2026-10-23T13:09:29.356Z</updated>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="大模型" scheme="https://caiusy.github.io/categories/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="模型架构" scheme="https://caiusy.github.io/categories/%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%A8%A1%E5%9E%8B%E6%9E%B6%E6%9E%84/"/>
+    <category term="DeepSeek" scheme="https://caiusy.github.io/tags/DeepSeek/"/>
+    <category term="DSA" scheme="https://caiusy.github.io/tags/DSA/"/>
+    <category term="Lightning Indexer" scheme="https://caiusy.github.io/tags/Lightning-Indexer/"/>
+    <category term="MLA" scheme="https://caiusy.github.io/tags/MLA/"/>
+    <category term="Sparse Attention" scheme="https://caiusy.github.io/tags/Sparse-Attention/"/>
+    <id>https://caiusy.github.io/2026/10/23/deepseek-dsa-lightning-indexer/</id>
+    <link href="https://caiusy.github.io/2026/10/23/deepseek-dsa-lightning-indexer/"/>
+    <published>2026-10-23T01:00:00.000Z</published>
+    <summary>用一个 token 的完整推理链路讲清 Lightning Indexer、动态 Gate、Top-K 与 MLA 两套缓存，附交互演示和成本估算。</summary>
+    <title>从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存</title>
+    <updated>2026-10-23T13:09:29.356Z</updated>
+  </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -465,8 +483,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="概念笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>
@@ -610,24 +628,6 @@
 <p>本文将基于我与 AI 的一次深度对话，系统地梳理 LoRA 的核心原理。我们不仅会用直觉去理解它，更会通过 <strong>数学证明</strong> 和 <strong>Python 模拟</strong> ，彻底搞懂为什么它需要除以 $r$ ，以及它在反向传播中是如何工作的。</p>]]>
     </summary>
     <title>深入浅出 LoRA：大模型微调的核心原理、数学证明与实战指南</title>
-    <updated>2026-05-15T17:03:44.260Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="BEV感知" scheme="https://caiusy.github.io/categories/BEV%E6%84%9F%E7%9F%A5/"/>
-    <category term="计算机视觉" scheme="https://caiusy.github.io/categories/BEV%E6%84%9F%E7%9F%A5/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
-    <category term="计算机视觉" scheme="https://caiusy.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
-    <category term="相机几何" scheme="https://caiusy.github.io/tags/%E7%9B%B8%E6%9C%BA%E5%87%A0%E4%BD%95/"/>
-    <category term="单应性矩阵" scheme="https://caiusy.github.io/tags/%E5%8D%95%E5%BA%94%E6%80%A7%E7%9F%A9%E9%98%B5/"/>
-    <id>https://caiusy.github.io/2026/01/19/camera-geometry-complete-guide/</id>
-    <link href="https://caiusy.github.io/2026/01/19/camera-geometry-complete-guide/"/>
-    <published>2026-01-19T14:30:00.000Z</published>
-    <summary>
-      <![CDATA[<p>本文详细推导从3D世界坐标系到2D图像坐标系的完整数学过程，包括相机内外参数、旋转矩阵、单应矩阵的推导与分解，并提供完整的Python可视化代码。</p>]]>
-    </summary>
-    <title>相机成像模型：从世界坐标到像素坐标的工程推导</title>
     <updated>2026-05-15T17:03:44.260Z</updated>
   </entry>
 </feed>

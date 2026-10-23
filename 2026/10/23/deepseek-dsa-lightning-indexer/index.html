@@ -1,0 +1,2170 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存 - Caius Lu</title>
+
+  
+    <meta name="description" content="用一个 token 的完整推理链路讲清 Lightning Indexer、动态 Gate、Top-K 与 MLA 两套缓存，附交互演示和成本估算。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存">
+<meta property="og:url" content="https://caiusy.github.io/2026/10/23/deepseek-dsa-lightning-indexer/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="用一个 token 的完整推理链路讲清 Lightning Indexer、动态 Gate、Top-K 与 MLA 两套缓存，附交互演示和成本估算。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-10-23T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-23T13:09:29.356Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="DeepSeek">
+<meta property="article:tag" content="DSA">
+<meta property="article:tag" content="Lightning Indexer">
+<meta property="article:tag" content="MLA">
+<meta property="article:tag" content="Sparse Attention">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="DeepSeek,DSA,Lightning Indexer,MLA,Sparse Attention">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-10-23T09:00:00+08:00","dateModified":"2026-10-23T21:09:29+08:00","datePublished":"2026-10-23T09:00:00+08:00","description":"DSA 的关键链路只有两步：Lightning Indexer 用小 Key 扫描全部历史并选出 Top-K，Sparse MLA 再从压缩缓存中读取这些位置。这篇文章从 token 9 的一次查询出发，逐个讲清 Query、共享 Key、动态 Gate、两套 Cache 与成本边界。\n👉 打开交互演示：自己调整 Gate、Top-K 与上下文长度","headline":"从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/10/23/deepseek-dsa-lightning-indexer/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/10/23/deepseek-dsa-lightning-indexer/","keywords":"DeepSeek, DSA, Lightning Indexer, MLA, Sparse Attention","image":[]}</script>
+  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+<body>
+
+<div class="l_body content" id="start" layout="post" type="article" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a class="nav-item active" title="Home" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:home-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="Projects" href="/projects/" style="color:#10B981"><img src="https://api.iconify.design/solar:rocket-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="BEV" href="/roadside-bev/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:camera-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="Fusion" href="/radar-camera-fusion/" style="color:#EC4899"><img src="https://api.iconify.design/solar:radar-bold-duotone.svg?color=%23EC4899"/></a><a class="nav-item" title="LLM" href="/llm-reading-map/" style="color:#8B5CF6"><img src="https://api.iconify.design/solar:atom-bold-duotone.svg?color=%238B5CF6"/></a><a class="nav-item" title="Notes" href="/notes/" style="color:#0EA5E9"><img src="https://api.iconify.design/solar:notebook-bookmark-bold-duotone.svg?color=%230EA5E9"/></a><a class="nav-item" title="Review" href="/review/" style="color:#F43F5E"><img src="https://api.iconify.design/solar:checklist-minimalistic-bold-duotone.svg?color=%23F43F5E"/></a><a class="nav-item" title="About" href="/about/" style="color:#64748B"><img src="https://api.iconify.design/solar:user-id-bold-duotone.svg?color=%2364748B"/></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+
+<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/10/23/deepseek-dsa-lightning-indexer/"><span class="title">从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存</span></a><a class="item title" href="/2026/10/04/llm-history-eighty-years/"><span class="title">大模型发展史：从“会算”到“会聊、会看、会做事”的八十年</span></a><a class="item title" href="/2026/10/01/deepseek-v2-v3-v4-moe-attention-loss/"><span class="title">从 DeepSeek-V2 到 V4：MoE、注意力与 Loss 的完整演进</span></a><a class="item title" href="/2026/09/13/kv-cache-rope-mla-explained/"><span class="title">从 KV 缓存到 MLA：把每一步都算清楚</span></a><a class="item title" href="/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"><span class="title">结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></a><a class="item title" href="/2026/08/25/minimind-to-minimind-v-real-training-source-code/"><span class="title">从 MiniMind 到 MiniMind-V：Pretrain、SFT、视觉 Token 与 Loss 的源码级推导</span></a><a class="item title" href="/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"><span class="title">MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/minimind-ppo-from-rollout-to-loss/"><span class="title">MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/yolov10-vehicle-pose-compression/"><span class="title">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</span></a><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner slide-up top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%A8%A1%E5%9E%8B%E6%9E%B6%E6%9E%84/">模型架构</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-10-23T01:00:00.000Z">2026-10-23</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-10-23T13:09:29.356Z">2026-10-23</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content slide-up"><p>DSA 的关键链路只有两步：<strong>Lightning Indexer 用小 Key 扫描全部历史并选出 Top-K，Sparse MLA 再从压缩缓存中读取这些位置</strong>。这篇文章从 token 9 的一次查询出发，逐个讲清 Query、共享 Key、动态 Gate、两套 Cache 与成本边界。</p>
+<p>👉 <a href="/dsa-lab/">打开交互演示：自己调整 Gate、Top-K 与上下文长度</a></p>
+<span id="more"></span>
+
+
+
+<blockquote>
+<p>这篇文章不是从论文公式开始，而是从我真正学习 DSA 时卡住的几个问题开始：</p>
+<ul>
+<li><code>W_K</code> 是共享的，那 <code>k_t</code> 为什么又说不共享？</li>
+<li>Head weights 到底是共享参数，还是每个 token 自己的值？</li>
+<li>为什么 Lightning Indexer 每一步必须用<strong>当前 token 的 Gate</strong>？</li>
+<li>当前 token 的 <code>k_t</code> 当下好像没用，为什么还要计算？</li>
+<li>历史 token 是不是要缓存 <code>h</code>，然后每次重新算 Key？</li>
+<li>Top-K 选完以后，是不是还要访问 MLA 的压缩缓存？</li>
+<li>Lightning Indexer 自己扫完整历史，那它真的省计算吗？</li>
+</ul>
+<p>把这些问题理清之后，DSA 的推理链路其实非常干净。</p>
+</blockquote>
+<blockquote>
+<p><strong>阅读范围</strong>：DeepSeek-V3.2 技术报告与 V3.2-Exp 官方 reference 实现，聚焦 Lightning Indexer 的推理链路与训练对齐，不展开 MoE 与后训练。所有配图为机制示意，按报告/官方代码重绘，收益注明比较条件；教学例子的数值人为设定，不代表实测日志。</p>
+<p><strong>公式分级</strong>：本文公式分三等——报告原式（注明出处）、统一符号重写（结构不变，符号按本文约定）、教学示意式（只服务第一阶段理解与复现）。三者不混用；第 6 节的打分式是报告式 (1) 的统一符号重写（报告中 Gate 记为 $w^I_{t,j}$，本文记为 $g_{t,j}$）。</p>
+</blockquote>
+<hr>
+<h3 id="0-先给结论：DSA-到底在做什么？"><a href="#0-先给结论：DSA-到底在做什么？" class="headerlink" title="0. 先给结论：DSA 到底在做什么？"></a>0. 先给结论：DSA 到底在做什么？</h3><p>DeepSeek Sparse Attention（DSA）的核心不是“完全不看长上下文”，而是：</p>
+<blockquote>
+<p><strong>先用便宜的 Lightning Indexer 扫描全部历史 token，找出 Top-K；再让昂贵的 MLA Attention 只处理这些 Top-K 位置。</strong></p>
+</blockquote>
+<p>可以把它理解成搜索系统里的：</p>
+<blockquote>
+<p><strong>粗排 → 精排</strong></p>
+</blockquote>
+<p><img src="/images/deepseek-dsa-lightning-indexer/01_overview.svg" alt="DeepSeek DSA 两阶段：轻量 Indexer 扫描全部历史，Sparse MLA 读取 Top-K"></p>
+<p><em>图 1：DSA 的两阶段结构。Indexer 便宜但全量扫描，MLA 昂贵但只读 Top-2048；两套 Cache 一套负责找位置、一套负责真正计算，不能互相替代。</em></p>
+<p>Lightning Indexer 的目标不是直接产生 Attention 输出，而是回答：</p>
+<blockquote>
+<p><strong>“对于当前 token，我最应该去历史的哪些位置取信息？”</strong></p>
+</blockquote>
+<hr>
+<h2 id="1-第一件最容易混淆的事：参数和动态值不是一回事"><a href="#1-第一件最容易混淆的事：参数和动态值不是一回事" class="headerlink" title="1. 第一件最容易混淆的事：参数和动态值不是一回事"></a>1. 第一件最容易混淆的事：参数和动态值不是一回事</h2><p>学习 Lightning Indexer 时，我最开始反复混淆：</p>
+<ul>
+<li><code>W_K</code></li>
+<li><code>k_t</code></li>
+<li><code>W_G</code></li>
+<li><code>g_t</code></li>
+<li><code>W_Q</code></li>
+<li><code>q_t</code></li>
+</ul>
+<p>核心原因是：<strong>大写 W 是模型参数，小写 q/k/g 是某个 token 运行时产生的动态值。</strong></p>
+<h3 id="1-1-同一层中，参数是共享的"><a href="#1-1-同一层中，参数是共享的" class="headerlink" title="1.1 同一层中，参数是共享的"></a>1.1 同一层中，参数是共享的</h3><p>为了讲清楚，本文统一用下面的教学符号：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$W_Q^I$</td>
+<td>生成 Indexer Query 的参数</td>
+</tr>
+<tr>
+<td>$W_K^I$</td>
+<td>生成 Indexer Key 的参数</td>
+</tr>
+<tr>
+<td>$W_G^I$</td>
+<td>生成 Gate / Head Mixer 的参数</td>
+</tr>
+<tr>
+<td>$q_{t,j}^I$</td>
+<td>当前 token $t$ 的第 $j$ 个 Indexer Query</td>
+</tr>
+<tr>
+<td>$k_t^I$</td>
+<td>token $t$ 的 Indexer Key</td>
+</tr>
+<tr>
+<td>$g_{t,j}$</td>
+<td>当前 token $t$ 对第 $j$ 个 Indexer Head 的动态 Gate</td>
+</tr>
+<tr>
+<td>$r_{t,s}$</td>
+<td>当前 token $t$ 对历史 token $s$ 的 Indexer ranking score</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>注：DeepSeek 论文/代码里 Gate 系数常写成 $w^I_{t,j}$。为了避免和参数矩阵 <code>W</code> 混淆，本文统一改写成 $g_{t,j}$。数学含义不变。</p>
+</blockquote>
+<p>同一层里的所有 token 使用<strong>同一套参数</strong>：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">h1  ─┐</span><br><span class="line">h2  ─┼──&gt; 同一个 W_K^I ──&gt; k1, k2, ...</span><br><span class="line">h3  ─┤</span><br><span class="line">...  │</span><br><span class="line">ht  ─┘</span><br></pre></td></tr></tbody></table></figure>
+
+<p>所以：</p>
+
+$$
+k_t^I = W_K^I h_t
+$$
+
+
+<p><code>W_K^I</code> 共享，但 <code>h_t</code> 不同，因此每个 token 的 <code>k_t^I</code> 当然不同。</p>
+<p>这和一个最简单的函数完全一样：</p>
+
+$$
+y=2x
+$$
+
+
+<p><code>2</code> 没有变，但输入 <code>x</code> 不同，输出 <code>y</code> 就不同。</p>
+<hr>
+<h3 id="1-2-“共享参数”不等于“输出相同”"><a href="#1-2-“共享参数”不等于“输出相同”" class="headerlink" title="1.2 “共享参数”不等于“输出相同”"></a>1.2 “共享参数”不等于“输出相同”</h3><p>下面这张表是整篇最值得记住的表：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th align="right">是模型参数吗</th>
+<th align="right">跨 token 共享吗</th>
+<th align="right">会随 token 改变吗</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$W_Q^I$</td>
+<td align="right">✅</td>
+<td align="right">✅</td>
+<td align="right">❌</td>
+</tr>
+<tr>
+<td>$W_K^I$</td>
+<td align="right">✅</td>
+<td align="right">✅</td>
+<td align="right">❌</td>
+</tr>
+<tr>
+<td>$W_G^I$</td>
+<td align="right">✅</td>
+<td align="right">✅</td>
+<td align="right">❌</td>
+</tr>
+<tr>
+<td>$q_t^I$</td>
+<td align="right">❌</td>
+<td align="right">❌</td>
+<td align="right">✅</td>
+</tr>
+<tr>
+<td>$k_t^I$</td>
+<td align="right">❌</td>
+<td align="right">❌</td>
+<td align="right">✅</td>
+</tr>
+<tr>
+<td>$g_t$</td>
+<td align="right">❌</td>
+<td align="right">❌</td>
+<td align="right">✅</td>
+</tr>
+</tbody></table>
+<p>一句话：</p>
+<blockquote>
+<p><strong>共享的是“生成规则”，不是生成结果。</strong></p>
+</blockquote>
+<hr>
+<h2 id="2-从当前-token-9-开始走一遍-Lightning-Indexer"><a href="#2-从当前-token-9-开始走一遍-Lightning-Indexer" class="headerlink" title="2. 从当前 token 9 开始走一遍 Lightning Indexer"></a>2. 从当前 token 9 开始走一遍 Lightning Indexer</h2><p>假设历史已经有：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">token1 token2 token3 ... token8</span><br></pre></td></tr></tbody></table></figure>
+
+<p>现在处理：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">token9</span><br></pre></td></tr></tbody></table></figure>
+
+<p>进入当前 Transformer 层之后，token9 已经有隐藏状态：</p>
+
+$$
+h_9 \in \mathbb{R}^{D}
+$$
+
+
+<p>为了先理解原理，假设：</p>
+
+$$
+D=768
+$$
+
+
+<p>Lightning Indexer 会围绕 <code>h9</code> 产生三类信息。</p>
+<p><img src="/images/deepseek-dsa-lightning-indexer/05_paths.svg" alt="DSA 机制图 1"></p>
+<p>三者分工完全不同：</p>
+<ul>
+<li><code>q9</code>：<strong>我要从哪些检索角度找历史信息？</strong></li>
+<li><code>g9</code>：<strong>对于当前 token，这些检索角度各有多重要？</strong></li>
+<li><code>k9</code>：<strong>把 token9 自己编码成未来其他 token 可以查询的检索 Key。</strong></li>
+</ul>
+<hr>
+<h2 id="3-Indexer-Query：当前-token-“拿什么去搜”"><a href="#3-Indexer-Query：当前-token-“拿什么去搜”" class="headerlink" title="3. Indexer Query：当前 token “拿什么去搜”"></a>3. Indexer Query：当前 token “拿什么去搜”</h2><p>假设 Indexer 有 $H_I$ 个 Query Head，每个 Head 维度为 $d_I$。</p>
+<p>教学版可以写成：</p>
+
+$$
+Q_t^I = W_Q^I h_t
+$$
+
+
+<p>然后 reshape：</p>
+
+$$
+Q_t^I \in \mathbb{R}^{H_I \times d_I}
+$$
+
+
+<p>例如：</p>
+
+$$
+H_I=4,\qquad d_I=64
+$$
+
+
+<p>那么当前 token9 得到：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">q9,1 : 64 维</span><br><span class="line">q9,2 : 64 维</span><br><span class="line">q9,3 : 64 维</span><br><span class="line">q9,4 : 64 维</span><br></pre></td></tr></tbody></table></figure>
+
+<p>多个 Query Head 可以理解成：</p>
+<blockquote>
+<p><strong>同一个当前 token，从多个不同的检索子空间去判断历史 token 是否相关。</strong></p>
+</blockquote>
+<p>这里不要人为规定“Head1 一定负责实体、Head2 一定负责位置”。这些分工是训练自己学出来的。</p>
+<hr>
+<h2 id="4-Indexer-Key：历史-token-“被怎么检索”"><a href="#4-Indexer-Key：历史-token-“被怎么检索”" class="headerlink" title="4. Indexer Key：历史 token “被怎么检索”"></a>4. Indexer Key：历史 token “被怎么检索”</h2><p>每个 token 都会经过同一个 <code>W_K^I</code>：</p>
+
+$$
+k_s^I = W_K^I h_s
+$$
+
+
+<p>于是历史缓存中有：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">token1 -&gt; k1</span><br><span class="line">token2 -&gt; k2</span><br><span class="line">token3 -&gt; k3</span><br><span class="line">...</span><br><span class="line">token8 -&gt; k8</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这里 Lightning Indexer 有一个非常重要的设计：</p>
+<blockquote>
+<p><strong>Query 是多头的，但每个历史 token 只有一个共享 Indexer Key。</strong></p>
+</blockquote>
+<p>也就是说判断 token5 时：</p>
+<p><img src="/images/deepseek-dsa-lightning-indexer/06_shared_key.svg" alt="DSA 机制图 2"></p>
+<p>不是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">q1 -&gt; k_head1</span><br><span class="line">q2 -&gt; k_head2</span><br><span class="line">q3 -&gt; k_head3</span><br></pre></td></tr></tbody></table></figure>
+
+<p>而是多个 Query Head 都和同一个 <code>k5</code> 比较。</p>
+<p>这样做的直觉是：</p>
+<blockquote>
+<p><strong>多 Query 保留多视角检索能力；单共享 Key 降低 Key Cache 和历史扫描成本。</strong></p>
+</blockquote>
+<hr>
+<h2 id="5-Gate：为什么必须是“当前-token-的-g-t”"><a href="#5-Gate：为什么必须是“当前-token-的-g-t”" class="headerlink" title="5. Gate：为什么必须是“当前 token 的 g_t”"></a>5. Gate：为什么必须是“当前 token 的 g_t”</h2><p>这是我学习过程中最关键的一个理解点。</p>
+<p>当前 token 会产生：</p>
+
+$$
+g_t = W_G^I h_t
+$$
+
+
+<p>如果 Indexer 有 4 个 Query Head：</p>
+
+$$
+g_t=[g_{t,1},g_{t,2},g_{t,3},g_{t,4}]
+$$
+
+
+<p>例如 token9：</p>
+
+$$
+g_9=[0.8,\ 0.2,\ -0.3,\ 1.1]
+$$
+
+
+<p>这里的 <code>g9</code> <strong>不是共享参数</strong>。</p>
+<p>共享的是：</p>
+
+$$
+W_G^I
+$$
+
+
+<p>不同 token 经过同一个 $W_G^I$，会产生不同的 Gate：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">h8  -&gt; W_G^I -&gt; g8</span><br><span class="line">h9  -&gt; W_G^I -&gt; g9</span><br><span class="line">h10 -&gt; W_G^I -&gt; g10</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因此：</p>
+
+$$
+g_8 \neq g_9 \neq g_{10}
+$$
+
+
+<hr>
+<h3 id="5-1-Gate-的真正含义"><a href="#5-1-Gate-的真正含义" class="headerlink" title="5.1 Gate 的真正含义"></a>5.1 Gate 的真正含义</h3><p>我最后把它理解为：</p>
+<blockquote>
+<p><strong><code>g_t</code> 本质上是一个 query-conditioned head mixer。</strong></p>
+</blockquote>
+<p>也就是：</p>
+<blockquote>
+<p><strong>站在当前 token 的角度，动态决定多个 Indexer Query Head 的判断应该怎么混合。</strong></p>
+</blockquote>
+<p>这就是为什么必须使用**当前 token 的 <code>g_t</code>**。</p>
+<p>当前的问题是：</p>
+<blockquote>
+<p>“token9 现在最需要从历史中找什么？”</p>
+</blockquote>
+<p>而不是：</p>
+<blockquote>
+<p>“历史 token5 自己认为哪个 Head 比较重要？”</p>
+</blockquote>
+<p>所以整个检索必须由当前 Query 驱动。</p>
+<hr>
+<h2 id="6-Lightning-Indexer-怎么给历史-token-打分？"><a href="#6-Lightning-Indexer-怎么给历史-token-打分？" class="headerlink" title="6. Lightning Indexer 怎么给历史 token 打分？"></a>6. Lightning Indexer 怎么给历史 token 打分？</h2><p>现在评价：</p>
+<blockquote>
+<p>token9 是否应该关注历史 token5？</p>
+</blockquote>
+<p>token9 有多个 Query：</p>
+
+$$
+q_{9,1},q_{9,2},q_{9,3}
+$$
+
+
+<p>token5 有一个：</p>
+
+$$
+k_5
+$$
+
+
+<p>先分别做点积：</p>
+
+$$
+q_{9,1}^{T}k_5
+$$
+
+
+
+$$
+q_{9,2}^{T}k_5
+$$
+
+
+
+$$
+q_{9,3}^{T}k_5
+$$
+
+
+<p>假设得到：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Head1 =  2.0</span><br><span class="line">Head2 = -1.0</span><br><span class="line">Head3 =  3.0</span><br></pre></td></tr></tbody></table></figure>
+
+<p>先过 ReLU：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Head1 = 2.0</span><br><span class="line">Head2 = 0</span><br><span class="line">Head3 = 3.0</span><br></pre></td></tr></tbody></table></figure>
+
+<p>当前 token9 的 Gate：</p>
+
+$$
+g_9=[0.8,\ 0.2,\ -0.3]
+$$
+
+
+<p>于是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Head1: 2.0 ×  0.8 =  1.60</span><br><span class="line">Head2: 0.0 ×  0.2 =  0.00</span><br><span class="line">Head3: 3.0 × -0.3 = -0.90</span><br></pre></td></tr></tbody></table></figure>
+
+<p>最后加起来：</p>
+
+$$
+r_{9,5}=1.6+0-0.9=0.7
+$$
+
+
+<p>这个：</p>
+
+$$
+\boxed{r_{9,5}=0.7}
+$$
+
+
+<p>就是：</p>
+<blockquote>
+<p><strong>当前 token9 对历史 token5 的 Lightning Indexer ranking score。</strong></p>
+</blockquote>
+<p><img src="/images/deepseek-dsa-lightning-indexer/02_scoring.svg" alt="Lightning Indexer 三个 Head 的 ReLU、Gate 与求和数值示意"></p>
+<p><em>图 2：第 6 节数值例子的完整流水线。三个 Head 共享同一个 $k_5$，差别只来自各自的 Query 与当前 token 的 Gate；数值人为设定。</em></p>
+<hr>
+<h3 id="6-1-它不是概率"><a href="#6-1-它不是概率" class="headerlink" title="6.1 它不是概率"></a>6.1 它不是概率</h3><p>Indexer Score：</p>
+<ul>
+<li>可以大于 1；</li>
+<li>可以小于 0；</li>
+<li>没有固定的 $[0,1]$ 或 $[-1,1]$ 范围。</li>
+</ul>
+<p>原因是：</p>
+
+$$
+\mathrm{ReLU}(q^Tk)\ge 0
+$$
+
+
+<p>但 Gate：</p>
+
+$$
+g_{t,j}
+$$
+
+
+<p>可以是正，也可以是负。</p>
+<p>所以：</p>
+
+$$
+r_{t,s}
+=
+\sum_j
+g_{t,j}\mathrm{ReLU}(q_{t,j}^Tk_s)
+$$
+
+
+<p>理论上可以取正值或负值。</p>
+<p>它的意义只是：</p>
+<blockquote>
+<p><strong>Ranking Score——用于比较历史 token 谁更值得被选。</strong></p>
+</blockquote>
+<hr>
+<h2 id="7-Top-K：排的是历史-token，不是-Head"><a href="#7-Top-K：排的是历史-token，不是-Head" class="headerlink" title="7. Top-K：排的是历史 token，不是 Head"></a>7. Top-K：排的是历史 token，不是 Head</h2><p>这也是一个很容易误解的点。</p>
+<p>Gate 并不是：</p>
+<blockquote>
+<p>对 Head 排序，然后只保留几个 Head。</p>
+</blockquote>
+<p>错误理解：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Head1</span><br><span class="line">Head2 -&gt; Top-K Heads   ×</span><br><span class="line">Head3</span><br></pre></td></tr></tbody></table></figure>
+
+<p>真正流程是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">多个 Head</span><br><span class="line">    ↓</span><br><span class="line">共同给 token1 一个 score</span><br><span class="line">共同给 token2 一个 score</span><br><span class="line">共同给 token3 一个 score</span><br><span class="line">...</span><br><span class="line">    ↓</span><br><span class="line">对“历史 token score”排序</span><br></pre></td></tr></tbody></table></figure>
+
+<p>例如：</p>
+<table>
+<thead>
+<tr>
+<th>历史 token</th>
+<th align="right">Ranking Score</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>token1</td>
+<td align="right">0.3</td>
+</tr>
+<tr>
+<td>token2</td>
+<td align="right">2.8</td>
+</tr>
+<tr>
+<td>token3</td>
+<td align="right">-0.4</td>
+</tr>
+<tr>
+<td>token4</td>
+<td align="right">1.1</td>
+</tr>
+<tr>
+<td>token5</td>
+<td align="right">0.7</td>
+</tr>
+<tr>
+<td>token6</td>
+<td align="right">3.7</td>
+</tr>
+<tr>
+<td>token7</td>
+<td align="right">2.1</td>
+</tr>
+<tr>
+<td>token8</td>
+<td align="right">0.2</td>
+</tr>
+</tbody></table>
+<p>如果：</p>
+
+$$
+K=3
+$$
+
+
+<p>那么：</p>
+
+$$
+\text{TopK}=[6,2,7]
+$$
+
+
+<p>Lightning Indexer 到这里就完成任务了。</p>
+<p>它最终需要提供的核心结果就是：</p>
+<blockquote>
+<p><strong>Top-K 历史位置。</strong></p>
+</blockquote>
+<hr>
+<h2 id="8-一个非常重要的问题：当前的-k9-当下不是没用吗？"><a href="#8-一个非常重要的问题：当前的-k9-当下不是没用吗？" class="headerlink" title="8. 一个非常重要的问题：当前的 k9 当下不是没用吗？"></a>8. 一个非常重要的问题：当前的 k9 当下不是没用吗？</h2><p>最开始我有一个困惑：</p>
+<blockquote>
+<p>token9 当前查询历史时已经有 <code>q9 + g9</code> 了，那为什么还要算 <code>k9</code>？</p>
+</blockquote>
+<p>答案有两层。</p>
+<h3 id="8-1-当前-causal-self-attention-可以包含自己"><a href="#8-1-当前-causal-self-attention-可以包含自己" class="headerlink" title="8.1 当前 causal self-attention 可以包含自己"></a>8.1 当前 causal self-attention 可以包含自己</h3><p>官方 reference inference 的顺序是：</p>
+<ol>
+<li>计算 <code>k9</code></li>
+<li>将 <code>k9</code> 写入 Indexer K Cache</li>
+<li><code>q9</code> 扫描到 <code>end_pos</code></li>
+</ol>
+<p>因此当前位置本身也可以参与 causal self-attention。</p>
+<h3 id="8-2-更重要：k9-是给未来-token-用的"><a href="#8-2-更重要：k9-是给未来-token-用的" class="headerlink" title="8.2 更重要：k9 是给未来 token 用的"></a>8.2 更重要：k9 是给未来 token 用的</h3><p>即便为了教学把当前位置自己排除，<code>k9</code> 仍然必须计算。</p>
+<p>因为 token10 来的时候需要：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">q10 + g10</span><br><span class="line">    ↓</span><br><span class="line">扫描</span><br><span class="line">k1 k2 ... k8 k9 k10</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因此：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">q9 : 当前查询使用，用完即可丢</span><br><span class="line">g9 : 当前混合 Head 使用，用完即可丢</span><br><span class="line">k9 : 写入 Indexer Cache，未来继续使用</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="9-会不会缓存历史-h，然后每次重新算-k？"><a href="#9-会不会缓存历史-h，然后每次重新算-k？" class="headerlink" title="9. 会不会缓存历史 h，然后每次重新算 k？"></a>9. 会不会缓存历史 h，然后每次重新算 k？</h2><p>不会。</p>
+<p>这是另一个关键误区。</p>
+<p>如果系统每次都：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">保存 h1...h100000</span><br><span class="line">然后每个 decode step：</span><br><span class="line">h1 -&gt; WK -&gt; k1</span><br><span class="line">h2 -&gt; WK -&gt; k2</span><br><span class="line">...</span><br></pre></td></tr></tbody></table></figure>
+
+<p>那开销会非常离谱。</p>
+<p>真实逻辑是：</p>
+<p><img src="/images/deepseek-dsa-lightning-indexer/07_lifecycle.svg" alt="DSA 机制图 3"></p>
+<p>因此历史只需要缓存已经计算好的：</p>
+
+$$
+k_1,k_2,\ldots,k_t
+$$
+
+
+<p>不需要为了 Indexer 缓存历史 <code>h</code>。</p>
+<hr>
+<h2 id="10-每一步都重新计算-q-t-和-g-t，会不会很贵？"><a href="#10-每一步都重新计算-q-t-和-g-t，会不会很贵？" class="headerlink" title="10. 每一步都重新计算 q_t 和 g_t，会不会很贵？"></a>10. 每一步都重新计算 q_t 和 g_t，会不会很贵？</h2><p>每生成一个新 token，只需要计算<strong>当前 token 自己的</strong>：</p>
+
+$$
+q_t,\quad g_t,\quad k_t
+$$
+
+
+<p>不会重新计算历史：</p>
+
+$$
+q_1,\ldots,q_{t-1}
+$$
+
+
+<p>也不会重新计算历史：</p>
+
+$$
+g_1,\ldots,g_{t-1}
+$$
+
+
+<p>这些投影的成本本身与历史长度 $L$ 无关。</p>
+<p>真正随着上下文变长的成本来自：</p>
+<blockquote>
+<p><strong>当前 <code>q_t + g_t</code> 扫描历史 Indexer Key Cache。</strong></p>
+</blockquote>
+<p>也就是说 DSA 没有让“全历史扫描”消失。</p>
+<p>它只是把：</p>
+<blockquote>
+<p><strong>昂贵的主 Attention 全历史扫描</strong></p>
+</blockquote>
+<p>替换成：</p>
+<blockquote>
+<p><strong>轻量 Indexer 全历史扫描 + Top-K 主 Attention</strong></p>
+</blockquote>
+<hr>
+<h2 id="11-Lightning-Indexer-之后：进入-MLA-第二阶段"><a href="#11-Lightning-Indexer-之后：进入-MLA-第二阶段" class="headerlink" title="11. Lightning Indexer 之后：进入 MLA 第二阶段"></a>11. Lightning Indexer 之后：进入 MLA 第二阶段</h2><p>这里必须把两套 Cache 分开。</p>
+<p><img src="/images/deepseek-dsa-lightning-indexer/08_dual_cache.svg" alt="DSA 机制图 4"></p>
+<h3 id="第一套-Cache：Indexer-Cache"><a href="#第一套-Cache：Indexer-Cache" class="headerlink" title="第一套 Cache：Indexer Cache"></a>第一套 Cache：Indexer Cache</h3><p>主要保存：</p>
+
+$$
+k_s^I
+$$
+
+
+<p>作用：</p>
+<blockquote>
+<p><strong>找历史位置。</strong></p>
+</blockquote>
+<h3 id="第二套-Cache：MLA-压缩缓存"><a href="#第二套-Cache：MLA-压缩缓存" class="headerlink" title="第二套 Cache：MLA 压缩缓存"></a>第二套 Cache：MLA 压缩缓存</h3><p>保存 MLA 的压缩表示，例如：</p>
+
+$$
+c_s^{KV}
+$$
+
+
+<p>以及位置编码相关缓存。</p>
+<p>作用：</p>
+<blockquote>
+<p><strong>真正进行 Attention。</strong></p>
+</blockquote>
+<p>这里本文默认讨论的是 MLA 压缩缓存，不把它重新解释为“缓存完整 K/V”。</p>
+<hr>
+<h2 id="12-Top-K-后发生什么？"><a href="#12-Top-K-后发生什么？" class="headerlink" title="12. Top-K 后发生什么？"></a>12. Top-K 后发生什么？</h2><p>假设 Lightning Indexer 得到：</p>
+
+$$
+[6,2,7]
+$$
+
+
+<p>第二阶段根据这些位置访问 MLA 的压缩缓存：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">position 6 -&gt; cKV6 + PE6</span><br><span class="line">position 2 -&gt; cKV2 + PE2</span><br><span class="line">position 7 -&gt; cKV7 + PE7</span><br></pre></td></tr></tbody></table></figure>
+
+<p>然后进行真正的 Sparse MLA Attention。</p>
+<p>所以完整链路：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">当前 h_t</span><br><span class="line">   ↓</span><br><span class="line">当前 Indexer q_t + g_t</span><br><span class="line">   ↓</span><br><span class="line">扫描历史 Indexer k cache</span><br><span class="line">   ↓</span><br><span class="line">Ranking Scores</span><br><span class="line">   ↓</span><br><span class="line">Top-K indices</span><br><span class="line">   ↓</span><br><span class="line">按位置访问 MLA 压缩缓存</span><br><span class="line">   ↓</span><br><span class="line">Sparse MLA Attention</span><br><span class="line">   ↓</span><br><span class="line">o_t</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这才是 DSA + MLA 在推理时最应该形成的脑图。</p>
+<hr>
+<h2 id="13-为什么-DSA-要维护两套-Cache？"><a href="#13-为什么-DSA-要维护两套-Cache？" class="headerlink" title="13. 为什么 DSA 要维护两套 Cache？"></a>13. 为什么 DSA 要维护两套 Cache？</h2><p>如果直接用 MLA 的主缓存做第一次“找位置”，Indexer 本身就会变重。</p>
+<p>所以 DeepSeek 单独设计了一套非常轻量的 Indexer Key：</p>
+<blockquote>
+<p><strong>小 Key 负责检索，大信息留给 MLA。</strong></p>
+</blockquote>
+<p>类比搜索系统：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>类比</th>
+<th>目标</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Lightning Indexer</td>
+<td>倒排/粗排</td>
+<td>快速找到候选</td>
+</tr>
+<tr>
+<td>Top-K</td>
+<td>候选集合</td>
+<td>缩小搜索空间</td>
+</tr>
+<tr>
+<td>MLA Attention</td>
+<td>精排/读取正文</td>
+<td>高精度信息融合</td>
+</tr>
+</tbody></table>
+<p><img src="/images/deepseek-dsa-lightning-indexer/03_caches.svg" alt="MHA、MLA 和 Indexer 每历史 token 每层核心缓存字节数对比"></p>
+<p><em>图 3：每历史 token、每层的缓存字节数（对数轴）。口径：MHA 基线为 K/V 各 128 头 × 128 维、BF16；MLA 为 $c^{KV}$ 512 维 + RoPE 64 维、BF16；Indexer Key 为 128 维、FP8，均不含量化 scale 等元数据。Indexer 的单位置成本比 MLA 压缩缓存还低近一个数量级——全量扫描在访存上才成立。</em></p>
+<hr>
+<h2 id="14-参数量：先看一个教学版"><a href="#14-参数量：先看一个教学版" class="headerlink" title="14. 参数量：先看一个教学版"></a>14. 参数量：先看一个教学版</h2><p>为了容易复现，设：</p>
+
+$$
+D=768,\qquad H_I=4,\qquad d_I=64
+$$
+
+
+<p>教学版直接使用：</p>
+
+$$
+h_t\rightarrow W_Q^I\rightarrow H_I\times d_I
+$$
+
+
+<p>忽略 bias 和 norm。</p>
+<h3 id="Query-投影"><a href="#Query-投影" class="headerlink" title="Query 投影"></a>Query 投影</h3>
+$$
+768\times(4\times64)=196608
+$$
+
+
+<h3 id="Key-投影"><a href="#Key-投影" class="headerlink" title="Key 投影"></a>Key 投影</h3><p>因为 Key 是共享单头：</p>
+
+$$
+768\times64=49152
+$$
+
+
+<h3 id="Gate-投影"><a href="#Gate-投影" class="headerlink" title="Gate 投影"></a>Gate 投影</h3>
+$$
+768\times4=3072
+$$
+
+
+<h3 id="总参数量"><a href="#总参数量" class="headerlink" title="总参数量"></a>总参数量</h3>
+$$
+196608+49152+3072=248832
+$$
+
+
+<p>即：</p>
+
+$$
+\boxed{\approx0.249M}
+$$
+
+
+<p>对于教学模型而言，这个 Indexer 很小。</p>
+<hr>
+<h2 id="15-DeepSeek-V3-2-Exp-官方-Indexer-参数量"><a href="#15-DeepSeek-V3-2-Exp-官方-Indexer-参数量" class="headerlink" title="15. DeepSeek-V3.2-Exp 官方 Indexer 参数量"></a>15. DeepSeek-V3.2-Exp 官方 Indexer 参数量</h2><p>官方 671B 配置中：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dim              = 7168</span><br><span class="line">q_lora_rank      = 1536</span><br><span class="line">index_n_heads    = 64</span><br><span class="line">index_head_dim   = 128</span><br><span class="line">index_topk       = 2048</span><br></pre></td></tr></tbody></table></figure>
+
+<p>需要注意：</p>
+<blockquote>
+<p><strong>官方 Query 路径并不是教学版的 <code>h -&gt; WQ</code>。</strong></p>
+</blockquote>
+<p>它复用了 MLA Query 的低秩中间表示：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">h_t</span><br><span class="line"> ↓</span><br><span class="line">MLA wq_a</span><br><span class="line"> ↓</span><br><span class="line">q_norm</span><br><span class="line"> ↓</span><br><span class="line">qr (1536维)</span><br><span class="line"> ↓</span><br><span class="line">Indexer wq_b</span><br><span class="line"> ↓</span><br><span class="line">64 × 128 个 Indexer Query 分量</span><br></pre></td></tr></tbody></table></figure>
+
+<p>因此 Indexer 自己新增的 Query 投影是：</p>
+
+$$
+W_{q,b}^{I}:1536\rightarrow64\times128
+$$
+
+
+<h4 id="15-1-wq-b"><a href="#15-1-wq-b" class="headerlink" title="15.1 wq_b"></a>15.1 <code>wq_b</code></h4>
+$$
+1536\times(64\times128)
+$$
+
+
+
+$$
+=12,582,912
+$$
+
+
+<p>约：</p>
+
+$$
+12.58M
+$$
+
+
+<h4 id="15-2-wk"><a href="#15-2-wk" class="headerlink" title="15.2 wk"></a>15.2 <code>wk</code></h4>
+$$
+7168\times128=917,504
+$$
+
+
+<p>约：</p>
+
+$$
+0.918M
+$$
+
+
+<h4 id="15-3-weights-proj（本文-WG）"><a href="#15-3-weights-proj（本文-WG）" class="headerlink" title="15.3 weights_proj（本文 WG）"></a>15.3 <code>weights_proj</code>（本文 WG）</h4>
+$$
+7168\times64=458,752
+$$
+
+
+<p>约：</p>
+
+$$
+0.459M
+$$
+
+
+<h4 id="15-4-k-norm"><a href="#15-4-k-norm" class="headerlink" title="15.4 k_norm"></a>15.4 <code>k_norm</code></h4><p>官方 reference <code>LayerNorm(128)</code> 有 weight + bias：</p>
+
+$$
+128+128=256
+$$
+
+
+<h4 id="15-5-单层-Indexer-新增参数"><a href="#15-5-单层-Indexer-新增参数" class="headerlink" title="15.5 单层 Indexer 新增参数"></a>15.5 单层 Indexer 新增参数</h4><p>约：</p>
+
+$$
+12,582,912+917,504+458,752+256
+$$
+
+
+
+$$
+\boxed{13,959,424\approx13.96M}
+$$
+
+
+<p>如果简单按 61 层都配置 Indexer：</p>
+
+$$
+13.959M\times61\approx851.5M
+$$
+
+
+<p>也就是约 <strong>0.85B 参数</strong>。</p>
+<p>相对于 671B 总参数规模，它仍然只是较小的结构增量；更重要的问题其实不是参数量，而是<strong>长上下文下 Indexer 的全历史扫描成本和访存模式</strong>。</p>
+<hr>
+<h2 id="16-Indexer-Cache-到底有多大？"><a href="#16-Indexer-Cache-到底有多大？" class="headerlink" title="16. Indexer Cache 到底有多大？"></a>16. Indexer Cache 到底有多大？</h2><p>官方：</p>
+
+$$
+d_I=128
+$$
+
+
+<p>Indexer Key Cache 使用 FP8。</p>
+<p>因此每个历史 token、每层的核心 Key 数据大约：</p>
+
+$$
+128\times1\text{ byte}=128\text{ bytes}
+$$
+
+
+<p>不算量化 scale 等额外元数据。</p>
+<p>以 128K 上下文为例：</p>
+
+$$
+131072\times128
+=
+16,777,216\text{ bytes}
+$$
+
+
+<p>即核心 Key 数据约：</p>
+
+$$
+\boxed{16\text{ MiB / layer}}
+$$
+
+
+<p>这说明 Lightning Indexer 之所以能做全历史扫描，一个基础前提就是：</p>
+<blockquote>
+<p><strong>每个历史位置的检索表示必须足够小。</strong></p>
+</blockquote>
+<hr>
+<h2 id="17-它真的省计算吗？"><a href="#17-它真的省计算吗？" class="headerlink" title="17. 它真的省计算吗？"></a>17. 它真的省计算吗？</h2><p>这里不能简单说：</p>
+<blockquote>
+<p>128K → 2048，所以就是 64 倍加速。</p>
+</blockquote>
+<p>这是错误的。</p>
+<p>因为 Lightning Indexer 自己仍然要扫 128K。</p>
+<hr>
+<h3 id="17-1-Indexer-的粗略扫描量"><a href="#17-1-Indexer-的粗略扫描量" class="headerlink" title="17.1 Indexer 的粗略扫描量"></a>17.1 Indexer 的粗略扫描量</h3><p>官方配置：</p>
+
+$$
+H_I=64,\qquad d_I=128
+$$
+
+
+<p>对于单个新 Query、128K 历史：</p>
+
+$$
+L\times H_I\times d_I
+$$
+
+
+<p>约为：</p>
+
+$$
+131072\times64\times128
+$$
+
+
+
+$$
+\approx1.07\times10^9
+$$
+
+
+<p>即约 <strong>1.07B 量级的乘加匹配工作</strong>。</p>
+<p>所以 Lightning Indexer 自己绝对不是“免费”的。</p>
+<hr>
+<h3 id="17-2-但主-Attention-被压到了-Top-2048"><a href="#17-2-但主-Attention-被压到了-Top-2048" class="headerlink" title="17.2 但主 Attention 被压到了 Top-2048"></a>17.2 但主 Attention 被压到了 Top-2048</h3><p>如果主 MLA 每次都对 128K 历史做真正的高维 Attention，成本明显更高。</p>
+<p>DSA 的关键变成：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">便宜但全量：</span><br><span class="line">Indexer × 128K</span><br><span class="line"></span><br><span class="line">+</span><br><span class="line"></span><br><span class="line">昂贵但稀疏：</span><br><span class="line">MLA × 2048</span><br></pre></td></tr></tbody></table></figure>
+
+<p>而不是：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">昂贵：</span><br><span class="line">MLA × 128K</span><br></pre></td></tr></tbody></table></figure>
+
+<p>以官方维度做一个<strong>只用于量级理解</strong>的简化估算：</p>
+<ul>
+<li>Indexer 扫描约：1.07B</li>
+<li>Top-2048 MLA score 部分约：0.15B</li>
+<li>Dense 128K MLA score 部分约：9.66B</li>
+</ul>
+<p>简化比值：</p>
+
+$$
+\frac{9.66}{1.07+0.15}\approx7.9
+$$
+
+
+<p>即这个极简计算模型下，Attention score 相关交互大约是 <strong>7.9× 的理论量级差异</strong>。</p>
+<p>但这<strong>绝不是端到端真实加速比</strong>，因为真实运行还包括：</p>
+<ul>
+<li>projection；</li>
+<li>Top-K reduction；</li>
+<li>Kernel 启动；</li>
+<li>HBM 访问；</li>
+<li>稀疏 gather；</li>
+<li>多卡通信；</li>
+<li>FP8 量化/反量化；</li>
+<li>MoE 等其他模块。</li>
+</ul>
+<p>真正性能必须依赖专门的 Indexer Kernel 和 Sparse Attention Kernel。</p>
+<p><img src="/images/deepseek-dsa-lightning-indexer/04_compute.svg" alt="Dense MLA 与 DSA 简化打分乘加量随上下文长度变化"></p>
+<p><em>图 4：本文简化模型下，单步解码的打分乘加量随上下文长度的变化。Dense 按 MLA 的 128 头 × 576 维对全部 L 打分；DSA 为 Indexer（64 头 × 128 维）扫 L 加 MLA 对 Top-2048 打分。只比较打分环节，不含投影、gather、通信与 MoE，不是端到端延迟。</em></p>
+<hr>
+<h2 id="18-补上训练视角：Indexer-是怎么学会“该看谁”的"><a href="#18-补上训练视角：Indexer-是怎么学会“该看谁”的" class="headerlink" title="18. 补上训练视角：Indexer 是怎么学会“该看谁”的"></a>18. 补上训练视角：Indexer 是怎么学会“该看谁”的</h2><p>前面所有内容都在讲推理：给定一个训练好的 Indexer，它如何打分、如何选位置。但有一个问题不能跳过：</p>
+<blockquote>
+<p><strong>Indexer 的打分凭什么可信？选错了怎么办？</strong></p>
+</blockquote>
+<p>DeepSeek 的答案不是让 Indexer 从语言建模 loss 里顺带学会选位置，而是给它一个<strong>单独的对齐目标</strong>：模仿主 Attention 自己的分布。[6, §2.1]</p>
+<h3 id="18-1-目标分布：主-Attention-说“重要”的样子"><a href="#18-1-目标分布：主-Attention-说“重要”的样子" class="headerlink" title="18.1 目标分布：主 Attention 说“重要”的样子"></a>18.1 目标分布：主 Attention 说“重要”的样子</h3><p>对第 $t$ 个 query token，把主 Attention 在全部注意力头上的分数求和，再沿序列维做 L1 归一化，得到目标分布 $p_{t,:}$。Indexer 分数经 Softmax 后与它对齐：</p>
+
+$$
+L_I = D_{KL}\big(\mathrm{Softmax}(I_{t,:})\ \|\ p_{t,:}\big)
+$$
+
+<blockquote>
+<p>统一符号重写：结构与报告式 (3) 一致，$I_{t,:}$ 即本文的 $r_{t,:}$。</p>
+</blockquote>
+<p>注意这个目标的真实含义：**Indexer 学的不是”语义相关”，而是”主 Attention 实际会把权重放在哪”**。它是一个为稠密注意力打工的代理学生。</p>
+<h3 id="18-2-两阶段：先稠密热身，再稀疏训练"><a href="#18-2-两阶段：先稠密热身，再稀疏训练" class="headerlink" title="18.2 两阶段：先稠密热身，再稀疏训练"></a>18.2 两阶段：先稠密热身，再稀疏训练</h3><p><strong>Dense Warmup 阶段</strong>：保持稠密注意力，冻结主模型全部参数，只训 Indexer，让它先对齐稠密分布。学习率 $10^{-3}$，1000 步，每步 16 条 128K 序列，共约 2.1B token。</p>
+<p><strong>Sparse Training 阶段</strong>：开启 Top-K 选择（每个 query 选 2048 个 KV），主模型与 Indexer 一起训练，但目标分开：</p>
+<ul>
+<li>主模型只用语言建模 loss；</li>
+<li>Indexer 只用 KL loss，且只在被选中的集合 $S_t$ 上计算（报告式 (4)）；</li>
+<li>Indexer 的输入从计算图上 detach，避免两个目标互相拉扯。</li>
+</ul>
+<p>学习率 $7.3\times10^{-6}$，15000 步，每步 480 条 128K 序列，共约 943.7B token。报告口径下，这是基于 V3.1-Terminus 的继续训练，不是 DSA 从零训练的成本，引用这个数字时不要错位。</p>
+<h3 id="18-3-创新的边界"><a href="#18-3-创新的边界" class="headerlink" title="18.3 创新的边界"></a>18.3 创新的边界</h3><p>每个创新都要讲它的代价。DSA 的代价不在推理链路里，在下面四处：</p>
+<ol>
+<li><strong>选错不可恢复</strong>：某一层里没被选进 Top-K 的位置，该层主 Attention 就永远读不到它。Indexer 的召回率就是 DSA 的效果上限——这正是训练目标必须选”对齐稠密分布”、而不是某个更省事的代理指标的原因。</li>
+<li><strong>继承稠密注意力的偏置</strong>：Indexer 是稠密注意力的学生。稠密注意力系统性忽略的位置，Indexer 也学不会选。它优化的是保真度，不是纠错。</li>
+<li><strong>固定 K 与内容无关</strong>：2048 对所有 query 一视同仁。信息高度分散的长文档可能不够用，简单上下文又纯属浪费；K 是部署前定死的超参，不是按内容自适应的预算。</li>
+<li><strong>理论降幅不等于延迟降幅</strong>：第 17 节的 7.9× 只是打分环节的简化账。真实收益依赖 DeepGEMM 的 Indexer logit kernel 与 FlashMLA 的稀疏 kernel；没有这套 kernel，gather 与 Top-K reduction 的开销会吃掉相当一部分理论收益。</li>
+</ol>
+<hr>
+<h2 id="19-我学习过程中真正踩过的误区"><a href="#19-我学习过程中真正踩过的误区" class="headerlink" title="19. 我学习过程中真正踩过的误区"></a>19. 我学习过程中真正踩过的误区</h2><p>这一节比公式更值得以后复习。</p>
+<h3 id="误区-1：W-K-共享，所以-k-t-也应该共享"><a href="#误区-1：W-K-共享，所以-k-t-也应该共享" class="headerlink" title="误区 1：W_K 共享，所以 k_t 也应该共享"></a>误区 1：<code>W_K</code> 共享，所以 <code>k_t</code> 也应该共享</h3><p>错误。</p>
+<p>正确关系：</p>
+
+$$
+k_t=W_Kh_t
+$$
+
+
+<p><code>W_K</code> 是共享机器。</p>
+<p><code>k_t</code> 是不同 token 的不同输出。</p>
+<hr>
+<h3 id="误区-2：Head-weights-是一组固定参数"><a href="#误区-2：Head-weights-是一组固定参数" class="headerlink" title="误区 2：Head weights 是一组固定参数"></a>误区 2：Head weights 是一组固定参数</h3><p>不是。</p>
+<p>共享的是生成 Gate 的参数：</p>
+
+$$
+W_G
+$$
+
+
+<p>每个当前 token 都动态产生：</p>
+
+$$
+g_t=W_Gh_t
+$$
+
+
+<p>所以：</p>
+
+$$
+g_8\neq g_9\neq g_{10}
+$$
+
+
+<hr>
+<h3 id="误区-3：Gate-是用来-Top-K-Head"><a href="#误区-3：Gate-是用来-Top-K-Head" class="headerlink" title="误区 3：Gate 是用来 Top-K Head"></a>误区 3：Gate 是用来 Top-K Head</h3><p>不是。</p>
+<p>Gate 是：</p>
+<blockquote>
+<p><strong>query-conditioned head mixer</strong></p>
+</blockquote>
+<p>它负责把多个 Query Head 对某个历史 token 的匹配结果混合起来。</p>
+<p>真正 Top-K 排序的是：</p>
+
+$$
+r_{t,1},r_{t,2},...,r_{t,L}
+$$
+
+
+<p>也就是<strong>历史 token 的 ranking score</strong>。</p>
+<hr>
+<h3 id="误区-4：为什么用当前-g-t，而不是历史-g-s？"><a href="#误区-4：为什么用当前-g-t，而不是历史-g-s？" class="headerlink" title="误区 4：为什么用当前 g_t，而不是历史 g_s？"></a>误区 4：为什么用当前 g_t，而不是历史 g_s？</h3><p>因为检索问题本身是：</p>
+<blockquote>
+<p><strong>当前 token 想看谁？</strong></p>
+</blockquote>
+<p>所以需要站在当前 Query 的角度决定：</p>
+<blockquote>
+<p>当前这一次查询，各个 Indexer Head 应该有多重要。</p>
+</blockquote>
+<p>因此 <code>g_t</code> 必须是当前 token 的。</p>
+<hr>
+<h3 id="误区-5：每次是不是要重新计算所有历史-k？"><a href="#误区-5：每次是不是要重新计算所有历史-k？" class="headerlink" title="误区 5：每次是不是要重新计算所有历史 k？"></a>误区 5：每次是不是要重新计算所有历史 k？</h3><p>不是。</p>
+<p>历史：</p>
+
+$$
+k_1,k_2,\ldots,k_{t-1}
+$$
+
+
+<p>已经缓存。</p>
+<p>当前只计算：</p>
+
+$$
+k_t
+$$
+
+
+<p>然后 append 到 Indexer K Cache。</p>
+<hr>
+<h3 id="误区-6：历史-h-也要一直缓存"><a href="#误区-6：历史-h-也要一直缓存" class="headerlink" title="误区 6：历史 h 也要一直缓存"></a>误区 6：历史 h 也要一直缓存</h3><p>至少对 Lightning Indexer 本身而言，不需要为了重新生成 k 而缓存历史 h。</p>
+<p>历史 k 已经生成并缓存。</p>
+<hr>
+<h3 id="误区-7：当前-k-t-没用，所以不用算"><a href="#误区-7：当前-k-t-没用，所以不用算" class="headerlink" title="误区 7：当前 k_t 没用，所以不用算"></a>误区 7：当前 k_t 没用，所以不用算</h3><p>不对。</p>
+<p>它：</p>
+<ol>
+<li>当前 causal self-attention 中可以被当前位置使用；</li>
+<li>更重要的是要留下给未来 token 查询。</li>
+</ol>
+<p>因此：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">q_t -&gt; 当前用，之后丢</span><br><span class="line">g_t -&gt; 当前用，之后丢</span><br><span class="line">k_t -&gt; 当前生成，并进入历史 cache</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="误区-8：Top-K-后还要恢复历史完整-K-x2F-V"><a href="#误区-8：Top-K-后还要恢复历史完整-K-x2F-V" class="headerlink" title="误区 8：Top-K 后还要恢复历史完整 K/V"></a>误区 8：Top-K 后还要恢复历史完整 K/V</h3><p>在 DSA + MLA 的讨论中，更准确的理解是：</p>
+<blockquote>
+<p>Top-K 提供位置，然后主 Attention 访问这些位置的 <strong>MLA 压缩 latent cache（如 cKV + PE）</strong>。</p>
+</blockquote>
+<p>不要把思路重新退化成必须先保存/恢复完整传统 K/V。</p>
+<hr>
+<h2 id="20-最终完整推理链路"><a href="#20-最终完整推理链路" class="headerlink" title="20. 最终完整推理链路"></a>20. 最终完整推理链路</h2><p>如果只能保存一张图，就保存下面这张。</p>
+<p><img src="/images/deepseek-dsa-lightning-indexer/09_full_flow.svg" alt="DSA 机制图 5"></p>
+<p>可以浓缩成：</p>
+
+$$
+\boxed{
+h_t
+\rightarrow
+(q_t,g_t,k_t)
+\rightarrow
+\text{scan cached }k
+\rightarrow
+TopK
+\rightarrow
+\text{select MLA latent cache}
+\rightarrow
+Sparse\ MLA
+\rightarrow
+o_t
+}
+$$
+
+
+<hr>
+<h2 id="21-一句话理解-DSA、MLA-和-Lightning-Indexer-的分工"><a href="#21-一句话理解-DSA、MLA-和-Lightning-Indexer-的分工" class="headerlink" title="21. 一句话理解 DSA、MLA 和 Lightning Indexer 的分工"></a>21. 一句话理解 DSA、MLA 和 Lightning Indexer 的分工</h2><h3 id="MLA"><a href="#MLA" class="headerlink" title="MLA"></a>MLA</h3><p>解决：</p>
+<blockquote>
+<p><strong>每个历史 token 要缓存多少 Attention 信息？</strong></p>
+</blockquote>
+<p>核心思想：</p>
+
+$$
+K/V\rightarrow compressed\ latent
+$$
+
+
+<hr>
+<h3 id="Lightning-Indexer"><a href="#Lightning-Indexer" class="headerlink" title="Lightning Indexer"></a>Lightning Indexer</h3><p>解决：</p>
+<blockquote>
+<p><strong>当前 token 到底值得读取哪些历史位置？</strong></p>
+</blockquote>
+<p>核心：</p>
+
+$$
+q_t+g_t
+\rightarrow
+\text{scan index keys}
+\rightarrow
+TopK
+$$
+
+
+<hr>
+<h3 id="DSA"><a href="#DSA" class="headerlink" title="DSA"></a>DSA</h3><p>把两者组合：</p>
+<blockquote>
+<p><strong>全历史做便宜检索，Top-K 做昂贵 Attention。</strong></p>
+</blockquote>
+<hr>
+<h2 id="22-下一步复现时，我应该先写什么？"><a href="#22-下一步复现时，我应该先写什么？" class="headerlink" title="22. 下一步复现时，我应该先写什么？"></a>22. 下一步复现时，我应该先写什么？</h2><p>不建议一开始就完整复刻 DeepSeek 的 FP8、RoPE、MLA 和 CUDA Sparse Kernel。</p>
+<p>应该分三阶段。</p>
+<h3 id="Stage-1：纯教学版-Lightning-Indexer"><a href="#Stage-1：纯教学版-Lightning-Indexer" class="headerlink" title="Stage 1：纯教学版 Lightning Indexer"></a>Stage 1：纯教学版 Lightning Indexer</h3><p>先实现：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">q = Wq(h_current)</span><br><span class="line">g = Wg(h_current)</span><br><span class="line">k_new = Wk(h_current)</span><br><span class="line"></span><br><span class="line">k_cache.append(k_new)</span><br><span class="line"></span><br><span class="line"><span class="keyword">match</span> = relu(q @ k_cache.T)</span><br><span class="line">score = (<span class="keyword">match</span> * g).<span class="built_in">sum</span>(head_dim)</span><br><span class="line"></span><br><span class="line">indices = topk(score, K)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>验收：</p>
+<ul>
+<li>能明确区分参数和 activation；</li>
+<li>历史只缓存 Indexer Key；</li>
+<li>当前 q/g 不进 cache；</li>
+<li>Top-K 排的是历史 token。</li>
+</ul>
+<hr>
+<h3 id="Stage-2：加入-MLA-压缩缓存"><a href="#Stage-2：加入-MLA-压缩缓存" class="headerlink" title="Stage 2：加入 MLA 压缩缓存"></a>Stage 2：加入 MLA 压缩缓存</h3><p>维护：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">index_k_cache</span><br><span class="line">mla_c_kv_cache</span><br><span class="line">mla_pe_cache</span><br></pre></td></tr></tbody></table></figure>
+
+<p>流程：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">topk_indices = indexer(...)</span><br><span class="line"></span><br><span class="line">selected_c_kv = c_kv_cache[topk_indices]</span><br><span class="line">selected_pe = pe_cache[topk_indices]</span><br><span class="line"></span><br><span class="line">out = sparse_mla_attention(</span><br><span class="line">    current_query,</span><br><span class="line">    selected_c_kv,</span><br><span class="line">    selected_pe</span><br><span class="line">)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这一步完成之后，DSA + MLA 的数据流就真正跑通了。</p>
+<hr>
+<h3 id="Stage-3：再处理工程优化"><a href="#Stage-3：再处理工程优化" class="headerlink" title="Stage 3：再处理工程优化"></a>Stage 3：再处理工程优化</h3><p>最后再考虑：</p>
+<ul>
+<li>FP8 Indexer Key；</li>
+<li>RoPE；</li>
+<li>block/paged cache；</li>
+<li>streaming Top-K；</li>
+<li>Sparse Attention Kernel；</li>
+<li>DeepGEMM / FlashMLA；</li>
+<li>与官方权重兼容。</li>
+</ul>
+<p>不要反过来。</p>
+<hr>
+<h2 id="23-最后的自测"><a href="#23-最后的自测" class="headerlink" title="23. 最后的自测"></a>23. 最后的自测</h2><p>如果下面 8 个问题都能直接回答，说明 Lightning Indexer 推理原理已经真正理解。</p>
+<h4 id="Q1"><a href="#Q1" class="headerlink" title="Q1"></a>Q1</h4><p><code>W_K</code> 和 <code>k_t</code> 哪个共享？</p>
+<blockquote>
+<p><code>W_K</code> 是同一层跨 token 共享的训练参数；<code>k_t</code> 是 token t 的动态 Key，不共享。</p>
+</blockquote>
+<h4 id="Q2"><a href="#Q2" class="headerlink" title="Q2"></a>Q2</h4><p>为什么 <code>q_t</code> 不缓存？</p>
+<blockquote>
+<p>它只服务当前 Query，未来 token 会生成自己的 Query。</p>
+</blockquote>
+<h4 id="Q3"><a href="#Q3" class="headerlink" title="Q3"></a>Q3</h4><p>为什么 <code>k_t</code> 要缓存？</p>
+<blockquote>
+<p>它会成为未来 token 查询的历史 Indexer Key。</p>
+</blockquote>
+<h4 id="Q4"><a href="#Q4" class="headerlink" title="Q4"></a>Q4</h4><p>为什么每一步都要重新算 <code>g_t</code>？</p>
+<blockquote>
+<p>因为 <code>g_t</code> 是 query-conditioned head mixer，必须站在当前 token 的检索需求决定各 Indexer Head 如何混合。</p>
+</blockquote>
+<h4 id="Q5"><a href="#Q5" class="headerlink" title="Q5"></a>Q5</h4><p>Top-K 排的是 Head 吗？</p>
+<blockquote>
+<p>不是。排的是各历史 token 的最终 ranking score。</p>
+</blockquote>
+<h4 id="Q6"><a href="#Q6" class="headerlink" title="Q6"></a>Q6</h4><p>历史 hidden state 是否需要为了 Indexer 一直缓存？</p>
+<blockquote>
+<p>不需要。已经转换后的历史 Indexer Key 被缓存即可。</p>
+</blockquote>
+<h4 id="Q7"><a href="#Q7" class="headerlink" title="Q7"></a>Q7</h4><p>Top-K 后访问什么？</p>
+<blockquote>
+<p>对应历史位置的 MLA 压缩缓存，如 <code>cKV + PE</code>。</p>
+</blockquote>
+<h4 id="Q8"><a href="#Q8" class="headerlink" title="Q8"></a>Q8</h4><p>DSA 为什么仍然有意义，明明 Indexer 还是扫描整个历史？</p>
+<blockquote>
+<p>因为全历史阶段使用小型、低精度、共享 Key 的廉价 Indexer；昂贵的 MLA 主 Attention 只处理 Top-K。</p>
+</blockquote>
+<p>如果这 8 个问题能自然说出来，Lightning Indexer 的推理主线就已经过关。</p>
+<hr>
+<h2 id="24-官方实现与本文符号对照"><a href="#24-官方实现与本文符号对照" class="headerlink" title="24. 官方实现与本文符号对照"></a>24. 官方实现与本文符号对照</h2><table>
+<thead>
+<tr>
+<th>本文</th>
+<th>DeepSeek-V3.2-Exp reference code</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$W_Q^I$</td>
+<td><code>Indexer.wq_b</code></td>
+</tr>
+<tr>
+<td>$W_K^I$</td>
+<td><code>Indexer.wk</code></td>
+</tr>
+<tr>
+<td>$W_G^I$</td>
+<td><code>Indexer.weights_proj</code></td>
+</tr>
+<tr>
+<td>$k$ normalization</td>
+<td><code>Indexer.k_norm</code></td>
+</tr>
+<tr>
+<td>当前 Gate $g_t$</td>
+<td><code>weights_proj(x) * n_heads**-0.5</code></td>
+</tr>
+<tr>
+<td>Indexer cache</td>
+<td><code>k_cache</code> + <code>k_scale_cache</code></td>
+</tr>
+<tr>
+<td>Top-K</td>
+<td><code>index_score.topk(...)</code></td>
+</tr>
+<tr>
+<td>MLA latent cache</td>
+<td><code>kv_cache</code></td>
+</tr>
+<tr>
+<td>MLA positional cache</td>
+<td><code>pe_cache</code></td>
+</tr>
+</tbody></table>
+<p>官方 Query 路径还会复用 MLA 的：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">x</span><br><span class="line"> -&gt; wq_a</span><br><span class="line"> -&gt; q_norm</span><br><span class="line"> -&gt; qr</span><br><span class="line"> -&gt; Indexer.wq_b</span><br></pre></td></tr></tbody></table></figure>
+
+<p>所以本文的：</p>
+
+$$
+q=W_Qh
+$$
+
+
+<p>只是用于第一阶段理解和复现的简化写法。</p>
+<hr>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/deepseek-ai/DeepSeek-V3.2-Exp">DeepSeek-V3.2-Exp 官方仓库</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/deepseek-ai/DeepSeek-V3.2-Exp/blob/main/inference/model.py">DeepSeek-V3.2-Exp 官方 reference inference：<code>inference/model.py</code></a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/deepseek-ai/DeepSeek-V3.2-Exp/blob/main/inference/config_671B_v3.2.json">DeepSeek-V3.2-Exp 671B 配置</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/huggingface/transformers/blob/main/src/transformers/models/deepseek_v32/modular_deepseek_v32.py">Hugging Face DeepSeek-V3.2 实现</a></p>
+</li>
+<li><p>DeepSeek 官方仓库说明中还给出了高性能 Indexer logit kernel（DeepGEMM）与 Sparse Attention kernel（FlashMLA）的入口，可用于后续工程复现。</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2512.02556">DeepSeek-V3.2 技术报告（arXiv:2512.02556），§2.1 DeepSeek Sparse Attention</a></p>
+</li>
+</ol>
+<hr>
+<h2 id="核验范围"><a href="#核验范围" class="headerlink" title="核验范围"></a>核验范围</h2><ul>
+<li><strong>已核对</strong>：index score 的形式与 ReLU + Gate 结构（报告 §2.1 式 (1)–(2)；报告中 Gate 记为 $w^I_{t,j}$，本文改记 $g_{t,j}$）；Indexer 两阶段训练与 KL 目标（报告 §2.1 式 (3)–(4)：warmup 1000 步、学习率 $10^{-3}$、约 2.1B token；稀疏阶段 15000 步、学习率 $7.3\times10^{-6}$、约 943.7B token、Top-K = 2048、Indexer 输入 detach、两目标分开优化）。</li>
+<li><strong>已核对</strong>：671B 配置（dim 7168、q_lora_rank 1536、index_n_heads 64、index_head_dim 128、index_topk 2048）出自官方仓库 <code>config_671B_v3.2.json</code>；第 15 节参数量为本文按配置逐项乘算的结果，不是报告原文数字。</li>
+<li><strong>本文估算</strong>：第 17 节与图 4 的计算量只含打分环节，是简化模型，不是实测数据；图 3 的缓存口径见图注。</li>
+<li><strong>未确认</strong>：Indexer 的 q/k 上 RoPE 的具体施加细节（报告图 2 有示意）与 <code>k_scale_cache</code> 的存储格式，本文未展开，不影响推理主线结论。</li>
+</ul>
+<hr>
+<h2 id="最终记忆卡"><a href="#最终记忆卡" class="headerlink" title="最终记忆卡"></a>最终记忆卡</h2><figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">【共享参数】</span><br><span class="line">W_Q^I / W_K^I / W_G^I</span><br><span class="line">        │</span><br><span class="line">        ▼</span><br><span class="line">【当前 token 动态值】</span><br><span class="line">q_t / k_t / g_t</span><br><span class="line">        │</span><br><span class="line">        ├── k_t 写入 Indexer Cache</span><br><span class="line">        │</span><br><span class="line">        └── q_t + g_t 扫历史 k</span><br><span class="line">                     │</span><br><span class="line">                     ▼</span><br><span class="line">              Ranking Scores</span><br><span class="line">                     │</span><br><span class="line">                     ▼</span><br><span class="line">                   Top-K</span><br><span class="line">                     │</span><br><span class="line">                     ▼</span><br><span class="line">         读取 MLA 压缩 cKV + PE</span><br><span class="line">                     │</span><br><span class="line">                     ▼</span><br><span class="line">             Sparse MLA Attention</span><br><span class="line">                     │</span><br><span class="line">                     ▼</span><br><span class="line">                    o_t</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p><strong>最重要的一句话：</strong></p>
+<p>Lightning Indexer 使用当前 token 的 <code>q_t</code> 与 <code>g_t</code>，去评价历史缓存中的 Indexer Key；其中 <code>g_t</code> 是一个 <strong>query-conditioned head mixer</strong>。Top-K 只负责给出历史位置，真正的信息读取仍由 MLA 在这些位置的压缩缓存上完成。</p>
+</blockquote>
+</article>
+<div class="article-footer slide-up">
+
+
+    <section id="share">
+      <div class="header"><span>分享文章</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/10/23/deepseek-dsa-lightning-indexer/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;复制成功&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/10/23/deepseek-dsa-lightning-indexer/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/10/04/llm-history-eighty-years/">大模型发展史：从“会算”到“会聊、会看、会做事”的八十年</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text slide-up" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#0-%E5%85%88%E7%BB%99%E7%BB%93%E8%AE%BA%EF%BC%9ADSA-%E5%88%B0%E5%BA%95%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">0. 先给结论：DSA 到底在做什么？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%AC%AC%E4%B8%80%E4%BB%B6%E6%9C%80%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%9A%84%E4%BA%8B%EF%BC%9A%E5%8F%82%E6%95%B0%E5%92%8C%E5%8A%A8%E6%80%81%E5%80%BC%E4%B8%8D%E6%98%AF%E4%B8%80%E5%9B%9E%E4%BA%8B"><span class="toc-text">1. 第一件最容易混淆的事：参数和动态值不是一回事</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E5%90%8C%E4%B8%80%E5%B1%82%E4%B8%AD%EF%BC%8C%E5%8F%82%E6%95%B0%E6%98%AF%E5%85%B1%E4%BA%AB%E7%9A%84"><span class="toc-text">1.1 同一层中，参数是共享的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E2%80%9C%E5%85%B1%E4%BA%AB%E5%8F%82%E6%95%B0%E2%80%9D%E4%B8%8D%E7%AD%89%E4%BA%8E%E2%80%9C%E8%BE%93%E5%87%BA%E7%9B%B8%E5%90%8C%E2%80%9D"><span class="toc-text">1.2 “共享参数”不等于“输出相同”</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BB%8E%E5%BD%93%E5%89%8D-token-9-%E5%BC%80%E5%A7%8B%E8%B5%B0%E4%B8%80%E9%81%8D-Lightning-Indexer"><span class="toc-text">2. 从当前 token 9 开始走一遍 Lightning Indexer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Indexer-Query%EF%BC%9A%E5%BD%93%E5%89%8D-token-%E2%80%9C%E6%8B%BF%E4%BB%80%E4%B9%88%E5%8E%BB%E6%90%9C%E2%80%9D"><span class="toc-text">3. Indexer Query：当前 token “拿什么去搜”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Indexer-Key%EF%BC%9A%E5%8E%86%E5%8F%B2-token-%E2%80%9C%E8%A2%AB%E6%80%8E%E4%B9%88%E6%A3%80%E7%B4%A2%E2%80%9D"><span class="toc-text">4. Indexer Key：历史 token “被怎么检索”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Gate%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E9%A1%BB%E6%98%AF%E2%80%9C%E5%BD%93%E5%89%8D-token-%E7%9A%84-g-t%E2%80%9D"><span class="toc-text">5. Gate：为什么必须是“当前 token 的 g_t”</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-Gate-%E7%9A%84%E7%9C%9F%E6%AD%A3%E5%90%AB%E4%B9%89"><span class="toc-text">5.1 Gate 的真正含义</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-Lightning-Indexer-%E6%80%8E%E4%B9%88%E7%BB%99%E5%8E%86%E5%8F%B2-token-%E6%89%93%E5%88%86%EF%BC%9F"><span class="toc-text">6. Lightning Indexer 怎么给历史 token 打分？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E5%AE%83%E4%B8%8D%E6%98%AF%E6%A6%82%E7%8E%87"><span class="toc-text">6.1 它不是概率</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-Top-K%EF%BC%9A%E6%8E%92%E7%9A%84%E6%98%AF%E5%8E%86%E5%8F%B2-token%EF%BC%8C%E4%B8%8D%E6%98%AF-Head"><span class="toc-text">7. Top-K：排的是历史 token，不是 Head</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E4%B8%80%E4%B8%AA%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9A%E5%BD%93%E5%89%8D%E7%9A%84-k9-%E5%BD%93%E4%B8%8B%E4%B8%8D%E6%98%AF%E6%B2%A1%E7%94%A8%E5%90%97%EF%BC%9F"><span class="toc-text">8. 一个非常重要的问题：当前的 k9 当下不是没用吗？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-%E5%BD%93%E5%89%8D-causal-self-attention-%E5%8F%AF%E4%BB%A5%E5%8C%85%E5%90%AB%E8%87%AA%E5%B7%B1"><span class="toc-text">8.1 当前 causal self-attention 可以包含自己</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-%E6%9B%B4%E9%87%8D%E8%A6%81%EF%BC%9Ak9-%E6%98%AF%E7%BB%99%E6%9C%AA%E6%9D%A5-token-%E7%94%A8%E7%9A%84"><span class="toc-text">8.2 更重要：k9 是给未来 token 用的</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E4%BC%9A%E4%B8%8D%E4%BC%9A%E7%BC%93%E5%AD%98%E5%8E%86%E5%8F%B2-h%EF%BC%8C%E7%84%B6%E5%90%8E%E6%AF%8F%E6%AC%A1%E9%87%8D%E6%96%B0%E7%AE%97-k%EF%BC%9F"><span class="toc-text">9. 会不会缓存历史 h，然后每次重新算 k？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E6%AF%8F%E4%B8%80%E6%AD%A5%E9%83%BD%E9%87%8D%E6%96%B0%E8%AE%A1%E7%AE%97-q-t-%E5%92%8C-g-t%EF%BC%8C%E4%BC%9A%E4%B8%8D%E4%BC%9A%E5%BE%88%E8%B4%B5%EF%BC%9F"><span class="toc-text">10. 每一步都重新计算 q_t 和 g_t，会不会很贵？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-Lightning-Indexer-%E4%B9%8B%E5%90%8E%EF%BC%9A%E8%BF%9B%E5%85%A5-MLA-%E7%AC%AC%E4%BA%8C%E9%98%B6%E6%AE%B5"><span class="toc-text">11. Lightning Indexer 之后：进入 MLA 第二阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E5%A5%97-Cache%EF%BC%9AIndexer-Cache"><span class="toc-text">第一套 Cache：Indexer Cache</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E5%A5%97-Cache%EF%BC%9AMLA-%E5%8E%8B%E7%BC%A9%E7%BC%93%E5%AD%98"><span class="toc-text">第二套 Cache：MLA 压缩缓存</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-Top-K-%E5%90%8E%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">12. Top-K 后发生什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-%E4%B8%BA%E4%BB%80%E4%B9%88-DSA-%E8%A6%81%E7%BB%B4%E6%8A%A4%E4%B8%A4%E5%A5%97-Cache%EF%BC%9F"><span class="toc-text">13. 为什么 DSA 要维护两套 Cache？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-%E5%8F%82%E6%95%B0%E9%87%8F%EF%BC%9A%E5%85%88%E7%9C%8B%E4%B8%80%E4%B8%AA%E6%95%99%E5%AD%A6%E7%89%88"><span class="toc-text">14. 参数量：先看一个教学版</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Query-%E6%8A%95%E5%BD%B1"><span class="toc-text">Query 投影</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Key-%E6%8A%95%E5%BD%B1"><span class="toc-text">Key 投影</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Gate-%E6%8A%95%E5%BD%B1"><span class="toc-text">Gate 投影</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E5%8F%82%E6%95%B0%E9%87%8F"><span class="toc-text">总参数量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-DeepSeek-V3-2-Exp-%E5%AE%98%E6%96%B9-Indexer-%E5%8F%82%E6%95%B0%E9%87%8F"><span class="toc-text">15. DeepSeek-V3.2-Exp 官方 Indexer 参数量</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#15-1-wq-b"><span class="toc-text">15.1 wq_b</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#15-2-wk"><span class="toc-text">15.2 wk</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#15-3-weights-proj%EF%BC%88%E6%9C%AC%E6%96%87-WG%EF%BC%89"><span class="toc-text">15.3 weights_proj（本文 WG）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#15-4-k-norm"><span class="toc-text">15.4 k_norm</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#15-5-%E5%8D%95%E5%B1%82-Indexer-%E6%96%B0%E5%A2%9E%E5%8F%82%E6%95%B0"><span class="toc-text">15.5 单层 Indexer 新增参数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#16-Indexer-Cache-%E5%88%B0%E5%BA%95%E6%9C%89%E5%A4%9A%E5%A4%A7%EF%BC%9F"><span class="toc-text">16. Indexer Cache 到底有多大？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-%E5%AE%83%E7%9C%9F%E7%9A%84%E7%9C%81%E8%AE%A1%E7%AE%97%E5%90%97%EF%BC%9F"><span class="toc-text">17. 它真的省计算吗？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#17-1-Indexer-%E7%9A%84%E7%B2%97%E7%95%A5%E6%89%AB%E6%8F%8F%E9%87%8F"><span class="toc-text">17.1 Indexer 的粗略扫描量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#17-2-%E4%BD%86%E4%B8%BB-Attention-%E8%A2%AB%E5%8E%8B%E5%88%B0%E4%BA%86-Top-2048"><span class="toc-text">17.2 但主 Attention 被压到了 Top-2048</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#18-%E8%A1%A5%E4%B8%8A%E8%AE%AD%E7%BB%83%E8%A7%86%E8%A7%92%EF%BC%9AIndexer-%E6%98%AF%E6%80%8E%E4%B9%88%E5%AD%A6%E4%BC%9A%E2%80%9C%E8%AF%A5%E7%9C%8B%E8%B0%81%E2%80%9D%E7%9A%84"><span class="toc-text">18. 补上训练视角：Indexer 是怎么学会“该看谁”的</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#18-1-%E7%9B%AE%E6%A0%87%E5%88%86%E5%B8%83%EF%BC%9A%E4%B8%BB-Attention-%E8%AF%B4%E2%80%9C%E9%87%8D%E8%A6%81%E2%80%9D%E7%9A%84%E6%A0%B7%E5%AD%90"><span class="toc-text">18.1 目标分布：主 Attention 说“重要”的样子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#18-2-%E4%B8%A4%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%85%88%E7%A8%A0%E5%AF%86%E7%83%AD%E8%BA%AB%EF%BC%8C%E5%86%8D%E7%A8%80%E7%96%8F%E8%AE%AD%E7%BB%83"><span class="toc-text">18.2 两阶段：先稠密热身，再稀疏训练</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#18-3-%E5%88%9B%E6%96%B0%E7%9A%84%E8%BE%B9%E7%95%8C"><span class="toc-text">18.3 创新的边界</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#19-%E6%88%91%E5%AD%A6%E4%B9%A0%E8%BF%87%E7%A8%8B%E4%B8%AD%E7%9C%9F%E6%AD%A3%E8%B8%A9%E8%BF%87%E7%9A%84%E8%AF%AF%E5%8C%BA"><span class="toc-text">19. 我学习过程中真正踩过的误区</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E5%8C%BA-1%EF%BC%9AW-K-%E5%85%B1%E4%BA%AB%EF%BC%8C%E6%89%80%E4%BB%A5-k-t-%E4%B9%9F%E5%BA%94%E8%AF%A5%E5%85%B1%E4%BA%AB"><span class="toc-text">误区 1：W_K 共享，所以 k_t 也应该共享</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E5%8C%BA-2%EF%BC%9AHead-weights-%E6%98%AF%E4%B8%80%E7%BB%84%E5%9B%BA%E5%AE%9A%E5%8F%82%E6%95%B0"><span class="toc-text">误区 2：Head weights 是一组固定参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E5%8C%BA-3%EF%BC%9AGate-%E6%98%AF%E7%94%A8%E6%9D%A5-Top-K-Head"><span class="toc-text">误区 3：Gate 是用来 Top-K Head</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E5%8C%BA-4%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8%E5%BD%93%E5%89%8D-g-t%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E5%8E%86%E5%8F%B2-g-s%EF%BC%9F"><span class="toc-text">误区 4：为什么用当前 g_t，而不是历史 g_s？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E5%8C%BA-5%EF%BC%9A%E6%AF%8F%E6%AC%A1%E6%98%AF%E4%B8%8D%E6%98%AF%E8%A6%81%E9%87%8D%E6%96%B0%E8%AE%A1%E7%AE%97%E6%89%80%E6%9C%89%E5%8E%86%E5%8F%B2-k%EF%BC%9F"><span class="toc-text">误区 5：每次是不是要重新计算所有历史 k？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E5%8C%BA-6%EF%BC%9A%E5%8E%86%E5%8F%B2-h-%E4%B9%9F%E8%A6%81%E4%B8%80%E7%9B%B4%E7%BC%93%E5%AD%98"><span class="toc-text">误区 6：历史 h 也要一直缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E5%8C%BA-7%EF%BC%9A%E5%BD%93%E5%89%8D-k-t-%E6%B2%A1%E7%94%A8%EF%BC%8C%E6%89%80%E4%BB%A5%E4%B8%8D%E7%94%A8%E7%AE%97"><span class="toc-text">误区 7：当前 k_t 没用，所以不用算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E5%8C%BA-8%EF%BC%9ATop-K-%E5%90%8E%E8%BF%98%E8%A6%81%E6%81%A2%E5%A4%8D%E5%8E%86%E5%8F%B2%E5%AE%8C%E6%95%B4-K-x2F-V"><span class="toc-text">误区 8：Top-K 后还要恢复历史完整 K&#x2F;V</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#20-%E6%9C%80%E7%BB%88%E5%AE%8C%E6%95%B4%E6%8E%A8%E7%90%86%E9%93%BE%E8%B7%AF"><span class="toc-text">20. 最终完整推理链路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#21-%E4%B8%80%E5%8F%A5%E8%AF%9D%E7%90%86%E8%A7%A3-DSA%E3%80%81MLA-%E5%92%8C-Lightning-Indexer-%E7%9A%84%E5%88%86%E5%B7%A5"><span class="toc-text">21. 一句话理解 DSA、MLA 和 Lightning Indexer 的分工</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MLA"><span class="toc-text">MLA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Lightning-Indexer"><span class="toc-text">Lightning Indexer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DSA"><span class="toc-text">DSA</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#22-%E4%B8%8B%E4%B8%80%E6%AD%A5%E5%A4%8D%E7%8E%B0%E6%97%B6%EF%BC%8C%E6%88%91%E5%BA%94%E8%AF%A5%E5%85%88%E5%86%99%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">22. 下一步复现时，我应该先写什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Stage-1%EF%BC%9A%E7%BA%AF%E6%95%99%E5%AD%A6%E7%89%88-Lightning-Indexer"><span class="toc-text">Stage 1：纯教学版 Lightning Indexer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stage-2%EF%BC%9A%E5%8A%A0%E5%85%A5-MLA-%E5%8E%8B%E7%BC%A9%E7%BC%93%E5%AD%98"><span class="toc-text">Stage 2：加入 MLA 压缩缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stage-3%EF%BC%9A%E5%86%8D%E5%A4%84%E7%90%86%E5%B7%A5%E7%A8%8B%E4%BC%98%E5%8C%96"><span class="toc-text">Stage 3：再处理工程优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#23-%E6%9C%80%E5%90%8E%E7%9A%84%E8%87%AA%E6%B5%8B"><span class="toc-text">23. 最后的自测</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Q1"><span class="toc-text">Q1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Q2"><span class="toc-text">Q2</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Q3"><span class="toc-text">Q3</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Q4"><span class="toc-text">Q4</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Q5"><span class="toc-text">Q5</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Q6"><span class="toc-text">Q6</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Q7"><span class="toc-text">Q7</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Q8"><span class="toc-text">Q8</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#24-%E5%AE%98%E6%96%B9%E5%AE%9E%E7%8E%B0%E4%B8%8E%E6%9C%AC%E6%96%87%E7%AC%A6%E5%8F%B7%E5%AF%B9%E7%85%A7"><span class="toc-text">24. 官方实现与本文符号对照</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-text">参考资料</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E9%AA%8C%E8%8C%83%E5%9B%B4"><span class="toc-text">核验范围</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E7%BB%88%E8%AE%B0%E5%BF%86%E5%8D%A1"><span class="toc-text">最终记忆卡</span></a></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/10/23/deepseek-dsa-lightning-indexer/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
+  ctx.fancybox = {
+    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
+    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const memos = document.getElementsByClassName('ds-memos');
+    if (memos != undefined && memos.length > 0) {
+      needFancybox = true;
+    }
+    const fancybox = document.getElementsByClassName('with-fancybox');
+    if (fancybox != undefined && fancybox.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const slideUp = {
+      distance: `16px`,
+      duration: `600`,
+      interval: `100`,
+      scale: `1`,
+      opacity: 0,
+      easing: "ease-out"
+    };
+    ScrollReveal().reveal('.slide-up', { ...slideUp });
+  });
+</script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      processEscapes: true,
+      skipTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+    },
+    startup: {
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.typesetPromise().then(() => {
+          const math = document.querySelectorAll("mjx-container");
+          math.forEach((element) => {
+            if (element.parentNode) {
+              element.parentNode.classList.add("has-jax");
+            }
+          });
+        });
+      },
+    },
+  };
+</script>
+
+<script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+
+</div></body></html>

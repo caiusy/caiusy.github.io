@@ -3,7 +3,6 @@ title: 结合 MiniMind 源码彻底搞懂 LoRA 与 MoE
 date: 2026-08-30 20:00:00
 categories:
   - AI与大模型
-  - 大模型
 tags:
   - LoRA
   - MoE

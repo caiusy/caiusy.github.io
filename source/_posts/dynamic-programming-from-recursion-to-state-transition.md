@@ -5,7 +5,7 @@ updated: 2026-07-13 23:50:00
 mathjax: true
 description: "从 LC70 爬楼梯出发，用递归树、状态表和完整代码理解动态规划五步法，再迁移到线性 DP、网格 DP、0/1 与完全背包、子序列和股票状态机。"
 categories:
-  - 算法与数据结构
+  - 算法基础
   - LeetCode
 tags:
   - 动态规划

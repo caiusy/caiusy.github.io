@@ -8,7 +8,7 @@ tags:
   - 多模态
   - Fine-tuning
 categories:
-  - 多模态大模型
+  - AI与大模型
   - 深度学习
 mathjax: true
 type: deep-dive

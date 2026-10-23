@@ -2,7 +2,7 @@
 title: attention_mechanism_xmind
 date: 2019-10-31 00:00:00
 categories:
-  - 多模态大模型
+  - AI与大模型
   - 其他
 tags:
   - Attention

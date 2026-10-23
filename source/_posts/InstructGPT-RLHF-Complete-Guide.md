@@ -5,7 +5,7 @@ updated: 2026-02-07 03:00:00
 mathjax: true
 description: "一篇面向面试的深度长文。使用费曼技巧通俗解释 RLHF，结合详细的数学推导（SFT Loss, Bradley-Terry Model, PPO Clip, GAE），并深入分析每一阶段的输入输出流。"
 categories:
-  - 多模态大模型
+  - AI与大模型
   - 深度学习
 tags:
   - Python

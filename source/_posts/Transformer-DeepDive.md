@@ -8,7 +8,7 @@ tags:
   - 多模态
   - Transformer
 categories:
-  - 多模态大模型
+  - AI与大模型
   - 深度学习
 type: deep-dive
 difficulty: intermediate

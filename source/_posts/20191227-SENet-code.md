@@ -1,7 +1,7 @@
 ---
 title: Attention机制中SEnet CBAM以及Dual pooling的pytorch实现
 categories:
-  - 多模态大模型
+  - AI与大模型
   - 深度学习
 date: 2019-12-27 00:00:00
 tags:

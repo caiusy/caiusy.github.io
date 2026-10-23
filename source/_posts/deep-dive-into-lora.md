@@ -9,7 +9,7 @@ tags:
   - LoRA
   - Fine-tuning
 categories:
-  - 多模态大模型
+  - AI与大模型
   - 深度学习
 cover: /images/lora-math/gradient_stability.png
 type: deep-dive

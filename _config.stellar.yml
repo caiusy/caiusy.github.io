@@ -71,7 +71,7 @@ menubar:
       theme: '#245f9e'
       icon: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5M3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-label">大模型</span>'
       title: LLM
-      url: /llm-reading-map/
+      url: /categories/AI与大模型/
     - id: notes
       theme: '#245f9e'
       icon: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4zM8 7h8M8 11h8M8 15h5"/></svg><span class="nav-label">学习笔记</span>'
@@ -216,7 +216,7 @@ article:
     'BEV感知': '#356ea8'
     '雷达相机融合': '#2d7f9f'
     '计算机视觉': '#2f73b5'
-    '多模态大模型': '#245f9e'
+    'AI与大模型': '#245f9e'
     '工程实践': '#b7791f'
     '算法基础': '#397db6'
     '学习笔记': '#4a7fa8'

@@ -7,7 +7,7 @@ tags:
   - 大模型
   - 多模态
 categories:
-  - 多模态大模型
+  - AI与大模型
   - 深度学习
 cover: /images/clip/fig1_arch.png
 type: deep-dive

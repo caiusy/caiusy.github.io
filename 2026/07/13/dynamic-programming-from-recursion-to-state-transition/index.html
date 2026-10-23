@@ -66,36 +66,36 @@
   
 
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-07-13T23:50:00+08:00","dateModified":"2026-07-13T23:50:00+08:00","datePublished":"2026-07-13T23:50:00+08:00","description":"\n动态规划不等于背公式。本文从一个会重复计算的递归开始，逐步得到状态定义、转移方程、初始化、遍历顺序和空间优化，并用 n=5 -&gt; 8 的完整例子把每一步连起来。\n","headline":"动态规划完全图解：从重复递归到状态转移","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/07/13/dynamic-programming-from-recursion-to-state-transition/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/07/13/dynamic-programming-from-recursion-to-state-transition/","keywords":"C++, Python, 动态规划, DP, LeetCode","image":[]}</script>
-  <link rel="stylesheet" href="/css/custom.css"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <link rel="stylesheet" href="/css/custom.css?v=20261023"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-</head>
-<body>
+<link rel="canonical" href="https://caiusy.github.io/2026/07/13/dynamic-programming-from-recursion-to-state-transition/"></head>
+<body><a class="skip-link" href="#main">跳到正文</a><div class="mobile-sitebar"><a href="/">Caius Lu<span>技术札记</span></a><div><button type="button" data-site-search aria-label="打开站内搜索">搜索</button><button type="button" data-site-nav aria-label="打开站点导航" aria-expanded="false">导航 ☰</button></div></div>
 
 <div class="l_body content" id="start" layout="post" type="deep-dive" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
 
 
-<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url();"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
 
 <div class="nav-area">
 
-<nav class="menu dis-select"><a class="nav-item active" title="Home" href="/" style="color:#6366F1"><img src="https://api.iconify.design/solar:home-bold-duotone.svg?color=%236366F1"/></a><a class="nav-item" title="Projects" href="/projects/" style="color:#10B981"><img src="https://api.iconify.design/solar:rocket-bold-duotone.svg?color=%2310B981"/></a><a class="nav-item" title="BEV" href="/roadside-bev/" style="color:#F59E0B"><img src="https://api.iconify.design/solar:camera-bold-duotone.svg?color=%23F59E0B"/></a><a class="nav-item" title="Fusion" href="/radar-camera-fusion/" style="color:#EC4899"><img src="https://api.iconify.design/solar:radar-bold-duotone.svg?color=%23EC4899"/></a><a class="nav-item" title="LLM" href="/llm-reading-map/" style="color:#8B5CF6"><img src="https://api.iconify.design/solar:atom-bold-duotone.svg?color=%238B5CF6"/></a><a class="nav-item" title="Notes" href="/notes/" style="color:#0EA5E9"><img src="https://api.iconify.design/solar:notebook-bookmark-bold-duotone.svg?color=%230EA5E9"/></a><a class="nav-item" title="Review" href="/review/" style="color:#F43F5E"><img src="https://api.iconify.design/solar:checklist-minimalistic-bold-duotone.svg?color=%23F43F5E"/></a><a class="nav-item" title="About" href="/about/" style="color:#64748B"><img src="https://api.iconify.design/solar:user-id-bold-duotone.svg?color=%2364748B"/></a></nav>
+<nav class="menu dis-select"><a aria-label="首页" aria-current="page" class="nav-item active" title="首页" href="/" style="color:#297c72"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-8h6v8"/></svg><span class="nav-label">首页</span></a><a aria-label="项目" class="nav-item" title="项目" href="/projects/" style="color:#297c72"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v14H4zM8 7V3h8v4M4 12h16M10 12v3h4v-3"/></svg><span class="nav-label">项目</span></a><a aria-label="BEV 感知" class="nav-item" title="BEV 感知" href="/roadside-bev/" style="color:#297c72"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v12H3zM8 7l2-3h4l2 3M16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><span class="nav-label">BEV 感知</span></a><a aria-label="雷视融合" class="nav-item" title="雷视融合" href="/radar-camera-fusion/" style="color:#297c72"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9l6-6M21 12a9 9 0 1 1-9-9M17 12a5 5 0 1 1-5-5"/></svg><span class="nav-label">雷视融合</span></a><a aria-label="大模型" class="nav-item" title="大模型" href="/llm-reading-map/" style="color:#297c72"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5M3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-label">大模型</span></a><a aria-label="学习笔记" class="nav-item" title="学习笔记" href="/notes/" style="color:#297c72"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4zM8 7h8M8 11h8M8 15h5"/></svg><span class="nav-label">学习笔记</span></a><a aria-label="复习索引" class="nav-item" title="复习索引" href="/review/" style="color:#297c72"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h12M9 12h12M9 19h12M2 5l2 2 3-4M2 12l2 2 3-4M2 19l2 2 3-4"/></svg><span class="nav-label">复习索引</span></a><a aria-label="关于我" class="nav-item" title="关于我" href="/about/" style="color:#297c72"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span class="nav-label">关于我</span></a></nav>
 </div>
 <div class="widgets">
-<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" aria-label="搜索文章、主题与笔记" autocomplete="off" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
 
 
 
-<widget class="widget-wrapper slide-up recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/10/23/deepseek-dsa-lightning-indexer/"><span class="title">从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存</span></a><a class="item title" href="/2026/10/04/llm-history-eighty-years/"><span class="title">大模型发展史：从“会算”到“会聊、会看、会做事”的八十年</span></a><a class="item title" href="/2026/10/01/deepseek-v2-v3-v4-moe-attention-loss/"><span class="title">从 DeepSeek-V2 到 V4：MoE、注意力与 Loss 的完整演进</span></a><a class="item title" href="/2026/09/13/kv-cache-rope-mla-explained/"><span class="title">从 KV 缓存到 MLA：把每一步都算清楚</span></a><a class="item title" href="/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"><span class="title">结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></a><a class="item title" href="/2026/08/25/minimind-to-minimind-v-real-training-source-code/"><span class="title">从 MiniMind 到 MiniMind-V：Pretrain、SFT、视觉 Token 与 Loss 的源码级推导</span></a><a class="item title" href="/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"><span class="title">MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/minimind-ppo-from-rollout-to-loss/"><span class="title">MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/yolov10-vehicle-pose-compression/"><span class="title">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</span></a><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a></div></widget>
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/10/23/deepseek-dsa-lightning-indexer/"><span class="title">从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存</span></a><a class="item title" href="/2026/10/04/llm-history-eighty-years/"><span class="title">大模型发展史：从“会算”到“会聊、会看、会做事”的八十年</span></a><a class="item title" href="/2026/10/01/deepseek-v2-v3-v4-moe-attention-loss/"><span class="title">从 DeepSeek-V2 到 V4：MoE、注意力与 Loss 的完整演进</span></a><a class="item title" href="/2026/09/13/kv-cache-rope-mla-explained/"><span class="title">从 KV 缓存到 MLA：把每一步都算清楚</span></a><a class="item title" href="/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"><span class="title">结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></a><a class="item title" href="/2026/08/25/minimind-to-minimind-v-real-training-source-code/"><span class="title">从 MiniMind 到 MiniMind-V：Pretrain、SFT、视觉 Token 与 Loss 的源码级推导</span></a><a class="item title" href="/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"><span class="title">MiniMind GRPO/CISPO 完整拆解：真实四候选、Reward、Advantage、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/minimind-ppo-from-rollout-to-loss/"><span class="title">MiniMind PPO 完整拆解：真实输入、Token、Reward、Critic、GAE、Loss 与 GPU 全流程</span></a><a class="item title" href="/2026/08/01/yolov10-vehicle-pose-compression/"><span class="title">一个 4M 参数的 YOLOv10，把我对模型压缩的直觉打碎了</span></a><a class="item title" href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"><span class="title">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</span></a></div></widget>
 </div>
-<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><img src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/08a41b181ce68.svg"/></a></div></footer>
-</div></aside><div class="l_main" id="main">
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 7-5 5 5 5m8-10 5 5-5 5M14 4l-4 16"/></svg></a></div></footer>
+</div></aside><div class="l_main" id="main" tabindex="-1">
 
 
 
 
 
-<div class="article banner slide-up top">
+<div class="article banner top">
   <div class="content">
     <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">算法与数据结构</a> <span class="sep"></span> <a class="cap breadcrumb-link" href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/LeetCode/">LeetCode</a></div>
@@ -110,7 +110,7 @@
     </div>
     
   </div>
-  </div><article class="md-text content slide-up"><blockquote>
+  </div><div class="reader-tools" role="group" aria-label="阅读设置"><span id="reading-estimate">长文阅读</span><div><button type="button" id="reader-size" aria-label="切换正文字号" aria-pressed="false">大字</button><button type="button" id="reader-focus" aria-pressed="false">专注阅读</button><button type="button" id="reader-link">复制链接</button></div></div><div id="reading-progress" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div><article class="md-text content"><blockquote>
 <p>动态规划不等于背公式。本文从一个会重复计算的递归开始，逐步得到状态定义、转移方程、初始化、遍历顺序和空间优化，并用 <code>n=5 -&gt; 8</code> 的完整例子把每一步连起来。</p>
 </blockquote>
 <span id="more"></span>
@@ -535,7 +535,7 @@ $$
 </blockquote>
 <p>真正掌握 DP 的标准不是能默写某道题，而是看到新约束后，能说明需要修改的是状态、来路、初始化还是遍历方向。先画最小例子，再写代码，公式会变成推理结果，而不再是一串需要硬背的符号。</p>
 </article>
-<div class="article-footer slide-up">
+<div class="article-footer">
 
 
     <section id="share">
@@ -552,12 +552,12 @@ $$
     </section>
     </div>
 
-<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</a></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/">Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</a></div></section></div>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/2026/07/23/LifeOS-Agent-Zero-to-Mastery/">LifeOS-Agent 从零到独立训练：Transformer、SFT、DPO、PPO、GRPO 与 Agent RL 完整推导</a></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/07/13/Agent-RL-Multiturn-Tool-Use-Complete-Guide/">Agent RL 全链路教程：从工具选择、多轮对话到 Reward、Advantage 与 Token Loss</a></div></section></div>
 
 
 
 
-  <div class="related-wrap md-text slide-up" id="comments">
+  <div class="related-wrap md-text" id="comments">
     <section class='header cmt-title cap theme'>
       <p>💬 欢迎留言讨论</p>
 
@@ -574,7 +574,7 @@ $$
 
 
 
-<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<footer class="page-footer footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
 <p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv"></span> 人</span></p>
 </div></footer>
 <div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
@@ -582,12 +582,12 @@ $$
 
 
 
-<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%85%88%E7%94%A8%E4%B8%80%E5%8F%A5%E4%BA%BA%E8%AF%9D%E7%90%86%E8%A7%A3%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92"><span class="toc-text">1. 先用一句人话理解动态规划</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%E5%80%BC%E5%BE%97%E8%80%83%E8%99%91-DP"><span class="toc-text">2. 什么问题值得考虑 DP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DP%E3%80%81%E8%B4%AA%E5%BF%83%E5%92%8C%E5%9B%9E%E6%BA%AF%E6%80%8E%E4%B9%88%E5%8C%BA%E5%88%86"><span class="toc-text">DP、贪心和回溯怎么区分</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-DP-%E4%BA%94%E9%97%AE%EF%BC%9A%E5%86%99%E4%BB%A3%E7%A0%81%E5%89%8D%E5%85%88%E6%8A%8A%E4%B8%AD%E6%96%87%E8%AF%B4%E6%B8%85%E6%A5%9A"><span class="toc-text">3. DP 五问：写代码前先把中文说清楚</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%8A%B6%E6%80%81%E5%BF%85%E9%A1%BB%E5%86%99%E6%88%90%E5%AE%8C%E6%95%B4%E5%8F%A5%E5%AD%90"><span class="toc-text">为什么状态必须写成完整句子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%90%8C%E4%B8%80%E4%B8%AA%E9%80%92%E6%8E%A8%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%AE%9E%E7%8E%B0"><span class="toc-text">4. 同一个递推的四种实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E6%9A%B4%E5%8A%9B%E9%80%92%E5%BD%92"><span class="toc-text">4.1 暴力递归</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E8%AE%B0%E5%BF%86%E5%8C%96%E9%80%92%E5%BD%92%EF%BC%9A%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B"><span class="toc-text">4.2 记忆化递归：自顶向下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E9%80%92%E6%8E%A8%E5%A1%AB%E8%A1%A8%EF%BC%9A%E8%87%AA%E5%BA%95%E5%90%91%E4%B8%8A"><span class="toc-text">4.3 递推填表：自底向上</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E6%BB%9A%E5%8A%A8%E5%8F%98%E9%87%8F"><span class="toc-text">4.4 滚动变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BE%8B%E5%AD%90%EF%BC%9ALC70-%E7%88%AC%E6%A5%BC%E6%A2%AF"><span class="toc-text">5. 端到端例子：LC70 爬楼梯</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E4%B8%8D%E4%BB%8E%E5%85%AC%E5%BC%8F%E5%87%BA%E5%8F%91%EF%BC%8C%E4%BB%8E%E6%9C%80%E5%90%8E%E4%B8%80%E6%AD%A5%E5%87%BA%E5%8F%91"><span class="toc-text">5.1 不从公式出发，从最后一步出发</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E7%94%A8%E4%BA%94%E9%97%AE%E5%AE%8C%E6%88%90%E5%BB%BA%E6%A8%A1"><span class="toc-text">5.2 用五问完成建模</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E6%89%8B%E6%8E%A8-n-5-gt-8"><span class="toc-text">5.3 手推 n&#x3D;5 -&gt; 8</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-Python-%E5%AE%8C%E6%95%B4%E8%A1%A8%E7%89%88%E6%9C%AC"><span class="toc-text">5.4 Python 完整表版本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-Python-%E7%A9%BA%E9%97%B4%E4%BC%98%E5%8C%96%E7%89%88%E6%9C%AC"><span class="toc-text">5.5 Python 空间优化版本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-6-C-%E7%A9%BA%E9%97%B4%E4%BC%98%E5%8C%96%E7%89%88%E6%9C%AC"><span class="toc-text">5.6 C++ 空间优化版本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E7%BA%BF%E6%80%A7-DP%EF%BC%9A%E4%BB%8E%E7%9B%B8%E5%8A%A0%E5%88%B0%E2%80%9C%E9%80%89%E6%88%96%E4%B8%8D%E9%80%89%E2%80%9D"><span class="toc-text">6. 线性 DP：从相加到“选或不选”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E7%BD%91%E6%A0%BC-DP%EF%BC%9A%E4%BE%9D%E8%B5%96%E7%AE%AD%E5%A4%B4%E5%86%B3%E5%AE%9A%E5%A1%AB%E8%A1%A8%E6%96%B9%E5%90%91"><span class="toc-text">7. 网格 DP：依赖箭头决定填表方向</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E8%83%8C%E5%8C%85-DP%EF%BC%9A%E6%96%B9%E5%90%91%E5%86%B3%E5%AE%9A%E7%89%A9%E5%93%81%E4%BC%9A%E4%B8%8D%E4%BC%9A%E9%87%8D%E5%A4%8D%E4%BD%BF%E7%94%A8"><span class="toc-text">8. 背包 DP：方向决定物品会不会重复使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-LC416%EF%BC%9A0-x2F-1-%E8%83%8C%E5%8C%85%E5%8F%AF%E8%A1%8C%E6%80%A7"><span class="toc-text">8.1 LC416：0&#x2F;1 背包可行性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-LC322%EF%BC%9A%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85%E6%9C%80%E5%B0%8F%E5%80%BC"><span class="toc-text">8.2 LC322：完全背包最小值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E5%AD%90%E5%BA%8F%E5%88%97-DP%EF%BC%9A%E5%8D%95%E4%B8%B2%E7%9C%8B%E7%BB%93%E5%B0%BE%EF%BC%8C%E5%8F%8C%E4%B8%B2%E7%9C%8B%E5%89%8D%E7%BC%80"><span class="toc-text">9. 子序列 DP：单串看结尾，双串看前缀</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-1-LC300-%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97"><span class="toc-text">9.1 LC300 最长递增子序列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-LC1143-%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97"><span class="toc-text">9.2 LC1143 最长公共子序列</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E8%82%A1%E7%A5%A8%E7%8A%B6%E6%80%81%E6%9C%BA%EF%BC%9A%E5%85%88%E7%94%BB%E7%8A%B6%E6%80%81%EF%BC%8C%E5%86%8D%E5%86%99%E5%85%AC%E5%BC%8F"><span class="toc-text">10. 股票状态机：先画状态，再写公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%8E%E9%81%8D%E5%8E%86%E9%A1%BA%E5%BA%8F%E7%9A%84%E7%BB%9F%E4%B8%80%E8%A7%A3%E9%87%8A"><span class="toc-text">11. 初始化与遍历顺序的统一解释</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-1-%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%96%E5%86%B3%E4%BA%8E%E7%9B%AE%E6%A0%87%E8%BF%90%E7%AE%97"><span class="toc-text">11.1 初始化取决于目标运算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-2-%E9%81%8D%E5%8E%86%E9%A1%BA%E5%BA%8F%E6%98%AF%E4%BE%9D%E8%B5%96%E5%9B%BE%E7%9A%84%E6%8B%93%E6%89%91%E9%A1%BA%E5%BA%8F"><span class="toc-text">11.2 遍历顺序是依赖图的拓扑顺序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-%E9%9D%A2%E8%AF%95%E7%99%BD%E6%9D%BF%E6%B5%81%E7%A8%8B"><span class="toc-text">12. 面试白板流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-%E9%AB%98%E9%A2%91%E9%94%99%E8%AF%AF%E8%AF%8A%E6%96%AD"><span class="toc-text">13. 高频错误诊断</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-%E7%BB%8F%E5%85%B8%E9%A2%98%E7%9B%AE%E5%AD%A6%E4%B9%A0%E5%9C%B0%E5%9B%BE"><span class="toc-text">14. 经典题目学习地图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-%E6%9C%80%E7%BB%88%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80"><span class="toc-text">15. 最终记忆口诀</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%85%88%E7%94%A8%E4%B8%80%E5%8F%A5%E4%BA%BA%E8%AF%9D%E7%90%86%E8%A7%A3%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92"><span class="toc-text">1. 先用一句人话理解动态规划</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%E5%80%BC%E5%BE%97%E8%80%83%E8%99%91-DP"><span class="toc-text">2. 什么问题值得考虑 DP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DP%E3%80%81%E8%B4%AA%E5%BF%83%E5%92%8C%E5%9B%9E%E6%BA%AF%E6%80%8E%E4%B9%88%E5%8C%BA%E5%88%86"><span class="toc-text">DP、贪心和回溯怎么区分</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-DP-%E4%BA%94%E9%97%AE%EF%BC%9A%E5%86%99%E4%BB%A3%E7%A0%81%E5%89%8D%E5%85%88%E6%8A%8A%E4%B8%AD%E6%96%87%E8%AF%B4%E6%B8%85%E6%A5%9A"><span class="toc-text">3. DP 五问：写代码前先把中文说清楚</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%8A%B6%E6%80%81%E5%BF%85%E9%A1%BB%E5%86%99%E6%88%90%E5%AE%8C%E6%95%B4%E5%8F%A5%E5%AD%90"><span class="toc-text">为什么状态必须写成完整句子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%90%8C%E4%B8%80%E4%B8%AA%E9%80%92%E6%8E%A8%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%AE%9E%E7%8E%B0"><span class="toc-text">4. 同一个递推的四种实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E6%9A%B4%E5%8A%9B%E9%80%92%E5%BD%92"><span class="toc-text">4.1 暴力递归</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E8%AE%B0%E5%BF%86%E5%8C%96%E9%80%92%E5%BD%92%EF%BC%9A%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B"><span class="toc-text">4.2 记忆化递归：自顶向下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E9%80%92%E6%8E%A8%E5%A1%AB%E8%A1%A8%EF%BC%9A%E8%87%AA%E5%BA%95%E5%90%91%E4%B8%8A"><span class="toc-text">4.3 递推填表：自底向上</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E6%BB%9A%E5%8A%A8%E5%8F%98%E9%87%8F"><span class="toc-text">4.4 滚动变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%AB%AF%E5%88%B0%E7%AB%AF%E4%BE%8B%E5%AD%90%EF%BC%9ALC70-%E7%88%AC%E6%A5%BC%E6%A2%AF"><span class="toc-text">5. 端到端例子：LC70 爬楼梯</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E4%B8%8D%E4%BB%8E%E5%85%AC%E5%BC%8F%E5%87%BA%E5%8F%91%EF%BC%8C%E4%BB%8E%E6%9C%80%E5%90%8E%E4%B8%80%E6%AD%A5%E5%87%BA%E5%8F%91"><span class="toc-text">5.1 不从公式出发，从最后一步出发</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E7%94%A8%E4%BA%94%E9%97%AE%E5%AE%8C%E6%88%90%E5%BB%BA%E6%A8%A1"><span class="toc-text">5.2 用五问完成建模</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E6%89%8B%E6%8E%A8-n-5-gt-8"><span class="toc-text">5.3 手推 n&#x3D;5 -&gt; 8</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-Python-%E5%AE%8C%E6%95%B4%E8%A1%A8%E7%89%88%E6%9C%AC"><span class="toc-text">5.4 Python 完整表版本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-Python-%E7%A9%BA%E9%97%B4%E4%BC%98%E5%8C%96%E7%89%88%E6%9C%AC"><span class="toc-text">5.5 Python 空间优化版本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-6-C-%E7%A9%BA%E9%97%B4%E4%BC%98%E5%8C%96%E7%89%88%E6%9C%AC"><span class="toc-text">5.6 C++ 空间优化版本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E7%BA%BF%E6%80%A7-DP%EF%BC%9A%E4%BB%8E%E7%9B%B8%E5%8A%A0%E5%88%B0%E2%80%9C%E9%80%89%E6%88%96%E4%B8%8D%E9%80%89%E2%80%9D"><span class="toc-text">6. 线性 DP：从相加到“选或不选”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E7%BD%91%E6%A0%BC-DP%EF%BC%9A%E4%BE%9D%E8%B5%96%E7%AE%AD%E5%A4%B4%E5%86%B3%E5%AE%9A%E5%A1%AB%E8%A1%A8%E6%96%B9%E5%90%91"><span class="toc-text">7. 网格 DP：依赖箭头决定填表方向</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E8%83%8C%E5%8C%85-DP%EF%BC%9A%E6%96%B9%E5%90%91%E5%86%B3%E5%AE%9A%E7%89%A9%E5%93%81%E4%BC%9A%E4%B8%8D%E4%BC%9A%E9%87%8D%E5%A4%8D%E4%BD%BF%E7%94%A8"><span class="toc-text">8. 背包 DP：方向决定物品会不会重复使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-LC416%EF%BC%9A0-x2F-1-%E8%83%8C%E5%8C%85%E5%8F%AF%E8%A1%8C%E6%80%A7"><span class="toc-text">8.1 LC416：0&#x2F;1 背包可行性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-LC322%EF%BC%9A%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85%E6%9C%80%E5%B0%8F%E5%80%BC"><span class="toc-text">8.2 LC322：完全背包最小值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E5%AD%90%E5%BA%8F%E5%88%97-DP%EF%BC%9A%E5%8D%95%E4%B8%B2%E7%9C%8B%E7%BB%93%E5%B0%BE%EF%BC%8C%E5%8F%8C%E4%B8%B2%E7%9C%8B%E5%89%8D%E7%BC%80"><span class="toc-text">9. 子序列 DP：单串看结尾，双串看前缀</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-1-LC300-%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97"><span class="toc-text">9.1 LC300 最长递增子序列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-LC1143-%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97"><span class="toc-text">9.2 LC1143 最长公共子序列</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E8%82%A1%E7%A5%A8%E7%8A%B6%E6%80%81%E6%9C%BA%EF%BC%9A%E5%85%88%E7%94%BB%E7%8A%B6%E6%80%81%EF%BC%8C%E5%86%8D%E5%86%99%E5%85%AC%E5%BC%8F"><span class="toc-text">10. 股票状态机：先画状态，再写公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%8E%E9%81%8D%E5%8E%86%E9%A1%BA%E5%BA%8F%E7%9A%84%E7%BB%9F%E4%B8%80%E8%A7%A3%E9%87%8A"><span class="toc-text">11. 初始化与遍历顺序的统一解释</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-1-%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%96%E5%86%B3%E4%BA%8E%E7%9B%AE%E6%A0%87%E8%BF%90%E7%AE%97"><span class="toc-text">11.1 初始化取决于目标运算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-2-%E9%81%8D%E5%8E%86%E9%A1%BA%E5%BA%8F%E6%98%AF%E4%BE%9D%E8%B5%96%E5%9B%BE%E7%9A%84%E6%8B%93%E6%89%91%E9%A1%BA%E5%BA%8F"><span class="toc-text">11.2 遍历顺序是依赖图的拓扑顺序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-%E9%9D%A2%E8%AF%95%E7%99%BD%E6%9D%BF%E6%B5%81%E7%A8%8B"><span class="toc-text">12. 面试白板流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-%E9%AB%98%E9%A2%91%E9%94%99%E8%AF%AF%E8%AF%8A%E6%96%AD"><span class="toc-text">13. 高频错误诊断</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-%E7%BB%8F%E5%85%B8%E9%A2%98%E7%9B%AE%E5%AD%A6%E4%B9%A0%E5%9C%B0%E5%9B%BE"><span class="toc-text">14. 经典题目学习地图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-%E6%9C%80%E7%BB%88%E8%AE%B0%E5%BF%86%E5%8F%A3%E8%AF%80"><span class="toc-text">15. 最终记忆口诀</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
 </div></aside><div class='float-panel'>
-  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+  <button type='button' style='display:none' aria-label='打开文章目录' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
   </button>
-  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+  <button type='button' style='display:none' aria-label='打开站点导航' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
   </button>
 </div>
@@ -611,11 +611,11 @@ $$
   };
 
   // required plugins (only load if needs)
-  if (`local_search`) {
+  if (`native_search`) {
     ctx.search = {};
-    ctx.search.service = `local_search`;
+    ctx.search.service = `native_search`;
     if (ctx.search.service == 'local_search') {
-      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null,"sort":"-date"}`);
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null}`);
       ctx.search[ctx.search.service] = service_obj;
     }
   }
@@ -625,7 +625,7 @@ $$
     loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
   };
   const deps = {
-    jquery: `https://gcore.jsdelivr.net/npm/jquery@3.7/dist/jquery.min.js`,
+    jquery: `/vendor/jquery-3.7.1.min.js`,
     marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
     lazyload: `/%5Bobject%20Object%5D`
   }
@@ -939,7 +939,7 @@ $$
   })()
 </script>
 
-<script async src="https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"></script>
+<script async src="/vendor/lazyload-19.1.3.min.js"></script>
 <script>
   // https://www.npmjs.com/package/vanilla-lazyload
   // Set the options globally
@@ -1230,57 +1230,6 @@ $$
 
 <script>
   window.addEventListener('DOMContentLoaded', (event) => {
-    ctx.search = {
-      path: `/search.json`,
-    }
-    utils.js('/js/search/local-search.js', { defer: true });
-  });
-</script><script>
-  window.FPConfig = {
-    delay: 0,
-    ignoreKeywords: [],
-    maxRPS: 5,
-    hoverDelay: 25
-  };
-</script>
-<script defer src="https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script>
-  ctx.fancybox = {
-    selector: `.md-text img:not([class]), .md-text .image img, .timenode p>img`,
-    css: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
-    js: `https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
-  };
-  var selector = '[data-fancybox]:not(.error), .with-fancybox .atk-content img:not([atk-emoticon])';
-  if (ctx.fancybox.selector) {
-    selector += `, ${ctx.fancybox.selector}`
-  }
-  var needFancybox = document.querySelectorAll(selector).length !== 0;
-  if (!needFancybox) {
-    const memos = document.getElementsByClassName('ds-memos');
-    if (memos != undefined && memos.length > 0) {
-      needFancybox = true;
-    }
-    const fancybox = document.getElementsByClassName('with-fancybox');
-    if (fancybox != undefined && fancybox.length > 0) {
-      needFancybox = true;
-    }
-  }
-  if (needFancybox) {
-    utils.css(ctx.fancybox.css);
-    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
-      Fancybox.bind(selector, {
-        hideScrollbar: false,
-        Thumbs: {
-          autoStart: false,
-        },
-        caption: (fancybox, slide) => {
-          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
-        }
-      });
-    })
-  }
-</script>
-<script>
-  window.addEventListener('DOMContentLoaded', (event) => {
     const swiper_api = document.getElementById('swiper-api');
     if (swiper_api != undefined) {
       utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
@@ -1303,20 +1252,6 @@ $$
         });
       })
     }
-  });
-</script>
-<script defer src="https://gcore.jsdelivr.net/npm/scrollreveal@4.0/dist/scrollreveal.min.js"></script>
-<script>
-  window.addEventListener('DOMContentLoaded', (event) => {
-    const slideUp = {
-      distance: `16px`,
-      duration: `600`,
-      interval: `100`,
-      scale: `1`,
-      opacity: 0,
-      easing: "ease-out"
-    };
-    ScrollReveal().reveal('.slide-up', { ...slideUp });
   });
 </script>
 
@@ -1364,5 +1299,5 @@ $$
 
 
 <!-- inject -->
-
+<script defer src="/js/site-experience.js?v=20261023"></script>
 </div></body></html>

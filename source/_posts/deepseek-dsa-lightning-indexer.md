@@ -1,17 +1,24 @@
 ---
 title: "从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存"
 date: 2026-10-23 09:00:00
+updated: 2026-10-24 09:30:00
 categories:
-  - 大模型
-  - 模型架构
+  - AI与大模型
+  - 深度学习
 tags:
   - DeepSeek
   - DSA
   - Lightning Indexer
   - MLA
   - Sparse Attention
-type: article
+type: deep-dive
 difficulty: advanced
+cover: /images/deepseek-dsa-lightning-indexer/01_overview.svg
+keywords:
+  - DeepSeek-V3.2-Exp
+  - Sparse Attention
+  - KV Cache
+  - 推理优化
 mathjax: true
 description: "用一个 token 的完整推理链路讲清 Lightning Indexer、动态 Gate、Top-K 与 MLA 两套缓存，附交互演示和成本估算。"
 review_status: published
@@ -43,7 +50,7 @@ DSA 的关键链路只有两步：**Lightning Indexer 用小 Key 扫描全部历
 
 ---
 
-### 0. 先给结论：DSA 到底在做什么？
+## 0. 先给结论：DSA 到底在做什么？
 
 DeepSeek Sparse Attention（DSA）的核心不是“完全不看长上下文”，而是：
 
@@ -896,7 +903,7 @@ W_{q,b}^{I}:1536\rightarrow64\times128
 $$
 {% endraw %}
 
-#### 15.1 `wq_b`
+### 15.1 `wq_b`
 
 {% raw %}
 $$
@@ -918,7 +925,7 @@ $$
 $$
 {% endraw %}
 
-#### 15.2 `wk`
+### 15.2 `wk`
 
 {% raw %}
 $$
@@ -934,7 +941,7 @@ $$
 $$
 {% endraw %}
 
-#### 15.3 `weights_proj`（本文 WG）
+### 15.3 `weights_proj`（本文 WG）
 
 {% raw %}
 $$
@@ -950,7 +957,7 @@ $$
 $$
 {% endraw %}
 
-#### 15.4 `k_norm`
+### 15.4 `k_norm`
 
 官方 reference `LayerNorm(128)` 有 weight + bias：
 
@@ -960,7 +967,7 @@ $$
 $$
 {% endraw %}
 
-#### 15.5 单层 Indexer 新增参数
+### 15.5 单层 Indexer 新增参数
 
 约：
 
@@ -1496,49 +1503,49 @@ out = sparse_mla_attention(
 
 如果下面 8 个问题都能直接回答，说明 Lightning Indexer 推理原理已经真正理解。
 
-#### Q1
+### Q1
 
 `W_K` 和 `k_t` 哪个共享？
 
 > `W_K` 是同一层跨 token 共享的训练参数；`k_t` 是 token t 的动态 Key，不共享。
 
-#### Q2
+### Q2
 
 为什么 `q_t` 不缓存？
 
 > 它只服务当前 Query，未来 token 会生成自己的 Query。
 
-#### Q3
+### Q3
 
 为什么 `k_t` 要缓存？
 
 > 它会成为未来 token 查询的历史 Indexer Key。
 
-#### Q4
+### Q4
 
 为什么每一步都要重新算 `g_t`？
 
 > 因为 `g_t` 是 query-conditioned head mixer，必须站在当前 token 的检索需求决定各 Indexer Head 如何混合。
 
-#### Q5
+### Q5
 
 Top-K 排的是 Head 吗？
 
 > 不是。排的是各历史 token 的最终 ranking score。
 
-#### Q6
+### Q6
 
 历史 hidden state 是否需要为了 Indexer 一直缓存？
 
 > 不需要。已经转换后的历史 Indexer Key 被缓存即可。
 
-#### Q7
+### Q7
 
 Top-K 后访问什么？
 
 > 对应历史位置的 MLA 压缩缓存，如 `cKV + PE`。
 
-#### Q8
+### Q8
 
 DSA 为什么仍然有意义，明明 Indexer 还是扫描整个历史？
 

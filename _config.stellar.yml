@@ -18,7 +18,7 @@ inject:
   script:
     - '<script defer src="/js/site-experience.js?v=20261023"></script>'
   head:
-    - '<link rel="stylesheet" href="/css/custom.css?v=20261024">'
+    - '<link rel="stylesheet" href="/css/custom.css?v=20261025">'
     - '<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>'
 
 # 一旦设置源站地址，非源站地址将不会被SEO收录，并且访问时弹出提示
@@ -213,20 +213,20 @@ article:
   auto_excerpt: 150
   # 分类颜色
   category_color:
-    'BEV感知': '#6366F1'
-    '雷达相机融合': '#EC4899'
-    '计算机视觉': '#10B981'
-    '多模态大模型': '#8B5CF6'
-    '工程实践': '#F59E0B'
-    '算法基础': '#0EA5E9'
-    '学习笔记': '#14B8A6'
-    '实验记录': '#F43F5E'
+    'BEV感知': '#356ea8'
+    '雷达相机融合': '#2d7f9f'
+    '计算机视觉': '#2f73b5'
+    '多模态大模型': '#245f9e'
+    '工程实践': '#b7791f'
+    '算法基础': '#397db6'
+    '学习笔记': '#4a7fa8'
+    '实验记录': '#b86b55'
     '历史归档': '#64748B'
-    '深度学习': '#10B981'
-    '目标跟踪': '#F59E0B'
-    '探索号': '#f44336'
-    '技术笔记': '#8B5CF6'
-    '项目实践': '#EC4899'
+    '深度学习': '#356ea8'
+    '目标跟踪': '#b7791f'
+    '探索号': '#a9564c'
+    '技术笔记': '#245f9e'
+    '项目实践': '#2d7f9f'
   # 文章许可协议
   license: false  # 关闭文章顶部的大 License 框
   # 分享

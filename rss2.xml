@@ -77,8 +77,8 @@
       <link>https://caiusy.github.io/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/</link>
       <description>从直觉到公式，从公式到 Tensor Shape，从 Shape 到 MiniMind 真实代码—— 彻底搞懂 LoRA 低秩适配与 MoE 混合专家的工作原理、工程实现和设计取舍。</description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81-AI/">多模态 AI</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81-AI/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <category domain="https://caiusy.github.io/tags/MoE/">MoE</category>
@@ -165,10 +165,10 @@
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
       <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
+      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
       <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
-      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <pubDate>Thu, 23 Jul 2026 12:30:00 GMT</pubDate>
     </item>
     <item>
@@ -259,9 +259,9 @@
         <![CDATA[<h1 id="LLaVA-终极指南：从盲人教授到多模态大模型的数学解剖"><a href="#LLaVA-终极指南：从盲人教授到多模态大模型的数学解剖" class="headerlink" title="LLaVA]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/">多模态大模型</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
@@ -363,8 +363,8 @@
         <![CDATA[<h1 id="CLIP-Contrastive-Language-Image-Pre-Training-深度解析"><a href="#CLIP-Contrastive-Language-Image-Pre-Training-深度解析" class="headerlink"]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/">多模态大模型</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
@@ -376,8 +376,8 @@
       <link>https://caiusy.github.io/2026/02/08/MoE-Switch-Transformer-Mixtral-Deep-Dive/</link>
       <description>【费曼式深度解析】从零理解 Mixture of Experts 的核心机制。详解 Router 路由、Load Balance Loss 推导、梯度流动分析，含完整 Tensor 维度变化图解与生产级代码实现。</description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/">多模态大模型</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
@@ -414,8 +414,8 @@
       <link>https://caiusy.github.io/2026/02/07/InstructGPT-RLHF-Complete-Guide/</link>
       <description>一篇面向面试的深度长文。使用费曼技巧通俗解释 RLHF，结合详细的数学推导（SFT Loss, Bradley-Terry Model, PPO Clip, GAE），并深入分析每一阶段的输入输出流。</description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/">多模态大模型</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/Python/">Python</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
@@ -430,8 +430,8 @@
         <![CDATA[<p><strong>摘要</strong>：本文深度解析 OpenAI 的 GPT 系列模型演进之路。从 GPT-1 的预训练+微调范式，到 GPT-2 的零样本尝试，再到 GPT-3 的上下文学习（In-context Learning）与规模法则（Scaling Laws）。文章详细拆解了模型架构、Tensor 维度变化、训练数据流，并配有 13 张可视化图表与通俗易懂的费曼式讲解。</p>]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/">多模态大模型</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
@@ -446,8 +446,8 @@
         <![CDATA[<h1 id="BERT-完整解析：从论文到-KV-Cache"><a href="#BERT-完整解析：从论文到-KV-Cache" class="headerlink" title="BERT 完整解析：从论文到 KV Cache"></a>BERT 完整解析：从论文到]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/">多模态大模型</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
@@ -461,8 +461,8 @@
         <![CDATA[<h1 id="彻底理解-Transformer-Attention-Is-All-You-Need"><a href="#彻底理解-Transformer-Attention-Is-All-You-Need" class="headerlink" title="彻底理解]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/">多模态大模型</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
@@ -479,8 +479,8 @@
 <p>本文将基于深度技术问答，带你彻底搞懂 QLoRA 的核心机制。</p>]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/">多模态大模型</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
@@ -498,8 +498,8 @@
 <p>本文将基于我与 AI 的一次深度对话，系统地梳理 LoRA 的核心原理。我们不仅会用直觉去理解它，更会通过 <strong>数学证明</strong> 和 <strong>Python 模拟</strong> ，彻底搞懂为什么它需要除以 $r$ ，以及它在反向传播中是如何工作的。</p>]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/">多模态大模型</category>
-      <category domain="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
+      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
       <category domain="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>

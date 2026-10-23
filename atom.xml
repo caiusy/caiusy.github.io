@@ -94,8 +94,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态 AI" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81-AI/"/>
-    <category term="大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81-AI/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="MoE" scheme="https://caiusy.github.io/tags/MoE/"/>
@@ -105,7 +105,7 @@
     <published>2026-08-30T12:00:00.000Z</published>
     <summary>从直觉到公式，从公式到 Tensor Shape，从 Shape 到 MiniMind 真实代码—— 彻底搞懂 LoRA 低秩适配与 MoE 混合专家的工作原理、工程实现和设计取舍。</summary>
     <title>结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</title>
-    <updated>2026-08-30T15:33:57.995Z</updated>
+    <updated>2026-10-23T17:23:00.001Z</updated>
   </entry>
   <entry>
     <author>
@@ -202,10 +202,10 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
+    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
     <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
-    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <id>https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/</id>
     <link href="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"/>
     <published>2026-07-23T12:30:00.000Z</published>
@@ -318,9 +318,9 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
-    <category term="多模态" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="多模态" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
@@ -336,7 +336,7 @@
       <![CDATA[<h1 id="LLaVA-终极指南：从盲人教授到多模态大模型的数学解剖"><a href="#LLaVA-终极指南：从盲人教授到多模态大模型的数学解剖" class="headerlink" title="LLaVA]]>
     </summary>
     <title>LLaVA 原理拆解：视觉编码器、投影层与语言模型如何对齐</title>
-    <updated>2026-05-15T17:03:44.253Z</updated>
+    <updated>2026-10-23T17:23:00.004Z</updated>
   </entry>
   <entry>
     <author>
@@ -446,8 +446,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="计算机视觉" scheme="https://caiusy.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
@@ -459,14 +459,14 @@
       <![CDATA[<h1 id="CLIP-Contrastive-Language-Image-Pre-Training-深度解析"><a href="#CLIP-Contrastive-Language-Image-Pre-Training-深度解析" class="headerlink"]]>
     </summary>
     <title>CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用</title>
-    <updated>2026-05-15T17:03:44.251Z</updated>
+    <updated>2026-10-23T17:23:00.007Z</updated>
   </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
@@ -511,8 +511,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>
     <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
@@ -529,8 +529,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
@@ -543,14 +543,14 @@
       <![CDATA[<p><strong>摘要</strong>：本文深度解析 OpenAI 的 GPT 系列模型演进之路。从 GPT-1 的预训练+微调范式，到 GPT-2 的零样本尝试，再到 GPT-3 的上下文学习（In-context Learning）与规模法则（Scaling Laws）。文章详细拆解了模型架构、Tensor 维度变化、训练数据流，并配有 13 张可视化图表与通俗易懂的费曼式讲解。</p>]]>
     </summary>
     <title>GPT 系列深度解析：从 GPT-1 到 GPT-3</title>
-    <updated>2026-05-15T17:03:44.251Z</updated>
+    <updated>2026-10-23T17:22:59.999Z</updated>
   </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
@@ -562,14 +562,14 @@
       <![CDATA[<h1 id="BERT-完整解析：从论文到-KV-Cache"><a href="#BERT-完整解析：从论文到-KV-Cache" class="headerlink" title="BERT 完整解析：从论文到 KV Cache"></a>BERT 完整解析：从论文到]]>
     </summary>
     <title>BERT 完整解析：从论文到 KV Cache</title>
-    <updated>2026-05-15T17:03:44.260Z</updated>
+    <updated>2026-10-23T17:23:00.009Z</updated>
   </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
@@ -582,14 +582,14 @@
       <![CDATA[<h1 id="彻底理解-Transformer-Attention-Is-All-You-Need"><a href="#彻底理解-Transformer-Attention-Is-All-You-Need" class="headerlink" title="彻底理解]]>
     </summary>
     <title>彻底理解 Transformer：Attention Is All You Need</title>
-    <updated>2026-05-15T17:03:44.259Z</updated>
+    <updated>2026-10-23T17:22:59.997Z</updated>
   </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
@@ -606,14 +606,14 @@
 <p>本文将基于深度技术问答，带你彻底搞懂 QLoRA 的核心机制。</p>]]>
     </summary>
     <title>彻底搞懂 QLoRA：如何用 4-bit 量化技术单卡微调千亿模型？</title>
-    <updated>2026-05-15T17:03:44.267Z</updated>
+    <updated>2026-10-23T17:23:00.007Z</updated>
   </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="多模态大模型" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
@@ -628,6 +628,6 @@
 <p>本文将基于我与 AI 的一次深度对话，系统地梳理 LoRA 的核心原理。我们不仅会用直觉去理解它，更会通过 <strong>数学证明</strong> 和 <strong>Python 模拟</strong> ，彻底搞懂为什么它需要除以 $r$ ，以及它在反向传播中是如何工作的。</p>]]>
     </summary>
     <title>深入浅出 LoRA：大模型微调的核心原理、数学证明与实战指南</title>
-    <updated>2026-05-15T17:03:44.260Z</updated>
+    <updated>2026-10-23T17:22:59.998Z</updated>
   </entry>
 </feed>

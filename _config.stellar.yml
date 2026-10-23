@@ -16,9 +16,10 @@ preconnect:
 # 引入自定义 CSS
 inject:
   script:
+    - '<script defer src="/js/companion.js?v=1"></script>'
     - '<script defer src="/js/site-experience.js?v=20261023"></script>'
   head:
-    - '<link rel="stylesheet" href="/css/custom.css?v=20261026">'
+    - '<link rel="stylesheet" href="/css/custom.css?v=20261024cat1">'
     - '<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>'
 
 # 一旦设置源站地址，非源站地址将不会被SEO收录，并且访问时弹出提示

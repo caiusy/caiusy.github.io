@@ -78,9 +78,9 @@
     <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
-    <category term="Attention" scheme="https://caiusy.github.io/tags/Attention/"/>
     <category term="DeepSeek" scheme="https://caiusy.github.io/tags/DeepSeek/"/>
     <category term="MLA" scheme="https://caiusy.github.io/tags/MLA/"/>
+    <category term="Attention" scheme="https://caiusy.github.io/tags/Attention/"/>
     <category term="KV-Cache" scheme="https://caiusy.github.io/tags/KV-Cache/"/>
     <category term="RoPE" scheme="https://caiusy.github.io/tags/RoPE/"/>
     <id>https://caiusy.github.io/2026/09/13/kv-cache-rope-mla-explained/</id>
@@ -202,10 +202,10 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
-    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
     <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
+    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <id>https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/</id>
     <link href="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"/>
     <published>2026-07-23T12:30:00.000Z</published>
@@ -483,8 +483,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="概念笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>

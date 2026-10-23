@@ -95,7 +95,6 @@
       <name>Caius Lu</name>
     </author>
     <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="MoE" scheme="https://caiusy.github.io/tags/MoE/"/>
@@ -105,7 +104,7 @@
     <published>2026-08-30T12:00:00.000Z</published>
     <summary>从直觉到公式，从公式到 Tensor Shape，从 Shape 到 MiniMind 真实代码—— 彻底搞懂 LoRA 低秩适配与 MoE 混合专家的工作原理、工程实现和设计取舍。</summary>
     <title>结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</title>
-    <updated>2026-10-23T17:23:00.001Z</updated>
+    <updated>2026-10-23T17:28:50.342Z</updated>
   </entry>
   <entry>
     <author>
@@ -202,10 +201,10 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
-    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
     <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
+    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <id>https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/</id>
     <link href="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"/>
     <published>2026-07-23T12:30:00.000Z</published>
@@ -217,8 +216,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="算法与数据结构" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
-    <category term="LeetCode" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/LeetCode/"/>
+    <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
+    <category term="LeetCode" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/LeetCode/"/>
     <category term="C++" scheme="https://caiusy.github.io/tags/C/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>
     <category term="动态规划" scheme="https://caiusy.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"/>
@@ -345,7 +344,6 @@
     <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法与数据结构" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
     <category term="算法" scheme="https://caiusy.github.io/tags/%E7%AE%97%E6%B3%95/"/>
     <category term="图论" scheme="https://caiusy.github.io/tags/%E5%9B%BE%E8%AE%BA/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
@@ -361,7 +359,7 @@
 <p>这篇文章用费曼式教学法，带你从「图是什么」一路打通到「LeetCode 实战」。每个概念都有具体例子、可视化图解、完整代码和数据流追踪。不讲废话，直击本质。</p>]]>
     </summary>
     <title>图论与搜索：邻接表、BFS/DFS 与最短路的题型模板</title>
-    <updated>2026-05-15T17:03:44.261Z</updated>
+    <updated>2026-10-23T17:28:50.341Z</updated>
   </entry>
   <entry>
     <author>
@@ -370,7 +368,6 @@
     <category term="算法基础" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <category term="算法笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/"/>
-    <category term="算法与数据结构" scheme="https://caiusy.github.io/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
     <category term="算法" scheme="https://caiusy.github.io/tags/%E7%AE%97%E6%B3%95/"/>
     <category term="链表" scheme="https://caiusy.github.io/tags/%E9%93%BE%E8%A1%A8/"/>
     <category term="LeetCode" scheme="https://caiusy.github.io/tags/LeetCode/"/>
@@ -385,7 +382,7 @@
 </blockquote>]]>
     </summary>
     <title>链表与指针完全图解：从内存本质到 LeetCode 实战</title>
-    <updated>2026-05-15T17:03:44.264Z</updated>
+    <updated>2026-10-23T17:28:50.343Z</updated>
   </entry>
   <entry>
     <author>
@@ -483,8 +480,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="概念笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>

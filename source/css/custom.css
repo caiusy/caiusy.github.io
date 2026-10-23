@@ -52,3 +52,22 @@ html{scroll-padding-top:90px}body{background:var(--paper);color:var(--ink);--bac
 .article-footer section .body{padding:16px}.article-footer .copy-area{width:100%;padding:10px 12px;background:var(--paper);border:1px solid var(--rule);border-radius:7px;color:var(--ink);font:12px "SFMono-Regular",Menlo,monospace}
 .related-wrap#read-next{margin-top:26px}.related-wrap#read-next .body{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:18px}.related-wrap#read-next .item{min-width:0}.related-wrap#read-next .note{margin-bottom:8px;color:var(--muted);font:700 10px "SFMono-Regular",Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}.related-wrap#read-next a{display:block;color:var(--ink);font-weight:650;line-height:1.65}.related-wrap#read-next #next{text-align:right}
 @media(max-width:767px){.l_main:has(> .article.banner){max-width:none}.l_main>.article.banner{padding:22px 0 24px}.l_main>.article.banner:before{font-size:9px}.l_main>article.md-text.content{padding:24px 0 4px}.md-text.content h2:after{display:none}.md-text.content table:not(.highlight table){font-size:.84em}.related-wrap#read-next .body{grid-template-columns:1fr;gap:14px}.related-wrap#read-next #next{text-align:left;border-top:1px solid var(--rule);padding-top:14px}}
+
+/* Editorial engineering pass: a calmer, more deliberate article canvas */
+body:has(.l_main>.article.banner){background:var(--paper)}
+.l_main:has(> .article.banner){position:relative}
+.l_main:has(> .article.banner):before{content:'';position:absolute;inset:0 0 auto;height:190px;pointer-events:none;opacity:.55;background-image:linear-gradient(to right,transparent 49.8%,var(--rule) 50%,transparent 50.2%),linear-gradient(to bottom,transparent 49.8%,var(--rule) 50%,transparent 50.2%);background-size:28px 28px;mask-image:linear-gradient(to bottom,#000,transparent)}
+.l_main>.article.banner{z-index:1;background:color-mix(in srgb,var(--paper) 92%,var(--surface));padding:34px clamp(18px,4vw,46px) 30px;border:1px solid var(--rule);border-top:3px solid var(--accent);border-radius:14px 14px 0 0;box-shadow:0 10px 30px rgba(23,43,77,.04)}
+.l_main>.article.banner .breadcrumb{display:inline-flex;padding:5px 9px;border:1px solid var(--rule);border-radius:5px;background:var(--surface)}
+.l_main h1.article-title{font-size:clamp(30px,4vw,52px);line-height:1.18;max-width:850px}
+.l_main>article.md-text.content{position:relative;z-index:1;max-width:none;padding:34px clamp(18px,4vw,46px) 18px;background:var(--surface);border-left:1px solid var(--rule);border-right:1px solid var(--rule)}
+.l_main>article.md-text.content>p:first-child{max-width:790px;margin-top:0;padding:18px 20px;border-left:3px solid var(--accent);background:var(--soft);border-radius:0 8px 8px 0}
+.l_main>article.md-text.content>p,.l_main>article.md-text.content>ul,.l_main>article.md-text.content>ol,.l_main>article.md-text.content>blockquote,.l_main>article.md-text.content>h2,.l_main>article.md-text.content>h3,.l_main>article.md-text.content>h4,.l_main>article.md-text.content>table,.l_main>article.md-text.content>hr,.l_main>article.md-text.content>.image-zoom,.l_main>article.md-text.content>p img{max-width:790px;margin-left:auto;margin-right:auto}
+.l_main>article.md-text.content>h2{margin-top:3.8em}
+.l_main>article.md-text.content .image-zoom{display:block}
+.l_main>article.md-text.content .image-zoom img{margin-left:auto;margin-right:auto}
+.l_main>.article.banner + .reader-tools{margin:0 clamp(18px,4vw,46px);padding-left:0;padding-right:0}
+.article-footer,.related-wrap{background:var(--surface)}
+.article-footer{padding:10px clamp(18px,4vw,46px) 24px;border-left:1px solid var(--rule);border-right:1px solid var(--rule)}
+.related-wrap#read-next{margin-left:clamp(18px,4vw,46px);margin-right:clamp(18px,4vw,46px)}
+@media(max-width:767px){.l_main>.article.banner{padding:25px 16px 24px;border-radius:0}.l_main>article.md-text.content{padding:26px 16px 12px}.l_main>article.md-text.content>p:first-child{padding:14px 15px}.l_main>.article.banner + .reader-tools{margin:0 16px}.article-footer{padding-left:16px;padding-right:16px}.related-wrap#read-next{margin-left:16px;margin-right:16px}.l_main:has(> .article.banner):before{display:none}}

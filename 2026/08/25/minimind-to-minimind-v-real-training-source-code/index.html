@@ -70,7 +70,7 @@
   
 
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-08-25T22:10:00+08:00","dateModified":"2026-08-25T23:48:53+08:00","datePublished":"2026-08-25T22:10:00+08:00","description":"MiniMind-V 的关键并不是“给 MiniMind 加一张图片”，而是完成一次严格的坐标变换：像素先变成 64 个视觉 patch token，再投影到 MiniMind 的 768 维 hidden space，最后占据文本序列中的 64 个位置。进入第一个 Transformer block 后，模型看到的已经不再是“图片”和“文字”，而是一条统一的 768 维向量序列。\n本文不以环境安装和训练日志为主线，而是回答四个技术问题：\n\nMiniMind 文本 Pretrain 与 SFT 到底改变了什么？\nMiniMind 与 MiniMind-V 的网络、token 和参数路径有什么结构性差异？\nMiniMind-V Pretrain 与 SFT 明明调用同一个 forward，为什么仍是两个不同阶段？\n一张真实图片如何产生真实 logits，并最终得到可手工复算的 loss？\n\n所有源码默认值来自固定 commit；所有 shape、token 数值和 loss 来自远端最终 SFT checkpoint 的只读 forward。远端本次没有执行 VLM Pretrain，但这不影响我们依据真实源码完整分析该阶段。\n","headline":"从 MiniMind 到 MiniMind-V：Pretrain、SFT、视觉 Token 与 Loss 的源码级推导","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/08/25/minimind-to-minimind-v-real-training-source-code/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/08/25/minimind-to-minimind-v-real-training-source-code/","keywords":"MiniMind, GRPO, SFT, DPO, PPO, MiniMind-V, Vision-Language-Model, Pretrain, SigLIP2","thumbnailUrl":"/images/minimind-v-real-training/00-cover-signal-cartography.png","image":1}</script>
-  <link rel="stylesheet" href="/css/custom.css?v=20261025pika5"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <link rel="stylesheet" href="/css/custom.css?v=20261025pika6"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
 <link rel="canonical" href="https://caiusy.github.io/2026/08/25/minimind-to-minimind-v-real-training-source-code/"></head>
@@ -1729,5 +1729,5 @@ $$
 
 
 <!-- inject -->
-<script defer src="/js/companion.js?v=4"></script><script defer src="/js/site-experience.js?v=20261023"></script>
+<script defer src="/js/companion.js?v=5"></script><script defer src="/js/site-experience.js?v=20261023"></script>
 </div></body></html>

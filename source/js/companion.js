@@ -8,7 +8,7 @@
     <button class="cat-toggle" type="button" aria-label="收起学习伙伴" title="收起学习伙伴">−</button>
     <button class="cat-character" type="button" aria-label="拖动皮卡丘，点击获取学习提示" title="拖动我，点一下有提示">
       <span class="pika-sparks" aria-hidden="true"><i>✦</i><i>⚡</i><i>✦</i></span>
-      <picture class="pika-art"><source srcset="/images/companion/pikachu-showdown.gif" type="image/gif"><img src="/images/companion/pikachu-official.png" alt="" width="475" height="475" draggable="false" decoding="async"></picture>
+      <img src="/images/companion/pikachu-official.png" alt="" width="475" height="475" draggable="false" decoding="async">
     </button>`;
   document.body.append(host);
   const toggle = host.querySelector('.cat-toggle');

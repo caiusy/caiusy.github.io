@@ -67,7 +67,7 @@
   
 
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-01-25T14:45:00+08:00","dateModified":"2026-10-24T01:22:59+08:00","datePublished":"2026-01-25T14:45:00+08:00","description":"在大模型（LLM）时代， PEFT (Parameter-Efficient Fine-Tuning, 参数高效微调) 几乎是每一位开发者必须掌握的技能。而其中最耀眼的明星，莫过于 LoRA (Low-Rank Adaptation) 。\n本文将基于我与 AI 的一次深度对话，系统地梳理 LoRA 的核心原理。我们不仅会用直觉去理解它，更会通过 数学证明 和 Python 模拟 ，彻底搞懂为什么它需要除以 $r$ ，以及它在反向传播中是如何工作的。","headline":"深入浅出 LoRA：大模型微调的核心原理、数学证明与实战指南","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/01/25/deep-dive-into-lora/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/01/25/deep-dive-into-lora/","keywords":"深度学习, 大模型, 多模态, Fine-tuning, NLP, LoRA","thumbnailUrl":"/images/lora-math/gradient_stability.png","image":1}</script>
-  <link rel="stylesheet" href="/css/custom.css?v=20261025pika6"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <link rel="stylesheet" href="/css/custom.css?v=20261025pika7"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
 <link rel="canonical" href="https://caiusy.github.io/2026/01/25/deep-dive-into-lora/"></head>
@@ -942,5 +942,5 @@
 
 
 <!-- inject -->
-<script defer src="/js/companion.js?v=5"></script><script defer src="/js/site-experience.js?v=20261023"></script>
+<script defer src="/js/companion.js?v=6"></script><script defer src="/js/site-experience.js?v=20261023"></script>
 </div></body></html>

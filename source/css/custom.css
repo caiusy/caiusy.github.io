@@ -98,3 +98,33 @@ body:has(.l_main>.article.banner){background:var(--paper)}
 .study-pikachu.is-dragging .pika-body,.study-pikachu.is-dragging .pika-tail{animation-play-state:paused}
 @keyframes pika-tail{50%{transform:rotate(8deg)}}
 @media(prefers-reduced-motion:reduce){.study-pikachu .pika-body,.study-pikachu .pika-tail,.study-pikachu .pika-eyes{animation:none!important}}
+
+/* A denser technical reading canvas, especially in the narrow in-app browser. */
+.l_main>.article.banner{padding:22px clamp(18px,3vw,32px) 18px}
+.l_main>.article.banner:before{margin-bottom:8px}
+.l_main>.article.banner .content .top{margin:8px 0}
+.l_main>.article.banner .bottom.only-title{padding:0}
+.l_main>.article.banner .content .bottom.only-title .title{padding:0}
+.l_main>.article.banner h1{margin:8px 0;line-height:1.23}
+.l_main h1.article-title{font-size:clamp(28px,3vw,42px)}
+.l_main>article.md-text.content{padding:26px clamp(18px,3vw,32px) 18px}
+.l_main>.article.banner + .reader-tools{margin:0 clamp(18px,3vw,32px)}
+.article-footer{padding-left:clamp(18px,3vw,32px);padding-right:clamp(18px,3vw,32px)}
+.related-wrap#read-next{margin-left:clamp(18px,3vw,32px);margin-right:clamp(18px,3vw,32px)}
+.l_main>article.md-text.content>h2{margin-top:2.5em}
+.reader-tools>span{max-width:none;white-space:nowrap;flex-shrink:0}
+@media (min-width:1025px){
+  .l_body{max-width:1760px}
+  .l_main>article.md-text.content>p,.l_main>article.md-text.content>ul,.l_main>article.md-text.content>ol,.l_main>article.md-text.content>blockquote,.l_main>article.md-text.content>h2,.l_main>article.md-text.content>h3,.l_main>article.md-text.content>h4,.l_main>article.md-text.content>hr{max-width:980px}
+  .l_main>article.md-text.content>table,.l_main>article.md-text.content>.image-zoom{max-width:1100px}
+  .article-footer,.related-wrap{max-width:980px}
+}
+@media (max-width:767px){
+  .l_main>.article.banner{padding:16px 16px 14px}
+  .l_main h1.article-title{font-size:clamp(25px,5vw,31px)}
+  .l_main>article.md-text.content{padding:20px 16px 12px}
+  .l_main>article.md-text.content>h2{margin-top:2em}
+  .l_main>.article.banner + .reader-tools{margin:0 16px}
+  .article-footer{padding-left:16px;padding-right:16px}
+  .related-wrap#read-next{margin-left:16px;margin-right:16px}
+}

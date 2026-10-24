@@ -1,4 +1,4 @@
-/* Local, draggable reading companion. */
+/* Draggable companion; artwork: PokéAPI sprites/official-artwork/25.png. */
 (() => {
   'use strict';
   const host = document.createElement('aside');
@@ -7,14 +7,7 @@
   host.innerHTML = `<div class="cat-note" role="status">皮卡丘陪你学习，拖动我可以换位置。⚡</div>
     <button class="cat-toggle" type="button" aria-label="收起学习伙伴" title="收起学习伙伴">−</button>
     <button class="cat-character" type="button" aria-label="拖动皮卡丘，点击获取学习提示" title="拖动我，点一下有提示">
-      <svg viewBox="0 0 160 174" aria-hidden="true">
-        <ellipse cx="80" cy="165" rx="47" ry="7" fill="#172b4d" opacity=".13"/>
-        <g class="pika-tail"><path d="M114 110 144 83 133 76 155 52 132 58 141 70 115 81Z" fill="#f7c83d" stroke="#664c27" stroke-width="3" stroke-linejoin="round"/></g>
-        <g class="pika-body"><path d="M48 111q-10 24-2 42 14 13 35 13t35-13q9-22-3-42Z" fill="#ffda45" stroke="#664c27" stroke-width="3"/><path d="m51 134-14 10q-3 11 11 12l18-8m45-14 13 10q4 11-10 12l-19-8" fill="#ffda45" stroke="#664c27" stroke-width="3" stroke-linecap="round"/>
-        <path d="M46 67 25 12q-3-11 5-10 17 7 38 43M94 45q20-36 36-43 9-1 5 10l-21 55" fill="#ffda45" stroke="#664c27" stroke-width="3" stroke-linejoin="round"/><path d="M25 12q-3-11 5-10 7 3 17 12L31 28Zm110 0q4-11-5-10-7 3-17 12l16 14Z" fill="#664c27"/><path d="M30 53q8-25 50-25t50 25v41q-4 40-50 43-45-3-50-43Z" fill="#ffda45" stroke="#664c27" stroke-width="3"/>
-        <g class="pika-eyes" fill="#392f2a"><ellipse cx="56" cy="78" rx="7" ry="10"/><ellipse cx="104" cy="78" rx="7" ry="10"/></g><circle cx="58" cy="75" r="2.5" fill="white"/><circle cx="106" cy="75" r="2.5" fill="white"/><circle cx="43" cy="100" r="11" fill="#ed6a51"/><circle cx="117" cy="100" r="11" fill="#ed6a51"/><path d="m76 96 4 3 4-3m-4 4q-4 8-9 3m9-3q4 8 9 3" fill="none" stroke="#664c27" stroke-width="2.5" stroke-linecap="round"/></g>
-        <path d="m66 139 14 4 14-4-2 12-12 4-12-4Z" fill="#315f91"/><path d="m74 145 5 4 7-6" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img src="/images/companion/pikachu-official.png" alt="" width="475" height="475" draggable="false" decoding="async">
     </button>`;
   document.body.append(host);
   const toggle = host.querySelector('.cat-toggle');

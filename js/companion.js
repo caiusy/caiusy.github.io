@@ -7,6 +7,7 @@
   host.innerHTML = `<div class="cat-note" role="status">皮卡丘陪你学习，拖动我可以换位置。⚡</div>
     <button class="cat-toggle" type="button" aria-label="收起学习伙伴" title="收起学习伙伴">−</button>
     <button class="cat-character" type="button" aria-label="拖动皮卡丘，点击获取学习提示" title="拖动我，点一下有提示">
+      <span class="pika-sparks" aria-hidden="true"><i>✦</i><i>⚡</i><i>✦</i></span>
       <img src="/images/companion/pikachu-official.png" alt="" width="475" height="475" draggable="false" decoding="async">
     </button>`;
   document.body.append(host);
@@ -46,7 +47,23 @@
   render();
   toggle.addEventListener('click', () => { small = !small; render(); store('caius.pika.small', String(small)); });
   const tips = ['先说清输入和输出，再开始写代码。', '试一个最小例子，看看每一步发生了什么。', '检查边界：空输入、重复值和最大值。', '读公式时，检查每个张量的形状。', '卡住也没关系，先把问题拆小一点。', '休息一下，喝口水再继续。'];
-  let tipIndex = 0, drag = null, suppressClick = false;
+  const moods = [
+    ['pika-happy', '太棒了！保持这个节奏继续推导。⚡'],
+    ['pika-think', '让我想想……先从最小例子验证。💡'],
+    ['pika-zap', '能量充满！把复杂问题拆成几个小步骤。✨'],
+    ['pika-rest', '深呼吸一下，好的答案值得慢慢打磨。🌙']
+  ];
+  let moodIndex = 0, tipIndex = 0, drag = null, suppressClick = false;
+  let moodTimer;
+  function setMood(index, announce = true) {
+    moodIndex = (index + moods.length) % moods.length;
+    host.classList.remove(...moods.map(item => item[0]));
+    host.classList.add(moods[moodIndex][0]);
+    if (announce) note.textContent = moods[moodIndex][1];
+    clearTimeout(moodTimer);
+    moodTimer = setTimeout(() => setMood(moodIndex + 1), 7500);
+  }
+  setMood(0, false);
   character.addEventListener('pointerdown', e => {
     if (e.button !== 0 || small) return;
     const box = host.getBoundingClientRect();
@@ -72,7 +89,10 @@
   character.addEventListener('pointercancel', endDrag);
   character.addEventListener('click', e => {
     if (suppressClick) { e.preventDefault(); suppressClick = false; return; }
-    note.textContent = tips[tipIndex++ % tips.length];
+    setMood(moodIndex + 1);
+    note.textContent = `${moods[moodIndex][1]} ${tips[tipIndex++ % tips.length]}`;
   });
+  character.addEventListener('mouseenter', () => host.classList.add('pika-hover'));
+  character.addEventListener('mouseleave', () => host.classList.remove('pika-hover'));
   addEventListener('resize', placeSaved);
 })();

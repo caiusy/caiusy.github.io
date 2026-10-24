@@ -97,7 +97,8 @@ body:has(.l_main>.article.banner){background:var(--paper)}
 /* Official Pikachu artwork scales with the viewport and remains draggable. */
 .study-pikachu{width:clamp(112px,9vw,160px)}
 .study-pikachu .cat-character{position:relative;width:100%;height:auto;aspect-ratio:1;touch-action:none;cursor:grab}
-.study-pikachu .cat-character img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 9px 8px rgba(23,43,77,.19));animation:pika-float 4s ease-in-out infinite;transform-origin:50% 78%}
+.study-pikachu .pika-art{position:relative;z-index:1;display:block;width:100%;height:100%;pointer-events:none}
+.study-pikachu .cat-character img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 9px 8px rgba(23,43,77,.19));animation:pika-float 4s ease-in-out infinite;transform-origin:50% 78%}
 .pika-sparks{position:absolute;inset:5% 0 0;z-index:2;pointer-events:none;opacity:0;color:#ffd34e;text-shadow:0 0 8px #ffd34e;transition:opacity .2s}
 .pika-sparks i{position:absolute;font-style:normal;font-size:clamp(14px,1.6vw,22px);animation:pika-spark 1.6s ease-in-out infinite}
 .pika-sparks i:nth-child(1){left:8%;top:30%}.pika-sparks i:nth-child(2){right:6%;top:15%;animation-delay:.35s}.pika-sparks i:nth-child(3){right:19%;bottom:19%;font-size:.75em;animation-delay:.7s}

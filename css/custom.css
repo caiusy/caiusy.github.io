@@ -76,28 +76,34 @@ body:has(.l_main>.article.banner){background:var(--paper)}
 .study-cat{position:fixed;left:16px;bottom:16px;z-index:30;width:140px;display:flex;flex-direction:column;align-items:center;pointer-events:none}.study-cat button{pointer-events:auto}.cat-note{background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.6;box-shadow:0 4px 18px #0001}.cat-character{background:none;border:0;padding:0;width:110px;height:117px;cursor:pointer}.cat-character svg{width:100%;height:100%;overflow:visible}.cat-toggle{align-self:flex-end;width:28px;height:28px;min-height:28px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);border-radius:50%;font-size:18px;line-height:1;margin-bottom:-20px;z-index:1}.study-cat.is-small{width:32px}.study-cat.is-small .cat-toggle{margin:0}.cat-body{animation:cat-breathe 4s ease-in-out infinite;transform-origin:80px 155px}.cat-eyes{animation:cat-blink 6s infinite;transform-origin:80px 77px}.cat-character:hover .cat-body{animation:cat-breathe 1s ease-in-out infinite}@keyframes cat-breathe{50%{transform:translateY(-4px) rotate(2deg)}}@keyframes cat-blink{0%,43%,47%,100%{transform:scaleY(1)}45%{transform:scaleY(.1)}}@media(max-width:767px){.study-cat{left:8px;bottom:8px;width:108px}.cat-character{width:76px;height:81px}.cat-note{font-size:11px;padding:7px 8px}}@media(prefers-reduced-motion:reduce){.cat-body,.cat-eyes{animation:none!important}}@media print{.study-cat{display:none}}html.reader-focus .study-cat{display:none}
 
 /* Give the article the room left unused by Stellar's equal side tracks. */
-@media (min-width:768px) and (max-width:1024px){
-  .l_body{width:calc(100% - 32px);grid-template-columns:248px minmax(0,1fr);gap:16px}
-  .l_body .l_left{--side-content-width:208px;--gap-margin:8px;--gap-padding:12px}
+@media (min-width:668px) and (max-width:1180px){
+  .l_body{width:calc(100% - 32px);grid-template-columns:clamp(200px,22vw,248px) minmax(0,1fr);gap:clamp(12px,1.4vw,18px)}
+  .l_body .l_left{width:100%;--side-content-width:calc(100% - 40px);--gap-margin:8px;--gap-padding:12px}
   .l_main:has(> .article.banner){max-width:none}
 }
-@media (min-width:1025px){
-  .l_body{width:calc(100% - 32px);max-width:1560px;grid-template-columns:248px minmax(0,1fr) 216px;gap:16px}
-  .l_body .l_left{--side-content-width:208px;--gap-margin:8px;--gap-padding:12px}
-  .l_body .l_right{--side-content-width:176px;--gap-margin:8px;--gap-padding:12px}
+@media (min-width:668px) and (max-width:900px){
+  .l_left .menu{grid-template-columns:1fr}
+  .nav-area .menu .nav-item{min-height:40px;padding:8px 12px}
+}
+@media (min-width:1181px){
+  .l_body{width:calc(100% - 32px);max-width:1760px;grid-template-columns:clamp(224px,16vw,248px) minmax(0,1fr) clamp(192px,13vw,216px);gap:16px}
+  .l_body .l_left,.l_body .l_right{width:100%;--gap-margin:8px;--gap-padding:12px}
+  .l_body .l_left{--side-content-width:calc(100% - 40px)}
+  .l_body .l_right{--side-content-width:calc(100% - 40px)}
   .l_main:has(> .article.banner){max-width:none}
   .l_main>article.md-text.content>p,.l_main>article.md-text.content>ul,.l_main>article.md-text.content>ol,.l_main>article.md-text.content>blockquote,.l_main>article.md-text.content>h2,.l_main>article.md-text.content>h3,.l_main>article.md-text.content>h4,.l_main>article.md-text.content>table,.l_main>article.md-text.content>hr,.l_main>article.md-text.content>.image-zoom{max-width:860px}
   .article-footer,.related-wrap{max-width:860px}
 }
-/* Pikachu can be moved with a mouse, touch, or pen. */
-.study-pikachu .cat-character{touch-action:none;cursor:grab}
+/* Official Pikachu artwork scales with the viewport and remains draggable. */
+.study-pikachu{width:clamp(112px,9vw,160px)}
+.study-pikachu .cat-character{width:100%;height:auto;aspect-ratio:1;touch-action:none;cursor:grab}
+.study-pikachu .cat-character img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 9px 8px rgba(23,43,77,.19));animation:pika-float 4s ease-in-out infinite}
 .study-pikachu.is-dragging .cat-character{cursor:grabbing}
-.study-pikachu .pika-body{animation:cat-breathe 4s ease-in-out infinite;transform-origin:80px 150px}
-.study-pikachu .pika-tail{animation:pika-tail 2.8s ease-in-out infinite;transform-origin:115px 100px}
-.study-pikachu .pika-eyes{animation:cat-blink 6s infinite;transform-origin:80px 78px}
-.study-pikachu.is-dragging .pika-body,.study-pikachu.is-dragging .pika-tail{animation-play-state:paused}
-@keyframes pika-tail{50%{transform:rotate(8deg)}}
-@media(prefers-reduced-motion:reduce){.study-pikachu .pika-body,.study-pikachu .pika-tail,.study-pikachu .pika-eyes{animation:none!important}}
+.study-pikachu.is-dragging .cat-character img{animation-play-state:paused}
+.study-pikachu.is-small{width:32px}
+@keyframes pika-float{50%{transform:translateY(-5px)}}
+@media(max-width:667px){.study-pikachu{width:clamp(84px,23vw,110px)}}
+@media(prefers-reduced-motion:reduce){.study-pikachu .cat-character img{animation:none}}
 
 /* A denser technical reading canvas, especially in the narrow in-app browser. */
 .l_main>.article.banner{padding:22px clamp(18px,3vw,32px) 18px}
@@ -113,8 +119,7 @@ body:has(.l_main>.article.banner){background:var(--paper)}
 .related-wrap#read-next{margin-left:clamp(18px,3vw,32px);margin-right:clamp(18px,3vw,32px)}
 .l_main>article.md-text.content>h2{margin-top:2.5em}
 .reader-tools>span{max-width:none;white-space:nowrap;flex-shrink:0}
-@media (min-width:1025px){
-  .l_body{max-width:1760px}
+@media (min-width:1181px){
   .l_main>article.md-text.content>p,.l_main>article.md-text.content>ul,.l_main>article.md-text.content>ol,.l_main>article.md-text.content>blockquote,.l_main>article.md-text.content>h2,.l_main>article.md-text.content>h3,.l_main>article.md-text.content>h4,.l_main>article.md-text.content>hr{max-width:980px}
   .l_main>article.md-text.content>table,.l_main>article.md-text.content>.image-zoom{max-width:1100px}
   .article-footer,.related-wrap{max-width:980px}

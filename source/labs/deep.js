@@ -53,3 +53,24 @@ if(slug==='rlhf'){watch(['adv','ratio','clip','kl','pold','pref'],rlhf);for(cons
 if(slug==='rope'){watch(['m','n','theta','deepShift'],rope);rope()}
 if(slug==='sampling'){watch(['temp','topk','topp'],()=>{sampleCounts=[0,0,0,0,0,0];sampleTotal=0;sampling()});$d('deepDraw100').addEventListener('click',()=>drawSamples(100));$d('deepDraw1000').addEventListener('click',()=>drawSamples(1000));$d('deepDrawReset').addEventListener('click',()=>{sampleCounts=[0,0,0,0,0,0];sampleTotal=0;sampleFrequency()});sampling()}
 })();
+const $d=id=>document.getElementById(id);
+function addNotebook(){
+ const slug=location.pathname.split('/').filter(Boolean).at(-1);
+ const configs={
+  attention:{title:'Attention 实验工作台',goal:'验证温度与因果掩码怎样改变注意力分布。',steps:['选择第 2 个 Query，记录未来位置是否为 0。','把温度从 1.0 调到 0.4，比较熵和最大权重。','切换无掩码，解释为什么所有 Key 都重新参与归一化。']},
+  'kv-cache':{title:'KV Cache 容量实验工作台',goal:'从单请求扩展到并发请求，找出预算先被哪种缓存耗尽。',steps:['固定 16 GiB 预算，逐渐增加并发序列。','把精度从 BF16 改成 FP8，比较绝对占用。','把上下文长度翻倍，验证缓存近似线性增长。']},
+  moe:{title:'MoE 路由实验工作台',goal:'观察亲和分数、偏置和 Top-K 如何共同决定专家负载。',steps:['将 γ 设为 0，运行三轮作为无反馈基线。','恢复 γ=0.30，记录变异系数如何变化。','切换检查 token，说明 bias 只参与排序前加法。']},
+  rope:{title:'RoPE 几何实验工作台',goal:'用数值验证旋转后的点积只依赖相对位置。',steps:['记下当前 m−n 和点积。','改变共同平移量，确认两组位置差仍相等。','改变 θ，观察相同距离为何得到不同相对角度。']},
+  sampling:{title:'采样策略实验工作台',goal:'拆开温度、Top-K、Top-P 和重新归一化四道门。',steps:['把 Top-K 设为 1，观察输出是否退化为确定选择。','降低 Top-P，记录候选集合和熵的变化。','抽样 1000 次，比较经验频率与理论概率。']}
+ };
+ const c=configs[slug];if(!c||document.getElementById('lab-notebook'))return;
+ const key='caius.lab.notebook.'+slug;let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch{}
+ const section=document.createElement('section');section.id='lab-notebook';section.className='lab-notebook panel';section.innerHTML='<div class="eyebrow">LAB NOTEBOOK / '+slug.toUpperCase()+'</div><h2>'+c.title+'</h2><p>'+c.goal+'</p><div class="notebook-grid"><div><h3>实验清单</h3><div class="notebook-steps">'+c.steps.map((x,i)=>'<label><input type="checkbox" data-step="'+i+'"><span><b>0'+(i+1)+'</b>'+x+'</span></label>').join('')+'</div><div class="notebook-progress"><span id="notebookProgress">0 / '+c.steps.length+' 完成</span><span id="notebookRuns">运行记录 0 次</span></div></div><div><h3>我的观察</h3><textarea id="notebookText" rows="6" placeholder="记录你观察到的变化、一个疑问，或下一步想验证的假设……"></textarea><div class="notebook-actions"><button class="button primary" id="notebookSave" type="button">保存实验记录</button><button class="button" id="notebookClear" type="button">清空</button><span id="notebookStatus" aria-live="polite"></span></div></div></div>';
+ const anchor=document.querySelector('.lab-extra')||document.querySelector('.source');anchor?.before(section);
+ const boxes=[...section.querySelectorAll('[data-step]')],text=$d('notebookText'),progress=$d('notebookProgress'),runs=$d('notebookRuns'),status=$d('notebookStatus');boxes.forEach((b,i)=>b.checked=!!saved.steps?.[i]);text.value=saved.text||'';
+ const render=()=>{const done=boxes.filter(x=>x.checked).length;progress.textContent=done+' / '+boxes.length+' 完成';runs.textContent='运行记录 '+(saved.runs||0)+' 次';section.classList.toggle('notebook-complete',done===boxes.length)};
+ boxes.forEach(b=>b.addEventListener('change',()=>{saved.steps=boxes.map(x=>x.checked);saved.runs=(saved.runs||0)+1;try{localStorage.setItem(key,JSON.stringify(saved))}catch{}render()}));
+ $('notebookSave').addEventListener('click',()=>{saved.steps=boxes.map(x=>x.checked);saved.text=text.value;saved.runs=(saved.runs||0)+1;try{localStorage.setItem(key,JSON.stringify(saved))}catch{}status.textContent='已保存 '+new Date().toLocaleTimeString();render()});
+ $('notebookClear').addEventListener('click',()=>{saved={};boxes.forEach(x=>x.checked=false);text.value='';try{localStorage.removeItem(key)}catch{}status.textContent='已清空';render()});render();
+}
+setTimeout(addNotebook,0);

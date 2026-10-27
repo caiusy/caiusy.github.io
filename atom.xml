@@ -12,7 +12,40 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-10-24T01:30:00.000Z</updated>
+  <updated>2026-10-27T01:10:00.000Z</updated>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="雷达相机融合" scheme="https://caiusy.github.io/categories/%E9%9B%B7%E8%BE%BE%E7%9B%B8%E6%9C%BA%E8%9E%8D%E5%90%88/"/>
+    <category term="Radar" scheme="https://caiusy.github.io/tags/Radar/"/>
+    <category term="MOT" scheme="https://caiusy.github.io/tags/MOT/"/>
+    <category term="EOT" scheme="https://caiusy.github.io/tags/EOT/"/>
+    <category term="Extended Object Tracking" scheme="https://caiusy.github.io/tags/Extended-Object-Tracking/"/>
+    <id>https://caiusy.github.io/2026/10/27/radar-camera-02-point-vs-eot/</id>
+    <link href="https://caiusy.github.io/2026/10/27/radar-camera-02-point-vs-eot/"/>
+    <published>2026-10-27T01:10:00.000Z</published>
+    <summary>用排队车辆的反射点解释点目标、扩展目标、单目标 EOT 与多目标 MEOT 的结构差异。</summary>
+    <title>【雷视融合专题 02】一辆车为什么会有多个雷达点？从点目标跟踪到 EOT</title>
+    <updated>2026-10-27T01:10:00.000Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="雷达相机融合" scheme="https://caiusy.github.io/categories/%E9%9B%B7%E8%BE%BE%E7%9B%B8%E6%9C%BA%E8%9E%8D%E5%90%88/"/>
+    <category term="雷视融合" scheme="https://caiusy.github.io/tags/%E9%9B%B7%E8%A7%86%E8%9E%8D%E5%90%88/"/>
+    <category term="Dataset" scheme="https://caiusy.github.io/tags/Dataset/"/>
+    <category term="Radar" scheme="https://caiusy.github.io/tags/Radar/"/>
+    <category term="Camera" scheme="https://caiusy.github.io/tags/Camera/"/>
+    <category term="MOT" scheme="https://caiusy.github.io/tags/MOT/"/>
+    <id>https://caiusy.github.io/2026/10/27/radar-camera-01-datasets/</id>
+    <link href="https://caiusy.github.io/2026/10/27/radar-camera-01-datasets/"/>
+    <published>2026-10-27T01:00:00.000Z</published>
+    <summary>先辨清 RAD、雷达点云、目标级 Track 与跨模态真值，再按任务选择 8 个路侧雷视数据集。</summary>
+    <title>【雷视融合专题 01】路侧雷视公开数据集：从 RAD、点云到稳定 Radar Track</title>
+    <updated>2026-10-27T01:00:00.000Z</updated>
+  </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -201,10 +234,10 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
+    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
     <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
-    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <id>https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/</id>
     <link href="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"/>
     <published>2026-07-23T12:30:00.000Z</published>
@@ -480,8 +513,8 @@
     <author>
       <name>Caius Lu</name>
     </author>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="学习笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <category term="深度学习" scheme="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="概念笔记" scheme="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/"/>
     <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     <category term="Python" scheme="https://caiusy.github.io/tags/Python/"/>
@@ -580,51 +613,5 @@
     </summary>
     <title>彻底理解 Transformer：Attention Is All You Need</title>
     <updated>2026-10-23T17:22:59.997Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
-    <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
-    <category term="Fine-tuning" scheme="https://caiusy.github.io/tags/Fine-tuning/"/>
-    <category term="NLP" scheme="https://caiusy.github.io/tags/NLP/"/>
-    <category term="LoRA" scheme="https://caiusy.github.io/tags/LoRA/"/>
-    <category term="QLoRA" scheme="https://caiusy.github.io/tags/QLoRA/"/>
-    <id>https://caiusy.github.io/2026/01/25/qlora-deep-dive/</id>
-    <link href="https://caiusy.github.io/2026/01/25/qlora-deep-dive/"/>
-    <published>2026-01-25T07:30:00.000Z</published>
-    <summary>
-      <![CDATA[<p>在上一篇文章中，我们深入探讨了 <strong>LoRA</strong> 的数学原理。今天，我们来聊聊它的进化版——**QLoRA (Quantized LoRA)**。</p>
-<p>如果你想在普通的消费级显卡（如 RTX 3060/4090）上微调 33B 甚至 65B 的巨型模型，QLoRA 是你唯一的救星。它通过“4-bit 极限压缩”，将显存需求<strong>再次减半</strong>。</p>
-<p>本文将基于深度技术问答，带你彻底搞懂 QLoRA 的核心机制。</p>]]>
-    </summary>
-    <title>彻底搞懂 QLoRA：如何用 4-bit 量化技术单卡微调千亿模型？</title>
-    <updated>2026-10-23T17:23:00.007Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
-    <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
-    <category term="Fine-tuning" scheme="https://caiusy.github.io/tags/Fine-tuning/"/>
-    <category term="NLP" scheme="https://caiusy.github.io/tags/NLP/"/>
-    <category term="LoRA" scheme="https://caiusy.github.io/tags/LoRA/"/>
-    <id>https://caiusy.github.io/2026/01/25/deep-dive-into-lora/</id>
-    <link href="https://caiusy.github.io/2026/01/25/deep-dive-into-lora/"/>
-    <published>2026-01-25T06:45:00.000Z</published>
-    <summary>
-      <![CDATA[<p>在大模型（LLM）时代， <strong>PEFT (Parameter-Efficient Fine-Tuning, 参数高效微调)</strong> 几乎是每一位开发者必须掌握的技能。而其中最耀眼的明星，莫过于 <strong>LoRA (Low-Rank Adaptation)</strong> 。</p>
-<p>本文将基于我与 AI 的一次深度对话，系统地梳理 LoRA 的核心原理。我们不仅会用直觉去理解它，更会通过 <strong>数学证明</strong> 和 <strong>Python 模拟</strong> ，彻底搞懂为什么它需要除以 $r$ ，以及它在反向传播中是如何工作的。</p>]]>
-    </summary>
-    <title>深入浅出 LoRA：大模型微调的核心原理、数学证明与实战指南</title>
-    <updated>2026-10-23T17:22:59.998Z</updated>
   </entry>
 </feed>

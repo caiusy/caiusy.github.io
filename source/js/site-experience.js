@@ -14,6 +14,23 @@
   const themeName=()=>({light:'浅色',dark:'深色',auto:'跟随系统'}[root.getAttribute('data-theme') || 'auto']);
   const labelTheme=()=>{themeButton.textContent='显示主题 · '+themeName()+'  ◐';themeButton.setAttribute('aria-label','当前'+themeName()+'，切换显示主题');};
   $('.l_left .nav-area')?.append(themeButton);labelTheme();
+  // Keep the laboratory discoverable on the home page after future Hexo rebuilds.
+  const homeHero=$('.fieldnotes-hero');
+  if(homeHero){
+    const actions=homeHero.querySelector('.hero-actions');
+    if(actions&&!actions.querySelector('a[href="/labs/"]'))actions.insertAdjacentHTML('beforeend','<a href="/labs/">交互实验室 <span aria-hidden="true">→</span></a>');
+    if(!$('#home-labs')){
+      const lab=document.createElement('section');lab.id='home-labs';lab.className='home-labs';lab.setAttribute('aria-labelledby','home-labs-title');
+      lab.innerHTML='<div class="home-labs-main"><p class="home-labs-kicker">INTERACTIVE / 08 LABS</p><h2 id="home-labs-title">把公式变成<br>可以亲手操作的实验。</h2><p>从 Attention、MoE 到 LoRA 与 RLHF，改变变量、观察计算，再回到论文和代码。</p><a class="home-labs-all" href="/labs/">探索全部实验 <span aria-hidden="true">↗</span></a></div><div class="home-labs-list" aria-label="精选实验"><a href="/labs/attention/"><span>01 / 模型机制</span><strong>Transformer Attention</strong><b aria-hidden="true">↗</b></a><a href="/labs/lora/"><span>06 / 高效微调</span><strong>LoRA 矩阵训练</strong><b aria-hidden="true">↗</b></a><a href="/labs/moe/"><span>04 / 稀疏计算</span><strong>MoE 专家路由</strong><b aria-hidden="true">↗</b></a><a href="/labs/rlhf/"><span>03 / 对齐训练</span><strong>RLHF / PPO</strong><b aria-hidden="true">↗</b></a></div>';
+      homeHero.querySelector('.topic-tracks')?.after(lab);
+    }
+  }
+  const mainMenu=$('.l_left .menu');
+  if(mainMenu&&!mainMenu.querySelector('a[href="/labs/"]')){
+    const item=document.createElement('a');item.href='/labs/';item.className='nav-item';item.title='交互实验室';item.setAttribute('aria-label','交互实验室');item.innerHTML='<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 8a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-8V3M8 15h8"/></svg><span class="nav-label">实验室</span>';
+    const notes=mainMenu.querySelector('a[href="/notes/"]');notes?notes.before(item):mainMenu.append(item);
+  }
+
   themeButton.addEventListener('click',()=>{
     const next=({auto:'light',light:'dark',dark:'auto'})[root.getAttribute('data-theme')||'auto'];
     next==='auto'?root.removeAttribute('data-theme'):root.setAttribute('data-theme',next);store.set('Stellar.theme',next);labelTheme();

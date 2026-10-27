@@ -17,9 +17,9 @@ preconnect:
 inject:
   script:
     - '<script defer src="/js/companion.js?v=6"></script>'
-    - '<script defer src="/js/site-experience.js?v=20261023"></script>'
+    - '<script defer src="/js/site-experience.js?v=20261025labs1"></script>'
   head:
-    - '<link rel="stylesheet" href="/css/custom.css?v=20261025pika7">'
+    - '<link rel="stylesheet" href="/css/custom.css?v=20261025labs1">'
     - '<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>'
 
 # 一旦设置源站地址，非源站地址将不会被SEO收录，并且访问时弹出提示
@@ -73,6 +73,11 @@ menubar:
       icon: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5M3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-label">大模型</span>'
       title: LLM
       url: /categories/AI与大模型/
+    - id: labs
+      theme: '#245f9e'
+      icon: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 8a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-8V3M8 15h8"/></svg><span class="nav-label">实验室</span>'
+      title: Labs
+      url: /labs/
     - id: notes
       theme: '#245f9e'
       icon: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4zM8 7h8M8 11h8M8 15h5"/></svg><span class="nav-label">学习笔记</span>'
@@ -88,6 +93,7 @@ menubar:
       icon: '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span class="nav-label">关于我</span>'
       title: About
       url: /about/
+
 
 
 ######## Main ########

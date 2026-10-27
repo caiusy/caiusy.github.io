@@ -16,7 +16,7 @@ preconnect:
 # 引入自定义 CSS
 inject:
   script:
-    - '<script defer src="/js/companion.js?v=6"></script>'
+    - '<script defer src="/js/companion.js?v=7"></script>'
     - '<script defer src="/js/site-experience.js?v=20261027stats1"></script>'
     - '<script defer src="/js/visitor-counter.js?v=20261027stats1"></script>'
   head:

@@ -138,10 +138,10 @@
       <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
       <category domain="https://caiusy.github.io/tags/CISPO/">CISPO</category>
       <category domain="https://caiusy.github.io/tags/RLHF/">RLHF</category>
-      <category domain="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/">Group-Relative-Policy-Optimization</category>
       <category domain="https://caiusy.github.io/tags/Reference-Model/">Reference-Model</category>
       <category domain="https://caiusy.github.io/tags/GPU/">GPU</category>
       <category domain="https://caiusy.github.io/tags/LLM-Alignment/">LLM-Alignment</category>
+      <category domain="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/">Group-Relative-Policy-Optimization</category>
       <pubDate>Mon, 03 Aug 2026 13:35:00 GMT</pubDate>
     </item>
     <item>
@@ -154,11 +154,11 @@
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
       <category domain="https://caiusy.github.io/tags/RLHF/">RLHF</category>
+      <category domain="https://caiusy.github.io/tags/Actor-Critic/">Actor-Critic</category>
+      <category domain="https://caiusy.github.io/tags/GAE/">GAE</category>
       <category domain="https://caiusy.github.io/tags/Reference-Model/">Reference-Model</category>
       <category domain="https://caiusy.github.io/tags/GPU/">GPU</category>
       <category domain="https://caiusy.github.io/tags/LLM-Alignment/">LLM-Alignment</category>
-      <category domain="https://caiusy.github.io/tags/Actor-Critic/">Actor-Critic</category>
-      <category domain="https://caiusy.github.io/tags/GAE/">GAE</category>
       <pubDate>Sat, 01 Aug 2026 15:19:00 GMT</pubDate>
     </item>
     <item>
@@ -189,10 +189,10 @@
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
       <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
-      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
       <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
+      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <pubDate>Thu, 23 Jul 2026 12:30:00 GMT</pubDate>
     </item>
     <item>

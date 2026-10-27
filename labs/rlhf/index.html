@@ -1,0 +1,839 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>Caius Lu</title>
+
+  
+    <meta name="description" content="CAIUS LU &#x2F; ALIGNMENT LAB实验室AttentionKV Cache03 &#x2F; ALIGNMENTRLHF：从人类偏好到策略更新。先比较两个回答，理解奖励模型怎样学习偏好；再计算优势，亲手运行 PPO 与 KL 约束下的策略更新。每一步都有公式、数值和适用边界。Reward modelAdvantagePPO clipKL control01 &#x2F; 偏好数据人类比较回答选择较好的输">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Caius Lu">
+<meta property="og:url" content="https://caiusy.github.io/labs/rlhf/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="CAIUS LU &#x2F; ALIGNMENT LAB实验室AttentionKV Cache03 &#x2F; ALIGNMENTRLHF：从人类偏好到策略更新。先比较两个回答，理解奖励模型怎样学习偏好；再计算优势，亲手运行 PPO 与 KL 约束下的策略更新。每一步都有公式、数值和适用边界。Reward modelAdvantagePPO clipKL control01 &#x2F; 偏好数据人类比较回答选择较好的输">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-10-27T00:10:10.537Z">
+<meta property="article:modified_time" content="2026-10-27T00:10:10.537Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="BEV Perception, Roadside Perception, Radar-Camera Fusion, Camera Geometry, Homography, Multimodal AI, LLaVA, CLIP, LoRA, Computer Vision">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="BEV Perception, Roadside Perception, Radar-Camera Fusion, Camera Geometry, Homography, Multimodal AI, LLaVA, CLIP, LoRA, Computer Vision">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Website","@id":"https://caiusy.github.io/labs/rlhf/","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"name":"Caius Lu","description":"CAIUS LU / ALIGNMENT LAB实验室AttentionKV Cache03 / ALIGNMENTRLHF：从人类偏好到策略更新。先比较两个回答，理解奖励模型怎样学习偏好；再计算优势，亲手运行 PPO 与 KL 约束下的策略更新。每一步都有公式、数值和适用边界。Reward modelAdvantagePPO clipKL control01 / 偏好数据人类比较回答选择较...","url":"https://caiusy.github.io/labs/rlhf/","keywords":"BEV Perception, Roadside Perception, Radar-Camera Fusion, Camera Geometry, Homography, Multimodal AI, LLaVA, CLIP, LoRA, Computer Vision"}</script>
+  <link rel="stylesheet" href="/css/custom.css?v=20261027stats1">
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="canonical" href="https://caiusy.github.io/labs/rlhf/"></head>
+<body><a class="skip-link" href="#main">跳到正文</a><div class="mobile-sitebar"><a href="/">Caius Lu<span>技术札记</span></a><div><button type="button" data-site-search aria-label="打开站内搜索">搜索</button><button type="button" data-site-nav aria-label="打开站点导航" aria-expanded="false">导航 ☰</button></div></div>
+
+<div class="l_body content" id="start" layout="page" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url();"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a aria-label="首页" class="nav-item" title="首页" href="/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-8h6v8"/></svg><span class="nav-label">首页</span></a><a aria-label="项目" class="nav-item" title="项目" href="/projects/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v14H4zM8 7V3h8v4M4 12h16M10 12v3h4v-3"/></svg><span class="nav-label">项目</span></a><a aria-label="BEV 感知" class="nav-item" title="BEV 感知" href="/roadside-bev/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v12H3zM8 7l2-3h4l2 3M16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><span class="nav-label">BEV 感知</span></a><a aria-label="雷视融合" class="nav-item" title="雷视融合" href="/radar-camera-fusion/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9l6-6M21 12a9 9 0 1 1-9-9M17 12a5 5 0 1 1-5-5"/></svg><span class="nav-label">雷视融合</span></a><a aria-label="大模型" class="nav-item" title="大模型" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5M3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-label">大模型</span></a><a aria-label="实验室" class="nav-item" title="实验室" href="/labs/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 8a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-8V3M8 15h8"/></svg><span class="nav-label">实验室</span></a><a aria-label="学习笔记" class="nav-item" title="学习笔记" href="/notes/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4zM8 7h8M8 11h8M8 15h5"/></svg><span class="nav-label">学习笔记</span></a><a aria-label="复习索引" class="nav-item" title="复习索引" href="/review/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h12M9 12h12M9 19h12M2 5l2 2 3-4M2 12l2 2 3-4M2 19l2 2 3-4"/></svg><span class="nav-label">复习索引</span></a><a aria-label="关于我" class="nav-item" title="关于我" href="/about/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span class="nav-label">关于我</span></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" aria-label="搜索文章、主题与笔记" autocomplete="off" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/10/27/radar-camera-02-point-vs-eot/"><span class="title">【雷视融合专题 02】一辆车为什么会有多个雷达点？从点目标跟踪到 EOT</span></a><a class="item title" href="/2026/10/27/radar-camera-01-datasets/"><span class="title">【雷视融合专题 01】路侧雷视公开数据集：从 RAD、点云到稳定 Radar Track</span></a><a class="item title" href="/2026/10/23/deepseek-dsa-lightning-indexer/"><span class="title">从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存</span></a><a class="item title" href="/2026/02/22/linkedlist-pointer-complete-guide/"><span class="title">链表与指针完全图解：从内存本质到 LeetCode 实战</span></a><a class="item title" href="/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"><span class="title">结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></a><a class="item title" href="/2026/02/23/graph-theory-and-search/"><span class="title">图论与搜索：邻接表、BFS/DFS 与最短路的题型模板</span></a><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/10/31/20191031-attention-mechanism-xmind/"><span class="title">attention_mechanism_xmind</span></a><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"><span class="title">CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.1c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.96.1-.74.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 6.14c.97 0 1.95.13 2.86.38 2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.07.78 2.16v3.2c0 .3.21.66.79.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg></a></div></footer>
+</div></aside><div class="l_main" id="main" tabindex="-1">
+
+
+
+
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+
+  <span class="sep"></span>
+  <a class="cap breadcrumb" href="/labs/rlhf/"></a>
+  </div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-10-27T00:10:10.537Z">2026-10-27</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-10-27T00:10:10.537Z">2026-10-27</time></span></div></div></div>
+    
+  </div>
+  </div><article class="md-text content"><main class="wrap"><header class="top"><a class="brand" href="/labs/">CAIUS LU / ALIGNMENT LAB</a><nav class="nav"><a href="/labs/">实验室</a><a href="/labs/attention/">Attention</a><a href="/labs/kv-cache/">KV Cache</a></nav></header><section class="hero"><div class="eyebrow">03 / ALIGNMENT</div><h1>RLHF：<span>从人类偏好到策略更新。</span></h1><p class="lead">先比较两个回答，理解奖励模型怎样学习偏好；再计算优势，亲手运行 PPO 与 KL 约束下的策略更新。每一步都有公式、数值和适用边界。</p><div class="chips"><span class="chip">Reward model</span><span class="chip">Advantage</span><span class="chip">PPO clip</span><span class="chip">KL control</span></div></section><section class="rlhf-flow" aria-label="RLHF 训练流程"><div><span>01 / 偏好数据</span><b>人类比较回答</b><small>选择较好的输出</small></div><div><span>02 / 奖励模型</span><b>拟合偏好</b><small>学习相对评分</small></div><div><span>03 / 优势估计</span><b>与基线比较</b><small>决定更新方向</small></div><div><span>04 / 策略优化</span><b>PPO + KL</b><small>控制更新幅度</small></div></section>
+<section class="rlhf-section panel"><div class="eyebrow">00 / VARIABLE MAP</div><h2>先认清每个变量的职责</h2><div class="deep-scroll"><table class="deep-table"><thead><tr><th>符号</th><th>是什么</th><th>本页怎么算</th><th>是否被训练</th></tr></thead><tbody><tr><td>y⁺ / y⁻</td><td>被偏好 / 未被偏好的回答</td><td>由你的选择决定</td><td>数据标签</td></tr><tr><td>s_A / s_B</td><td>奖励模型给两个回答的分数</td><td>滑杆设定的玩具分数</td><td>真实训练中由奖励模型学习</td></tr><tr><td>P_pref</td><td>模型预测你选 A 的概率</td><td>σ(s_A−s_B)</td><td>由分数计算</td></tr><tr><td>R / V / A</td><td>选中回答的奖励 / 价值基线 / 优势</td><td>本页用 A=R−V</td><td>此处都是教学量</td></tr><tr><td>π_old / π_new</td><td>采样时 / 更新后的策略</td><td>二选一动作概率</td><td>只更新 π_new</td></tr><tr><td>π_ref</td><td>冻结的参考策略</td><td>二选一参考概率</td><td>冻结</td></tr><tr><td>r / ε / β</td><td>概率比 / PPO 裁剪宽度 / KL 系数</td><td>r=π_new/π_old</td><td>本页配置量</td></tr></tbody></table></div><p class="deep-small">关键区分：π_old 用于 PPO 的概率比，π_ref 用于约束策略偏移；两者的作用不同。下方只有两个候选动作，真实语言模型拥有完整词表和长序列。</p></section>
+<section class="rlhf-section"><div class="eyebrow">01 / PREFERENCE DATA</div><h2>先做人类偏好比较</h2><p class="rlhf-intro">同一个问题有两个回答。选出你更喜欢的，再拖动奖励模型分数，观察“模型是否理解你的偏好”。</p><div class="rlhf-prompt"><small>示例提示 / PROMPT</small><strong>为什么长文本生成通常需要 KV Cache？</strong></div><div class="rlhf-answer-grid"><button class="rlhf-answer" id="chooseA" type="button" aria-pressed="true"><span>回答 A · 有解释</span><p>自回归生成每次只新增一个 token。缓存历史 token 的 Key 和 Value，可避免在每一步重复计算它们；代价是缓存随上下文增长并占用显存。</p><b>选择这个回答 →</b></button><button class="rlhf-answer" id="chooseB" type="button" aria-pressed="false"><span>回答 B · 过度简化</span><p>KV Cache 可以让模型更快，而且不会有额外成本。无论上下文多长，都不用担心显存。</p><b>选择这个回答 →</b></button></div><div class="deep-grid two"><aside class="panel"><h3>奖励模型的两个分数</h3><label class="control"><span>回答 A 的分数 s_A <output id="scoreAV">1.0</output></span><input id="scoreA" type="range" min="-1" max="2" step="0.1" value="1"></label><label class="control"><span>回答 B 的分数 s_B <output id="scoreBV">0.0</output></span><input id="scoreB" type="range" min="-1" max="2" step="0.1" value="0"></label><div class="formula">P(A ≻ B) = σ(s_A − s_B)<br>偏好损失 = −log P(被选中的回答)</div></aside><section class="panel"><h3>偏好学习账本</h3><div class="metrics"><div class="metric"><strong id="prefProb">—</strong><small>模型预测所选回答的概率</small></div><div class="metric"><strong id="prefLoss">—</strong><small>偏好交叉熵损失</small></div></div><div id="prefBars" class="bars"></div><p id="prefExplain" class="note"></p><p class="deep-small">分数只表示相对偏好：给 s_A、s_B 同时加同一个常数，偏好概率不变。这里滑杆代替训练奖励模型。</p></section></div></section>
+<section class="rlhf-section"><div class="eyebrow">02 / REWARD TO ADVANTAGE</div><h2>奖励高，不等于优势一定为正</h2><p class="rlhf-intro">优势比较“实际得到的奖励”与“基线原本预期的奖励”。这里用最简单的 A=R−V 演示符号；实际 PPO 通常使用按时间步估计的优势。</p><div class="deep-grid two"><aside class="panel"><label class="control"><span>价值基线 V <output id="valueV">0.2</output></span><input id="value" type="range" min="-1" max="1" step="0.1" value="0.2"></label><button class="button primary" id="sendAdv" type="button">把本次优势送入 PPO ↓</button><div class="formula">R = 奖励模型对选中回答的分数<br>A_demo = R − V</div></aside><section class="panel"><div class="metrics"><div class="metric"><strong id="rewardV">—</strong><small>选中回答的奖励 R</small></div><div class="metric"><strong id="advantageV">—</strong><small>教学优势 A_demo</small></div></div><p id="advantageExplain" class="note"></p><p class="deep-small">本页把回答级分数直接当作奖励，并省略序列内每步奖励、价值函数训练及 GAE。按钮只是把这个示意值带入下方 PPO 控制台。</p></section></div></section>
+<div class="grid"><aside class="panel"><h2>PPO 控制台</h2><p>把一次 response 中的一个二选一动作抽出，观察策略更新。可以接收上方算出的教学优势。</p><label class="control"><span>优势 Aₜ <output id="advV">1.2</output></span><input id="adv" type="range" min="-2" max="3" step="0.1" value="1.2"><small>Aₜ &gt; 0：这个动作比预期好；Aₜ &lt; 0：应该降低概率。</small></label><label class="control"><span>概率比 rₜ <output id="ratioV">1.20</output></span><input id="ratio" type="range" min="0.5" max="1.8" step="0.01" value="1.2"></label><label class="control"><span>clip ε <output id="clipV">0.20</output></span><input id="clip" type="range" min="0.05" max="0.5" step="0.01" value="0.2"></label><label class="control"><span>旧策略动作概率 π_old <output id="poldV">0.40</output></span><input id="pold" type="range" min="0.10" max="0.50" step="0.01" value="0.40"></label><label class="control"><span>参考策略动作概率 π_ref <output id="prefV">0.40</output></span><input id="pref" type="range" min="0.10" max="0.90" step="0.01" value="0.40"></label><label class="control"><span>KL 惩罚 β <output id="klV">0.04</output></span><input id="kl" type="range" min="0" max="0.5" step="0.01" value="0.04"></label><div class="formula">J_demo = min(rₜAₜ, clip(rₜ,1−ε,1+ε)Aₜ) − β·KL<br>π_new = rₜ·π_old；KL = D(π_new ‖ π_ref)</div></aside><section class="panel"><h2>当前 PPO 目标如何计算？</h2><p>两个候选项取较小者，再减去二选一动作分布相对于参考策略的精确 KL。目标值与梯度方向要分开读。</p><div class="metrics"><div class="metric"><strong id="raw">—</strong><small>未裁剪目标</small></div><div class="metric"><strong id="clipped">—</strong><small>裁剪后目标</small></div><div class="metric"><strong id="final">—</strong><small>示意目标值</small></div></div><div id="bars" class="bars"></div><div id="explain" class="note"></div><h3 class="section-title">训练判断</h3><div id="judgement" class="formula"></div></section></div><section class="deep-section"><div class="eyebrow">03 / PPO OBJECTIVE</div><h2>把概率比扫过整个区间</h2><p>当前优势与裁剪范围固定后，曲线展示 PPO 单动作 surrogate 随概率比变化的形状。拖动上方概率比，观察落点与平台区。</p><div class="deep-grid two"><section class="panel"><div class="deep-actions"><button type="button" class="button" id="deepPositive">正优势示例</button><button type="button" class="button" id="deepNegative">负优势示例</button><button type="button" class="button" id="deepInside">回到裁剪区间</button></div><svg id="deepRlhfChart" class="deep-chart" viewBox="0 0 600 240" role="img" aria-label="PPO surrogate 随概率比变化曲线"></svg><div class="deep-legend"><span style="color:#72c7ff">● 未裁剪</span><span style="color:#58d8b2">● PPO min</span><span style="color:#ffbf72">● 当前点</span></div></section><aside class="panel"><h3>当前点的计算账本</h3><div id="deepRlhfLedger" class="deep-ledger"></div><div id="deepRlhfRegion" class="note"></div><p class="deep-small">图中是 surrogate 的函数值，不是模型训练质量。真实策略更新还涉及序列、采样分布、价值网络和参考模型。</p></aside></div></section><section class="rlhf-section"><div class="eyebrow">04 / POLICY UPDATE</div><h2>运行多步：有 KL 与无 KL 的策略轨迹</h2><p class="rlhf-intro">两个玩具策略从同一个 π_old 出发，使用相同 PPO 裁剪目标做梯度上升；绿色额外受到参考策略 KL 约束。每次点击都会实际更新策略 logit。</p><div class="deep-grid two"><aside class="panel"><label class="control"><span>学习率 η <output id="learningRateV">0.40</output></span><input id="learningRate" type="range" min="0.05" max="1" step="0.05" value="0.4"></label><div class="deep-actions"><button class="button primary" id="policyStep" type="button">训练 1 步</button><button class="button" id="policyRun" type="button">自动运行</button><button class="button" id="policyReset" type="button">重置</button></div><div class="metrics"><div class="metric"><strong id="policyStepV">0</strong><small>已运行步数</small></div><div class="metric"><strong id="policyWithV">—</strong><small>有 KL：动作概率</small></div><div class="metric"><strong id="policyWithoutV">—</strong><small>无 KL：动作概率</small></div></div><p id="policyNote" class="note" aria-live="polite"></p></aside><section class="panel"><h3>策略选择该动作的概率</h3><svg id="policyChart" class="deep-chart" viewBox="0 0 600 240" role="img" aria-label="有无 KL 的玩具策略更新曲线"></svg><div class="deep-legend"><span style="color:#58d8b2">● PPO + KL</span><span style="color:#ffbf72">● 仅 PPO</span><span style="color:#72c7ff">--- 参考策略</span></div><p class="deep-small">横轴是迭代步数，纵轴是二选一动作的概率。梯度在 logit 上计算，PPO 裁剪平台会改变后续更新。该曲线不衡量回答质量。</p></section></div></section>
+<section class="panel lab-extra" aria-label="深入实验"><div class="eyebrow">05 / 复盘与边界</div><h2>再回看 PPO 的关键量</h2><p>先读变量，再按照下面的步骤改变一个控制量，观察右侧指标。</p><div class="lab-table-scroll"><table class="lab-table"><thead><tr><th>变量</th><th>含义</th><th>在本页如何使用</th></tr></thead><tbody><tr><td>Aₜ</td><td>动作相对基线的优势</td><td>正值倾向增加动作概率，负值倾向降低</td></tr><tr><td>rₜ</td><td>新策略与旧策略概率比</td><td>rₜ = π_new(a|s) / π_old(a|s)</td></tr><tr><td>ε</td><td>PPO 裁剪区间半宽</td><td>区间 [1−ε, 1+ε]</td></tr><tr><td>β</td><td>参考策略偏离惩罚系数</td><td>此页使用二选一动作的精确 KL</td></tr></tbody></table></div><h3 class="section-title">三步实验</h3><ol><li>先令 Aₜ 为正，增大 rₜ 超过 1+ε：观察 clipped surrogate 的上界。</li><li>将 Aₜ 改为负，再把 rₜ 降到 1−ε 以下：裁剪生效的方向会反过来。</li><li>调大 β：最终 surrogate 数值下降；它不是完整训练梯度。</li></ol><div class="note"><strong>模型边界：</strong>完整 RLHF 的偏好数据、奖励模型、价值函数、序列奖励与批量优化未在此页运行。单 token surrogate 的数值不能直接当作“模型变好”的证据。</div></section><p class="source">参考：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1707.06347">PPO 原论文</a>、<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2203.02155">InstructGPT（RLHF）</a>。 说明：偏好、奖励和训练轨迹均为教学示例；PPO 部分使用二选一动作模拟。KL 在本页对二选一动作分布精确计算；完整 RLHF 还涉及 batch、GAE、value loss、词表概率和序列级奖励。</p><footer><a href="/labs/">← 返回交互实验室</a></footer></main><script>
+'use strict';
+const $=id=>document.getElementById(id);
+const ids=['adv','ratio','clip','kl','pold','pref'];
+function klBinary(p,q){return p*Math.log(p/q)+(1-p)*Math.log((1-p)/(1-q))}
+function bar(label,value,max,color){return '<div class="bar-row"><span>'+label+'</span><span class="track"><span class="fill" style="width:'+Math.min(100,Math.abs(value)/max*100)+'%;background:'+color+'"></span></span><output>'+value.toFixed(3)+'</output></div>'}
+function render(){
+ const A=+$('adv').value,r=+$('ratio').value,e=+$('clip').value,b=+$('kl').value,pold=+$('pold').value,pref=+$('pref').value;
+ const pnew=pold*r,raw=r*A,cr=Math.min(Math.max(r,1-e),1+e),clipped=cr*A,kl=klBinary(pnew,pref),penalty=b*kl,ppo=Math.min(raw,clipped),final=ppo-penalty,max=Math.max(.1,Math.abs(raw),Math.abs(clipped),Math.abs(final),penalty);
+ for(const [id,v,d] of [['advV',A,1],['ratioV',r,2],['clipV',e,2],['klV',b,2],['poldV',pold,2],['prefV',pref,2]])$(id).textContent=v.toFixed(d);
+ $('raw').textContent=raw.toFixed(3);$('clipped').textContent=clipped.toFixed(3);$('final').textContent=final.toFixed(3);
+ $('bars').innerHTML=bar('rₜAₜ',raw,max,raw>=0?'#72c7ff':'#ff788d')+bar('clip(rₜ)Aₜ',clipped,max,'#58d8b2')+bar('β·KL',-penalty,max,'#ffbf72');
+ const onPlateau=(A>0&&r>1+e)||(A<0&&r<1-e);
+ $('explain').textContent='当前 π_old='+pold.toFixed(2)+'，π_new='+pnew.toFixed(2)+'，π_ref='+pref.toFixed(2)+'。二选一分布的精确 KL='+kl.toFixed(4)+'；它与概率比 r 是不同的比较。';
+ $('judgement').textContent=onPlateau?'PPO 项在当前方向进入裁剪平台，PPO 的局部梯度为 0；KL 项仍可能推动策略靠近参考分布。':A>0?'PPO 项倾向提高这个动作的概率；KL 项限制它偏离参考策略。':A<0?'PPO 项倾向降低这个动作的概率；KL 项限制它偏离参考策略。':'PPO 项为 0；这里只剩 KL 约束。';
+}
+ids.forEach(id=>$(id).addEventListener('input',render));render();
+</script><script src="/labs/deep.js" defer=""></script><script src="/labs/rlhf/flow.js" defer=""></script>
+</article>
+
+  <div class="related-wrap md-text" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv">加载中</span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv">加载中</span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-text">RLHF：从人类偏好到策略更新。</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">先认清每个变量的职责</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">先做人类偏好比较</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">奖励模型的两个分数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">偏好学习账本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">奖励高，不等于优势一定为正</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">PPO 控制台</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">当前 PPO 目标如何计算？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">训练判断</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">把概率比扫过整个区间</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">当前点的计算账本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">运行多步：有 KL 与无 KL 的策略轨迹</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">策略选择该动作的概率</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">再回看 PPO 的关键量</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">三步实验</span></a></li></ol></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' aria-label='打开文章目录' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' aria-label='打开站点导航' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/labs/rlhf/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`native_search`) {
+    ctx.search = {};
+    ctx.search.service = `native_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `/vendor/jquery-3.7.1.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="/vendor/lazyload-19.1.3.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+<script defer src="/js/companion.js?v=6"></script><script defer src="/js/site-experience.js?v=20261027stats1"></script><script defer src="/js/visitor-counter.js?v=20261027stats1"></script>
+</div></body></html>

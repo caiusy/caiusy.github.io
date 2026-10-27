@@ -171,10 +171,10 @@
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
     <category term="CISPO" scheme="https://caiusy.github.io/tags/CISPO/"/>
     <category term="RLHF" scheme="https://caiusy.github.io/tags/RLHF/"/>
-    <category term="Group-Relative-Policy-Optimization" scheme="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/"/>
     <category term="Reference-Model" scheme="https://caiusy.github.io/tags/Reference-Model/"/>
     <category term="GPU" scheme="https://caiusy.github.io/tags/GPU/"/>
     <category term="LLM-Alignment" scheme="https://caiusy.github.io/tags/LLM-Alignment/"/>
+    <category term="Group-Relative-Policy-Optimization" scheme="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/"/>
     <id>https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/</id>
     <link href="https://caiusy.github.io/2026/08/03/minimind-grpo-cispo-real-sample-gpu-complete-guide/"/>
     <published>2026-08-03T13:35:00.000Z</published>
@@ -191,11 +191,11 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
     <category term="RLHF" scheme="https://caiusy.github.io/tags/RLHF/"/>
+    <category term="Actor-Critic" scheme="https://caiusy.github.io/tags/Actor-Critic/"/>
+    <category term="GAE" scheme="https://caiusy.github.io/tags/GAE/"/>
     <category term="Reference-Model" scheme="https://caiusy.github.io/tags/Reference-Model/"/>
     <category term="GPU" scheme="https://caiusy.github.io/tags/GPU/"/>
     <category term="LLM-Alignment" scheme="https://caiusy.github.io/tags/LLM-Alignment/"/>
-    <category term="Actor-Critic" scheme="https://caiusy.github.io/tags/Actor-Critic/"/>
-    <category term="GAE" scheme="https://caiusy.github.io/tags/GAE/"/>
     <id>https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/</id>
     <link href="https://caiusy.github.io/2026/08/01/minimind-ppo-from-rollout-to-loss/"/>
     <published>2026-08-01T15:19:00.000Z</published>
@@ -234,10 +234,10 @@
     <category term="MiniMind" scheme="https://caiusy.github.io/tags/MiniMind/"/>
     <category term="LifeOS-Agent" scheme="https://caiusy.github.io/tags/LifeOS-Agent/"/>
     <category term="GRPO" scheme="https://caiusy.github.io/tags/GRPO/"/>
-    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <category term="SFT" scheme="https://caiusy.github.io/tags/SFT/"/>
     <category term="DPO" scheme="https://caiusy.github.io/tags/DPO/"/>
     <category term="PPO" scheme="https://caiusy.github.io/tags/PPO/"/>
+    <category term="Transformer" scheme="https://caiusy.github.io/tags/Transformer/"/>
     <id>https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/</id>
     <link href="https://caiusy.github.io/2026/07/23/LifeOS-Agent-Zero-to-Mastery/"/>
     <published>2026-07-23T12:30:00.000Z</published>

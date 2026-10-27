@@ -1,0 +1,840 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>Caius Lu</title>
+
+  
+    <meta name="description" content="CAIUS LU &#x2F; LORA LAB实验室AttentionRLHF 06 &#x2F; PARAMETER-EFFICIENT FINE-TUNINGLoRA：把矩阵更新拆开来看。先读数据流，再亲手训练一个小矩阵，最后估算大模型目标层的参数开销。每一步都显示数值如何变化。Frozen WΔW &#x3D; (α&#x2F;r)BAGradient descentRank constraint 00 &#x2F; SYMBOLS变量速">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Caius Lu">
+<meta property="og:url" content="https://caiusy.github.io/labs/lora/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="CAIUS LU &#x2F; LORA LAB实验室AttentionRLHF 06 &#x2F; PARAMETER-EFFICIENT FINE-TUNINGLoRA：把矩阵更新拆开来看。先读数据流，再亲手训练一个小矩阵，最后估算大模型目标层的参数开销。每一步都显示数值如何变化。Frozen WΔW &#x3D; (α&#x2F;r)BAGradient descentRank constraint 00 &#x2F; SYMBOLS变量速">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-10-27T00:10:10.536Z">
+<meta property="article:modified_time" content="2026-10-27T00:10:10.536Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="BEV Perception, Roadside Perception, Radar-Camera Fusion, Camera Geometry, Homography, Multimodal AI, LLaVA, CLIP, LoRA, Computer Vision">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="BEV Perception, Roadside Perception, Radar-Camera Fusion, Camera Geometry, Homography, Multimodal AI, LLaVA, CLIP, LoRA, Computer Vision">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Website","@id":"https://caiusy.github.io/labs/lora/","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"name":"Caius Lu","description":"CAIUS LU / LORA LAB实验室AttentionRLHF\n06 / PARAMETER-EFFICIENT FINE-TUNINGLoRA：把矩阵更新拆开来看。先读数据流，再亲手训练一个小矩阵，最后估算大模型目标层的参数开销。每一步都显示数值如何变化。Frozen WΔW = (α/r)BAGradient descentRank constraint\n00 / SYMBOLS...","url":"https://caiusy.github.io/labs/lora/","keywords":"BEV Perception, Roadside Perception, Radar-Camera Fusion, Camera Geometry, Homography, Multimodal AI, LLaVA, CLIP, LoRA, Computer Vision"}</script>
+  <link rel="stylesheet" href="/css/custom.css?v=20261027stats1">
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="canonical" href="https://caiusy.github.io/labs/lora/"></head>
+<body><a class="skip-link" href="#main">跳到正文</a><div class="mobile-sitebar"><a href="/">Caius Lu<span>技术札记</span></a><div><button type="button" data-site-search aria-label="打开站内搜索">搜索</button><button type="button" data-site-nav aria-label="打开站点导航" aria-expanded="false">导航 ☰</button></div></div>
+
+<div class="l_body content" id="start" layout="page" type="tech" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url();"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a aria-label="首页" class="nav-item" title="首页" href="/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-8h6v8"/></svg><span class="nav-label">首页</span></a><a aria-label="项目" class="nav-item" title="项目" href="/projects/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v14H4zM8 7V3h8v4M4 12h16M10 12v3h4v-3"/></svg><span class="nav-label">项目</span></a><a aria-label="BEV 感知" class="nav-item" title="BEV 感知" href="/roadside-bev/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v12H3zM8 7l2-3h4l2 3M16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><span class="nav-label">BEV 感知</span></a><a aria-label="雷视融合" class="nav-item" title="雷视融合" href="/radar-camera-fusion/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9l6-6M21 12a9 9 0 1 1-9-9M17 12a5 5 0 1 1-5-5"/></svg><span class="nav-label">雷视融合</span></a><a aria-label="大模型" class="nav-item" title="大模型" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5M3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-label">大模型</span></a><a aria-label="实验室" class="nav-item" title="实验室" href="/labs/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 8a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-8V3M8 15h8"/></svg><span class="nav-label">实验室</span></a><a aria-label="学习笔记" class="nav-item" title="学习笔记" href="/notes/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4zM8 7h8M8 11h8M8 15h5"/></svg><span class="nav-label">学习笔记</span></a><a aria-label="复习索引" class="nav-item" title="复习索引" href="/review/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h12M9 12h12M9 19h12M2 5l2 2 3-4M2 12l2 2 3-4M2 19l2 2 3-4"/></svg><span class="nav-label">复习索引</span></a><a aria-label="关于我" class="nav-item" title="关于我" href="/about/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span class="nav-label">关于我</span></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" aria-label="搜索文章、主题与笔记" autocomplete="off" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/10/27/radar-camera-02-point-vs-eot/"><span class="title">【雷视融合专题 02】一辆车为什么会有多个雷达点？从点目标跟踪到 EOT</span></a><a class="item title" href="/2026/10/27/radar-camera-01-datasets/"><span class="title">【雷视融合专题 01】路侧雷视公开数据集：从 RAD、点云到稳定 Radar Track</span></a><a class="item title" href="/2026/10/23/deepseek-dsa-lightning-indexer/"><span class="title">从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存</span></a><a class="item title" href="/2026/02/22/linkedlist-pointer-complete-guide/"><span class="title">链表与指针完全图解：从内存本质到 LeetCode 实战</span></a><a class="item title" href="/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"><span class="title">结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></a><a class="item title" href="/2026/02/23/graph-theory-and-search/"><span class="title">图论与搜索：邻接表、BFS/DFS 与最短路的题型模板</span></a><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/10/31/20191031-attention-mechanism-xmind/"><span class="title">attention_mechanism_xmind</span></a><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a><a class="item title" href="/2026/02/16/CLIP%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/"><span class="title">CLIP (Contrastive Language-Image Pre-Training) 深度解析：从原理到大模型应用</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.1c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.96.1-.74.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 6.14c.97 0 1.95.13 2.86.38 2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.07.78 2.16v3.2c0 .3.21.66.79.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg></a></div></footer>
+</div></aside><div class="l_main" id="main" tabindex="-1">
+
+
+
+
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+
+  <span class="sep"></span>
+  <a class="cap breadcrumb" href="/labs/lora/"></a>
+  </div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-10-27T00:10:10.536Z">2026-10-27</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-10-27T00:10:10.536Z">2026-10-27</time></span></div></div></div>
+    
+  </div>
+  </div><article class="md-text content"><main class="wrap"><header class="top"><a class="brand" href="/labs/">CAIUS LU / LORA LAB</a><nav class="nav"><a href="/labs/">实验室</a><a href="/labs/attention/">Attention</a><a href="/labs/rlhf/">RLHF</a></nav></header>
+<section class="hero"><div class="eyebrow">06 / PARAMETER-EFFICIENT FINE-TUNING</div><h1>LoRA：<span>把矩阵更新拆开来看。</span></h1><p class="lead">先读数据流，再亲手训练一个小矩阵，最后估算大模型目标层的参数开销。每一步都显示数值如何变化。</p><div class="chips"><span class="chip">Frozen W</span><span class="chip">ΔW = (α/r)BA</span><span class="chip">Gradient descent</span><span class="chip">Rank constraint</span></div></section>
+<section class="lab-section panel"><div class="lab-kicker">00 / SYMBOLS</div><h2>变量速查</h2><div class="table-wrap"><table class="quick-table"><thead><tr><th>符号</th><th>含义</th><th>形状 / 关系</th><th>训练时变化？</th></tr></thead><tbody><tr><td>x</td><td>输入向量</td><td>dᵢₙ × 1</td><td>来自数据</td></tr><tr><td>W</td><td>预训练线性层权重</td><td>dₒᵤₜ × dᵢₙ</td><td>冻结</td></tr><tr><td>A</td><td>降维矩阵</td><td>r × dᵢₙ</td><td>参与梯度更新</td></tr><tr><td>B</td><td>升维矩阵</td><td>dₒᵤₜ × r</td><td>参与梯度更新</td></tr><tr><td>r</td><td>低秩通道数</td><td>r ≤ min(dᵢₙ,dₒᵤₜ)</td><td>配置值</td></tr><tr><td>α</td><td>适配器缩放系数</td><td>ΔW = (α/r)BA</td><td>配置值</td></tr><tr><td>ΔW</td><td>任务相关权重更新</td><td>dₒᵤₜ × dᵢₙ</td><td>由 A、B 算出</td></tr></tbody></table></div><p class="lab-caption">读法提示：W 是冻结的基础权重；A、B 才是训练变量。α/r 缩放的是更新分支，不改变 W。</p></section>
+<section class="lab-section"><div class="lab-kicker">01 / DATA FLOW</div><h2>同一个输入，走两条分支</h2><div class="flow"><div class="flowbox"><b>x</b><small>输入向量<br>dᵢₙ × 1</small></div><span class="flow-arrow">→</span><div class="branch"><div class="flowbox"><b>Wx</b><small>基础分支 · W 冻结<br>保留预训练能力</small></div><div class="flowbox"><b>(α/r)BAx</b><small>适配分支 · A、B 可训练<br>先降维，再升维</small></div></div><span class="flow-arrow">→</span><div class="flowbox"><b>y = Wx + ΔWx</b><small>两个分支相加<br>输出 dₒᵤₜ × 1</small></div></div><div class="note">常见初始化：A 随机、B 为零。因此刚插入适配器时 BA = 0，输出与基础模型一致。第一步通常先更新 B；B 离开零后，A 才开始收到非零梯度。</div></section>
+<section class="lab-section"><div class="lab-kicker">02 / LIVE TRAINING</div><h2>亲手跑一个 2×2 LoRA</h2><p>这是真正按梯度公式计算的玩具训练。目标矩阵 T 与冻结 W 的差是 rank 1，因此 r=1 已能表达目标；改成 r=2 可以比较参数路径。示例与上方的大矩阵估算互相独立。</p><div class="lab-split"><aside class="panel"><h2>训练控制</h2><label class="control"><span>玩具 rank r <output id="toyRankV">1</output></span><input id="toyRank" type="range" min="1" max="2" value="1"><small>改变 rank 会重置训练。</small></label><label class="control"><span>缩放 α <output id="alphaV">1.0</output></span><input id="alpha" type="range" min="0.5" max="4" step="0.5" value="1"><small>实际更新乘以 α/r；改变 α 会重置训练。</small></label><div class="lab-actions"><button id="step" class="button primary" type="button">训练 1 步</button><button id="run" class="button" type="button">自动运行</button><button id="reset" class="button" type="button">重置</button></div><div id="trainStatus" class="lab-status" aria-live="polite"></div><div class="formula">目标：T = [[1.6, −0.3], [0.4, 0.8]]<br>冻结：W = [[1, 0], [0, 1]]<br>Loss = ½‖W + (α/r)BA − T‖²_F<br>每步：A,B ← A,B − η·∇Loss，η = 0.08</div><p class="lab-caption">输入取两个标准基向量，相当于观察这 2×2 线性层在两种输入上的输出。曲线是此玩具目标的训练误差，不能推断真实模型质量。</p></aside><section class="panel"><h2>矩阵正在怎样变？</h2><div class="metrics"><div class="metric"><strong id="stepV">0</strong><small>训练步数</small></div><div class="metric"><strong id="lossV">—</strong><small>当前 Loss</small></div><div class="metric"><strong id="scaleV">1.00</strong><small>α/r</small></div></div><div class="demo-layout"><div class="matrix-card"><h3>冻结 W</h3><p>训练全程不变</p><div id="wMatrix" class="tiny-matrix"></div></div><div class="matrix-card"><h3>低秩更新 ΔW</h3><p>蓝色正值，橙色负值</p><div id="deltaMatrix" class="tiny-matrix"></div></div><div class="matrix-card"><h3>当前 W + ΔW</h3><p>逐步接近目标 T</p><div id="resultMatrix" class="tiny-matrix"></div></div></div><h3 class="section-title">Loss 随步数变化</h3><svg id="lossChart" class="lab-chart" viewBox="0 0 600 190" preserveAspectRatio="none" role="img" aria-label="训练损失曲线"></svg><p id="gradientNote" class="note"></p></section></div></section>
+<section class="lab-section"><div class="lab-kicker">03 / SCALE ESTIMATOR</div><h2>真实尺寸的参数预算</h2><p>输入一组线性层尺寸，比较全量训练与只训练 LoRA A、B 的参数规模。数字只覆盖所选线性权重，不代表整模型总参数或训练峰值显存。</p><div class="lab-split"><aside class="panel"><h2>矩阵配置</h2><label class="control"><span>输入维度 dᵢₙ <output id="dinV">4096</output></span><input id="din" type="range" min="512" max="8192" step="512" value="4096"></label><label class="control"><span>输出维度 dₒᵤₜ <output id="doutV">4096</output></span><input id="dout" type="range" min="512" max="8192" step="512" value="4096"></label><label class="control"><span>LoRA rank r <output id="rankV">16</output></span><input id="rank" type="range" min="1" max="128" value="16"></label><label class="control"><span>同尺寸目标矩阵数 <output id="layersV">8</output></span><input id="layers" type="range" min="1" max="64" value="8"><small>例如选中的若干投影矩阵；不等于模型总层数。</small></label><label class="control"><span>参数与梯度精度</span><select id="bytes"><option value="2">2 bytes · BF16/FP16</option><option value="4">4 bytes · FP32</option></select></label><div class="formula">全量参数 = dᵢₙ × dₒᵤₜ × 矩阵数<br>LoRA 参数 = r(dᵢₙ+dₒᵤₜ) × 矩阵数</div></aside><section class="panel"><h2>规模对比</h2><div class="metrics"><div class="metric"><strong id="full">—</strong><small>所选权重全量参数</small></div><div class="metric"><strong id="lora">—</strong><small>LoRA 可训练参数</small></div><div class="metric"><strong id="ratio">—</strong><small>所选权重参数比</small></div></div><div id="bars" class="bars"></div><div id="matrix" class="formula" style="margin-top:18px"></div><h3 class="section-title">仅参数、梯度和 Adam 状态的近似内存</h3><div class="metrics"><div class="metric"><strong id="trainMem">—</strong><small>LoRA 训练状态</small></div><div class="metric"><strong id="fullMem">—</strong><small>全量训练状态</small></div><div class="metric"><strong id="baseMem">—</strong><small>冻结 W 仍须加载</small></div></div><p id="scaleNote" class="note"></p><p class="lab-caption">估算口径：所选权重按选定精度存储；可训练参数另计同精度梯度及 Adam 的两个 FP32 状态（每参数 8 bytes）。不含 FP32 主副本、激活、其他层、优化器实现开销与临时缓冲区。</p></section></div></section>
+<section class="lab-section"><div class="lab-kicker">04 / ENGINEERING NOTES</div><h2>把图上的结论带回实际微调</h2><div class="lab-callouts"><article class="panel"><span class="lab-tag">01 / TARGET MODULES</span><h3>先决定放在哪里</h3><p>选择 Q、K、V、O 或前馈投影，会改变覆盖的权重与任务表达能力。目标矩阵数量本身不能说明模型效果；先记录基线和目标模块。</p></article><article class="panel"><span class="lab-tag">02 / RANK &amp; SCALE</span><h3>rank 是容量，不是保证</h3><p>r 越大，参数开销线性增加；收益取决于任务、数据和目标层。α/r 改变更新幅度，需与学习率一起实验，而不是单独追求更大。</p></article><article class="panel"><span class="lab-tag">03 / DEPLOYMENT</span><h3>推理时可选择合并</h3><p>对普通线性层，固定适配器可把 (α/r)BA 合进 W。多适配器切换或量化部署要核对具体实现及精度；训练中通常保留分支。</p></article></div><div class="panel lab-foot"><h3>建议按这三步动手</h3><ol><li>先看初始 ΔW=0，再点击“训练 1 步”，观察 B 先被更新。</li><li>比较玩具 r=1 与 r=2 的曲线；本目标本来就是 rank 1，增大 r 不等于必然更好。</li><li>把大矩阵 rank 从 8 调到 64，观察可训练参数与冻结权重占用各怎样变化。</li></ol></div></section>
+<p class="source">理论依据：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2106.09685">Hu et al., LoRA: Low-Rank Adaptation of Large Language Models</a>。本页 2×2 数值由浏览器按所列公式计算，属于教学示例；规模估算采用明确列出的简化口径。</p><footer><a href="/labs/">← 返回交互实验室</a></footer></main><script>
+'use strict';
+const $=id=>document.getElementById(id),W=[[1,0],[0,1]],T=[[1.6,-.3],[.4,.8]];let A,B,steps,history,timer=null;
+const fmt=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toFixed(0);
+const mem=n=>n>=1048576?(n/1048576).toFixed(2)+' MiB':(n/1024).toFixed(1)+' KiB';
+function stop(){if(timer){clearInterval(timer);timer=null}$('run').textContent='自动运行'}
+function settings(){return {r:+$('toyRank').value,alpha:+$('alpha').value}}
+function delta(){const {r,alpha}=settings(),s=alpha/r;return W.map((row,i)=>row.map((_,j)=>s*B[i].reduce((v,b,k)=>v+b*A[k][j],0)))}
+function loss(D){let v=0;for(let i=0;i<2;i++)for(let j=0;j<2;j++)v+=.5*(W[i][j]+D[i][j]-T[i][j])**2;return v}
+function matrix(id,M){$(id).innerHTML=M.flat().map(v=>{let intensity=Math.min(.65,Math.abs(v)/1.6*.6+.08),color=v<-.001?'rgba(255,191,114,'+intensity+')':'rgba(114,199,255,'+intensity+')';return '<span style="background:'+color+'">'+v.toFixed(2)+'</span>'}).join('')}
+function chart(){const max=Math.max(.01,...history),n=history.length;let points=history.map((v,i)=>[32+(n===1?0:i/(n-1)*548),164-v/max*135]);$('lossChart').innerHTML='<line x1="32" y1="164" x2="580" y2="164" stroke="#45617b"/><line x1="32" y1="20" x2="32" y2="164" stroke="#45617b"/><text x="35" y="17" fill="#abc1d5" font-size="11">'+max.toFixed(3)+'</text><text x="548" y="180" fill="#abc1d5" font-size="11">step '+steps+'</text><polyline fill="none" stroke="#58d8b2" stroke-width="3" points="'+points.map(p=>p.join(',')).join(' ')+'"/><circle cx="'+points.at(-1)[0]+'" cy="'+points.at(-1)[1]+'" r="5" fill="#ffbf72"/>'}
+function renderToy(){const D=delta(),v=loss(D),{r,alpha}=settings();$('toyRankV').textContent=r;$('alphaV').textContent=alpha.toFixed(1);$('stepV').textContent=steps;$('lossV').textContent=v.toFixed(5);$('scaleV').textContent=(alpha/r).toFixed(2);matrix('wMatrix',W);matrix('deltaMatrix',D);matrix('resultMatrix',W.map((row,i)=>row.map((x,j)=>x+D[i][j])));chart();$('gradientNote').textContent=steps===0?'初始 B = 0，因此 ΔW = 0。此时 ∂Loss/∂A = 0；第一步主要改变 B。':steps===1?'第一步完成：B 已离开零，下一步 A 也会收到梯度。当前 Loss = '+v.toFixed(5)+'。':'A 与 B 现在都可收到梯度；ΔW 的秩不超过 '+r+'。当前 Loss = '+v.toFixed(5)+'。'}
+function reset(){stop();const {r}=settings();A=r===1?[[.65,-.35]]:[[.65,-.35],[-.25,.5]];B=Array.from({length:2},()=>Array(r).fill(0));steps=0;history=[loss(delta())];$('trainStatus').textContent='已重置：W 冻结，B 为零。';renderToy()}
+function train(){const {r,alpha}=settings(),s=alpha/r,D=delta(),E=W.map((row,i)=>row.map((x,j)=>x+D[i][j]-T[i][j]));let gB=B.map((row,i)=>row.map((_,k)=>s*E[i].reduce((v,e,j)=>v+e*A[k][j],0)));let gA=A.map((row,k)=>row.map((_,j)=>s*E.reduce((v,e,i)=>v+B[i][k]*e[j],0)));for(let i=0;i<2;i++)for(let k=0;k<r;k++)B[i][k]-=.08*gB[i][k];for(let k=0;k<r;k++)for(let j=0;j<2;j++)A[k][j]-=.08*gA[k][j];steps++;let v=loss(delta());history.push(v);if(history.length>150)history.shift();renderToy();if(!Number.isFinite(v)||v>100){stop();$('trainStatus').textContent='数值发散，请降低 α 或重置。'}else $('trainStatus').textContent='训练中：第 '+steps+' 步。'}
+function renderScale(){let x=+$('din').value,y=+$('dout').value,r=+$('rank').value,l=+$('layers').value,b=+$('bytes').value,full=x*y*l,lo=r*(x+y)*l,ratio=full/lo;for(const [id,val] of [['dinV',x],['doutV',y],['rankV',r],['layersV',l]])$(id).textContent=val;$('full').textContent=fmt(full);$('lora').textContent=fmt(lo);$('ratio').textContent=ratio.toFixed(1)+'×';$('trainMem').textContent=mem(lo*(2*b+8));$('fullMem').textContent=mem(full*(2*b+8));$('baseMem').textContent=mem(full*b);$('matrix').textContent='W ['+y+'×'+x+'] + B ['+y+'×'+r+'] · A ['+r+'×'+x+'] → ΔW ['+y+'×'+x+']';$('bars').innerHTML='<div class="bar-row"><span>全量权重</span><span class="track"><span class="fill" style="width:100%;background:#ffbf72"></span></span><output>'+fmt(full)+'</output></div><div class="bar-row"><span>LoRA A+B</span><span class="track"><span class="fill" style="width:'+Math.max(.5,100/ratio)+'%;background:#58d8b2"></span></span><output>'+fmt(lo)+'</output></div>';$('scaleNote').textContent='当前 r / min(dᵢₙ,dₒᵤₜ) = '+(r/Math.min(x,y)*100).toFixed(2)+'%。冻结的 W 仍需加载；这里的训练状态估算只比较选中矩阵，不能当作完整训练峰值显存。'}
+$('step').addEventListener('click',train);$('reset').addEventListener('click',reset);$('run').addEventListener('click',()=>{if(timer){stop();return}timer=setInterval(()=>{if(steps>=120){stop();$('trainStatus').textContent='已运行 120 步，可继续单步或重置。';return}train()},90);$('run').textContent='暂停'});['toyRank','alpha'].forEach(id=>$(id).addEventListener('input',reset));['din','dout','rank','layers','bytes'].forEach(id=>$(id).addEventListener('input',renderScale));reset();renderScale();
+</script>
+</article>
+
+  <div class="related-wrap md-text" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv">加载中</span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv">加载中</span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-text">LoRA：把矩阵更新拆开来看。</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">变量速查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">同一个输入，走两条分支</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">亲手跑一个 2×2 LoRA</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">训练控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">矩阵正在怎样变？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">冻结 W</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">低秩更新 ΔW</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">当前 W + ΔW</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">Loss 随步数变化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">真实尺寸的参数预算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">矩阵配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">规模对比</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">仅参数、梯度和 Adam 状态的近似内存</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-text">把图上的结论带回实际微调</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">先决定放在哪里</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">rank 是容量，不是保证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">推理时可选择合并</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">建议按这三步动手</span></a></li></ol></li></ol></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' aria-label='打开文章目录' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' aria-label='打开站点导航' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/labs/lora/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`native_search`) {
+    ctx.search = {};
+    ctx.search.service = `native_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `/vendor/jquery-3.7.1.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="/vendor/lazyload-19.1.3.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+<script defer src="/js/companion.js?v=6"></script><script defer src="/js/site-experience.js?v=20261027stats1"></script><script defer src="/js/visitor-counter.js?v=20261027stats1"></script>
+</div></body></html>

@@ -16,6 +16,10 @@
   const note = host.querySelector('.cat-note');
   const store = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
   const read = key => { try { return localStorage.getItem(key); } catch { return null; } };
+  // Migrate the old left-corner default once; keep positions users explicitly drag later.
+  if (read('caius.pika.position.version') !== '2') {
+    try { localStorage.removeItem('caius.pika.position'); localStorage.setItem('caius.pika.position.version', '2'); } catch {}
+  }
   let small = read('caius.pika.small') === 'true';
   const saved = (() => { try { return JSON.parse(read('caius.pika.position')); } catch { return null; } })();
   let position = saved && Number.isFinite(saved.x) && Number.isFinite(saved.y) ? saved : null;

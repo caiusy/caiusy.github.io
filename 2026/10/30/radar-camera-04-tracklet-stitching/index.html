@@ -1,0 +1,960 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>【雷视融合专题 04】纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验 - Caius Lu</title>
+
+  
+    <meta name="description" content="调研长期多目标跟踪的轨迹连接方法，并在纯视觉 Vision-TPMB 回放中用几何 tracklet stitching 把多出的 ID 压到 GT 的 9.36%。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【雷视融合专题 04】纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验">
+<meta property="og:url" content="https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="调研长期多目标跟踪的轨迹连接方法，并在纯视觉 Vision-TPMB 回放中用几何 tracklet stitching 把多出的 ID 压到 GT 的 9.36%。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-10-30T10:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-30T10:00:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="Radar">
+<meta property="article:tag" content="Camera">
+<meta property="article:tag" content="MOT">
+<meta property="article:tag" content="MTPMB">
+<meta property="article:tag" content="Tracklet Stitching">
+<meta property="article:tag" content="IDF1">
+<meta property="article:tag" content="HOTA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="Radar,Camera,MOT,MTPMB,Tracklet Stitching,IDF1,HOTA">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-10-30T18:00:00+08:00","dateModified":"2026-10-30T18:00:00+08:00","datePublished":"2026-10-30T18:00:00+08:00","description":"\nTL;DR：上一期解决的是“目标短暂消失后找回原 ID”，这一期继续处理更顽固的轨迹碎片：完整 4532 帧中视觉 ID 从 367 个降到 292 个，GT 是 267 个，多出的 ID 从 37.45% 降到 **9.36%**。整个后处理不读取视频像素、HSV、雷达或 GT，只使用 3D 位置、速度、航向、尺寸和类别。\n","headline":"【雷视融合专题 04】纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/","keywords":"Radar, Camera, MOT, MTPMB, Tracklet Stitching, IDF1, HOTA","thumbnailUrl":"/images/radar-camera/04/method-survey.svg","image":1}</script>
+  <link rel="stylesheet" href="/css/custom.css?v=20261027stats1">
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="canonical" href="https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/"></head>
+<body><a class="skip-link" href="#main">跳到正文</a><div class="mobile-sitebar"><a href="/">Caius Lu<span>技术札记</span></a><div><button type="button" data-site-search aria-label="打开站内搜索">搜索</button><button type="button" data-site-nav aria-label="打开站点导航" aria-expanded="false">导航 ☰</button></div></div>
+
+<div class="l_body content" id="start" layout="post" type="experiment" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url();"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a aria-label="首页" aria-current="page" class="nav-item active" title="首页" href="/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-8h6v8"/></svg><span class="nav-label">首页</span></a><a aria-label="项目" class="nav-item" title="项目" href="/projects/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v14H4zM8 7V3h8v4M4 12h16M10 12v3h4v-3"/></svg><span class="nav-label">项目</span></a><a aria-label="BEV 感知" class="nav-item" title="BEV 感知" href="/roadside-bev/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v12H3zM8 7l2-3h4l2 3M16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><span class="nav-label">BEV 感知</span></a><a aria-label="雷视融合" class="nav-item" title="雷视融合" href="/radar-camera-fusion/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9l6-6M21 12a9 9 0 1 1-9-9M17 12a5 5 0 1 1-5-5"/></svg><span class="nav-label">雷视融合</span></a><a aria-label="大模型" class="nav-item" title="大模型" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5M3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-label">大模型</span></a><a aria-label="实验室" class="nav-item" title="实验室" href="/labs/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 8a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-8V3M8 15h8"/></svg><span class="nav-label">实验室</span></a><a aria-label="学习笔记" class="nav-item" title="学习笔记" href="/notes/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4zM8 7h8M8 11h8M8 15h5"/></svg><span class="nav-label">学习笔记</span></a><a aria-label="复习索引" class="nav-item" title="复习索引" href="/review/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h12M9 12h12M9 19h12M2 5l2 2 3-4M2 12l2 2 3-4M2 19l2 2 3-4"/></svg><span class="nav-label">复习索引</span></a><a aria-label="关于我" class="nav-item" title="关于我" href="/about/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span class="nav-label">关于我</span></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" aria-label="搜索文章、主题与笔记" autocomplete="off" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/10/30/radar-camera-04-tracklet-stitching/"><span class="title">【雷视融合专题 04】纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验</span></a><a class="item title" href="/2026/10/30/radar-camera-03-pure-vision-recovery/"><span class="title">【雷视融合专题 03】从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID</span></a><a class="item title" href="/2026/10/27/radar-camera-02-point-vs-eot/"><span class="title">【雷视融合专题 02】一辆车为什么会有多个雷达点？从点目标跟踪到 EOT</span></a><a class="item title" href="/2026/10/27/radar-camera-01-datasets/"><span class="title">【雷视融合专题 01】路侧雷视公开数据集：从 RAD、点云到稳定 Radar Track</span></a><a class="item title" href="/2026/10/23/deepseek-dsa-lightning-indexer/"><span class="title">从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存</span></a><a class="item title" href="/2026/02/22/linkedlist-pointer-complete-guide/"><span class="title">链表与指针完全图解：从内存本质到 LeetCode 实战</span></a><a class="item title" href="/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"><span class="title">结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></a><a class="item title" href="/2026/02/23/graph-theory-and-search/"><span class="title">图论与搜索：邻接表、BFS/DFS 与最短路的题型模板</span></a><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/10/31/20191031-attention-mechanism-xmind/"><span class="title">attention_mechanism_xmind</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.1c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.96.1-.74.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 6.14c.97 0 1.95.13 2.86.38 2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.07.78 2.16v3.2c0 .3.21.66.79.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg></a></div></footer>
+</div></aside><div class="l_main" id="main" tabindex="-1">
+
+
+
+
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E9%9B%B7%E8%BE%BE%E7%9B%B8%E6%9C%BA%E8%9E%8D%E5%90%88/">雷达相机融合</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-10-30T10:00:00.000Z">2026-10-30</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-10-30T10:00:00.000Z">2026-10-30</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>【雷视融合专题 04】纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><div class="reader-tools" role="group" aria-label="阅读设置"><span id="reading-estimate">长文阅读</span><div><button type="button" id="reader-size" aria-label="切换正文字号" aria-pressed="false">大字</button><button type="button" id="reader-focus" aria-pressed="false">专注阅读</button><button type="button" id="reader-link">复制链接</button></div></div><div id="reading-progress" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div><article class="md-text content"><blockquote>
+<p><strong>TL;DR</strong>：上一期解决的是“目标短暂消失后找回原 ID”，这一期继续处理更顽固的轨迹碎片：完整 4532 帧中视觉 ID 从 367 个降到 292 个，GT 是 267 个，多出的 ID 从 37.45% 降到 **9.36%**。整个后处理不读取视频像素、HSV、雷达或 GT，只使用 3D 位置、速度、航向、尺寸和类别。</p>
+</blockquote>
+<span id="more"></span>
+
+<p>这是<a href="/radar-camera-fusion/">雷视融合专题</a>的第四篇。前一篇已经把 ES-MEOT 论文的 MTPMB 和本项目 Vision-TPMB 适配区分清楚，并加入了休眠 Bernoulli 池和低分检测恢复。这次面对一个更具体的验收条件：**多出来的纯视觉 ID 不能超过 GT 的 10%**。</p>
+<p><img src="/images/radar-camera/04/method-survey.svg" alt="方法调研与结果对比：在线恢复、保守几何拼接和数量约束几何拼接"></p>
+<h2 id="1-先把“ID-多”拆开"><a href="#1-先把“ID-多”拆开" class="headerlink" title="1. 先把“ID 多”拆开"></a>1. 先把“ID 多”拆开</h2><p>367 个视觉 ID 对 267 个 GT ID，看起来像检测器多出了 100 辆车。逐帧检查后发现，平均每帧视觉目标数是 10.79，GT 是 10.69；3,173 帧的目标数量完全一致。多出来的 ID 主要来自同一辆车被切成多段：</p>
+<ul>
+<li>54 个 GT 目标被多个视觉 ID 覆盖；</li>
+<li>其中 90 个视觉 ID 是这些 GT 的次级轨迹碎片；</li>
+<li>33 个视觉 ID 从未匹配到 GT，属于短时误检或几何偏出的轨迹；</li>
+<li>131 次同一 GT 的视觉 ID 转换中，127 次间隔不超过 15 帧。</li>
+</ul>
+<p>所以问题的核心是轨迹生命周期和长期连接，不能只调检测阈值。</p>
+<h2 id="2-调研后保留哪些方法"><a href="#2-调研后保留哪些方法" class="headerlink" title="2. 调研后保留哪些方法"></a>2. 调研后保留哪些方法</h2><h3 id="长序列需要-tracklet-stitching"><a href="#长序列需要-tracklet-stitching" class="headerlink" title="长序列需要 tracklet stitching"></a>长序列需要 tracklet stitching</h3><p>WaspMOT 的长序列实验说明，即使检测结果是 oracle，轨迹也会因为遮挡、跳变和相似目标而碎片化；简单的空间 tracklet stitching 仍然能带来提升。这与当前路侧视频的现象很接近：检测数量基本对，但公共 ID 断开了。</p>
+<h3 id="运动模型要贯穿短期和长期"><a href="#运动模型要贯穿短期和长期" class="headerlink" title="运动模型要贯穿短期和长期"></a>运动模型要贯穿短期和长期</h3><p>MPMOT 将运动感知关联、置信度自适应噪声和全局轨迹连接放在一起。3D LiDAR MOT 的短期/长期多级关联也维护 inactive tracks，再用长期时空一致性恢复身份。当前工程把这两个方向落成双向 3D 运动外推：</p>
+<p><img src="/images/radar-camera/04/geometry-stitch-flow.svg" alt="几何 tracklet stitching 流程：双向外推、几何门控和最早 ID 复用"></p>
+<ul>
+<li>轨迹 A 的末端用最近 8 个 3D 状态拟合速度；</li>
+<li>轨迹 B 的开端也反向拟合速度；</li>
+<li>两边都外推到断点，计算前向和后向位置误差；</li>
+<li>再检查速度、航向、尺寸和类别；</li>
+<li>只有互相选择为唯一最佳候选时才合并。</li>
+</ul>
+<h3 id="评测不能只看-ID-总数"><a href="#评测不能只看-ID-总数" class="headerlink" title="评测不能只看 ID 总数"></a>评测不能只看 ID 总数</h3><p>HOTA 把检测、关联和定位拆开。当前实验因此同时固定报告 TP、FP、FN、相邻 IDSW、轨迹碎片和“一个 canonical ID 触达多个 GT”的数量。ID 总数达标，不能自动说明身份语义正确。</p>
+<h2 id="3-为什么不使用外观特征"><a href="#3-为什么不使用外观特征" class="headerlink" title="3. 为什么不使用外观特征"></a>3. 为什么不使用外观特征</h2><p>本项目的纯视觉主路径是整帧图像直接回归 3D XYZ、尺寸、朝向和类别，然后进入 Vision-TPMB。此次优化明确保持这个边界：stitching 只读取已序列化的 3D 轨迹状态，不重新读取视频，也不提取 HSV 或其他外观描述子。</p>
+<p>这样做有两个好处：</p>
+<ol>
+<li>结果可以在没有视频文件的远程评测环境中复现；</li>
+<li>连接依据和 BEV 轨迹使用同一组几何状态，便于排查标定、俯仰角和地平面误差。</li>
+</ol>
+<p>代价是相邻车辆在空间上接近时缺少外观身份线索，因此必须保留严格的互选和时间不重叠约束。</p>
+<h2 id="4-两种几何配置"><a href="#4-两种几何配置" class="headerlink" title="4. 两种几何配置"></a>4. 两种几何配置</h2><p>保守配置使用 15 帧连接窗口、5 个观测的最小轨迹长度和较大的唯一最佳 margin。它将完整序列 ID 从 367 降到 319，适合身份质量优先的回放。</p>
+<p>数量约束配置使用 90 帧连接窗口、3 个观测的最小轨迹长度、25 m 位置门限、40 m/s 速度门限和 0 margin。它的目标是满足明确的 ID 预算：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th align="right">原始恢复版</th>
+<th align="right">保守几何版</th>
+<th align="right">数量约束几何版</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>完整序列视觉 ID</td>
+<td align="right">367</td>
+<td align="right">319</td>
+<td align="right"><strong>292</strong></td>
+</tr>
+<tr>
+<td>GT ID</td>
+<td align="right">267</td>
+<td align="right">267</td>
+<td align="right">267</td>
+</tr>
+<tr>
+<td>多出 ID</td>
+<td align="right">+100</td>
+<td align="right">+52</td>
+<td align="right"><strong>+25</strong></td>
+</tr>
+<tr>
+<td>多出比例</td>
+<td align="right">37.45%</td>
+<td align="right">19.48%</td>
+<td align="right"><strong>9.36%</strong></td>
+</tr>
+<tr>
+<td>779 帧留出集视觉 ID</td>
+<td align="right">107</td>
+<td align="right">85</td>
+<td align="right"><strong>78</strong></td>
+</tr>
+<tr>
+<td>779 帧留出集 GT ID</td>
+<td align="right">60</td>
+<td align="right">60</td>
+<td align="right">60</td>
+</tr>
+<tr>
+<td>留出集相邻 IDSW</td>
+<td align="right">22</td>
+<td align="right">22</td>
+<td align="right">22</td>
+</tr>
+</tbody></table>
+<p>两种配置的 TP/FP/FN 都保持不变，因为它们只重写公共 ID、模板 ID 和轨迹历史。</p>
+<h2 id="5-验收结果与风险"><a href="#5-验收结果与风险" class="headerlink" title="5. 验收结果与风险"></a>5. 验收结果与风险</h2><p>数量约束版已经达到“多出 ID 不超过 GT 的 10%”：25 / 267 = 9.36%。不过放宽长期连接也带来了清晰的代价：一个 canonical ID 触达多个 GT 的数量从 15 增加到 28。这表示部分连接虽然减少了 ID 数，但可能把相邻车辆串到同一个长期身份。</p>
+<p>因此项目现在保留两个 profile：</p>
+<ul>
+<li>conservative_geometry：身份质量优先；</li>
+<li>count_constrained_geometry：ID 数量预算优先。</li>
+</ul>
+<p>展示结果时必须标注 profile，不能把数量约束版的 292 个 ID 直接当作 IDF1 或 HOTA 提升。</p>
+<p><img src="/images/radar-camera/04/geometry-replay-workbench.jpg" alt="几何 stitching 回放：相机 3D 框、BEV 轨迹和统一模板 ID"></p>
+<h2 id="6-复现边界"><a href="#6-复现边界" class="headerlink" title="6. 复现边界"></a>6. 复现边界</h2><p>实验在远程 WSL 的 RTX 3090 Ti 上完成。原始视频、雷达文件、检测缓存、模型权重和完整标注保留在远程机器；仓库只提交代码、配置、图示、截图和派生结果摘要。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PYTHONPATH=src python3 tools/stitch_vision_replay.py \</span><br><span class="line">  --input outputs/vision3d/centernet_xyz40/predictions_recovery.jsonl \</span><br><span class="line">  --output outputs/vision3d/centernet_xyz40/predictions_target2.jsonl \</span><br><span class="line">  --config configs/vision_tracklet_stitch.json</span><br></pre></td></tr></tbody></table></figure>
+
+<p>相关调研和完整表格见跟踪仓库的 docs/tracklet_stitching_research_report.md。远程全量检查为 108 tests passed，coverage 91.74%。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li>Stanczyk 等，WaspMOT: A Benchmark for Long-Term Multi-Object Tracking of Trichogramma Wasps，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.08729">arXiv</a>。</li>
+<li>Meng 等，Motion-Perception Multi-Object Tracking，<a target="_blank" rel="noopener" href="https://doi.org/10.3390/jimaging11050144">DOI</a>。</li>
+<li>Cho、Kim，3D LiDAR Multi-Object Tracking with Short-Term and Long-Term Multi-Level Associations，<a target="_blank" rel="noopener" href="https://doi.org/10.3390/rs15235486">DOI</a>。</li>
+<li>Huang 等，DeconfuseTrack: Dealing with Confusion for Multi-Object Tracking，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2403.02767">arXiv</a>。</li>
+<li>Luiten 等，HOTA: A Higher Order Metric for Evaluating Multi-object Tracking，<a target="_blank" rel="noopener" href="https://doi.org/10.1007/s11263-020-01375-2">DOI</a>。</li>
+</ul>
+<p><strong>上一篇</strong>：<a href="/2026/10/30/radar-camera-03-pure-vision-recovery/">从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID</a></p>
+</article>
+<div class="article-footer">
+
+
+    <section id="share">
+      <div class="header"><span>分享文章</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;复制成功&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/10/30/radar-camera-03-pure-vision-recovery/">【雷视融合专题 03】从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv">加载中</span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv">加载中</span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%85%88%E6%8A%8A%E2%80%9CID-%E5%A4%9A%E2%80%9D%E6%8B%86%E5%BC%80"><span class="toc-text">1. 先把“ID 多”拆开</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%B0%83%E7%A0%94%E5%90%8E%E4%BF%9D%E7%95%99%E5%93%AA%E4%BA%9B%E6%96%B9%E6%B3%95"><span class="toc-text">2. 调研后保留哪些方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%95%BF%E5%BA%8F%E5%88%97%E9%9C%80%E8%A6%81-tracklet-stitching"><span class="toc-text">长序列需要 tracklet stitching</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E5%8A%A8%E6%A8%A1%E5%9E%8B%E8%A6%81%E8%B4%AF%E7%A9%BF%E7%9F%AD%E6%9C%9F%E5%92%8C%E9%95%BF%E6%9C%9F"><span class="toc-text">运动模型要贯穿短期和长期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%84%E6%B5%8B%E4%B8%8D%E8%83%BD%E5%8F%AA%E7%9C%8B-ID-%E6%80%BB%E6%95%B0"><span class="toc-text">评测不能只看 ID 总数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BD%BF%E7%94%A8%E5%A4%96%E8%A7%82%E7%89%B9%E5%BE%81"><span class="toc-text">3. 为什么不使用外观特征</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%B8%A4%E7%A7%8D%E5%87%A0%E4%BD%95%E9%85%8D%E7%BD%AE"><span class="toc-text">4. 两种几何配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E9%AA%8C%E6%94%B6%E7%BB%93%E6%9E%9C%E4%B8%8E%E9%A3%8E%E9%99%A9"><span class="toc-text">5. 验收结果与风险</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%A4%8D%E7%8E%B0%E8%BE%B9%E7%95%8C"><span class="toc-text">6. 复现边界</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-text">参考资料</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' aria-label='打开文章目录' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' aria-label='打开站点导航' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`native_search`) {
+    ctx.search = {};
+    ctx.search.service = `native_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `/vendor/jquery-3.7.1.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="/vendor/lazyload-19.1.3.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+<script defer src="/js/companion.js?v=7"></script><script defer src="/js/site-experience.js?v=20261027stats1"></script><script defer src="/js/visitor-counter.js?v=20261027stats1"></script>
+</div></body></html>

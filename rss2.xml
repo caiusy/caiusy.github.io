@@ -146,10 +146,10 @@
       <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
       <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
-      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
       <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
       <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
+      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
       <category domain="https://caiusy.github.io/tags/MiniMind-V/">MiniMind-V</category>
       <category domain="https://caiusy.github.io/tags/Vision-Language-Model/">Vision-Language-Model</category>
       <category domain="https://caiusy.github.io/tags/Pretrain/">Pretrain</category>
@@ -167,10 +167,10 @@
       <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
       <category domain="https://caiusy.github.io/tags/CISPO/">CISPO</category>
       <category domain="https://caiusy.github.io/tags/RLHF/">RLHF</category>
-      <category domain="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/">Group-Relative-Policy-Optimization</category>
       <category domain="https://caiusy.github.io/tags/Reference-Model/">Reference-Model</category>
       <category domain="https://caiusy.github.io/tags/GPU/">GPU</category>
       <category domain="https://caiusy.github.io/tags/LLM-Alignment/">LLM-Alignment</category>
+      <category domain="https://caiusy.github.io/tags/Group-Relative-Policy-Optimization/">Group-Relative-Policy-Optimization</category>
       <pubDate>Mon, 03 Aug 2026 13:35:00 GMT</pubDate>
     </item>
     <item>
@@ -183,11 +183,11 @@
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
       <category domain="https://caiusy.github.io/tags/RLHF/">RLHF</category>
+      <category domain="https://caiusy.github.io/tags/Actor-Critic/">Actor-Critic</category>
+      <category domain="https://caiusy.github.io/tags/GAE/">GAE</category>
       <category domain="https://caiusy.github.io/tags/Reference-Model/">Reference-Model</category>
       <category domain="https://caiusy.github.io/tags/GPU/">GPU</category>
       <category domain="https://caiusy.github.io/tags/LLM-Alignment/">LLM-Alignment</category>
-      <category domain="https://caiusy.github.io/tags/Actor-Critic/">Actor-Critic</category>
-      <category domain="https://caiusy.github.io/tags/GAE/">GAE</category>
       <pubDate>Sat, 01 Aug 2026 15:19:00 GMT</pubDate>
     </item>
     <item>
@@ -213,15 +213,15 @@
       <author>Caius Lu</author>
       <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
       <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/">模型训练</category>
-      <category domain="https://caiusy.github.io/tags/Agent-RL/">Agent-RL</category>
-      <category domain="https://caiusy.github.io/tags/Tool-Calling/">Tool-Calling</category>
-      <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
-      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
-      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
+      <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
       <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
+      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
+      <category domain="https://caiusy.github.io/tags/Agent-RL/">Agent-RL</category>
+      <category domain="https://caiusy.github.io/tags/Tool-Calling/">Tool-Calling</category>
+      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <pubDate>Thu, 23 Jul 2026 12:30:00 GMT</pubDate>
     </item>
     <item>
@@ -245,11 +245,11 @@
       <author>Caius Lu</author>
       <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
       <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/Agent/">Agent</category>
+      <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
+      <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
+      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
       <category domain="https://caiusy.github.io/tags/Agent-RL/">Agent-RL</category>
       <category domain="https://caiusy.github.io/tags/Tool-Calling/">Tool-Calling</category>
-      <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
-      <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
-      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
       <category domain="https://caiusy.github.io/tags/CISPO/">CISPO</category>
       <pubDate>Mon, 13 Jul 2026 15:40:00 GMT</pubDate>
     </item>
@@ -260,13 +260,13 @@
       <author>Caius Lu</author>
       <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
       <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
-      <category domain="https://caiusy.github.io/tags/Agent-RL/">Agent-RL</category>
-      <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
-      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
+      <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
       <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
+      <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
+      <category domain="https://caiusy.github.io/tags/Agent-RL/">Agent-RL</category>
       <pubDate>Mon, 13 Jul 2026 15:00:00 GMT</pubDate>
     </item>
     <item>

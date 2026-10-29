@@ -67,7 +67,7 @@
 
   
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-10-30T18:00:00+08:00","dateModified":"2026-10-30T18:00:00+08:00","datePublished":"2026-10-30T18:00:00+08:00","description":"\nTL;DR：上一期解决的是“目标短暂消失后找回原 ID”，这一期继续处理更顽固的轨迹碎片：完整 4532 帧中视觉 ID 从 367 个降到 292 个，GT 是 267 个，多出的 ID 从 37.45% 降到 **9.36%**。整个后处理不读取视频像素、HSV、雷达或 GT，只使用 3D 位置、速度、航向、尺寸和类别。\n","headline":"【雷视融合专题 04】纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/","keywords":"Radar, Camera, MOT, MTPMB, Tracklet Stitching, IDF1, HOTA","thumbnailUrl":"/images/radar-camera/04/method-survey.svg","image":1}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-10-30T18:00:00+08:00","dateModified":"2026-10-30T18:00:00+08:00","datePublished":"2026-10-30T18:00:00+08:00","description":"\nTL;DR：上一期解决的是“目标短暂消失后找回原 ID”，这一期继续处理更顽固的轨迹碎片：完整 4532 帧中视觉 ID 从 367 个降到 280 个，GT 是 267 个，多出的 ID 从 37.45% 降到 **4.87%**。整个后处理不读取视频像素、HSV、雷达或 GT，只使用 3D 位置、速度、航向、尺寸和类别。\n","headline":"【雷视融合专题 04】纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/10/30/radar-camera-04-tracklet-stitching/","keywords":"Radar, Camera, MOT, MTPMB, Tracklet Stitching, IDF1, HOTA","thumbnailUrl":"/images/radar-camera/04/method-survey.svg","image":1}</script>
   <link rel="stylesheet" href="/css/custom.css?v=20261027stats1">
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
@@ -113,7 +113,7 @@
     
   </div>
   </div><div class="reader-tools" role="group" aria-label="阅读设置"><span id="reading-estimate">长文阅读</span><div><button type="button" id="reader-size" aria-label="切换正文字号" aria-pressed="false">大字</button><button type="button" id="reader-focus" aria-pressed="false">专注阅读</button><button type="button" id="reader-link">复制链接</button></div></div><div id="reading-progress" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div><article class="md-text content"><blockquote>
-<p><strong>TL;DR</strong>：上一期解决的是“目标短暂消失后找回原 ID”，这一期继续处理更顽固的轨迹碎片：完整 4532 帧中视觉 ID 从 367 个降到 292 个，GT 是 267 个，多出的 ID 从 37.45% 降到 **9.36%**。整个后处理不读取视频像素、HSV、雷达或 GT，只使用 3D 位置、速度、航向、尺寸和类别。</p>
+<p><strong>TL;DR</strong>：上一期解决的是“目标短暂消失后找回原 ID”，这一期继续处理更顽固的轨迹碎片：完整 4532 帧中视觉 ID 从 367 个降到 280 个，GT 是 267 个，多出的 ID 从 37.45% 降到 **4.87%**。整个后处理不读取视频像素、HSV、雷达或 GT，只使用 3D 位置、速度、航向、尺寸和类别。</p>
 </blockquote>
 <span id="more"></span>
 
@@ -146,7 +146,7 @@
 </ol>
 <p>代价是相邻车辆在空间上接近时缺少外观身份线索，因此必须保留严格的互选和时间不重叠约束。</p>
 <h2 id="4-两种几何配置"><a href="#4-两种几何配置" class="headerlink" title="4. 两种几何配置"></a>4. 两种几何配置</h2><p>保守配置使用 15 帧连接窗口、5 个观测的最小轨迹长度和较大的唯一最佳 margin。它将完整序列 ID 从 367 降到 319，适合身份质量优先的回放。</p>
-<p>数量约束配置使用 90 帧连接窗口、3 个观测的最小轨迹长度、25 m 位置门限、40 m/s 速度门限和 0 margin。它的目标是满足明确的 ID 预算：</p>
+<p>质量优先配置关闭长距离连接，只保留至少 16 次观测的轨迹，避免用长时间强行拼接换取 ID 数：</p>
 <table>
 <thead>
 <tr>
@@ -160,7 +160,7 @@
 <td>完整序列视觉 ID</td>
 <td align="right">367</td>
 <td align="right">319</td>
-<td align="right"><strong>292</strong></td>
+<td align="right"><strong>280</strong></td>
 </tr>
 <tr>
 <td>GT ID</td>
@@ -172,19 +172,19 @@
 <td>多出 ID</td>
 <td align="right">+100</td>
 <td align="right">+52</td>
-<td align="right"><strong>+25</strong></td>
+<td align="right"><strong>+13</strong></td>
 </tr>
 <tr>
 <td>多出比例</td>
 <td align="right">37.45%</td>
 <td align="right">19.48%</td>
-<td align="right"><strong>9.36%</strong></td>
+<td align="right"><strong>4.87%</strong></td>
 </tr>
 <tr>
 <td>779 帧留出集视觉 ID</td>
 <td align="right">107</td>
 <td align="right">85</td>
-<td align="right"><strong>78</strong></td>
+<td align="right"><strong>72</strong></td>
 </tr>
 <tr>
 <td>779 帧留出集 GT ID</td>
@@ -196,17 +196,17 @@
 <td>留出集相邻 IDSW</td>
 <td align="right">22</td>
 <td align="right">22</td>
-<td align="right">22</td>
+<td align="right"><strong>12</strong></td>
 </tr>
 </tbody></table>
 <p>两种配置的 TP/FP/FN 都保持不变，因为它们只重写公共 ID、模板 ID 和轨迹历史。</p>
-<h2 id="5-验收结果与风险"><a href="#5-验收结果与风险" class="headerlink" title="5. 验收结果与风险"></a>5. 验收结果与风险</h2><p>数量约束版已经达到“多出 ID 不超过 GT 的 10%”：25 / 267 = 9.36%。不过放宽长期连接也带来了清晰的代价：一个 canonical ID 触达多个 GT 的数量从 15 增加到 28。这表示部分连接虽然减少了 ID 数，但可能把相邻车辆串到同一个长期身份。</p>
+<h2 id="5-验收结果与风险"><a href="#5-验收结果与风险" class="headerlink" title="5. 验收结果与风险"></a>5. 验收结果与风险</h2><p>最终质量优先版达到“多出 ID 不超过 GT 的 5%”：13 / 267 = 4.87%。它把跨 GT canonical ID 控制在 13 个，低于原始恢复版的 15 个；完整序列 Precision 为 97.46%、Recall 为 97.33%，相邻 IDSW 从 62 降到 31，fragmentation 从 156 降到 126。Recall 比原始恢复版下降 0.58 个百分点，这是严格 ID 预算的代价。</p>
 <p>因此项目现在保留两个 profile：</p>
 <ul>
-<li>conservative_geometry：身份质量优先；</li>
-<li>count_constrained_geometry：ID 数量预算优先。</li>
+<li>quality_budget_geometry：身份质量和 5% ID 预算优先；</li>
+<li>long_window_geometry：用于研究 ID 数量下界，跨目标串联风险更高。</li>
 </ul>
-<p>展示结果时必须标注 profile，不能把数量约束版的 292 个 ID 直接当作 IDF1 或 HOTA 提升。</p>
+<p>展示结果时必须标注 profile，不能把 280 个 ID 直接当作 IDF1 或 HOTA 提升。</p>
 <p><img src="/images/radar-camera/04/geometry-replay-workbench.jpg" alt="几何 stitching 回放：相机 3D 框、BEV 轨迹和统一模板 ID"></p>
 <h2 id="6-复现边界"><a href="#6-复现边界" class="headerlink" title="6. 复现边界"></a>6. 复现边界</h2><p>实验在远程 WSL 的 RTX 3090 Ti 上完成。原始视频、雷达文件、检测缓存、模型权重和完整标注保留在远程机器；仓库只提交代码、配置、图示、截图和派生结果摘要。</p>
 <figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PYTHONPATH=src python3 tools/stitch_vision_replay.py \</span><br><span class="line">  --input outputs/vision3d/centernet_xyz40/predictions_recovery.jsonl \</span><br><span class="line">  --output outputs/vision3d/centernet_xyz40/predictions_target2.jsonl \</span><br><span class="line">  --config configs/vision_tracklet_stitch.json</span><br></pre></td></tr></tbody></table></figure>

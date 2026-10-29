@@ -112,4 +112,4 @@ IoU 高不保证 ID 连续；MOTA 高也不意味着几何形状准确。第二�
 - Granström 等，*Extended Object Tracking: Introduction, Overview and Applications*，综述入口：[DOI](https://doi.org/10.1007/s11263-016-0932-6)。
 - Deng 等，*3D Extended Object Tracking by Fusing Roadside Sparse Radar Point Clouds and Pixel Keypoints*：[arXiv:2404.17903](https://arxiv.org/abs/2404.17903)。
 
-**下一篇**：[ES-MEOT 精读：MTPMB、MDN 与 Doped Association](/2026/10/27/radar-camera-03-es-meot/)
+**下一篇**：[从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID](/2026/10/30/radar-camera-03-pure-vision-recovery/)

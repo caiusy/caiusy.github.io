@@ -175,3 +175,5 @@ PYTHONPATH=src python3 tools/infer_direct3d.py \
 - Cao 等，*Observation-Centric SORT: Rethinking SORT for Robust Multi-Object Tracking*，[CVPR 2023](https://openaccess.thecvf.com/content/CVPR2023/papers/Cao_Observation-Centric_SORT_Rethinking_SORT_for_Robust_Multi-Object_Tracking_CVPR_2023_paper.pdf)。
 
 **上一篇**：[一辆车为什么会有多个雷达点？从点目标跟踪到 EOT](/2026/10/27/radar-camera-02-point-vs-eot/)
+
+**下一篇**：[纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验](/2026/10/30/radar-camera-04-tracklet-stitching/)

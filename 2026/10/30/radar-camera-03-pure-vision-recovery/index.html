@@ -1,0 +1,1032 @@
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.33.1" theme-name="Stellar" theme-version="1.33.1">
+  
+  
+  <meta name="generator" content="Hexo 6.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title>【雷视融合专题 03】从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID - Caius Lu</title>
+
+  
+    <meta name="description" content="把 ES-MEOT 的 MTPMB 多目标跟踪思想落到纯视觉直接 XYZ 检测上：用休眠轨迹池、低分检测二次关联和自适应协方差，减少目标丢失与 ID 切换。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【雷视融合专题 03】从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID">
+<meta property="og:url" content="https://caiusy.github.io/2026/10/30/radar-camera-03-pure-vision-recovery/">
+<meta property="og:site_name" content="Caius Lu">
+<meta property="og:description" content="把 ES-MEOT 的 MTPMB 多目标跟踪思想落到纯视觉直接 XYZ 检测上：用休眠轨迹池、低分检测二次关联和自适应协方差，减少目标丢失与 ID 切换。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://caiusy.github.io/images/avatar.jpg">
+<meta property="article:published_time" content="2026-10-30T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-30T02:00:00.000Z">
+<meta property="article:author" content="Caius Lu">
+<meta property="article:tag" content="Radar">
+<meta property="article:tag" content="Camera">
+<meta property="article:tag" content="MOT">
+<meta property="article:tag" content="MTPMB">
+<meta property="article:tag" content="3D Tracking">
+<meta property="article:tag" content="ID Recovery">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://caiusy.github.io/images/avatar.jpg">
+  
+  
+  
+  <meta name="keywords" content="Radar,Camera,MOT,MTPMB,3D Tracking,ID Recovery">
+
+  <!-- feed -->
+  
+    
+
+    
+      
+        <link rel="alternate" href="/atom.xml" title="Caius Lu" type="application/atom+xml">
+      
+    
+      
+        <link rel="alternate" href="/rss2.xml" title="Caius Lu" type="application/rss+xml">
+      
+    
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.33.1">
+
+
+  
+
+  
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg"},"dateCreated":"2026-10-30T10:00:00+08:00","dateModified":"2026-10-30T10:00:00+08:00","datePublished":"2026-10-30T10:00:00+08:00","description":"\nTL;DR：纯视觉跟踪的难点通常不在“当前帧有没有框”，而在“目标消失几帧后回来，系统还能不能认出它”。这次我保留 ES-MEOT 论文中 MTPMB 的多假设生命周期，把雷达扩展目标似然换成相机端的目标级 3D 观测，并加入休眠轨迹池和低分检测恢复。779 帧固定留出集上，F1 从 93.645% 提升到 94.153%，误检减少 103，漏检减少 8，相邻帧 ID 切换保持 43 次。它是同序列标注验证，不是独立录像或官方 IDF1/HOTA 指标。\n","headline":"【雷视融合专题 03】从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID","mainEntityOfPage":{"@type":"WebPage","@id":"https://caiusy.github.io/2026/10/30/radar-camera-03-pure-vision-recovery/"},"publisher":{"@type":"Organization","name":"Caius Lu","sameAs":[],"image":"https://caiusy.github.io/images/avatar.jpg","logo":{"@type":"ImageObject","url":"https://caiusy.github.io/images/avatar.jpg"}},"url":"https://caiusy.github.io/2026/10/30/radar-camera-03-pure-vision-recovery/","keywords":"Radar, Camera, MOT, MTPMB, 3D Tracking, ID Recovery","thumbnailUrl":"/images/radar-camera/03/pure-vision-recovery-flow.svg","image":1}</script>
+  <link rel="stylesheet" href="/css/custom.css?v=20261027stats1">
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="canonical" href="https://caiusy.github.io/2026/10/30/radar-camera-03-pure-vision-recovery/"></head>
+<body><a class="skip-link" href="#main">跳到正文</a><div class="mobile-sitebar"><a href="/">Caius Lu<span>技术札记</span></a><div><button type="button" data-site-search aria-label="打开站内搜索">搜索</button><button type="button" data-site-nav aria-label="打开站点导航" aria-expanded="false">导航 ☰</button></div></div>
+
+<div class="l_body content" id="start" layout="post" type="experiment" ><aside class="l_left"><div class="sidebg"></div><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url();"></div><img no-lazy class="avatar" src="/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main">Caius Lu</div><div class="sub normal cap">CV · BEV Perception</div><div class="sub hover cap" style="opacity:0"> 路侧雷视融合 · 多模态 AI</div></a></div></header>
+
+<div class="nav-area">
+
+<nav class="menu dis-select"><a aria-label="首页" aria-current="page" class="nav-item active" title="首页" href="/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 3l9 7M5 9v12h14V9M9 21v-8h6v8"/></svg><span class="nav-label">首页</span></a><a aria-label="项目" class="nav-item" title="项目" href="/projects/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v14H4zM8 7V3h8v4M4 12h16M10 12v3h4v-3"/></svg><span class="nav-label">项目</span></a><a aria-label="BEV 感知" class="nav-item" title="BEV 感知" href="/roadside-bev/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v12H3zM8 7l2-3h4l2 3M16 13a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><span class="nav-label">BEV 感知</span></a><a aria-label="雷视融合" class="nav-item" title="雷视融合" href="/radar-camera-fusion/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9l6-6M21 12a9 9 0 1 1-9-9M17 12a5 5 0 1 1-5-5"/></svg><span class="nav-label">雷视融合</span></a><a aria-label="大模型" class="nav-item" title="大模型" href="/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5M3 12l9 5 9-5M3 16l9 5 9-5"/></svg><span class="nav-label">大模型</span></a><a aria-label="实验室" class="nav-item" title="实验室" href="/labs/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 8a3 3 0 0 0 3 4h8a3 3 0 0 0 3-4l-5-8V3M8 15h8"/></svg><span class="nav-label">实验室</span></a><a aria-label="学习笔记" class="nav-item" title="学习笔记" href="/notes/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4zM8 7h8M8 11h8M8 15h5"/></svg><span class="nav-label">学习笔记</span></a><a aria-label="复习索引" class="nav-item" title="复习索引" href="/review/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h12M9 12h12M9 19h12M2 5l2 2 3-4M2 12l2 2 3-4M2 19l2 2 3-4"/></svg><span class="nav-label">复习索引</span></a><a aria-label="关于我" class="nav-item" title="关于我" href="/about/" style="color:#245f9e"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span class="nav-label">关于我</span></a></nav>
+</div>
+<div class="widgets">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" aria-label="搜索文章、主题与笔记" autocomplete="off" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+
+<widget class="widget-wrapper recent post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/2026/10/30/radar-camera-03-pure-vision-recovery/"><span class="title">【雷视融合专题 03】从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID</span></a><a class="item title" href="/2026/10/27/radar-camera-02-point-vs-eot/"><span class="title">【雷视融合专题 02】一辆车为什么会有多个雷达点？从点目标跟踪到 EOT</span></a><a class="item title" href="/2026/10/27/radar-camera-01-datasets/"><span class="title">【雷视融合专题 01】路侧雷视公开数据集：从 RAD、点云到稳定 Radar Track</span></a><a class="item title" href="/2026/10/23/deepseek-dsa-lightning-indexer/"><span class="title">从一个 Token 理解 DeepSeek DSA：Lightning Indexer、Top-K 与 MLA 压缩缓存</span></a><a class="item title" href="/2026/02/22/linkedlist-pointer-complete-guide/"><span class="title">链表与指针完全图解：从内存本质到 LeetCode 实战</span></a><a class="item title" href="/2026/08/30/%E7%BB%93%E5%90%88-MiniMind-%E6%BA%90%E7%A0%81%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82-LoRA-%E4%B8%8E-MoE/"><span class="title">结合 MiniMind 源码彻底搞懂 LoRA 与 MoE</span></a><a class="item title" href="/2026/02/23/graph-theory-and-search/"><span class="title">图论与搜索：邻接表、BFS/DFS 与最短路的题型模板</span></a><a class="item title" href="/2026/02/03/bert-comprehensive-guide/"><span class="title">BERT 完整解析：从论文到 KV Cache</span></a><a class="item title" href="/2019/10/31/20191031-attention-mechanism-xmind/"><span class="title">attention_mechanism_xmind</span></a><a class="item title" href="/2019/12/27/20191227-SENet-code/"><span class="title">Attention机制中SEnet CBAM以及Dual pooling的pytorch实现</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com/caiusy" target="_blank" rel="external nofollow noopener noreferrer"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.1c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.96.1-.74.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 6.14c.97 0 1.95.13 2.86.38 2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.07.78 2.16v3.2c0 .3.21.66.79.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg></a></div></footer>
+</div></aside><div class="l_main" id="main" tabindex="-1">
+
+
+
+
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E9%9B%B7%E8%BE%BE%E7%9B%B8%E6%9C%BA%E8%9E%8D%E5%90%88/">雷达相机融合</a></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-10-30T02:00:00.000Z">2026-10-30</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-10-30T02:00:00.000Z">2026-10-30</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>【雷视融合专题 03】从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><div class="reader-tools" role="group" aria-label="阅读设置"><span id="reading-estimate">长文阅读</span><div><button type="button" id="reader-size" aria-label="切换正文字号" aria-pressed="false">大字</button><button type="button" id="reader-focus" aria-pressed="false">专注阅读</button><button type="button" id="reader-link">复制链接</button></div></div><div id="reading-progress" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div><article class="md-text content"><blockquote>
+<p><strong>TL;DR</strong>：纯视觉跟踪的难点通常不在“当前帧有没有框”，而在“目标消失几帧后回来，系统还能不能认出它”。这次我保留 ES-MEOT 论文中 MTPMB 的多假设生命周期，把雷达扩展目标似然换成相机端的目标级 3D 观测，并加入休眠轨迹池和低分检测恢复。779 帧固定留出集上，F1 从 93.645% 提升到 94.153%，误检减少 103，漏检减少 8，相邻帧 ID 切换保持 43 次。它是同序列标注验证，不是独立录像或官方 IDF1/HOTA 指标。</p>
+</blockquote>
+<span id="more"></span>
+
+<p>这是<a href="/radar-camera-fusion/">雷视融合专题</a>的第三篇。第一篇梳理了<a href="/2026/10/27/radar-camera-01-datasets/">路侧雷视公开数据</a>，第二篇解释了<a href="/2026/10/27/radar-camera-02-point-vs-eot/">一辆车为什么会变成多个雷达点</a>。这一篇换一个方向：如果暂时不把雷达测量放进跟踪器，只让相机图像输出 3D 目标，能不能把原论文的多目标跟踪骨架用起来？</p>
+<p>答案是可以借结构，但不能假装输入相同。ES-MEOT 原论文的方法名是 <strong>MTPMB</strong>，它面向雷达反射点、相机关键点和扩展目标似然；下面的实现是<strong>纯视觉点观测适配</strong>，不是原论文融合流程的完整复现。</p>
+<blockquote>
+<p><strong>术语说明</strong>：上游 ES-MEOT 仓库的命名并不完全统一：README 的目录项使用 <code>MTPMB Tracker</code>，后文又出现 <code>TPMBM Tracker</code>，代码文件则叫 <code>TPMB_RCfusion.py</code>，函数和参数使用 <code>TPMB_RCfusion_*</code> 与 <code>TPMB-RCfusion</code>。因此本文用 <strong>MTPMB</strong> 指论文方法，用 <strong>TPMB_RCfusion</strong> 指上游实现命名，用 <strong>Vision-TPMB</strong> 指本项目自己的纯视觉适配。三个名字指代层次不同，不能直接互换。</p>
+</blockquote>
+<h2 id="1-先看问题：为什么目标会“丢”"><a href="#1-先看问题：为什么目标会“丢”" class="headerlink" title="1. 先看问题：为什么目标会“丢”"></a>1. 先看问题：为什么目标会“丢”</h2><p>单帧检测器偶尔漏掉一辆车，或者远处车辆被遮挡几帧，本身很常见。真正麻烦的是后续：</p>
+<ul>
+<li>漏检后，预测状态继续外推，误差逐渐累积；</li>
+<li>目标回来时，位置门限已经对不上；</li>
+<li>原来的 Bernoulli 被裁剪或回收，公共 ID 消失；</li>
+<li>新检测被当成新目标，系统给了一个不同的 ID；</li>
+<li>拥挤场景里，两个相邻车辆还可能交换身份。</li>
+</ul>
+<p>这和“把检测框画得更准”不是同一个问题。它需要状态生命周期、关联和恢复策略一起工作。</p>
+<p><img src="/images/radar-camera/03/pure-vision-recovery-flow.svg" alt="MTPMB 风格纯视觉跟踪与休眠轨迹恢复的数据流"></p>
+<p>这张图里有一个容易被忽略的分支：低分检测不进入出生分支，只进入已有轨迹的恢复关联。这个约束很关键。否则，把检测阈值从 0.25 降到 0.10，虽然可能找回被遮挡车辆，也会制造大量幽灵轨迹。</p>
+<h2 id="2-原论文哪些东西值得保留"><a href="#2-原论文哪些东西值得保留" class="headerlink" title="2. 原论文哪些东西值得保留"></a>2. 原论文哪些东西值得保留</h2><p>ES-MEOT 的核心不是“某个网络输出一个框”，而是多目标随机有限集跟踪的几个环节：</p>
+<table>
+<thead>
+<tr>
+<th>论文/方法概念</th>
+<th>本项目的位置</th>
+<th>本次是否保留</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PPP 出生强度</td>
+<td><code>VisionTPMBTracker._birth</code></td>
+<td>保留</td>
+</tr>
+<tr>
+<td>Bernoulli 存在概率</td>
+<td><code>finish</code> 中的存在概率更新</td>
+<td>保留</td>
+</tr>
+<tr>
+<td>Murty top-K 全局关联</td>
+<td><code>k_best_assignments</code></td>
+<td>保留，K=5</td>
+</tr>
+<tr>
+<td>多假设矩匹配</td>
+<td><code>moment_match</code></td>
+<td>保留</td>
+</tr>
+<tr>
+<td>杂波、漏检和回收</td>
+<td><code>update</code> / <code>finish</code></td>
+<td>保留并增加休眠池</td>
+</tr>
+<tr>
+<td>雷达反射点扩展目标似然</td>
+<td>原论文 MTPMB</td>
+<td>纯视觉路径不适用</td>
+</tr>
+<tr>
+<td>相机关键点 / MDN 似然</td>
+<td>原论文 MTPMB</td>
+<td>不作为本路径的输入</td>
+</tr>
+</tbody></table>
+<p>纯视觉版本的状态仍然是一个 12 维高斯：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x_t = [p_x, p_y, p_z, v, omega, y_dot, delta_theta^T,</span><br><span class="line">       log l, log w, log h]^T</span><br></pre></td></tr></tbody></table></figure>
+
+<p>位置、速度和地平面 CTRV 负责运动；SO(3) 切空间负责完整朝向；三个对数尺寸负责车辆长宽高。相机图像经过 CenterNet 直接回归到米制 XYZ，随后交给 Vision-TPMB 适配器，而不是先用像素中心和深度反投影再拼一个伪 3D 框。</p>
+<h2 id="3-原来的关联为什么不够"><a href="#3-原来的关联为什么不够" class="headerlink" title="3. 原来的关联为什么不够"></a>3. 原来的关联为什么不够</h2><p>最开始的 Vision-TPMB 主要用 XYZ 的 Mahalanobis 距离做门限，姿态、尺寸和 2D 中心只是在 XYZ 门限内做一个有界重排。这个设计很保守，结果是：</p>
+<ul>
+<li>误检被压下去了；</li>
+<li>但漏检后的目标不容易重新接上；</li>
+<li>相邻车辆位置很近时，单靠 XYZ 不足以判断身份。</li>
+</ul>
+<p>我们也试过把姿态、尺寸和 UV 放进联合关联。消融结果很诚实：误检只从 787 降到 783，F1 几乎没有变化。原因是检测器的 XYZ 和 UV 头共享图像特征，单靠 UV 并不能提供真正独立的身份证据；在遮挡和边缘截断时，尺寸和姿态也会退化。</p>
+<p>所以最后的重点不是继续给 XYZ 加权重，而是补上<strong>轨迹生命周期</strong>。</p>
+<h2 id="4-三个改动：休眠、低分二次关联、自适应外推"><a href="#4-三个改动：休眠、低分二次关联、自适应外推" class="headerlink" title="4. 三个改动：休眠、低分二次关联、自适应外推"></a>4. 三个改动：休眠、低分二次关联、自适应外推</h2><h3 id="4-1-休眠轨迹池"><a href="#4-1-休眠轨迹池" class="headerlink" title="4.1 休眠轨迹池"></a>4.1 休眠轨迹池</h3><p>已确认的轨迹在连续漏检达到阈值后，不再直接进入回收质量，而是进入一个有寿命的休眠池：</p>
+<ul>
+<li>休眠期间不输出目标；</li>
+<li>但公共 ID 被保留；</li>
+<li>位置状态继续按 CTRV 预测；</li>
+<li>超过 1 秒仍没有恢复，就过期，ID 不复用。</li>
+</ul>
+<p>这相当于把“轨迹消失”和“身份永久结束”分开。目标只是暂时看不见，不等于它已经从世界里消失。</p>
+<h3 id="4-2-低分检测只做恢复，不做出生"><a href="#4-2-低分检测只做恢复，不做出生" class="headerlink" title="4.2 低分检测只做恢复，不做出生"></a>4.2 低分检测只做恢复，不做出生</h3><p>检测被分成两层：</p>
+<ul>
+<li><code>score &gt;= 0.25</code>：可以进入正常 Vision-TPMB 出生与关联；</li>
+<li><code>0.10 &lt;= score &lt; 0.25</code>：只能关联到已确认的活动轨迹或休眠轨迹；</li>
+<li>低于 <code>0.10</code>：忽略。</li>
+</ul>
+<p>低分检测没有私有出生列，也没有 PPP 质量。因此它即使匹配失败，也不会创建新 ID、消耗出生质量或污染全局假设。这个设计借鉴了 ByteTrack “把低分框留给未匹配轨迹”的思想，但在这里进一步约束为“只能恢复已有身份”。</p>
+<h3 id="4-3-漏帧后放大不确定性"><a href="#4-3-漏帧后放大不确定性" class="headerlink" title="4.3 漏帧后放大不确定性"></a>4.3 漏帧后放大不确定性</h3><p>轨迹漏检越多，位置预测越不可靠。实现中让过程噪声随漏检次数有界增长：</p>
+<figure class="highlight text"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s_miss = min(s_max, 1 + rho * n_miss)</span><br></pre></td></tr></tbody></table></figure>
+
+<p>它不会无限放大，也不会在每一帧额外叠加一个跳变协方差。目标重新出现时，观测仍然占主导，避免旧状态把新位置拖回去。</p>
+<h2 id="5-一个可手算的恢复例子"><a href="#5-一个可手算的恢复例子" class="headerlink" title="5. 一个可手算的恢复例子"></a>5. 一个可手算的恢复例子</h2><p>下面的数字是合成例子，只用来说明门限，不代表某辆车的真实标注。</p>
+<p>假设一辆车在 20 m 处，休眠轨迹预测到当前帧为 <code>(0.2, 0, 20.0)</code>。第 3 帧来了一个低分检测 <code>(0.8, 0, 20.4)</code>：</p>
+<ul>
+<li>中心距离约 <code>0.72 m</code>，小于 2 m；</li>
+<li>类别都是 <code>car</code>；</li>
+<li>朝向残差约 8°，小于 30°；</li>
+<li>尺寸对数残差通过门限；</li>
+<li>低分检测的 score 为 0.14，只给位置更新。</li>
+</ul>
+<p>如果同一位置还有另一辆同类车，两个候选的代价差小于 1 nat，系统会拒绝这次恢复。宁可暂时不接，也不把 A 车的 ID 强行贴到 B 车上。恢复需要连续两次通过严格门限，或者代价差达到立即恢复阈值。</p>
+<p>这个“拒绝歧义”的规则比单纯追求召回更重要。ID 跟踪里，错误的“找回来”往往比短暂的“没找回”更难排查。</p>
+<h2 id="6-实验结果"><a href="#6-实验结果" class="headerlink" title="6. 实验结果"></a>6. 实验结果</h2><p>固定 CenterNet 检测、固定 5 m XYZ 一对一匹配、固定 96 帧选择集和 779 帧留出集。参数只在选择集上选择，留出集只评估一次。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th align="right">Precision</th>
+<th align="right">Recall</th>
+<th align="right">F1</th>
+<th align="right">FP</th>
+<th align="right">FN</th>
+<th align="right">相邻帧 ID 切换</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Legacy CTRV</td>
+<td align="right">82.62%</td>
+<td align="right">96.93%</td>
+<td align="right">89.20%</td>
+<td align="right">2090</td>
+<td align="right">315</td>
+<td align="right">153</td>
+</tr>
+<tr>
+<td>Vision-TPMB K=5</td>
+<td align="right">92.51%</td>
+<td align="right">94.81%</td>
+<td align="right">93.645%</td>
+<td align="right">787</td>
+<td align="right">532</td>
+<td align="right">43</td>
+</tr>
+<tr>
+<td>confirm-2 K=5</td>
+<td align="right">93.19%</td>
+<td align="right">94.58%</td>
+<td align="right">93.879%</td>
+<td align="right">708</td>
+<td align="right">556</td>
+<td align="right">40</td>
+</tr>
+<tr>
+<td><strong>recovery K=5</strong></td>
+<td align="right"><strong>93.43%</strong></td>
+<td align="right"><strong>94.89%</strong></td>
+<td align="right"><strong>94.153%</strong></td>
+<td align="right"><strong>684</strong></td>
+<td align="right"><strong>524</strong></td>
+<td align="right"><strong>43</strong></td>
+</tr>
+</tbody></table>
+<p>和 Vision-TPMB K=5 基线相比，恢复版本多找回 8 个真目标，少产生 103 个误检，F1 提升 0.508 个百分点。相邻帧 ID 切换没有下降，但也没有增加。表中的 Vision-TPMB 是本文适配实现的名字，不是论文方法 MTPMB 的替代写法。</p>
+<p>另外记录了“轨迹间隙”诊断：在 779 帧中检测到 335 次轨迹间隙，其中 61 次恢复到同一个 ID，32 次恢复了不同 ID，242 次没有匹配上，93 次产生了新的匹配片段。这个指标比只看相邻帧切换更接近“丢帧后找回”的问题，但它仍然不是官方 IDF1/HOTA。</p>
+<p><img src="/images/radar-camera/03/replay-workbench.jpg" alt="新版纯视觉跟踪回放：相机、BEV、轨迹和目标 ID 同步显示"></p>
+<p>上图的重点是两种视图共用同一组 3D 状态：左侧相机框、右侧 BEV 轨迹和模板 ID 不是各自独立生成的。页面上仍把原论文结果、纯视觉结果、雷达点云和原始检测分层显示，避免把不同来源的结果混成一个“看起来很好”的合成画面。</p>
+<h2 id="7-这次没有解决的问题"><a href="#7-这次没有解决的问题" class="headerlink" title="7. 这次没有解决的问题"></a>7. 这次没有解决的问题</h2><p>这次最明显的提升来自生命周期和低分二次关联，不是外观重识别。当前没有可靠的车辆 Re-ID 特征，因此不能用“看起来像同一辆车”来直接恢复。轨迹间隙里仍有 242 次没有匹配上，说明以下问题还在：</p>
+<ul>
+<li>长时间遮挡后，CTRV 外推误差超过位置门限；</li>
+<li>远处目标只有几个像素，3D 尺寸和朝向不稳定；</li>
+<li>相邻车辆在同一车道排队时，几何约束仍可能歧义；</li>
+<li>休眠池的 1 秒寿命对高速驶离车辆可能太短；</li>
+<li>当前指标是同一录像序列上的时间留出，不是跨路口、跨天气的独立测试。</li>
+</ul>
+<p>所以“尽量一个都不丢”是一个目标，不是这次实验已经完成的结论。更稳妥的说法是：在不增加相邻帧 ID 切换的前提下，召回和误检同时得到小幅改善。</p>
+<h2 id="8-复现边界"><a href="#8-复现边界" class="headerlink" title="8. 复现边界"></a>8. 复现边界</h2><p>实验在远程 WSL 的 RTX 3090 Ti 上运行。原始视频、雷达文件、检测缓存和完整标注留在远程机器；仓库只保留代码、配置、精选截图和派生指标。</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PYTHONPATH=src python3 tools/infer_direct3d.py \</span><br><span class="line">  --checkpoint outputs/vision3d/centernet_xyz40/best.pt \</span><br><span class="line">  --video data/interim/official/output.avi \</span><br><span class="line">  --output outputs/vision3d/centernet_xyz40/predictions_recovery.jsonl \</span><br><span class="line">  --frames 4532 --score .25 --tracker tpmb \</span><br><span class="line">  --tracker-config configs/vision_tpmb_recovery.json \</span><br><span class="line">  --ground configs/esmeot_camera_ground.json</span><br></pre></td></tr></tbody></table></figure>
+
+<p>评测命令和完整配置见仓库的 <code>experiments/2026-10-30-vision-recovery/</code>。如果后续要做真正的“零丢失”验证，下一步应加入跨录像评测、IDF1/HOTA、不同距离分桶和真实遮挡标注，而不是继续在同一段视频上调门限。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li>Deng 等，<em>3D Multiple Extended Object Tracking by Fusing Roadside Radar and Camera Sensors</em>，<a target="_blank" rel="noopener" href="https://doi.org/10.1109/JSEN.2024.3493952">DOI</a>。</li>
+<li>Zhang 等，<em>ByteTrack: Multi-Object Tracking by Associating Every Detection Box</em>，<a target="_blank" rel="noopener" href="https://www.ecva.net/papers/eccv_2022/papers_ECCV/papers/136820001.pdf">ECCV 2022</a>。</li>
+<li>Cao 等，<em>Observation-Centric SORT: Rethinking SORT for Robust Multi-Object Tracking</em>，<a target="_blank" rel="noopener" href="https://openaccess.thecvf.com/content/CVPR2023/papers/Cao_Observation-Centric_SORT_Rethinking_SORT_for_Robust_Multi-Object_Tracking_CVPR_2023_paper.pdf">CVPR 2023</a>。</li>
+</ul>
+<p><strong>上一篇</strong>：<a href="/2026/10/27/radar-camera-02-point-vs-eot/">一辆车为什么会有多个雷达点？从点目标跟踪到 EOT</a></p>
+</article>
+<div class="article-footer">
+
+
+    <section id="share">
+      <div class="header"><span>分享文章</span></div>
+      <div class="body">
+        <div class="link"><input class="copy-area" readonly="true" id="copy-link" value="https://caiusy.github.io/2026/10/30/radar-camera-03-pure-vision-recovery/" /></div>
+        <div class="social-wrap dis-select"><a class="social share-item wechat" onclick="util.toggle(&quot;qrcode-wechat&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/b32ef3da1162a.svg" /></a><a class="social share-item link" onclick="util.copy(&quot;copy-link&quot;, &quot;复制成功&quot;)"><img  src="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/social/8411ed322ced6.svg" /></a></div>
+        
+        <div class="qrcode" id="qrcode-wechat" style="opacity:0;height:0">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=https://caiusy.github.io/2026/10/30/radar-camera-03-pure-vision-recovery/"/>
+        </div>
+        
+      </div>
+    </section>
+    </div>
+
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章</div><a href="/2026/10/27/radar-camera-02-point-vs-eot/">【雷视融合专题 02】一辆车为什么会有多个雷达点？从点目标跟踪到 EOT</a></div></section></div>
+
+
+
+
+  <div class="related-wrap md-text" id="comments">
+    <section class='header cmt-title cap theme'>
+      <p>💬 欢迎留言讨论</p>
+
+    </section>
+    <section class='body cmt-body giscus'>
+      
+
+<svg class="loading" style="vertical-align:middle;fill:currentColor;overflow:hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2709"><path d="M832 512c0-176-144-320-320-320V128c211.2 0 384 172.8 384 384h-64zM192 512c0 176 144 320 320 320v64C300.8 896 128 723.2 128 512h64z" p-id="2710"></path></svg>
+
+<div id="giscus" src="https://giscus.app/client.js" data-repo="caiusy/caiusy.github.io" data-repo-id="R_kgDOI0diCA" data-category="Announcements" data-category-id="DIC_kwDOI0diCM4C1G8d" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous"></div>
+
+    </section>
+  </div>
+
+
+
+<footer class="page-footer footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">博客</span><a href="/">最近文章</a><a href="/categories/">分类</a><a href="/tags/">标签</a><a href="/archives/">归档</a></div><div class="sitemap-group"><span class="fs15">专题</span><a href="/projects/">Projects</a><a href="/roadside-bev/">Roadside BEV</a><a href="/radar-camera-fusion/">Radar-Camera Fusion</a><a href="/llm-reading-map/">LLM Reading Map</a><a href="/engineering/">Engineering</a></div><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notes/">Learning Notes</a><a href="/review/">Review Index</a><a href="/about/">关于我</a><a target="_blank" rel="noopener" href="https://github.com/caiusy">GitHub</a></div></div><div class="text"><p>本站由 <strong>Caius Lu</strong> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a> 主题创建<br>© 2023-2026 · Computer Vision · BEV Perception · Multimodal AI</p>
+<p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv">加载中</span> 次</span> | <span id="busuanzi_container_site_uv">访客数 <span id="busuanzi_value_site_uv">加载中</span> 人</span></p>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="false"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%85%88%E7%9C%8B%E9%97%AE%E9%A2%98%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E7%9B%AE%E6%A0%87%E4%BC%9A%E2%80%9C%E4%B8%A2%E2%80%9D"><span class="toc-text">1. 先看问题：为什么目标会“丢”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%8E%9F%E8%AE%BA%E6%96%87%E5%93%AA%E4%BA%9B%E4%B8%9C%E8%A5%BF%E5%80%BC%E5%BE%97%E4%BF%9D%E7%95%99"><span class="toc-text">2. 原论文哪些东西值得保留</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%8E%9F%E6%9D%A5%E7%9A%84%E5%85%B3%E8%81%94%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E5%A4%9F"><span class="toc-text">3. 原来的关联为什么不够</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%B8%89%E4%B8%AA%E6%94%B9%E5%8A%A8%EF%BC%9A%E4%BC%91%E7%9C%A0%E3%80%81%E4%BD%8E%E5%88%86%E4%BA%8C%E6%AC%A1%E5%85%B3%E8%81%94%E3%80%81%E8%87%AA%E9%80%82%E5%BA%94%E5%A4%96%E6%8E%A8"><span class="toc-text">4. 三个改动：休眠、低分二次关联、自适应外推</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E4%BC%91%E7%9C%A0%E8%BD%A8%E8%BF%B9%E6%B1%A0"><span class="toc-text">4.1 休眠轨迹池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E4%BD%8E%E5%88%86%E6%A3%80%E6%B5%8B%E5%8F%AA%E5%81%9A%E6%81%A2%E5%A4%8D%EF%BC%8C%E4%B8%8D%E5%81%9A%E5%87%BA%E7%94%9F"><span class="toc-text">4.2 低分检测只做恢复，不做出生</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E6%BC%8F%E5%B8%A7%E5%90%8E%E6%94%BE%E5%A4%A7%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%80%A7"><span class="toc-text">4.3 漏帧后放大不确定性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E4%B8%80%E4%B8%AA%E5%8F%AF%E6%89%8B%E7%AE%97%E7%9A%84%E6%81%A2%E5%A4%8D%E4%BE%8B%E5%AD%90"><span class="toc-text">5. 一个可手算的恢复例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="toc-text">6. 实验结果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E8%BF%99%E6%AC%A1%E6%B2%A1%E6%9C%89%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">7. 这次没有解决的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E5%A4%8D%E7%8E%B0%E8%BE%B9%E7%95%8C"><span class="toc-text">8. 复现边界</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-text">参考资料</span></a></li></ol></div><div class="widget-footer"><a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/><path d="M7 3.338A9.95 9.95 0 0 1 12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12c0-1.821.487-3.53 1.338-5"/></g></svg><span>回到顶部</span></a><a class="buttom" onclick="util.scrollComment()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M8 10.5h8M8 14h5.5M17 3.338A9.95 9.95 0 0 0 12 2C6.477 2 2 6.477 2 12c0 1.6.376 3.112 1.043 4.453c.178.356.237.763.134 1.148l-.595 2.226a1.3 1.3 0 0 0 1.591 1.592l2.226-.596a1.63 1.63 0 0 1 1.149.133A9.96 9.96 0 0 0 12 22c5.523 0 10-4.477 10-10c0-1.821-.487-3.53-1.338-5"/></svg><span>参与讨论</span></a></div></widget>
+</div></aside><div class='float-panel'>
+  <button type='button' style='display:none' aria-label='打开文章目录' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' aria-label='打开站点导航' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+
+
+<script type="text/javascript">
+  window.canonical = {"closeEnable":true,"closeText":"关闭提示","originalHost":null,"officialHosts":["localhost"],"encoded":""};
+  window.canonical["param"] = {"permalink":"https://caiusy.github.io/2026/10/30/radar-camera-03-pure-vision-recovery/","checklink":"/js/plugins/video.js"};
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+    tag_plugins: {
+      chat: Object.assign({"api":"https://siteinfo.listentothewind.cn/api/v1"}),
+    }
+  };
+
+  // required plugins (only load if needs)
+  if (`native_search`) {
+    ctx.search = {};
+    ctx.search.service = `native_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"skip_search":null}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+    loading: `https://api.iconify.design/eos-icons:three-dots-loading.svg?color=%231cd0fd`,
+  };
+  const deps = {
+    jquery: `/vendor/jquery-3.7.1.min.js`,
+    marked: `https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js`,
+    lazyload: `/%5Bobject%20Object%5D`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  
+  function RunItem() {
+    this.list = []; // 存放回调函数
+    this.start = () => {
+      for (var i = 0; i < this.list.length; i++) {
+        this.list[i].run();
+      }
+    };
+    this.push = (fn, name, setRequestAnimationFrame = true) => {
+      let myfn = fn
+      if (setRequestAnimationFrame) {
+        myfn = () => {
+          utils.requestAnimationFrame(fn)
+        }
+      }
+      var f = new Item(myfn, name);
+      this.list.push(f);
+    };
+    this.remove = (name) => {
+      for (let index = 0; index < this.list.length; index++) {
+        const e = this.list[index];
+        if (e.name == name) {
+          this.list.splice(index, 1);
+        }
+      }
+    }
+    // 构造一个可以run的对象
+    function Item(fn, name) {
+      // 函数名称
+      this.name = name || fn.name;
+      // run方法
+      this.run = () => {
+        try {
+          fn()
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    }
+  }
+
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')) {
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function () {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+
+    onLoading: (el) => {
+      if (el) {
+        if ($(el).find('.loading-wrap').length == 0){
+          $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+        }
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      const maxRetry = 3;
+      let retryCount = 0;
+
+      return new Promise((resolve, reject) => {
+        const load = () => {
+          utils.onLoading?.(el);
+
+          let timedOut = false;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            console.warn('[request] 超时:', url);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject('请求超时');
+            } else {
+              setTimeout(load, 1000);
+            }
+          }, 5000);
+
+          fetch(url).then(resp => {
+            if (timedOut) return;
+            clearTimeout(timeout);
+
+            if (!resp.ok) throw new Error('响应失败');
+            return resp;
+          }).then(data => {
+            if (timedOut) return;
+            utils.onLoadSuccess?.(el);
+            callback(data);
+            resolve(data);
+          }).catch(err => {
+            clearTimeout(timeout);
+            console.warn('[request] 错误:', err);
+
+            if (++retryCount >= maxRetry) {
+              utils.onLoadFailure?.(el);
+              onFailure?.();
+              reject(err);
+            } else {
+              setTimeout(load, 1000);
+            }
+          });
+        };
+
+        load();
+      });
+    },
+    requestWithoutLoading: (url, options = {}, maxRetry = 2, timeout = 5000) => {
+      return new Promise((resolve, reject) => {
+        let retryCount = 0;
+
+        const tryRequest = () => {
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            if (++retryCount > maxRetry) reject('timeout');
+            else tryRequest();
+          }, timeout);
+
+          fetch(url, options)
+            .then(resp => {
+              clearTimeout(timer);
+              if (!resp.ok) throw new Error('bad response');
+              resolve(resp);
+            })
+            .catch(err => {
+              clearTimeout(timer);
+              if (++retryCount > maxRetry) reject(err);
+              else setTimeout(tryRequest, 500);
+            });
+        };
+
+        tryRequest();
+      });
+    },
+    /********************** requestAnimationFrame ********************************/
+    // 1、requestAnimationFrame 会把每一帧中的所有 DOM 操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    // 2、在隐藏或不可见的元素中，requestAnimationFrame 将不会进行重绘或回流，这当然就意味着更少的的 cpu，gpu 和内存使用量。
+    requestAnimationFrame: (fn) => {
+      if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+      }
+      window.requestAnimationFrame(fn)
+    },
+    dark: {},
+  };
+
+  // utils.dark.mode 当前模式 dark or light
+  // utils.dark.toggle() 暗黑模式触发器
+  // utils.dark.push(callBack[,"callBackName"]) 传入触发器回调函数
+  utils.dark.method = {
+    toggle: new RunItem(),
+  };
+  utils.dark = Object.assign(utils.dark, {
+    push: utils.dark.method.toggle.push,
+  });
+</script>
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+<script async src="/vendor/lazyload-19.1.3.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+    callback_loaded: (el) => {
+      el.classList.add('loaded');
+      const wrapper = el.closest('.lazy-box');
+      const icon = wrapper?.querySelector('.lazy-icon');
+      if (icon) icon.remove();
+    }
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+
+  window.wrapLazyloadImages = (container) => {
+    if (typeof container === 'string') {
+      container = document.querySelector(container);
+    }
+    if (!container) return;
+    
+    const images = container.querySelectorAll('img');
+    images.forEach((img) => {
+      if (img.classList.contains('lazy')) return;
+
+      const src = img.getAttribute('src');
+      if (!src) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'lazy-box';
+
+      const newImg = img.cloneNode();
+      newImg.removeAttribute('src');
+      newImg.setAttribute('data-src', src);
+      newImg.classList.add('lazy');
+
+      const icon = document.createElement('div');
+      icon.className = 'lazy-icon';
+      if (def.loading) {
+        icon.style.backgroundImage = `url("${def.loading}")`;
+      }
+
+      wrapper.appendChild(newImg);
+      wrapper.appendChild(icon);
+
+      img.replaceWith(wrapper);
+    });
+
+    // 通知 LazyLoad 更新
+    if (window.lazyLoadInstance?.update) {
+      window.lazyLoadInstance.update();
+    }
+  }
+  
+</script>
+
+<!-- required -->
+<script src="/js/main.js?v=1.33.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    // applyThemeToGiscus(theme)
+  }
+
+  // FIXME: 这会导致无法使用 preferred_color_scheme 以外的主题
+  const applyThemeToGiscus = (theme) => {
+    // theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'auto'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+    utils.dark.mode = newTheme === 'auto' ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : newTheme;
+    utils.dark.method.toggle.start();
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    } else {
+      utils.dark.mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    utils.dark.method.toggle.start();
+  })()
+</script>
+
+
+<!-- optional -->
+
+  <script type="module">
+  const el = document.querySelector('#comments #giscus');
+  util.viewportLazyload(el, load_discus, true);
+
+  function load_discus() {
+    if (!el) return;
+    try {
+        el.innerHTML = '';
+      } catch (error) {
+        console.error(error);
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      for (const key of Object.keys(el.attributes)) {
+        const attr = el.attributes[key];
+        if (['class', 'id'].includes(attr.name) === false) {
+          script.setAttribute(attr.name, attr.value);
+        }
+      }
+      el.appendChild(script);
+  }
+</script>
+
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"rating":{"js":"/js/services/rating.js","api":"https://star-vote.xaox.cc/api/rating"},"vote":{"js":"/js/services/vote.js","api":"https://star-vote.xaox.cc/api/vote"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"friends_and_posts":{"js":"/js/services/friends_and_posts.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"voice":{"js":"/js/plugins/voice.js"},"video":{"js":"/js/plugins/video.js"},"download-file":{"js":"/js/plugins/download-file.js"},"twikoo":{"js":"/js/services/twikoo_latest_comment.js"},"waline":{"js":"/js/services/waline_latest_comment.js"},"artalk":{"js":"/js/services/artalk_latest_comment.js"},"giscus":{"js":"/js/services/giscus_latest_comment.js"},"contributors":{"edit_this_page":{"_posts/":null,"wiki/stellar/":"https://github.com/xaoxuu/hexo-theme-stellar-docs/blob/main/"},"js":"/js/services/contributors.js"},"rss":{"js":"/js/services/rss.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else if (id == 'voice') {
+        ctx.voiceAudios = document.querySelectorAll('.voice>audio');
+        if (ctx.voiceAudios?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            createVoiceDom(ctx.voiceAudios);
+          });
+        }
+      } else if (id == 'video') {
+        ctx.videos = document.querySelectorAll('.video>video');
+        if (ctx.videos?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            videoEvents(ctx.videos);
+          });
+        }
+      } else if (id == 'download-file') {
+        ctx.files = document.querySelectorAll('.chat-file');
+        if (ctx.files?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            downloadFileEvent(ctx.files);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+
+    // chat iphone time
+    let phoneTimes = document.querySelectorAll('.chat .status-bar .time');
+
+    if (phoneTimes.length > 0) {
+      NowTime();
+      var date = new Date();
+      var sec = date.getSeconds();
+      var firstAdjustInterval = setInterval(firstAdjustTime, 1000 * (60 - sec));
+    }
+
+    function firstAdjustTime() {
+      NowTime();
+      clearInterval(firstAdjustInterval);
+      setInterval(NowTime, 1000 * 60);
+    }
+
+    function NowTime() {
+      for (let i = 0; i < phoneTimes.length; ++i) {
+        var timeSpan = phoneTimes[i];
+        var date = new Date();
+        var hour = date.getHours();
+        var min = date.getMinutes();
+        timeSpan.innerHTML = check(hour) + ":" + check(min);
+      }
+    };
+
+    function check(val) {
+      if (val < 10) {
+        return ("0" + val);
+      }
+      return (val);
+    }
+
+    // chat quote
+    const chat_quote_obverser = new IntersectionObserver((entries, observer) => {
+      entries.filter((entry) => { return entry.isIntersecting }).sort((a, b) => a.intersectionRect.y !== b.intersectionRect.y ? a.intersectionRect.y - b.intersectionRect.y : a.intersectionRect.x - b.intersectionRect.x).forEach((entry, index) => {
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('quote-blink');
+            setTimeout(() => {
+              entry.target.classList.remove('quote-blink');
+            }, 1000);
+          }, Math.max(100, 16) * (index + 1));
+        });
+    });
+
+    var chatQuotes = document.querySelectorAll(".chat .talk .quote");
+    chatQuotes.forEach((quote) => {
+      quote.addEventListener('click', function () {
+        var chatCellDom = document.getElementById("quote-" + quote.getAttribute("quotedCellTag"));
+        if (chatCellDom) {
+          var chatDiv = chatCellDom.parentElement;
+          var mid = chatDiv.clientHeight / 2;
+          var offsetTop = chatCellDom.offsetTop;
+          if (offsetTop > mid - chatCellDom.clientHeight / 2) {
+            chatDiv.scrollTo({
+              top: chatCellDom.offsetTop - mid + chatCellDom.clientHeight / 2,
+              behavior: "smooth"
+            });
+          } else {
+            chatDiv.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          }
+          chat_quote_obverser.observe(chatCellDom);
+        }
+      });
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    window.codeElements = document.querySelectorAll('.code');
+    if (window.codeElements.length > 0) {
+      ctx.copycode = {
+        default_text: `Copy`,
+        success_text: `Copied`,
+        toast: `复制成功`,
+      };
+      utils.js('/js/plugins/copycode.js');
+    }
+  });
+</script>
+
+
+<!-- inject -->
+<script defer src="/js/companion.js?v=7"></script><script defer src="/js/site-experience.js?v=20261027stats1"></script><script defer src="/js/visitor-counter.js?v=20261027stats1"></script>
+</div></body></html>

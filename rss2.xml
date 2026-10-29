@@ -8,9 +8,23 @@
     </description>
     <language>zh-CN</language>
     <copyright>All rights reserved 2026, Caius Lu</copyright>
-    <lastBuildDate>Tue, 27 Oct 2026 01:10:00 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 30 Oct 2026 02:00:00 GMT</lastBuildDate>
     <generator>Hexo</generator>
     <atom:link href="https://caiusy.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>【雷视融合专题 03】从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID</title>
+      <link>https://caiusy.github.io/2026/10/30/radar-camera-03-pure-vision-recovery/</link>
+      <description>把 ES-MEOT 的 MTPMB 多目标跟踪思想落到纯视觉直接 XYZ 检测上：用休眠轨迹池、低分检测二次关联和自适应协方差，减少目标丢失与 ID 切换。</description>
+      <author>Caius Lu</author>
+      <category domain="https://caiusy.github.io/categories/%E9%9B%B7%E8%BE%BE%E7%9B%B8%E6%9C%BA%E8%9E%8D%E5%90%88/">雷达相机融合</category>
+      <category domain="https://caiusy.github.io/tags/Radar/">Radar</category>
+      <category domain="https://caiusy.github.io/tags/Camera/">Camera</category>
+      <category domain="https://caiusy.github.io/tags/MOT/">MOT</category>
+      <category domain="https://caiusy.github.io/tags/MTPMB/">MTPMB</category>
+      <category domain="https://caiusy.github.io/tags/3D-Tracking/">3D Tracking</category>
+      <category domain="https://caiusy.github.io/tags/ID-Recovery/">ID Recovery</category>
+      <pubDate>Fri, 30 Oct 2026 02:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>【雷视融合专题 02】一辆车为什么会有多个雷达点？从点目标跟踪到 EOT</title>
       <link>https://caiusy.github.io/2026/10/27/radar-camera-02-point-vs-eot/</link>
@@ -189,10 +203,10 @@
       <category domain="https://caiusy.github.io/tags/MiniMind/">MiniMind</category>
       <category domain="https://caiusy.github.io/tags/LifeOS-Agent/">LifeOS-Agent</category>
       <category domain="https://caiusy.github.io/tags/GRPO/">GRPO</category>
-      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <category domain="https://caiusy.github.io/tags/SFT/">SFT</category>
       <category domain="https://caiusy.github.io/tags/DPO/">DPO</category>
       <category domain="https://caiusy.github.io/tags/PPO/">PPO</category>
+      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
       <pubDate>Thu, 23 Jul 2026 12:30:00 GMT</pubDate>
     </item>
     <item>
@@ -424,8 +438,8 @@
 </blockquote>]]>
       </description>
       <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
       <category domain="https://caiusy.github.io/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
+      <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</category>
       <category domain="https://caiusy.github.io/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A6%82%E5%BF%B5%E7%AC%94%E8%AE%B0/">概念笔记</category>
       <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
       <category domain="https://caiusy.github.io/tags/Python/">Python</category>
@@ -475,22 +489,6 @@
       <category domain="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
       <category domain="https://caiusy.github.io/tags/AI/">AI</category>
       <pubDate>Tue, 03 Feb 2026 07:30:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>彻底理解 Transformer：Attention Is All You Need</title>
-      <link>https://caiusy.github.io/2026/02/02/Transformer-DeepDive/</link>
-      <description>
-        <![CDATA[<h1 id="彻底理解-Transformer-Attention-Is-All-You-Need"><a href="#彻底理解-Transformer-Attention-Is-All-You-Need" class="headerlink" title="彻底理解]]>
-      </description>
-      <author>Caius Lu</author>
-      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/">AI与大模型</category>
-      <category domain="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
-      <category domain="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</category>
-      <category domain="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</category>
-      <category domain="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/">多模态</category>
-      <category domain="https://caiusy.github.io/tags/Transformer/">Transformer</category>
-      <category domain="https://caiusy.github.io/tags/DeepLearning/">DeepLearning</category>
-      <pubDate>Mon, 02 Feb 2026 06:00:00 GMT</pubDate>
     </item>
   </channel>
 </rss>

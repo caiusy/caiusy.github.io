@@ -16,7 +16,7 @@ description: 雷达-相机融合专题 — 从数据层级、EOT 到标定、关
 1. [路侧雷视公开数据集：从 RAD、点云到稳定 Radar Track](/2026/10/27/radar-camera-01-datasets/)
 2. [一辆车为什么会有多个雷达点？从点目标跟踪到 EOT](/2026/10/27/radar-camera-02-point-vs-eot/)
 3. [从 ES-MEOT 的 MTPMB 到纯视觉 3D 跟踪：目标丢帧后如何找回原 ID](/2026/10/30/radar-camera-03-pure-vision-recovery/)
-4. [纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验](/2026/10/30/radar-camera-04-tracklet-stitching/)
+4. [纯视觉 ID 碎片怎么压到 5%：从轨迹拼接调研到几何约束实验](/2026/10/30/radar-camera-04-tracklet-stitching/)
 
 后续的 ES-MEOT、ES-EOT、在线标定与 Common Feature 论文精读正在进行原文校核；未完成的工程实验不会提前写成结果。
 

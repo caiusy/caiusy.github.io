@@ -1,5 +1,5 @@
 ---
-title: "【雷视融合专题 04】纯视觉 ID 碎片怎么压到 10%：从轨迹拼接调研到几何约束实验"
+title: "【雷视融合专题 04】纯视觉 ID 碎片怎么压到 5%：从轨迹拼接调研到几何约束实验"
 date: 2026-10-30 18:00:00
 updated: 2026-10-30 18:00:00
 categories: [雷达相机融合]
@@ -7,7 +7,7 @@ tags: [Radar, Camera, MOT, MTPMB, Tracklet Stitching, IDF1, HOTA]
 type: experiment
 difficulty: advanced
 review_status: published
-description: "调研长期多目标跟踪的轨迹连接方法，并在纯视觉 Vision-TPMB 回放中用几何 tracklet stitching 把多出的 ID 压到 GT 的 9.36%。"
+description: "调研长期多目标跟踪的轨迹连接方法，并在纯视觉 Vision-TPMB 回放中用几何 tracklet stitching 把多出的 ID 压到 GT 的 4.87%。"
 cover: /images/radar-camera/04/method-survey.svg
 ---
 
@@ -15,7 +15,7 @@ cover: /images/radar-camera/04/method-survey.svg
 
 <!-- more -->
 
-这是[雷视融合专题](/radar-camera-fusion/)的第四篇。前一篇已经把 ES-MEOT 论文的 MTPMB 和本项目 Vision-TPMB 适配区分清楚，并加入了休眠 Bernoulli 池和低分检测恢复。这次面对一个更具体的验收条件：**多出来的纯视觉 ID 不能超过 GT 的 10%**。
+这是[雷视融合专题](/radar-camera-fusion/)的第四篇。前一篇已经把 ES-MEOT 论文的 MTPMB 和本项目 Vision-TPMB 适配区分清楚，并加入了休眠 Bernoulli 池和低分检测恢复。这次面对一个更具体的验收条件：**多出来的纯视觉 ID 不能超过 GT 的 5%**。
 
 ![方法调研与结果对比：在线恢复、保守几何拼接和数量约束几何拼接](/images/radar-camera/04/method-survey.svg)
 

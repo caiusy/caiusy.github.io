@@ -12,7 +12,25 @@
     <![CDATA[Computer Vision & BEV Perception Engineer | 路侧雷视融合 · 多模态 AI]]>
   </subtitle>
   <title>Caius Lu</title>
-  <updated>2026-10-30T10:00:00.000Z</updated>
+  <updated>2026-11-01T12:00:00.000Z</updated>
+  <entry>
+    <author>
+      <name>Caius Lu</name>
+    </author>
+    <category term="雷达相机融合" scheme="https://caiusy.github.io/categories/%E9%9B%B7%E8%BE%BE%E7%9B%B8%E6%9C%BA%E8%9E%8D%E5%90%88/"/>
+    <category term="Radar" scheme="https://caiusy.github.io/tags/Radar/"/>
+    <category term="Camera" scheme="https://caiusy.github.io/tags/Camera/"/>
+    <category term="MOT" scheme="https://caiusy.github.io/tags/MOT/"/>
+    <category term="ES-MEOT" scheme="https://caiusy.github.io/tags/ES-MEOT/"/>
+    <category term="数据分析" scheme="https://caiusy.github.io/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/"/>
+    <category term="传感器融合" scheme="https://caiusy.github.io/tags/%E4%BC%A0%E6%84%9F%E5%99%A8%E8%9E%8D%E5%90%88/"/>
+    <id>https://caiusy.github.io/2026/11/01/radar-camera-05-reliability/</id>
+    <link href="https://caiusy.github.io/2026/11/01/radar-camera-05-reliability/"/>
+    <published>2026-11-01T12:00:00.000Z</published>
+    <summary>只有雷达跟踪目标、没有置信度，怎样分析位置、速度、关联和强度的可用性？用十二张图讲清数据诊断、夜间策略及可复核的对照实验。</summary>
+    <title>【雷视融合专题 05】雷达不准怎么用：从数据体检到分维度融合</title>
+    <updated>2026-11-01T12:00:00.000Z</updated>
+  </entry>
   <entry>
     <author>
       <name>Caius Lu</name>
@@ -591,25 +609,5 @@
     <summary>一篇面向面试的深度长文。使用费曼技巧通俗解释 RLHF，结合详细的数学推导（SFT Loss, Bradley-Terry Model, PPO Clip, GAE），并深入分析每一阶段的输入输出流。</summary>
     <title>InstructGPT 与 RLHF 深度解析：费曼视角下的原理与实现</title>
     <updated>2026-02-06T19:00:00.000Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Caius Lu</name>
-    </author>
-    <category term="AI与大模型" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/categories/AI%E4%B8%8E%E5%A4%A7%E6%A8%A1%E5%9E%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
-    <category term="深度学习" scheme="https://caiusy.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
-    <category term="大模型" scheme="https://caiusy.github.io/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/"/>
-    <category term="多模态" scheme="https://caiusy.github.io/tags/%E5%A4%9A%E6%A8%A1%E6%80%81/"/>
-    <category term="Deep Learning" scheme="https://caiusy.github.io/tags/Deep-Learning/"/>
-    <category term="Fine-tuning" scheme="https://caiusy.github.io/tags/Fine-tuning/"/>
-    <id>https://caiusy.github.io/2026/02/05/2026-02-05-gpt-series-deep-dive/</id>
-    <link href="https://caiusy.github.io/2026/02/05/2026-02-05-gpt-series-deep-dive/"/>
-    <published>2026-02-05T08:30:00.000Z</published>
-    <summary>
-      <![CDATA[<p><strong>摘要</strong>：本文深度解析 OpenAI 的 GPT 系列模型演进之路。从 GPT-1 的预训练+微调范式，到 GPT-2 的零样本尝试，再到 GPT-3 的上下文学习（In-context Learning）与规模法则（Scaling Laws）。文章详细拆解了模型架构、Tensor 维度变化、训练数据流，并配有 13 张可视化图表与通俗易懂的费曼式讲解。</p>]]>
-    </summary>
-    <title>GPT 系列深度解析：从 GPT-1 到 GPT-3</title>
-    <updated>2026-10-23T17:22:59.999Z</updated>
   </entry>
 </feed>
